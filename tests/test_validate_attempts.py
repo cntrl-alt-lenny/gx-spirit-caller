@@ -72,6 +72,19 @@ def test_module_and_text_size_ground_truth_are_checked() -> None:
     assert wrong_size.text_size_mismatches
 
 
+def test_attempts_accepts_blank_or_integer_and_rejects_other_values() -> None:
+    assert not _audit(_row(attempts="")).schema_errors
+    assert not _audit(_row(attempts="3")).schema_errors
+    assert _audit(_row(attempts="not-a-number")).schema_errors
+    assert _audit(_row(attempts="-1")).schema_errors
+
+
+def test_legacy_row_without_attempts_is_treated_as_blank() -> None:
+    row = _row()
+    row.pop("attempts", None)
+    assert not _audit(row).schema_errors
+
+
 def test_shape_migration_and_conflict_are_distinguished() -> None:
     move = _audit(_row(shape="P-20-example", park_class=""))
     assert len(move.shape_migrations) == 1

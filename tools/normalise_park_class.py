@@ -19,9 +19,10 @@ MAP_PATH = ROOT / "tools" / "park_class_map.tsv"
 LEDGER_PATH = ROOT / "docs" / "research" / "campaign-analytics" / "attempts.tsv"
 LEDGER_FIELDS = (
     "addr", "module", "text_size", "tier", "shape", "result",
-    "match_pct", "park_class", "park_family", "brief",
+    "match_pct", "park_class", "park_family", "brief", "attempts",
 )
 LEGACY_LEDGER_FIELDS = tuple(field for field in LEDGER_FIELDS if field != "park_family")
+OLD_LEDGER_FIELDS = tuple(field for field in LEGACY_LEDGER_FIELDS if field != "attempts")
 ANCHOR_RE = re.compile(r"(?P<family>(?:c|p|oq)-\d+)", re.IGNORECASE)
 
 
@@ -89,7 +90,7 @@ def write_ledger(
     with path.open(encoding="utf-8", newline="") as handle:
         reader = csv.DictReader(handle, delimiter="\t")
         fields = tuple(reader.fieldnames or ())
-        if fields not in {LEDGER_FIELDS, LEGACY_LEDGER_FIELDS}:
+        if fields not in {LEDGER_FIELDS, LEGACY_LEDGER_FIELDS, OLD_LEDGER_FIELDS}:
             raise ValueError(
                 f"Unexpected attempts ledger header in {path}: {fields!r}"
             )

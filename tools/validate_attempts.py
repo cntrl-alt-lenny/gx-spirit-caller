@@ -35,7 +35,7 @@ ROOT = Path(__file__).resolve().parent.parent
 LEDGER = ROOT / "docs/research/campaign-analytics/attempts.tsv"
 FIELDS = (
     "addr", "module", "text_size", "tier", "shape", "result",
-    "match_pct", "park_class", "park_family", "brief",
+    "match_pct", "park_class", "park_family", "brief", "attempts",
 )
 _C_LEVER_RE = re.compile(r"\bC-\d+[a-z]?\b", re.IGNORECASE)
 _NON_SHAPE_RE = re.compile(
@@ -129,6 +129,16 @@ def audit_rows(
     """Audit parsed rows against supplied mechanical ground truth."""
     report = Audit(row_count=len(rows))
     for row in rows:
+        attempts = row.get("attempts")
+        attempts_text = "" if attempts is None else attempts.strip()
+        if attempts_text:
+            try:
+                if int(attempts_text) < 0:
+                    raise ValueError
+            except ValueError:
+                report.schema_errors.append(
+                    f"attempts must be a non-negative integer or blank: {attempts_text!r}"
+                )
         result = (row.get("result") or "").strip().lower()
         percentage = _pct(row)
         if result == "not-attempted" and percentage is not None:

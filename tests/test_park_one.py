@@ -48,7 +48,7 @@ class ParkOneLedgerTests(TestCase):
                 encoding="utf-8",
             )
             ledger.write_text(
-                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\n",
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\tattempts\n",
                 encoding="utf-8",
             )
 
@@ -64,6 +64,7 @@ class ParkOneLedgerTests(TestCase):
                     match_pct="75.0",
                     park_class="reg-alloc",
                     brief="brief-test",
+                    attempts=3,
                 )
 
             self.assertEqual(result, 0)
@@ -73,7 +74,7 @@ class ParkOneLedgerTests(TestCase):
             rows = ledger.read_text(encoding="utf-8").splitlines()
             self.assertEqual(
                 rows[-1],
-                "0x02000010\tmain\t24\tdefault\tguard-chain\tparked\t75.0\treg-alloc\tPROVISIONAL:register-allocation\tbrief-test",
+                "0x02000010\tmain\t24\tdefault\tguard-chain\tparked\t75.0\treg-alloc\tPROVISIONAL:register-allocation\tbrief-test\t3",
             )
 
     def test_overlay_park_round_trips_through_selector_module_key(self) -> None:
@@ -101,7 +102,7 @@ class ParkOneLedgerTests(TestCase):
                 encoding="utf-8",
             )
             ledger.write_text(
-                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\n",
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\tattempts\n",
                 encoding="utf-8",
             )
 
@@ -130,7 +131,7 @@ class ParkOneLedgerTests(TestCase):
             ledger = root / "docs/research/campaign-analytics/attempts.tsv"
             ledger.parent.mkdir(parents=True)
             ledger.write_text(
-                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\n",
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\tattempts\n",
                 encoding="utf-8",
             )
             with patch.object(park_one, "ROOT", root):
@@ -197,7 +198,7 @@ class ParkOneLedgerTests(TestCase):
                 encoding="utf-8",
             )
             ledger.write_text(
-                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\n",
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\tattempts\n",
                 encoding="utf-8",
             )
             before = (c_path.read_bytes(), s_path.read_bytes(), delinks.read_bytes())
@@ -247,7 +248,7 @@ class ParkOneLedgerTests(TestCase):
             ledger = root / "docs/research/campaign-analytics/attempts.tsv"
             ledger.parent.mkdir(parents=True)
             ledger.write_text(
-                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\n"
+                "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\tattempts\n"
                 "0x02100010\tov002\t24\tdefault\tunknown\tnot-attempted\tunknown\tunknown\tbrief-a\n",
                 encoding="utf-8",
             )

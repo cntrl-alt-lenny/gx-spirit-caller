@@ -59,6 +59,7 @@ def record_shipped(
     shape: str = "unknown",
     match_pct: str = "100",
     brief: str = "unknown",
+    attempts: int | str = "",
 ) -> int:
     delinks_path = _is_already_applied(c_rel, region)
     if delinks_path is None:
@@ -90,6 +91,7 @@ def record_shipped(
         park_class="n/a",
         brief=brief,
         result="shipped",
+        attempts=attempts,
     )
     return 0
 
@@ -102,6 +104,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--shape", default="unknown")
     parser.add_argument("--match-pct", default="100")
     parser.add_argument("--brief", default="unknown")
+    parser.add_argument("--attempts", default="")
     args = parser.parse_args(argv)
 
     c_path = Path(args.c_path)
@@ -109,7 +112,7 @@ def main(argv: list[str] | None = None) -> int:
 
     return record_shipped(
         c_rel, args.region, tier=args.tier, shape=args.shape,
-        match_pct=args.match_pct, brief=args.brief,
+        match_pct=args.match_pct, brief=args.brief, attempts=args.attempts,
     )
 
 

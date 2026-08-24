@@ -779,7 +779,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-worktree-gc`; commit; then take the
 next queue item immediately.
 
-### q-ledger-effort-column — the ledger cannot measure the thing that broke last round's headline [TODO]
+### q-ledger-effort-column — the ledger cannot measure the thing that broke last round's headline [DONE]
 
 `cm-main-exploit-drain-2` (#1536) reported **0/40** on the 193-256 B band, then
 disclosed in prose that Part 2 candidates got roughly **one** fastmatch attempt
