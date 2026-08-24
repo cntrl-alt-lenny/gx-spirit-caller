@@ -867,7 +867,7 @@ full 57-row classification pasted with counts per bucket. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-tentative-wall-audit — nine walls are stuck at "tentative" and the evidence to settle some may already exist [TODO]
+### q-tentative-wall-audit — nine walls are stuck at "tentative" and the evidence to settle some may already exist [DONE]
 
 `codegen-walls.md` currently carries **nine** LIVE-tentative walls: P-23, P-24,
 P-28, P-29, P-30, P-33, P-34, P-35, P-37. The catalog's own convention promotes

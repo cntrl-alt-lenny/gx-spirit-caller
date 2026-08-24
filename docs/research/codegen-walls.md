@@ -8336,14 +8336,14 @@ rather than iterating.
 | P-30 | LIVE (tentative) | Canary-lever residual — shared large-offset base reproduces structure but not its physical register (main). |
 | P-31 | LIVE | Predication-resistance — mwcc fully if-converts a guard no restructuring can force into a branch (mirror of C-55). 8+ confirmed instances, no longer tentative. |
 | P-32 | LIVE | OR-of-non-adjacent-equality-values resists branch separation; sticky CMP/CMPNE predicated form. Scope caveat: adjacency alone insufficient inside a larger guard chain. |
-| P-33 | LIVE (tentative) | Same-register repeated-equality compound-compare-merge; no working recipe (C-55 boundary case). Confirmed bidirectional. |
+| P-33 | LIVE | Same-register repeated-equality compound-compare-merge; no working recipe (C-55 boundary case). Confirmed bidirectional across three members. |
 | P-34 | LIVE (tentative) | Prologue pad-register-fold resistance — stack-alignment pad won't fold into the `lr` push from any source form. |
 | P-35 | LIVE (tentative) | SUBS-flag-fusion resistance for a variable-assigned shift/subtract amount. |
 | P-36 | LIVE | Instruction-scheduling order not source-controllable (6 sub-shapes); highest-yield new wall family this round. |
 | P-37 | LIVE (tentative) | Register reuse via free-`lr`-after-`pop{pc}` — hand-optimized allocation trick, single instance. |
 
 **Current count:** 32 genuinely live P-entries (P-17 under reconsideration,
-not yet retired; P-28/29/30/34/35/37 tentative but counted live); four retired
+not yet retired; P-23/24/28/29/30/34/35/37 tentative but counted live); four retired
 entries (P-6, P-7, P-8, P-10). The three corrected headings among the
 above are P-7, P-8, and P-10; their historical bodies remain intact. This
 table previously undercounted by omitting P-27/28/29 after they were added
@@ -11184,7 +11184,8 @@ repeated-equality tests on one already-loaded register.
 
 **Falsifiable claim:** *some source restructuring defeats the
 compound-compare-merge for same-register repeated-equality tests.*
-**Falsified on 2 members, cm-main-tier-sweep-1 (2026-08-08), batch 1:**
+**Falsified on 3 members, across cm-main-tier-sweep-1 and
+cm-main-tier-sweep-2 (2026-08-08):**
 `func_0204931c` (2-way, `tag==0`/`tag==2`) — `&&`, goto-to-shared-
 label, goto-to-distinct-labels, and `switch`-with-fallthrough all
 tried; 3 gave byte-identical 37.5% output, one (distinct labels) gave
@@ -11195,8 +11196,8 @@ sequential goto (10.0%, worse) → `volatile` parameter (0.0%, worst —
 forces a spurious stack frame). Attempts were NOT monotonic on this
 member; further tries actively degraded the match.
 
-**Affected picks:** `func_0204931c` (38.5%), `func_02052704` (20.0%)
-— both main.
+**Affected picks:** `func_0204931c` (38.5%), `func_02052704` (20.0%),
+`func_0206e33c` (50%) — all main.
 
 **Recipe status: NONE.**
 
