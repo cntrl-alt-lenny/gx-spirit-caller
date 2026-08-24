@@ -5,12 +5,14 @@ from __future__ import annotations
 
 import argparse
 import csv
+import re
 from collections import defaultdict
 from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 LEDGER = ROOT / "docs/research/campaign-analytics/attempts.tsv"
+PR_BRIEF_RE = re.compile(r"^PR#(?P<number>\d+):(?P<sha>[0-9a-f]+)$", re.IGNORECASE)
 
 
 @dataclass(frozen=True)
@@ -58,17 +60,47 @@ def _exact_event(row: dict[str, str]) -> tuple[str, ...]:
     )
 
 
+def _pr_number(row: dict[str, str]) -> int | None:
+    match = PR_BRIEF_RE.fullmatch((row.get("brief") or "").strip())
+    return int(match.group("number")) if match else None
+
+
+def _chronological_rows(
+    rows: tuple[dict[str, str], ...],
+) -> tuple[dict[str, str], ...] | None:
+    """Order rows by backfilled PR provenance, or refuse to guess."""
+    numbered = [(_pr_number(row), row) for row in rows]
+    if any(number is None for number, _row in numbered):
+        return None
+    if len({number for number, _row in numbered}) != len(numbered):
+        return None
+    return tuple(row for _number, row in sorted(numbered, key=lambda item: item[0]))
+
+
 def _classify(rows: tuple[dict[str, str], ...]) -> tuple[str, str]:
     results = [(row.get("result") or "").strip().lower() for row in rows]
     shipped_indices = [index for index, result in enumerate(results) if result == "shipped"]
     if len(shipped_indices) > 1:
         return "CONTRADICTORY", "more than one shipped event"
     if _same_brief_has_different_result(rows):
-        return "CONTRADICTORY", "same brief records different results"
-    if shipped_indices and any(
-        result == "parked" for result in results[shipped_indices[0] + 1 :]
-    ):
-        return "CONTRADICTORY", "parked after shipped with no intervening re-attempt"
+        if {
+            (row.get("result") or "").strip().lower() for row in rows
+        } == {"parked", "shipped"} and any(
+            (row.get("park_class") or "").strip().lower() == "tool-anomaly"
+            for row in rows
+        ):
+            return "LEGITIMATE", "tool-anomaly retry later shipped in the same batch"
+        return "AMBIGUOUS", "same brief records different results; order unavailable"
+    if any(result == "parked" for result in results) and shipped_indices:
+        ordered = _chronological_rows(rows)
+        if ordered is None:
+            return "AMBIGUOUS", "event order unavailable from ledger provenance"
+        ordered_results = [
+            (row.get("result") or "").strip().lower() for row in ordered
+        ]
+        shipped_index = ordered_results.index("shipped")
+        if any(result == "parked" for result in ordered_results[shipped_index + 1 :]):
+            return "CONTRADICTORY", "parked after shipped with no intervening re-attempt"
     if len({_exact_event(row) for row in rows}) < len(rows):
         return "AMBIGUOUS", "exact event repeated; provenance cannot distinguish it"
     return "LEGITIMATE", "event sequence is consistent"
