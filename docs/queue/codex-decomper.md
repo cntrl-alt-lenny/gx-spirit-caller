@@ -999,7 +999,7 @@ index. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-worktree-gc-mac-parity — the tool you just shipped has an unverified half [TODO]
+### q-worktree-gc-mac-parity — the tool you just shipped has an unverified half [DONE]
 
 `tools/worktree_gc.py` (#1540) is correct on Windows: the REPORT canary
 classified all five standing worktrees KEEP, reported four orphan directories,

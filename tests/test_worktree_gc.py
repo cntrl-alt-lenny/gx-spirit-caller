@@ -79,6 +79,26 @@ class TestDangerousCases(_RepoCase):
 
 
 class TestClassificationAndPrune(_RepoCase):
+    def test_mac_lane_basenames_keep_live_lanes_and_classify_other_shapes(self) -> None:
+        decomper = self.add_worktree("codex-decomper-queue")
+        scaffolder = self.add_worktree("codex-scaffolder-queue")
+        removable = self.add_worktree("mac-clean-merged")
+        dirty = self.add_worktree("mac-dirty")
+        (dirty / "README.md").write_text("uncommitted\n", encoding="utf-8")
+        held = self.add_worktree("mac-unmerged")
+        (held / "new.txt").write_text("unmerged\n", encoding="utf-8")
+        _run(["git", "add", "new.txt"], held)
+        _run(["git", "commit", "-q", "-m", "unmerged"], held)
+
+        entries = {entry.path.name: entry for entry in gc.registered_worktrees(self.repo)}
+        self.assertEqual(gc.classify_worktree(entries[decomper.name], self.repo).state, "KEEP")
+        self.assertEqual(gc.classify_worktree(entries[scaffolder.name], self.repo).state, "KEEP")
+        self.assertEqual(
+            gc.classify_worktree(entries[removable.name], self.repo).state, "REMOVABLE",
+        )
+        self.assertEqual(gc.classify_worktree(entries[dirty.name], self.repo).state, "HELD")
+        self.assertEqual(gc.classify_worktree(entries[held.name], self.repo).state, "HELD")
+
     def test_keep_set_uses_basename_and_extra_keep(self) -> None:
         standing = self.add_worktree("brain")
         extra = self.add_worktree("local-lane")
