@@ -995,6 +995,13 @@ stamping, and `--check-queue` are all right:
    `cm-restock-carve-9` shipped that pool in full. Say so explicitly rather
    than filing it alongside a stale-figure finding.
 
+Retake measurement at `878bd7b063d0828005204183534269e29b076655`: the drained
+`<=192 B` all-module pool is `0 / 0 B`; the live `193–256 B` all-module band is
+`224 / 50,548 B`, versus `99 / 22,432 B` for `--module main`. The tool now
+uses all modules by default, rejects an empty module, and records the scope in
+the reproducer command. The data-string pool's `0 / 0 B` is confirmed as a
+successful full drain, not a stale-figure finding.
+
 Everything below is the original item, still in force.
 
 

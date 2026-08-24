@@ -13,6 +13,7 @@ from pool_freshness import (  # noqa: E402
     PoolMeasurement,
     body_call_count,
     extract_queue_figures,
+    measure_pool,
     stale_queue_figures,
 )
 
@@ -87,3 +88,20 @@ def test_merge_threshold_can_expire_a_recent_figure():
         max_merges=10,
     )
     assert [(f.count, f.bytes) for f in stale] == [(34, 5224)]
+
+
+def test_wall_default_is_all_modules_and_exceeds_main_on_live_tree():
+    all_modules = measure_pool("wall-bl4-small", min_size=193, max_size=256)
+    main_only = measure_pool(
+        "wall-bl4-small", min_size=193, max_size=256, module="main",
+    )
+    assert all_modules.count > main_only.count
+
+
+def test_empty_module_is_rejected():
+    try:
+        measure_pool("wall-bl4-small", module="")
+    except ValueError as exc:
+        assert "non-empty" in str(exc)
+    else:
+        raise AssertionError("empty module must not silently measure an empty pool")

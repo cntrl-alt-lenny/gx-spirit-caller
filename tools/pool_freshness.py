@@ -132,8 +132,16 @@ def _wall_files(per: dict[str, dict], module: str | None) -> list[dict]:
 
 
 def _wall_bl4_pool(
-    *, max_size: int = 192, exclude_attempted: bool = True, module: str = "main",
+    *,
+    min_size: int = 0,
+    max_size: int = 192,
+    exclude_attempted: bool = True,
+    module: str | None = None,
 ) -> PoolMeasurement:
+    if min_size < 0 or min_size > max_size:
+        raise ValueError("min_size must be non-negative and no greater than max_size")
+    if module == "":
+        raise ValueError("module must be a non-empty module name or None for all modules")
     per = wall_aware_headroom.scan(
         max_size=max_size,
         exclude_attempted=exclude_attempted,
@@ -141,6 +149,9 @@ def _wall_bl4_pool(
     selected: list[dict[str, object]] = []
     missing_files = 0
     for item in _wall_files(per, module):
+        text_size = int(item["text_size"] or 0)
+        if text_size < min_size:
+            continue
         path = wall_aware_headroom.ROOT / item["path"]
         if not path.is_file():
             missing_files += 1
@@ -152,11 +163,12 @@ def _wall_bl4_pool(
                 "text_size": item["text_size"],
                 "bl_blx": calls,
             })
-    module_arg = f" --module {module}" if module else " --all-modules"
+    size_arg = f" --min-size {min_size}" if min_size else ""
+    module_arg = f" --module {module}" if module is not None else " --all-modules"
     attempted_arg = " --exclude-attempted" if exclude_attempted else ""
     command = (
         "python tools/pool_freshness.py --pool wall-bl4-small"
-        f" --max-size {max_size}{attempted_arg}{module_arg}"
+        f"{size_arg} --max-size {max_size}{attempted_arg}{module_arg}"
     )
     return PoolMeasurement(
         pool="wall-bl4-small",
@@ -171,6 +183,7 @@ def _wall_bl4_pool(
         ),
         details={
             "max_size": max_size,
+            "min_size": min_size,
             "exclude_attempted": exclude_attempted,
             "module": module,
             "min_bl_blx": 4,
@@ -185,14 +198,16 @@ def measure_pool(
     *,
     version: str = "eur",
     max_size: int = 192,
+    min_size: int = 0,
     exclude_attempted: bool = True,
-    module: str | None = "main",
+    module: str | None = None,
 ) -> PoolMeasurement:
     if pool == "data-string-pool":
         return _data_string_pool(version)
     if pool == "wall-bl4-small":
         return _wall_bl4_pool(
             max_size=max_size,
+            min_size=min_size,
             exclude_attempted=exclude_attempted,
             module=module,
         )
@@ -309,8 +324,9 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--pool", choices=("data-string-pool", "wall-bl4-small"))
     ap.add_argument("--version", default="eur")
     ap.add_argument("--max-size", type=int, default=192)
+    ap.add_argument("--min-size", type=int, default=0)
     ap.add_argument("--exclude-attempted", action=argparse.BooleanOptionalAction, default=True)
-    ap.add_argument("--module", default="main")
+    ap.add_argument("--module")
     ap.add_argument("--all-modules", action="store_true")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--check-queue", type=Path)
@@ -320,11 +336,16 @@ def main(argv: list[str] | None = None) -> int:
     args = ap.parse_args(argv)
     if not args.pool:
         ap.error("--pool is required")
+    if args.module == "":
+        ap.error("--module must be a non-empty module name")
+    if args.module is not None and args.all_modules:
+        ap.error("--module and --all-modules are mutually exclusive")
     module = None if args.all_modules else args.module
     measurement = measure_pool(
         args.pool,
         version=args.version,
         max_size=args.max_size,
+        min_size=args.min_size,
         exclude_attempted=args.exclude_attempted,
         module=module,
     )
