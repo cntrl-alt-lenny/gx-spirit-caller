@@ -1030,3 +1030,119 @@ Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — and report QUEUE-EMPTY honestly if you genuinely reach it.
+
+### q-ledger-chronology — your contradiction audit reads row order as time, and for 485 rows that is wrong [TODO]
+
+`q-ledger-contradiction-audit` (#1546) is merged and the tool is good: 57
+repeated groups classified 53 legitimate / 3 contradictory / 1 ambiguous, with
+real overlay-normalisation and main-vs-overlay separation. But the brain
+re-derived the three "contradictory" verdicts against the raw ledger and **two
+of them are false positives**, for a reason worth fixing properly.
+
+Both flagged groups are `parked after shipped with no intervening re-attempt`:
+
+```text
+CONTRADICTORY  main/0x02033b60    shipped brief=PR#1435:55bd0f94  (row 566)
+                                  parked  brief=PR#1414:bb6e87a4  (row 583)
+CONTRADICTORY  ov002/0x021b34f4   shipped brief=PR#1425:18164de4  (row 444)
+                                  parked  brief=PR#1414:28c00424  (row 628)
+```
+
+In both, the *park* carries the **lower PR number** — PR #1414 — and therefore
+happened first. Park-then-ship is the ordinary, healthy lifecycle of a candidate
+a later round cracked. The tool called it backwards because it infers sequence
+from **row order**, and row order is not chronology for the **485 of 1,735 rows**
+that carry the backfilled `PR#NNNN:sha` brief provenance — those were appended
+in a batch by `q-ledger-ship-coverage`, in an order that has nothing to do with
+when the events happened.
+
+Fix the ordering, not the verdicts:
+
+1. When a row's brief matches the backfilled `PR#<n>:<sha>` form, use `<n>` as
+   the ordering key. It is a real, monotonic, already-recorded timestamp
+   surrogate and it is sitting in the data unused.
+2. When ordering genuinely cannot be established — two rows from the same brief,
+   or two non-backfilled briefs with no derivable sequence — classify
+   **AMBIGUOUS**, not CONTRADICTORY. Fail toward "I cannot tell", because a
+   false contradiction sends someone hunting a bug that was never there, and
+   this campaign has spent real rounds on exactly that kind of chase.
+3. Re-run the live audit and publish the corrected split. Expect roughly 55
+   legitimate; state what you actually get.
+
+**Look at the third one on its own merits.** `ov007/0x021b2e00` is
+`same brief records different results` — a `tool-anomaly` park and a `shipped`
+row from the same batch of `cm-main-wall-filtered-sweep-1-batch4`. That is
+plausibly a legitimate retry after an infrastructure failure rather than a
+contradiction, and `tool-anomaly` is precisely the value
+`q-park-class-remap` refused to map to a wall family because it records tooling
+trouble, not a codegen wall. Decide it on the evidence and say which way you
+went.
+
+**The deeper fix, if you judge it in scope:** the ledger has no timestamp column
+at all, which is why this ambiguity exists. `q-ledger-effort-column` (#1544) just
+showed how to add a column append-safely with blanks for history. Say whether a
+timestamp is worth the same treatment — a recommendation with reasoning is an
+acceptable deliverable here; do not add it unilaterally.
+
+**Tooling budget:** catches a demonstrated failure class — a merged tool
+currently reporting two false defects against the campaign's most load-bearing
+data file.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + the corrected
+live split + a regression test that a park-then-ship pair with an earlier park PR
+classifies LEGITIMATE. Assert the shape, never the counts — they move. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-remaining-opportunity-census — the small-code frontier just closed; say honestly what is left [TODO]
+
+This item exists because the campaign reached a real inflection point on
+2026-08-24 and nobody has written down the resulting picture in one place with
+numbers anyone can reproduce.
+
+What just happened, all of it brain-verified:
+
+- The `<=192 B, >=4 bl` pool that drove three rounds (34-36% -> 60.8% -> 73%) is
+  **drained to 0 candidates / 0 B**.
+- The 193-256 B band returned **0/20 at matched effort** (#1545), after
+  **0/40** at reduced effort (#1536). Median `match_pct` 5.2%, 8 of 20 flat
+  zero. The band is not under-iterated; it is hard.
+- The data pool's headline 213,220 B turned out to need per-group verification
+  before most of it can ship: wave 11 shipped **46 of 3,187 symbols (1.4%)** and
+  deferred 3,069 symbols / 66,096 B pending a verifier.
+
+So the honest project-wide question — *what is actually left, and where* — has
+no current answer. Produce one:
+
+1. Remaining unmatched `.text` by module and by size band, with the command that
+   reproduces each figure.
+2. How much of it is excluded by a confirmed permanent wall versus genuinely
+   unassessed. `wall_aware_headroom.scan()` is the source; if
+   `pool_freshness.py` has merged, cross-check it rather than trusting it —
+   #1534 was held for a scope default that silently narrowed a pool.
+3. The data side's real reachable total, split into "shippable by a proven
+   recipe" and "blocked pending verification".
+4. Natural-C percentage per region, reusing the state-table generator's own
+   parser. **Do not re-implement the metric** — the standing rule is to read the
+   metric's own source and reuse it.
+
+**This is a census, not a strategy document.** Do not recommend what the
+campaign should do next; that is cntrl_alt_lenny's call, informed by
+`post-small-pool-strategy.md`. Your job is to make the numbers true and
+reproducible. If a figure cannot be derived honestly, say so and leave it blank
+rather than estimating — a blank is a fact and an estimate is not.
+
+If `cm-progress-dashboard` (#1553) has merged, build on it rather than beside
+it: a second, differently-derived set of project totals is exactly the kind of
+disagreement that costs a future round.
+
+**Tooling budget:** consolidates duplicated infrastructure — the brain
+re-derives fragments of this every review — and directly informs where the fleet
+points next.
+
+**Gate:** pytest + unittest green + `ruff check` clean + every figure annotated
+with its reproducing command. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
+the next item — report QUEUE-EMPTY honestly if you genuinely reach it.

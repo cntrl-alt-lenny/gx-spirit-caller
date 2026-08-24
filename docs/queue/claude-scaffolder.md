@@ -1919,57 +1919,71 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-progress-dashboard`; commit;
 report.
 
-### cm-restock-carve-12 — scale the tranche, not the risk [TODO]
+### cm-restock-carve-12 — build the group verifier, then drain the 66,096 B it unlocks [TODO]
 
-⚠️ **Read this scoping note before you size the wave, because the instruction
-here is deliberately different from previous waves.**
+**Rewritten 2026-08-24 after `cm-restock-carve-11` (#1547) reported its census.
+The previous version of this item said "continue from wherever 11 stopped",
+which is now underspecified — 11 told us exactly where it stopped and why.**
 
-cntrl_alt_lenny has asked the fleet to take on materially more work per round.
-For *this* lane that is genuinely safe, and it is worth being explicit about
-why: every file you ship is verified byte-identical by a 3-region SHA1 gate.
-There is no judgment call whose quality degrades when the batch gets bigger —
-a mis-carved symbol does not slip through as "probably fine", it fails the
-gate. `cm-restock-carve-10` shipped **739 files / 15,732 B in a single wave**
-with zero escapes. That is the proof that the method scales.
+Wave 11 shipped **46 of 3,187 symbols (1,060 B — 1.4%)** and the small number is
+the *good* outcome: it came down from an initial 62/1,456 estimate only because
+the lane actually tested the differing-size class instead of assuming it, and
+found a real EUR-breaking wall in the process. Its own disposition table is the
+map for this wave:
 
-**Sizing guidance, corrected 2026-08-24 after owner feedback.** An earlier
-draft of this item told you to treat 739 as a floor and push toward 1,500-2,500
-files. That was wrong for this lane and is withdrawn. cntrl_alt_lenny's
-throughput ask was aimed at the two Codex lanes, which were clearing their
-queues in ~25 minutes; **this lane already runs long**, and its real cost is the
-~40-minute 3-region clean gate on a machine-wide-serialised toolchain that the
-CC Decomper also needs.
+| Class | Windows | Symbols | Bytes | Status after wave 11 |
+|---|---:|---:|---:|---|
+| n=2, same size | 23 | 46 | 1,060 | shipped, proven |
+| n=2, differing size (ascending) | 8 | 16 | 396 | **declined — new wall** |
+| n=2, size decreasing | 17 | 34 | 668 | declined — P-50, permanent |
+| **n>=3, geometrically composable** | **576** | **3,069** | **66,096** | **deferred — this wave's target** |
+| unreachable from run start | — | 22 | 393 | needs backward absorption, untested |
 
-So size the tranche to **what you can carve, gate and write up comfortably
-within one round** — roughly wave 10's scale is a fine default, larger only if
-the pool happens to make it cheap. Do not inflate the batch to hit a number.
-Finishing one well-gated wave and leaving the rest for wave 13 is strictly
-better than a bigger wave that runs past the round or crowds the Decomper off
-the machine. Queue depth is what keeps this lane busy now, not batch size —
-`cm-restock-carve-13` is already seeded behind this one.
+**The blocker is verification cost, not a wall.** The standing rule — established
+the hard way in wave 4, when three separate n=4 groups from three different
+modules silently reordered despite correct section sizes — forbids trusting an
+n>=3 composed group without compiling it and inspecting its `.o` symbol table
+first. Nobody is going to do that 576 times by hand. Wave 11 says so explicitly
+and suggests a purpose-built tool. Build it.
 
-**What is NOT safe to scale, and must not be:** the canary-before-batch rule,
-the `screen_names_against_src` precondition, the per-candidate alignment check,
-and the byte-total reconciliation. Those are what make a big tranche
-trustworthy. A 2,000-file wave with a skipped canary is worth less than a
-200-file wave with one. If a bigger batch would mean cutting any of those,
-take the smaller batch and say so.
+**Part 1 — `tools/verify_composed_group.py` (name as you see fit).** Given a
+candidate window: emit the composed TU, compile it standalone (no link needed),
+read the resulting `.o` symbol table, and report whether the declaration order
+and section layout match what the recipe requires — pass/fail per group with the
+reason. Then run it across all 576 and publish the verified/rejected split.
 
-**The pool, from your own census (#1526) — re-derive before relying on it:**
+This is the same "inspect before linking" method the alignment-wall recipe
+already established; wave 11 used it manually at the compile stage to root-cause
+the `char[N]` finding. You are automating a check this project already trusts,
+not inventing a new one.
 
-- 3,187 string-shaped symbols / 68,613 B needing TU composition (P-50 live;
-  composition only works when the span is 4-aligned at BOTH ends).
-- 1,825 non-string symbols / 128,875 B needing shape-specific recipes, with
-  `fnptr_table` and `jump_table` among the shapes you identified.
+**Part 2 — drain what verifies.** Ship the groups that pass, canary-first
+(gate one composed TU alone on 3-region SHA1 before batching), then the tranche.
 
-`cm-restock-carve-11` takes the first bite of these. This wave continues from
-wherever 11 stopped — **read 11's own closing census rather than this item's
-numbers**, which will be stale by the time you get here. Four consecutive waves
-have corrected an inherited count; assume this one is wrong too.
+**Size the wave to one comfortable round, and do not inflate it.** Both CC lanes
+contend for the same ~40-minute 3-region clean gate; wave 10's scale is a fine
+default. If the verifier passes 400 groups and you can only gate 150 cleanly,
+ship 150 and leave the rest for wave 13 — the verifier's output is durable and
+the next wave starts from it rather than re-deriving.
 
-**Report the composable fraction honestly.** If TU composition turns out to
-apply to far fewer of the 3,187 than hoped, that is the finding and the byte
-figure comes down. A smaller true number beats a larger hopeful one.
+**Two things wave 11 proved that constrain this wave:**
+
+- **`char[N]` string globals compile to their OWN `.data` section per
+  declaration**, not one merged section with internal offsets. The
+  alignment-wall recipe's "in-section offset" language describes struct-typed
+  globals and does NOT describe this pool. Wave 11 corrected that doc; read the
+  correction before you compose anything.
+- **The n=2 ascending-size exception does not transfer here.** Wave 11's full
+  tranche failed EUR SHA1 with a 93 MB divergence and a ROM-header ARM9-size
+  shift — a file-layout signature, not a content bug — and bisected it to
+  exactly the 8 differing-size windows. Do not re-attempt that class on a hunch;
+  if you think you have a fix, prove it on ONE window with a full clean gate
+  before it goes anywhere near a tranche.
+
+**If the verifier finds most of the 576 reject**, that is the finding and the
+66,096 B comes down accordingly. Say so plainly with the count — this series has
+corrected an inherited number four waves running and that habit is worth more
+than a big headline.
 
 **Gate:** full `python tools/gate3.py --scope all --clean` — three SHA1 PASS
 lines verbatim plus the pytest tail. `typed_array_bytes` / `named_struct_bytes`

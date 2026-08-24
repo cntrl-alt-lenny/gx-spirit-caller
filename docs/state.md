@@ -26,7 +26,105 @@ the fleet redirects the day it lands. (4) Three queue seeds: `cm-progress-dashbo
 by the executed toggle. (6) Local worktree GC on the PC (registered+merged only;
 orphaned dirs reported to the owner, never `rm -rf`'d).
 
-**Last updated:** 2026-08-22 — **(Windows PC, brain=Opus 5; roster unchanged.)
+**Last updated:** 2026-08-24 — **(Windows PC, brain=Opus 5; roster unchanged.)
+Round 0824: eleven PRs merged and the campaign reached a real inflection. The
+193-256 B band came back 0/20 at MATCHED effort, so the small-code frontier is
+closed on evidence rather than on a confounded number. The data pool is the
+campaign's remaining axis — and it turns out to need a verifier before most of
+it can ship.**
+
+Merged **#1542** and **#1544** through **#1553** — eleven PRs. Closed **#1534**
+(superseded by #1542). The Codex Decomper cleared all
+seven of its items; the Codex Scaffolder cleared one and correctly paused.
+
+✅ **Transcript audit executed in full** — all four lanes on this host, both
+Claude sessions via `mcp__ccd_session_mgmt__*`, both Codex lanes from
+`~/.codex/sessions/**/rollout-*.jsonl` by mtime. It changed two outcomes.
+
+**THE HEADLINE — the cap is real, and this time the number can be spent.**
+`cm-main-boundary-rerun` (#1545) re-tested the 193-256 B slice with a **fresh
+20-candidate sample, zero overlap with #1536's 40**, under the full 2-4-iteration
+protocol. Result: **0/20**. Brain-verified against the ledger: 20 rows, all
+parked, sizes 196-256 B (no band drift), median `match_pct` **5.2%**, 16/20 below
+50%, **8/20 at flat 0.0%**, 2 above 85%.
+
+Read that against #1536's Part 2 (median 12.9%): **matched effort made the
+numbers worse, not better.** Different samples, so not a controlled comparison —
+but an under-iteration artifact would have improved under more iteration, and
+this did the opposite. Combined with the ≤192 B pool now standing at **0
+candidates**, `post-small-pool-strategy.md`'s **Outcome B** is the honest read.
+
+The lane also declined to lower its own bar: it hunted **10 extra candidates**
+looking for a clean canary ship, never found one, and said so plainly rather
+than relaxing the criterion. It flagged that
+`check_activation_invariant.py` correctly refuses a vacuous pass on a 0-ship
+round. And it documented a new wall, `P-20-mode-switch-selector`, on two
+independent confirmations. P-20 row-offset is now **20 consecutive hits across
+three rounds, zero ships**, cohort 55.
+
+**#1547 `cm-restock-carve-11` — a 1.4% result that is the round's second-best
+piece of work.** 46 of 3,187 symbols / 1,060 B shipped (brain-verified: 23 files,
+46 declarations, 1,060 declared bytes, exact). The number is small because the
+lane **tested an assumption instead of inheriting it**, and the test broke EUR:
+its full 31-window tranche failed EUR SHA1 with a **93 MB divergence** and a
+ROM-header ARM9-size shift — a file-layout signature. It bisected to the 8
+differing-size windows, root-caused it by standalone compile plus
+`objdump -h`, and found that **`char[N]` globals initialised from string
+literals compile to their OWN `.data` section per declaration**, not one merged
+section with internal offsets. The alignment-wall recipe's "in-section offset"
+language describes struct-typed globals and does not describe this pool; the
+lane corrected that doc in the same PR. It then shipped only the 23 verified-safe
+same-size windows. Canary-then-tranche discipline working exactly as designed.
+
+**The data lane's real lever is now sized:** 576 windows / **3,069 symbols /
+66,096 B** are *geometrically* composable but blocked behind the standing wave-4
+rule that an n>=3 composed group must be compiled and its `.o` symbol table
+inspected before it is trusted. Nobody will do that 576 times by hand.
+`cm-restock-carve-12` is rewritten to build that verifier and drain what passes.
+
+**Codex Decomper: 7 for 7, and one of them found a real latent bug.**
+`q-worktree-gc-mac-parity` (#1552) confirmed the failure the item predicted —
+the keep-set was Windows-only, so `codex-decomper-queue` and
+`codex-scaffolder-queue`, the two **live Mac lanes**, classified as REMOVABLE.
+On a Mac, `--prune` would have deleted working lanes. Caught before anyone ran
+it there. `q-ledger-effort-column` (#1544) added the `attempts` column
+append-safely — brain-verified all **1,735 existing rows blank, none zero**,
+which is the distinction that matters. `q-tentative-wall-audit` (#1548) promoted
+exactly one wall (P-33, three members, bidirectional) and left eight tentative
+rather than reaching for tag matches.
+
+⚠️ **Brain finding against a merged tool — two of #1546's three "contradictions"
+are false positives.** The contradiction audit infers event sequence from **row
+order**, and row order is not chronology for the **485 of 1,735 rows** carrying
+the backfilled `PR#<n>:<sha>` provenance from `q-ledger-ship-coverage`. Both
+flagged `parked after shipped` groups have the *park* at the **lower PR number**
+(#1414) — ordinary park-then-ship, not a defect:
+
+```text
+main/0x02033b60    shipped PR#1435 (row 566)   parked PR#1414 (row 583)
+ov002/0x021b34f4   shipped PR#1425 (row 444)   parked PR#1414 (row 628)
+```
+
+Merged anyway and safe to merge: `--check` exits 1 but is **wired into no
+workflow**, and the tests use synthetic fixtures rather than asserting zero on
+the live ledger, so it is advisory-only. `q-ledger-chronology` is seeded to use
+the PR number as the ordering key and to fail toward AMBIGUOUS rather than
+CONTRADICTORY when sequence cannot be established.
+
+**Codex Scaffolder paused correctly, and its paused work was one command from
+destruction.** #1542 rescoped the pool-freshness tool (all-modules default;
+live figures `<=192 B = 0/0 B`, `193-256 B = 224/50,548 B`, `main = 99/22,432 B`),
+superseding #1534. It then **stopped before item 2** because that item's own spec
+says not to build against an unmerged interface — the right call. But the
+generator was already written and gate-passing (**8/8 lane-host emissions clean,
+sabotaged establishment REFUSED**) and sat **uncommitted in `kb-types`**: 199
+lines of `make_kickoff.py` plus 60 of tests. The standard preflight opens with
+`git reset --hard`, which would have deleted it. Brain took a backup before
+touching anything and the next dispatch commits it first. **New standing rule:
+when a lane reports paused-but-implemented work, verify what is uncommitted in
+its worktree BEFORE writing a kickoff that resets it.**
+
+**Last updated (previous):** 2026-08-22 — **(Windows PC, brain=Opus 5; roster unchanged.)
 Round 0822c: all four lanes delivered, eight PRs reviewed, seven merged. The
 boundary experiment came back 0/40 and the lane disclosed the confound that makes
 it uninterpretable — so it is being re-run at matched effort rather than acted on.
@@ -324,7 +422,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-<!-- main-sha: f325ed31f -->
+<!-- main-sha: 157de4a54 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
@@ -372,43 +470,27 @@ they stay here:
 
 ## In flight (post this brain-PR)
 
-**Active PRs: 1** once `brain/integ-0822c` lands — **#1534**, HELD (not parked:
-the tool is correct and one default is wrong; it comes back as the
-`q-pool-freshness-tool` re-take with the scope finding written into the item).
-**#1020** (decomp.dev CI) remains the one genuinely parked draft and is declared
-in the `parked-prs` anchor above. **#1520 is CLOSED** — superseded by #1530,
-which shipped its three checks plus the self-sourcing fixture and the
-location-establishment guard. Held-vs-parked stays a real distinction: a held PR
-is expected back next round, a parked one is not.
+**Active PRs: 0** once `brain/integ-0824b` lands. **#1020** (decomp.dev CI)
+remains the one genuinely parked draft and is declared in the `parked-prs`
+anchor above. **#1534 is CLOSED**, superseded by #1542's rescope.
 
-**All four lanes idle at hand-off, and all four queues re-seeded** — each lane
-resumes with `python tools/work_queue.py next <lane>`, one PR per item. Every
-seeded item was verified to resolve via `work_queue.py next` on the integration
-tree before dispatch, per the standing pre-send check.
+**All four queues re-seeded.** Dispatch host: the Windows PC (recorded in
+[`docs/dispatch-log.md`](dispatch-log.md), row 0824). Every seeded item was
+verified to resolve via `work_queue.py next` on the integration tree.
 
-**Dispatch host this round: the Windows PC** (recorded in
-[`docs/dispatch-log.md`](dispatch-log.md), row 0822c)**.** All four kickoffs are Windows-pathed
-(`C:/Users/leona/Dev/gx-spirit-caller/{decomper,scaffolder,kb-map,kb-types}`,
-bare `python`, **not** `python3.13`). Round 0819 ran on the Mac, so all four
-worktrees here are a round stale and each kickoff opens with the fetch/reset step.
-Baserom capability re-verified on this machine before writing the gates:
-`decomper` and `scaffolder` hold all three baseroms, `kb-types` holds EUR only,
-`kb-map` holds none (build-free) — the Codex items are gated accordingly.
+⚠️ **The Codex Scaffolder's next kickoff must NOT open with `git reset --hard`.**
+Its `q-make-kickoff-generator` work is written, gate-passing and **uncommitted**
+in `kb-types` (199 lines of `tools/make_kickoff.py` + 60 of tests). It paused
+before committing because the item's own spec forbade building against an
+unmerged interface — correct behaviour that the standard preflight would then
+have destroyed. Brain holds a backup; the kickoff commits it as step one.
 
-⚠️ **Both build-gating lanes are on one machine and the mwcc toolchain serialises
-machine-wide.** The CC Scaffolder's `cm-restock-carve-10` is dispatched **first**
-so it gets the wine lane, the same scheduling fix that finally unblocked the dsd
-leg in #1522. The CC Decomper's kickoff carries the bounded-poll instruction
-rather than a blocked-report.
-
-This round's items, and why each is what it is:
-
-| Lane | Item | Why |
+| Lane | Next item | Why |
 |---|---|---|
-| CC Decomper | `cm-main-exploit-drain-2` | The ≤192 B pool is down to 32 drainable candidates (list pasted into the item, so it cannot go stale). The open question is the pool's *boundary*: the 193-256 B slice is 264 candidates / 59,560 B, and sweep-7 Part 2's 16% is the prior to test against. |
-| CC Scaffolder | `cm-restock-carve-10` | Wave 9 proved the ~227,820 B "zero-reader" pool is not reader-less — every sampled symbol has a relocation from an uncarved pointer table that `build_call_graph` discards because it resolves origins with `enclosing_function`. Largest unclaimed target on the board. |
-| Codex Decomper (×3) | `q-wall-citation-backfill`, `q-batch-sha1-stale-s`, `q-fastmatch-error-masking` | Queue was found EMPTY. All three are defects #1524 found and reported *as* defects; each is build-free and unit-testable, matching `kb-map`. |
-| Codex Scaffolder (×3) | `q-kickoff-lint-sha-brittleness`, `q-pool-freshness-tool`, `q-unittest-required-evidence` | The first finishes #1520 and generalises the brittleness guard (0-for-3 as a per-file fix). The other two were already queued and untouched. |
+| CC Decomper | `cm-main-band-followthrough` | The re-run answered: 0/20 at matched effort. Its Outcome-B branch fires — record the closure in the catalog, then the bounded 257-512 B pilot with the <15% kill criterion stated in advance. |
+| CC Scaffolder | `cm-restock-carve-12` (rewritten) | Wave 11 sized the lever precisely: 576 windows / 3,069 symbols / 66,096 B are geometrically composable but blocked behind a per-group `.o` inspection nobody will do 576 times by hand. Build the verifier, drain what passes. |
+| Codex Decomper | `q-ledger-chronology`, then `q-remaining-opportunity-census` | The first fixes a false-positive class in its own just-merged audit. The second writes down what is actually left now that the small-code frontier has closed. |
+| Codex Scaffolder | `q-make-kickoff-generator` | Commit the paused work first, then finish it against the now-merged #1542 interface. Three more items behind it. |
 
 ## Active clusters (post-pivot reality)
 

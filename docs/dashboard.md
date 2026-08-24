@@ -69,8 +69,9 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `3400ab917` | 2026-08-19 | 410,018 | 17.18% | +9,488 |
 | `c4e221eb8` | 2026-08-22 | 410,018 | 17.18% | +0 |
 | `181000b78` | 2026-08-22 | 410,626 | 17.21% | +608 |
+| `6b45ab651` | 2026-08-24 | 410,626 | 17.21% | +0 |
 
-44 points, one per commit that changed `docs/state-table.md` (oldest first).
+45 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 
@@ -81,7 +82,7 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | band | candidates (size-only) | bytes (size-only) |
 | --- | ---: | ---: |
 | <=192 B | 1,160 | 135,268 |
-| 193-256 B | 480 | 106,940 |
+| 193-256 B | 460 | 102,472 |
 | 257-320 B | 431 | 123,900 |
 | 321-384 B | 277 | 97,324 |
 
@@ -91,7 +92,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | metric | bytes | of data bytes |
 | --- | ---: | ---: |
-| Typed-array | 209,960 | 4.40% |
+| Typed-array | 211,020 | 4.42% |
 | Named-struct | 73,876 | 1.55% |
 | *(total data bytes)* | 4,776,528 | |
 
