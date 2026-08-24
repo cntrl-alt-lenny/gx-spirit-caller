@@ -1995,7 +1995,7 @@ LAST.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-12`; next item.
 
-### cm-restock-carve-13 — the non-string shapes, one recipe at a time [TODO]
+### cm-restock-carve-13 — the non-string shapes, one recipe at a time [DONE]
 
 The 1,825 non-string symbols / 128,875 B are the larger half of the remaining
 pool by bytes and the one with no established recipe. `cm-restock-carve-11`
