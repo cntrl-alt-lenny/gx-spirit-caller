@@ -290,6 +290,45 @@ directly apply and the safe/unsafe boundary must be re-derived
 empirically for that type. See `cm-restock-carve-11-2026-08-24.md`
 for the full incident.
 
+**wave 12 update: same-size does NOT generalize from n=2 to n>=3 for
+`char[N]` string arrays either -- confirmed empirically, not
+theorized.** `cm-restock-carve-12` built `tools/verify_composed_group.py`
+to automate wave 11's own "compile standalone, inspect the `.o`" method
+across the entire 576-window / 3,069-symbol / 66,096 B pool wave 11 sized
+for it. Applying the same-size requirement first (the only n=2 shape
+proven safe) left 8 declined windows (the exact ones wave 11's own
+census already flagged as unequal-size, correctly NOT re-attempted) and
+576 geometrically-composable n>=3 windows to actually test.
+
+**Result: 0 of 575 content-valid n>=3 windows passed.** 561 were
+mixed-size (rejected without compiling, per the same-size requirement);
+**14 were same-size across all members yet still failed the tool's
+compiled-content-order check** -- i.e. mwcc reordered the declarations
+even though every member was the identical byte length. Confirmed
+directly on two synthetic 3-member same-size groups before trusting the
+verifier's own logic: `zebra`/`apple`/`mango` (8 B each) compiled to
+file order `apple`/`zebra`/`mango` -- neither declaration order nor any
+simple sort key (alphabetical, byte-value, length) predicts the
+output; it appears to follow some internal hash-bucket order intrinsic
+to mwcc's string-literal handling that only the compiled object itself
+reveals. A REAL wave-11 n=2 same-size pair, compiled the same way,
+correctly preserved order -- so this is specifically an n>=3
+phenomenon, matching wave 4's original struct-type finding
+("mwcc doesn't preserve top-level declaration order" for n>2 groups)
+now confirmed for a completely different underlying mechanism (separate
+sections, not offsets within one section).
+
+**Standing rule addition**: there is currently **no known n>=3
+composition shape that is safe by default** for `char[N]` string
+arrays -- same-size is necessary (differing-size is proven unsafe,
+wave 11) but empirically NOT sufficient (wave 12). The only route to
+shipping an n>=3 group of this type is `verify_composed_group.py`'s
+compile-and-inspect check passing for that SPECIFIC group, followed by
+the standing canary-then-tranche discipline (a real link+SHA1 test)
+before batching -- there is no shortcut that avoids compiling each
+candidate. See `cm-restock-carve-12-2026-08-24.md` for the full null
+result and the verifier tool's design.
+
 ## See also
 
 - [`ov004-odd-aligned-slot-recipe.md`](ov004-odd-aligned-slot-recipe.md) —
@@ -308,3 +347,9 @@ for the full incident.
   sections per declaration, not one merged section) — a 93-million-byte
   EUR divergence caught by the canary-then-tranche discipline before
   merge.
+- [`cm-restock-carve-12-2026-08-24.md`](data/cm-restock-carve-12-2026-08-24.md) —
+  wave 12, `tools/verify_composed_group.py` (automates this document's
+  own compile-and-inspect check) applied across the full n>=3 pool wave
+  11 sized: 0 of 575 content-valid windows passed, including 14 that
+  were same-size across every member — same-size is necessary but not
+  sufficient for n>=3.

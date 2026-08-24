@@ -1919,7 +1919,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-progress-dashboard`; commit;
 report.
 
-### cm-restock-carve-12 — build the group verifier, then drain the 66,096 B it unlocks [TODO]
+### cm-restock-carve-12 — build the group verifier, then drain the 66,096 B it unlocks [DONE]
 
 **Rewritten 2026-08-24 after `cm-restock-carve-11` (#1547) reported its census.
 The previous version of this item said "continue from wherever 11 stopped",

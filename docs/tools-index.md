@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**144 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**145 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (8)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (68)
+- [Uncategorised](#uncategorised) (69)
 
 ## Analysis / worklist
 
@@ -840,6 +840,12 @@ Failure mode: ``attempts.tsv`` is consumed as machine data, but previously only 
 **byte-compare a compiled function against its dsd-delinked gap**
 
 object. The scaffolder's direct-mwcc per-pick gate (EUR objdiff 100%); the brain reproduces the 3-region SHA1 on merge.
+
+### `tools/verify_composed_group.py`
+
+**cm-restock-carve-12: automate the standalone-**
+
+compile-then-inspect check `alignment-wall-tu-composition-recipe.md`'s standing rule requires before any n>=3 composed TU is trusted.
 
 ### `tools/wall_aware_headroom.py`
 
