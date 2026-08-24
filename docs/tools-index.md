@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**138 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**139 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (7)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (64)
+- [Uncategorised](#uncategorised) (65)
 
 ## Analysis / worklist
 
@@ -672,6 +672,10 @@ Merge a list of reviewed branches into the current integration branch with the r
 **a pre-send gate on agent kickoff text (R&D r8, §4).**
 
 The 3-region `gate3.py` is our *merge* gate — the strongest possible arbiter of correctness. But it fires only after an agent has already spent its hour. The recurring void-work incidents (b576 transcription-without-invariant, b589 wrong…
+
+### `tools/ledger_analytics.py`
+
+**Summarize self-reported match percentages for selected ledger briefs.**
 
 ### `tools/m2c_bootstrap.py`
 
