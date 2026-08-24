@@ -779,7 +779,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-worktree-gc`; commit; then take the
 next queue item immediately.
 
-### q-ledger-effort-column — the ledger cannot measure the thing that broke last round's headline [TODO]
+### q-ledger-effort-column — the ledger cannot measure the thing that broke last round's headline [DONE]
 
 `cm-main-exploit-drain-2` (#1536) reported **0/40** on the 193-256 B band, then
 disclosed in prose that Part 2 candidates got roughly **one** fastmatch attempt
@@ -831,7 +831,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-decomper q-ledger-effort-column`; commit; then
 take the next item immediately.
 
-### q-ledger-contradiction-audit — 57 addresses appear more than once; find out which are real [TODO]
+### q-ledger-contradiction-audit — 57 addresses appear more than once; find out which are real [DONE]
 
 Brain measured on `main`: **1,655 distinct `(module, addr)` pairs across 1,715
 rows — 57 pairs appear more than once.** `attempts.tsv` is an EVENT log by
@@ -867,7 +867,7 @@ full 57-row classification pasted with counts per bucket. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-tentative-wall-audit — nine walls are stuck at "tentative" and the evidence to settle some may already exist [TODO]
+### q-tentative-wall-audit — nine walls are stuck at "tentative" and the evidence to settle some may already exist [DONE]
 
 `codegen-walls.md` currently carries **nine** LIVE-tentative walls: P-23, P-24,
 P-28, P-29, P-30, P-33, P-34, P-35, P-37. The catalog's own convention promotes
@@ -904,7 +904,7 @@ inline. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-park-class-drift-guard — new raw park_class values appear every round and are caught by hand [TODO]
+### q-park-class-drift-guard — new raw park_class values appear every round and are caught by hand [DONE]
 
 `tools/park_class_map.tsv` is the controlled vocabulary `q-park-class-remap`
 (#1511) established. It works, but it is maintained reactively: #1524 had to add
@@ -935,7 +935,7 @@ mapping. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-ledger-analytics-tool — commit the analysis that saved last round's headline [TODO]
+### q-ledger-analytics-tool — commit the analysis that saved last round's headline [DONE]
 
 Reviewing #1536, the brain wrote throwaway Python to bucket park `match_pct` by
 brief, and it changed the round's conclusion:
@@ -972,7 +972,7 @@ move as lanes append). Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-walls-catalog-index — 13,561 lines with no way in [TODO]
+### q-walls-catalog-index — 13,561 lines with no way in [DONE]
 
 `docs/research/codegen-walls.md` is **13,561 lines**. It is the campaign's most
 load-bearing document — every sweep consults it, `wall_aware_headroom.py`
@@ -999,7 +999,7 @@ index. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-worktree-gc-mac-parity — the tool you just shipped has an unverified half [TODO]
+### q-worktree-gc-mac-parity — the tool you just shipped has an unverified half [DONE]
 
 `tools/worktree_gc.py` (#1540) is correct on Windows: the REPORT canary
 classified all five standing worktrees KEEP, reported four orphan directories,
