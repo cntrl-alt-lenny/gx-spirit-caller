@@ -1282,7 +1282,7 @@ tooling PR that edits `state.md` incidentally. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-required-checks-coverage-audit — four checks are required; are they the right four? [TODO]
+### q-required-checks-coverage-audit — four checks are required; are they the right four? [DONE]
 
 Round 0822b made `unittest` required (#1531) and it earned its place within
 hours: it caught a CI-shallow-clone test dependency on the very next
