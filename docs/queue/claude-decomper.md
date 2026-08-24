@@ -1683,55 +1683,91 @@ ONE PR; verify every PR-body claim against `git diff --stat` before writing it �
 including the arithmetic, which is what slipped last round; `python
 tools/work_queue.py done claude-decomper cm-main-boundary-rerun`.
 
-### cm-main-band-followthrough — act on the re-run's answer, whichever way it lands [TODO]
+### cm-main-band-followthrough — one bounded pilot at 257-320 B, framed as the test it actually is [TODO]
 
-⚠️ **Do not start this until `cm-main-boundary-rerun` has a result.** This item
-is the follow-through for that experiment and its content depends on the
-answer. If you reach it with the re-run unmerged or inconclusive, say so and
-stop — that is the correct outcome, not a failure.
+**Rewritten 2026-08-24 by the brain after `cm-main-boundary-rerun` (#1545)
+answered, and after a finding that changes what this item should ask.**
 
-`post-small-pool-strategy.md` pre-stages the fork; this item executes it.
+Your re-run settled the 193-256 B question: **0/20 at matched effort**, median
+`match_pct` 5.2%, 8 of 20 flat zero, on a fresh sample with zero overlap
+against PR #1536's 40. That is Outcome B in `post-small-pool-strategy.md`, not
+in dispute.
 
-**If the re-run shipped >=25%** — the ~192 B cap was an effort artifact and the
-band is real work. Drain the 193-256 B band in bulk under the protocol that
-produced 73% on the small pool: frozen partitions written into the PR body,
-canary-first, both results ledgered, three single-region `--clean` gates. The
-band held **224 candidates / 50,548 B** at round 0822c and the re-run consumes
-20 of them. **Take as large a batch as you can gate cleanly** — this is
-mechanical drain work under a byte-exact gate, so batch size is throughput, not
-risk. Then probe 257-320 B with the same n=20 matched-effort pattern before
-stepping into it. Never step two bands on one band's evidence.
+**But the memo's Outcome B then says "take the 257-512 B pilot", and the
+justification for that was going to be sweep-7's 23.5% on 257-320 B. The brain
+checked that number's provenance and it will not bear the weight.** Sweep-7's
+own rows, banded:
 
-**If the re-run shipped <=10%** — the cap is real at matched effort and the
-small-code frontier is closed for this method generation. Do **not** grind the
-band. Instead:
+```text
+band        sweep-7 (2026-08-17)      recent matched-effort
+<=192 B     25/69 = 36.2%             pool drained to 0
+193-256 B    8/29 = 27.6%             0/60 = 0.0%     <-- same band, DISJOINT candidates
+257-320 B    8/34 = 23.5%             never tested
+321-376 B    2/17 = 11.8%             never tested
+```
 
-1. Write the closure into `codegen-walls.md` with the evidence from both runs,
-   so nobody re-opens it in three months. A closed tier recorded with its
-   evidence is a permanent saving.
-2. Take the **257-512 B bounded pilot**, n=25, m2c-as-draft-assist plus human
-   judgment (the post-#1515 m2c, which fixed a real stack-argument
-   misresolution). Kill criterion stated in advance: **<15% ships means the
-   tier is closed for this method generation** — write that result to the
-   catalog too, and do not iterate past it hunting for a better number.
+Address overlap between the two 193-256 B sets: **zero**. Same band, same
+`>=4 bl` filter, different functions, 27.6% collapsing to 0%. The campaign
+harvests in descending order of tractability, so a band's rate is a property of
+*the pool when it was measured*, not of the band. Sweep-7's 23.5% on 257-320 B
+is the same vintage as the 27.6% that just evaporated. Full write-up:
+[`docs/research/band-rate-vintage.md`](../research/band-rate-vintage.md).
 
-**If it landed between 10% and 25%** — the band is workable but poor. Report
-the number, take a modest batch, and let the measured rate speak for itself
-against the data lane's, which is currently shipping a far better return per
-hour of machine time.
+So this item is **not** "drain 257-512 B because it looks like 23%". It is one
+bounded test of a specific hypothesis.
 
-**In every branch, the protocol per candidate is fixed at 2-4 real
-iterations.** cntrl_alt_lenny has asked the fleet to take on more work, and for
-mechanical drain that means bigger batches. It does **not** mean thinner
-attempts: #1536 produced an uninterpretable 0/40 precisely because per-candidate
-effort was cut to fit a round, and the campaign spent a whole experiment
-learning nothing. Scale by taking more candidates, never by trying less hard on
-each. If you cannot do both, do fewer candidates properly and say so.
+**Scope — deliberately narrow.**
+
+1. **Record the closure first.** Write the 193-256 B result into
+   `codegen-walls.md` with both runs' evidence (0/40 reduced-effort, 0/20
+   matched-effort, the match_pct distributions, and the disjointness). A closed
+   band recorded with its evidence is a permanent saving; an unrecorded one gets
+   re-opened in three months by someone who forgot.
+
+2. **Then sample n=20 at 257-320 B only.** Not 257-512. Sweep-7 measured
+   321-376 B at 11.8% — already below any sane threshold — and >376 B has
+   essentially no data at all (0/2). Testing 257-512 as one block would blend a
+   plausible sub-band with two poor ones and produce exactly the kind of
+   ambiguous whole-band number that made #1536's comparison unusable. One
+   sub-band, one answer.
+
+3. Full 2-4-iteration protocol per candidate, drawn from the **unattempted**
+   population, ledgered shipped and parked, `attempts` column populated now that
+   #1544 added it — you are the first round that can record effort as data
+   rather than as prose. Please do.
+
+**The hypothesis under test, stated plainly:** is 257-320 B still tractable, or
+has it been cream-skimmed the way 193-256 B was? Sweep-7 took 34 candidates from
+it and shipped 8; what is left is what it declined.
+
+**Decision, fixed before you run:**
+
+- **>=25% ships** — the band genuinely holds, cream-skimming did not exhaust it,
+  and draining it is real work. Say so; the next wave drains.
+- **<=10% ships** — the code frontier is closed across every band this method
+  can reach. Record it as such in the catalog, and both CC lanes move to the
+  data pool, which is where the campaign's remaining measured headroom is
+  (66,096 B behind the verifier `cm-restock-carve-12` is building, plus 128,875 B
+  of non-string shapes).
+- **10-25%** — marginal. Report the number and the per-candidate effort, and let
+  it be weighed against the data lane's return per hour of machine time. Do not
+  drain a marginal band by default just because it is the familiar work.
+
+Do not adjust the sample, the protocol, or the thresholds to reach a number.
+Three rounds in a row have been trustworthy because nobody did.
+
+**Canary:** hand-verify one candidate end to end before batching — fastmatch
+100%, a real single-region `ninja sha1` PASS, delinks activation confirmed,
+ledger row read back. If no candidate in your sample produces a clean canary,
+that is itself close to the answer: say so explicitly, as #1545 did after
+hunting ten extra candidates rather than lowering the bar.
 
 **Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs with
-all three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
-`check_delink_dupes.py`, and `gate3.py --scope tests`. `git restore assets/`
-after each clean run. Dedup touched delinks against current `main`.
+all three SHA1 PASS lines pasted verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, and `gate3.py --scope tests`. If the round ships zero,
+say so plainly and note that the activation invariant correctly refuses a
+vacuous pass — #1545 handled that exactly right. `git restore assets/` after
+each clean run.
 
 ONE PR; verify every claim against `git diff --stat` including the arithmetic;
 `python tools/work_queue.py done claude-decomper cm-main-band-followthrough`.
