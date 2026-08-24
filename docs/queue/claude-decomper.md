@@ -1608,7 +1608,7 @@ delinks against **current `main`**, not just your branch base.
 ONE PR; verify every PR-body claim against `git diff --stat` before writing it;
 `python tools/work_queue.py done claude-decomper cm-main-exploit-drain-2`.
 
-### cm-main-boundary-rerun — settle the 193-256 B question with matched effort [TODO]
+### cm-main-boundary-rerun — settle the 193-256 B question with matched effort [DONE]
 
 `cm-main-exploit-drain-2` (#1536) ran the boundary test and reported **0/40**,
 then did the thing that makes it worth acting on: **it disclosed that Part 2 got

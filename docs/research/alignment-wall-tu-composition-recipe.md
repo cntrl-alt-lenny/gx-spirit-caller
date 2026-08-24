@@ -241,6 +241,55 @@ removed symbol that's still a relocation target in the original ROM).
 P-50 is confirmed PERMANENT with no open caveat. See P-50 in
 `codegen-walls.md` for the full readout.
 
+**wave 11 update: the n=2 differing-size exception does NOT transfer
+to `char[N]` literal-initialized arrays — a new, distinct failure
+mode, not just another P-50 instance.** `cm-restock-carve-11` composed
+31 windows of the non-4-aligned `main` string pool: 23 n=2 same-size
+pairs and 8 n=2 differing-size-but-address-ascending pairs (believed
+safe per this document's own precondition). The full tranche gate
+**failed EUR's SHA1 with a 93-million-byte divergence** — the ROM
+header's own ARM9-size field diverged, and `dsd check modules` failed
+every module, main through the last overlay (a file-layout-shift
+signature, not a localized mismatch). Bisecting (23-same-size-only:
+clean PASS) isolated the 8 differing-size pairs as the cause.
+
+Root-caused via standalone `.o` compilation (no full link needed —
+`arm-none-eabi-objdump -h` on the pre-link `.o`, the fast form of this
+document's own "inspect before linking" rule): **a `char[N]` global
+initialized from a string literal compiles to its OWN SEPARATE
+`.data` section per declaration — never one merged section with
+internal symbol offsets**, unlike the struct-typed globals this
+document's worked examples use (whose "in-section offset" evidence
+describes a genuinely merged section). Confirmed identical
+section-per-declaration behavior for BOTH a same-size pair (two 22 B
+sections) and a differing-size pair (17 B + 27 B sections) — so the
+section-splitting itself is not the trigger. The actual trigger is
+however the link step concatenates multiple same-named `.data`
+sections from ONE object file when their sizes DIFFER: same-size
+sections merge in a way that preserves this project's byte-identity
+requirement; differing-size ones do not, and the failure is a
+ROM-wide layout shift rather than P-50's contained wrong-symbol-first
+mismatch. This is mechanistically distinct from P-50 (which is about
+symbol offsets *within* one already-merged section) even though both
+ultimately trace back to "two top-level globals of differing size in
+one TU."
+
+**Standing rule addition**: this document's "n=2, non-decreasing size
+is safe by default" claim is confirmed ONLY for the struct/scalar
+types it was originally tested on (wave 5's worked examples). For
+plain arrays initialized from a literal — `char[N]` strings being the
+common case — **only same-size n=2 pairs are safe by default**; a
+differing-size pair, even address-ascending, must be compiled and
+inspected standalone before trusting, exactly like every n>=3 group
+already required by the combined standing rule above. Before reusing
+ANY composition recipe proven on one C type for a different type,
+check `objdump -h` on a standalone-compiled `.o`: if it shows N
+separate sections for N top-level declarations (rather than one
+merged section), the P-50 offset-based evidence chain does not
+directly apply and the safe/unsafe boundary must be re-derived
+empirically for that type. See `cm-restock-carve-11-2026-08-24.md`
+for the full incident.
+
 ## See also
 
 - [`ov004-odd-aligned-slot-recipe.md`](ov004-odd-aligned-slot-recipe.md) —
@@ -253,3 +302,9 @@ P-50 is confirmed PERMANENT with no open caveat. See P-50 in
 - [`cm-restock-carve-1-2026-08-06.md`](data/cm-restock-carve-1-2026-08-06.md) —
   wave 1, where the large multi-symbol bundle attempt's mwcc-reordering
   failure was first documented.
+- [`cm-restock-carve-11-2026-08-24.md`](data/cm-restock-carve-11-2026-08-24.md) —
+  wave 11, where the differing-size n=2 exception was found NOT to
+  transfer to `char[N]` literal-initialized arrays (separate `.data`
+  sections per declaration, not one merged section) — a 93-million-byte
+  EUR divergence caught by the canary-then-tranche discipline before
+  merge.

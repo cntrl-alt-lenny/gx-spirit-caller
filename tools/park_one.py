@@ -36,7 +36,7 @@ from wall_aware_headroom import _source_module
 _ATTEMPTS_REL = Path("docs/research/campaign-analytics/attempts.tsv")
 _ATTEMPTS_HEADER = (
     "addr", "module", "text_size", "tier", "shape", "result",
-    "match_pct", "park_class", "park_family", "brief",
+    "match_pct", "park_class", "park_family", "brief", "attempts",
 )
 
 
@@ -113,6 +113,7 @@ def _record_attempt(
     park_class: str,
     brief: str,
     result: str = "parked",
+    attempts: int | str = "",
 ) -> None:
     """Append one event, preserving repeated attempts and stable schema."""
     addr, module = _ledger_identity(c_rel)
@@ -125,7 +126,7 @@ def _record_attempt(
         addr, module, text_size, tier, shape, result,
         match_pct, park_class, derive_family({
             "result": result, "park_class": park_class,
-        }), brief,
+        }), brief, str(attempts).strip() if str(attempts).strip() else "",
     )
     report = audit_event(dict(zip(_ATTEMPTS_HEADER, row, strict=True)), root=ROOT)
     if report.error_count:
@@ -147,6 +148,7 @@ def park_one(
     match_pct: str = "unknown",
     park_class: str = "unknown",
     brief: str = "unknown",
+    attempts: int | str = "",
 ) -> int:
     """Preflight every external dependency before changing the source tree.
 
@@ -197,6 +199,7 @@ def park_one(
         "match_pct": match_pct,
         "park_class": park_class,
         "brief": brief,
+        "attempts": str(attempts).strip() if str(attempts).strip() else "",
     }
     report = audit_event(event, root=ROOT)
     if report.error_count:
@@ -241,6 +244,7 @@ def park_one(
         match_pct=match_pct,
         park_class=park_class,
         brief=brief,
+        attempts=attempts,
     )
     return 0
 
@@ -254,6 +258,7 @@ def main(argv: list[str] | None = None) -> int:
     parser.add_argument("--match-pct", default="unknown")
     parser.add_argument("--park-class", default="unknown")
     parser.add_argument("--brief", default="unknown")
+    parser.add_argument("--attempts", default="")
     args = parser.parse_args(argv)
 
     c_path = Path(args.c_path)
@@ -267,6 +272,7 @@ def main(argv: list[str] | None = None) -> int:
         match_pct=args.match_pct,
         park_class=args.park_class,
         brief=args.brief,
+        attempts=args.attempts,
     )
 
 

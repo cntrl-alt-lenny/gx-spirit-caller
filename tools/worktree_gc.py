@@ -15,7 +15,17 @@ from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-KEEP_BASENAMES = frozenset({"brain", "decomper", "scaffolder", "kb-map", "kb-types"})
+KEEP_BASENAMES = frozenset(
+    {
+        "brain",
+        "decomper",
+        "scaffolder",
+        "kb-map",
+        "kb-types",
+        "codex-decomper-queue",
+        "codex-scaffolder-queue",
+    }
+)
 WORKTREE_MARKERS = frozenset({"config", "include", "libs", "src", "tests", "tools"})
 
 

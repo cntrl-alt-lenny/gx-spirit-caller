@@ -7,19 +7,19 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**138 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**144 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
-- [Analysis / worklist](#analysis--worklist) (15)
+- [Analysis / worklist](#analysis--worklist) (16)
 - [Rename support](#rename-support) (7)
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (7)
+- [Hygiene / invariants](#hygiene--invariants) (8)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (64)
+- [Uncategorised](#uncategorised) (68)
 
 ## Analysis / worklist
 
@@ -96,6 +96,12 @@ NitroSDK / MSL_C / libnns API surface.
 **cross-module call-density report.**
 
 Walks every `config/<ver>/arm9/**/relocs.txt`, counts the control-flow edges between each (source module, destination module) pair, and produces:
+
+### `tools/pool_freshness.py`
+
+**Measure campaign pools from the live repository.**
+
+The pool definitions intentionally delegate to the campaign's existing selectors.  This module adds only a reproducible measurement envelope: count, effective bytes, repository revision, and the exact command.
 
 ### `tools/progress.py`
 
@@ -317,6 +323,10 @@ The metadata scattered across `symbols.txt`, `delinks.txt`, and the C sources in
 
 **Reject unqualified function-count completion claims in metric docs.**
 
+### `tools/check_park_class_drift.py`
+
+**Report parked ledger values missing from the controlled park-class map.**
+
 ### `tools/check_prototypes_provenance.py`
 
 **re-verify include/game/prototypes.h**
@@ -499,6 +509,10 @@ This is visibility only: it never rejects a change.  It finds added or modified 
 
 Ported from khdays-decomp's `tools/audit_callsite_arity.py` (https://github.com/Yokimitsuro/khdays-decomp, CC0-1.0 -- see docs/research/data/khdays-callsite-arity-report-2026-07-25.md for the full attribution note this project's q-khdays…
 
+### `tools/audit_ledger_contradictions.py`
+
+**Audit repeated attempts.tsv events without treating repeats as duplicates.**
+
 ### `tools/batch_carve.py`
 
 **automate the DETERMINISTIC mechanical carve lanes (brief 456).**
@@ -649,6 +663,12 @@ The merge gate (`ninja sha1` for eur, usa AND jpn, byte-identical) is the most-r
 
 PR #1327's 2047-line bank was reverted: adversarial review found 59/102 sampled conflicts had a prototype that CONTRADICTED its own matched C body (33 arity mismatches, 26 return-type mismatches), because it derived signatures by majorit…
 
+### `tools/generate_dashboard.py`
+
+**regenerate docs/dashboard.md, the committed**
+
+one-page status snapshot every number on which is tool-derived.
+
 ### `tools/generate_progress_bars.py`
 
 **Combined per-region progress-bar SVG (one card, three nested bars).**
@@ -661,6 +681,10 @@ Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C  
 
 snapshot of "where the project actually is".
 
+### `tools/generate_walls_index.py`
+
+**Generate a navigable index for the codegen wall catalog.**
+
 ### `tools/integrate.py`
 
 **deterministic merge-round driver for the brain lane.**
@@ -672,6 +696,10 @@ Merge a list of reviewed branches into the current integration branch with the r
 **a pre-send gate on agent kickoff text (R&D r8, §4).**
 
 The 3-region `gate3.py` is our *merge* gate — the strongest possible arbiter of correctness. But it fires only after an agent has already spent its hour. The recurring void-work incidents (b576 transcription-without-invariant, b589 wrong…
+
+### `tools/ledger_analytics.py`
+
+**Summarize self-reported match percentages for selected ledger briefs.**
 
 ### `tools/m2c_bootstrap.py`
 

@@ -1,4 +1,4 @@
-addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief
+addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	attempts
 0x022961a0	ov002	28	default	tail-call-forwarder	shipped	100	none		brief-650
 0x021b9ba0	ov002	52	default	guard-call	shipped	100	none		brief-650
 0x021c9af0	ov002	60	default	set-clear-bit	shipped	100	none		brief-650
@@ -1714,3 +1714,23 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief
 0x021aad10	ov020	252	default	unknown	parked	23.8	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
 0x021aaf5c	ov021	256	default	unknown	parked	9.4	reg-alloc	PROVISIONAL:register-allocation	cm-main-exploit-drain-2-part2
 0x02251bb0	ov002	140	default	unknown	parked	65.7	P-23-tentative	PROVISIONAL:unmapped	cm-main-exploit-drain-2
+0x020264f0	main	244	default	unknown	parked	57.4	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x020990e0	main	196	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x0209f7fc	main	204	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x020886a0	main	256	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x021b3e38	ov019	200	default	unknown	parked	21.1	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x021ad284	ov005	216	default	unknown	parked	92.6	register-choice	PROVISIONAL:register-choice	cm-main-boundary-rerun
+0x021b280c	ov014	252	default	unknown	parked	87.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-main-boundary-rerun
+0x02204380	ov002	204	default	unknown	parked	35.3	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x02262804	ov002	224	default	unknown	parked	10.7	register-choice	PROVISIONAL:register-choice	cm-main-boundary-rerun
+0x021b6514	ov010	208	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x021adc50	ov000	212	default	unknown	parked	5.5	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x0223252c	ov002	204	default	unknown	parked	3.9	P-20-row-offset	P-20	cm-main-boundary-rerun
+0x02233c50	ov002	220	default	unknown	parked	63.6	P-20-row-offset	P-20	cm-main-boundary-rerun
+0x02249818	ov002	256	default	unknown	parked	5.9	P-20-row-offset	P-20	cm-main-boundary-rerun
+0x0224a038	ov002	232	default	unknown	parked	4.9	P-20-row-offset	P-20	cm-main-boundary-rerun
+0x0228130c	ov002	236	default	unknown	parked	0.0	P-20-row-offset	P-20	cm-main-boundary-rerun
+0x020330e4	main	204	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x02086d70	main	212	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x021abbf0	ov008	236	default	unknown	parked	13.6	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun
+0x021aaa80	ov020	252	default	unknown	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	cm-main-boundary-rerun

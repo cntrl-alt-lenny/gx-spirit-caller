@@ -8336,14 +8336,14 @@ rather than iterating.
 | P-30 | LIVE (tentative) | Canary-lever residual — shared large-offset base reproduces structure but not its physical register (main). |
 | P-31 | LIVE | Predication-resistance — mwcc fully if-converts a guard no restructuring can force into a branch (mirror of C-55). 8+ confirmed instances, no longer tentative. |
 | P-32 | LIVE | OR-of-non-adjacent-equality-values resists branch separation; sticky CMP/CMPNE predicated form. Scope caveat: adjacency alone insufficient inside a larger guard chain. |
-| P-33 | LIVE (tentative) | Same-register repeated-equality compound-compare-merge; no working recipe (C-55 boundary case). Confirmed bidirectional. |
+| P-33 | LIVE | Same-register repeated-equality compound-compare-merge; no working recipe (C-55 boundary case). Confirmed bidirectional across three members. |
 | P-34 | LIVE (tentative) | Prologue pad-register-fold resistance — stack-alignment pad won't fold into the `lr` push from any source form. |
 | P-35 | LIVE (tentative) | SUBS-flag-fusion resistance for a variable-assigned shift/subtract amount. |
 | P-36 | LIVE | Instruction-scheduling order not source-controllable (6 sub-shapes); highest-yield new wall family this round. |
 | P-37 | LIVE (tentative) | Register reuse via free-`lr`-after-`pop{pc}` — hand-optimized allocation trick, single instance. |
 
 **Current count:** 32 genuinely live P-entries (P-17 under reconsideration,
-not yet retired; P-28/29/30/34/35/37 tentative but counted live); four retired
+not yet retired; P-23/24/28/29/30/34/35/37 tentative but counted live); four retired
 entries (P-6, P-7, P-8, P-10). The three corrected headings among the
 above are P-7, P-8, and P-10; their historical bodies remain intact. This
 table previously undercounted by omitting P-27/28/29 after they were added
@@ -10442,6 +10442,50 @@ wall. The other 13 are new: `02251104`, `02251ec0`, `022527b8`, `02295efc`,
 cohort to **50** (37 + 13 new). Ledger detail and match percentages:
 `cm-main-exploit-drain-2-2026-08-22.md`.
 
+**More members, cm-main-boundary-rerun (2026-08-22):** the matched-effort
+193-256B re-run drew 7 ov002 candidates from the untouched pool remainder; 5
+shared this table and reproduced the identical residual: `0223252c` (3.9%),
+`02233c50` (63.6%), `02249818` (5.9%), `0224a038` (4.9%), `0228130c` (0.0%,
+structural). All 5 new (no overlap with prior waves' addresses). Brings the
+confirmed cohort to **55** (50 + 5 new). 20 consecutive hits across three
+independent rounds (`cm-main-exploit-drain-1` 7, `cm-main-exploit-drain-2`
+Part 1+2 8, this round 5) with zero ships — the most heavily evidenced wall
+in the catalog. Ledger detail: `cm-main-boundary-rerun-2026-08-22.md`.
+
+### P-20-mode-switch-selector. `r0`-vs-`r1` register choice for a struct's-first-field 3-case mode switch (tentative, n=2, independent provenance)
+
+**The shape:** a function beginning `switch (self->mode) { case 0: ...; case
+1: ...; case 2: ...; }` (or the equivalent field read directly in the switch
+controlling expression), where target puts the switch selector in `r1` and
+every attempted C draft puts it in `r0` — a 4-word residual (one `cmp` per
+case, plus the initial `ldr`) that survives switch-vs-if/else-chain
+restructuring (if/else additionally inverts branch polarity and moves the
+result *away* from matching, not toward it), declaration-order changes,
+signedness changes on the field type, and an added unused second parameter.
+
+**Falsifiable claim:** *some source restructuring puts the switch selector in
+`r1`.* **Falsified on both members tried:**
+
+- `func_ov014_021b2eec` (main, 252B) — `cm-main-exploit-drain-2`
+  (2026-08-22), 92.2%.
+- `func_ov005_021ad284` (ov005, 216B) — `cm-main-boundary-rerun`
+  (2026-08-22), 92.6%.
+
+Both are structurally independent (different module, different field
+offsets, different callees, different case-body contents) and both plateau
+on the exact same 4-word pattern, which is why this is recorded as tentative
+rather than a single-instance curiosity — but two members from what is
+effectively one shape family (mode-switch dispatchers, common in this
+codebase's state-machine style) is a real but narrow evidence base. A third
+independent hit on a differently-shaped switch would move this to confirmed.
+
+**Recipe status: NONE.**
+
+**Affected picks (2):** `021b2eec`, `021ad284`.
+
+**Provenance:** `cm-main-exploit-drain-2` (2026-08-22);
+`cm-main-boundary-rerun` (2026-08-22).
+
 **Recipe status: NONE. Correction (2026-07-30): do NOT treat this
 cohort as a case for prioritizing the permuter.** An earlier version of
 this entry argued the growing member count "may justify solving the
@@ -11140,7 +11184,8 @@ repeated-equality tests on one already-loaded register.
 
 **Falsifiable claim:** *some source restructuring defeats the
 compound-compare-merge for same-register repeated-equality tests.*
-**Falsified on 2 members, cm-main-tier-sweep-1 (2026-08-08), batch 1:**
+**Falsified on 3 members, across cm-main-tier-sweep-1 and
+cm-main-tier-sweep-2 (2026-08-08):**
 `func_0204931c` (2-way, `tag==0`/`tag==2`) — `&&`, goto-to-shared-
 label, goto-to-distinct-labels, and `switch`-with-fallthrough all
 tried; 3 gave byte-identical 37.5% output, one (distinct labels) gave
@@ -11151,8 +11196,8 @@ sequential goto (10.0%, worse) → `volatile` parameter (0.0%, worst —
 forces a spurious stack frame). Attempts were NOT monotonic on this
 member; further tries actively degraded the match.
 
-**Affected picks:** `func_0204931c` (38.5%), `func_02052704` (20.0%)
-— both main.
+**Affected picks:** `func_0204931c` (38.5%), `func_02052704` (20.0%),
+`func_0206e33c` (50%) — all main.
 
 **Recipe status: NONE.**
 
