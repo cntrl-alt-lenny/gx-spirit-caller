@@ -904,7 +904,7 @@ inline. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-park-class-drift-guard — new raw park_class values appear every round and are caught by hand [TODO]
+### q-park-class-drift-guard — new raw park_class values appear every round and are caught by hand [DONE]
 
 `tools/park_class_map.tsv` is the controlled vocabulary `q-park-class-remap`
 (#1511) established. It works, but it is maintained reactively: #1524 had to add
