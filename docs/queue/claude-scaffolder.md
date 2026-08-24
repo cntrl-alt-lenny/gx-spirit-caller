@@ -1868,7 +1868,7 @@ LAST.
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-11`.
 
-### cm-progress-dashboard — one page where every number is tool-derived [TODO]
+### cm-progress-dashboard — one page where every number is tool-derived [DONE]
 
 The project owner steers this campaign without reading diffs; the brain
 re-derives the same handful of numbers by hand every round (natural-C % per

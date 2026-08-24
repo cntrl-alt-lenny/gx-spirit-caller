@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**138 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**139 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (7)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (64)
+- [Uncategorised](#uncategorised) (65)
 
 ## Analysis / worklist
 
@@ -648,6 +648,12 @@ The merge gate (`ninja sha1` for eur, usa AND jpn, byte-identical) is the most-r
 **evidence-only canonical prototype bank generator.**
 
 PR #1327's 2047-line bank was reverted: adversarial review found 59/102 sampled conflicts had a prototype that CONTRADICTED its own matched C body (33 arity mismatches, 26 return-type mismatches), because it derived signatures by majorit…
+
+### `tools/generate_dashboard.py`
+
+**regenerate docs/dashboard.md, the committed**
+
+one-page status snapshot every number on which is tool-derived.
 
 ### `tools/generate_progress_bars.py`
 
