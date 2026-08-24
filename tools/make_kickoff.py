@@ -15,10 +15,29 @@ sys.path.insert(0, str(ROOT / "tools"))
 import kickoff_lint  # noqa: E402
 
 
-LANES = ("decomper", "scaffolder", "kb-map", "kb-types")
 POOL_BY_ITEM = {"q-pool-freshness-tool": "wall-bl4-small"}
-WINDOWS_ROOT = "C:/Users/leona/Dev/gx-spirit-caller"
-MAC_ROOT = "~/Dev/spirit-caller"
+# One table is the source of truth for lane-to-worktree routing. Windows was
+# brain-verified on 2026-08-22. Mac follows AGENTS.md, but remains explicitly
+# UNVERIFIED until a Mac brain runs and confirms the generated paths.
+LANE_WORKTREES = {
+    "decomper": {
+        "windows": "C:/Users/leona/Dev/gx-spirit-caller/decomper",
+        "mac": "~/Dev/spirit-caller/decomper",
+    },
+    "scaffolder": {
+        "windows": "C:/Users/leona/Dev/gx-spirit-caller/scaffolder",
+        "mac": "~/Dev/spirit-caller/scaffolder",
+    },
+    "kb-map": {
+        "windows": "C:/Users/leona/Dev/gx-spirit-caller/kb-map",
+        "mac": "~/Dev/spirit-caller/kb-map",
+    },
+    "kb-types": {
+        "windows": "C:/Users/leona/Dev/gx-spirit-caller/kb-types",
+        "mac": "~/Dev/spirit-caller/kb-types",
+    },
+}
+LANES = tuple(LANE_WORKTREES)
 
 
 @dataclass(frozen=True)
@@ -39,11 +58,10 @@ def lane_spec(lane: str, host: str) -> LaneSpec:
         raise ValueError(f"unknown lane {lane!r}; choose from {', '.join(LANES)}")
     if host not in {"windows", "mac"}:
         raise ValueError("host must be windows or mac")
-    root = WINDOWS_ROOT if host == "windows" else MAC_ROOT
     return LaneSpec(
         lane=lane,
         host=host,
-        worktree=f"{root}/{lane}",
+        worktree=LANE_WORKTREES[lane][host],
         interpreter="python" if host == "windows" else "python3.13",
         powershell=host == "windows",
     )

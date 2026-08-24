@@ -1102,7 +1102,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-unittest-required-evidence`; commit;
 then take the next queue item immediately.
 
-### q-make-kickoff-generator — the machine writes the preflight, the brain writes the prose [TODO]
+### q-make-kickoff-generator — the machine writes the preflight, the brain writes the prose [DONE]
 
 ⚠️ **Ordering: take this AFTER `q-pool-freshness-tool`** — it consumes that
 tool's output. If you reach this item and pool-freshness is not yet merged,

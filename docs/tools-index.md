@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**144 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**145 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (8)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (68)
+- [Uncategorised](#uncategorised) (69)
 
 ## Analysis / worklist
 
@@ -710,6 +710,10 @@ mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
 ### `tools/main_shape_reclassify.py`
 
 **Mechanically reclassify the main small-tier worklist from .s bodies.**
+
+### `tools/make_kickoff.py`
+
+**Emit and self-lint the mechanical part of an agent kickoff.**
 
 ### `tools/naming_census.py`
 
