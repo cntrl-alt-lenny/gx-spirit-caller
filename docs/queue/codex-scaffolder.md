@@ -1117,9 +1117,26 @@ Build `tools/make_kickoff.py --lane <lane> --host <windows|mac> [--item <id>]
    lanes, `cd <path> || { echo "CANNOT REACH WORKTREE"; exit 1; }` for the
    Claude lanes), then the EXPECT assignment and the single-line location
    guard, tool-presence checks, `git fetch origin` + `git checkout -B <branch>
-   origin/main`, `work_queue.py next <lane> --claim`, and the expected-item
-   line. Host-correct interpreter throughout (Windows: plain `python`; Mac:
+   origin/main`, the **read-only** `work_queue.py next <lane>` used as the
+   expected-item CHECK, and only then `work_queue.py next <lane> --claim`.
+   Host-correct interpreter throughout (Windows: plain `python`; Mac:
    `python3.13`).
+
+   ⚠️ **That ordering is the fix for two defects the brain shipped, both of
+   which hit real lanes (2026-08-22 and 2026-08-24). The generator must make
+   them impossible rather than leaving them to the author:**
+
+   - **A mutating command must never be the one whose output triggers a STOP.**
+     Round 0822c's kickoffs ended the preflight with `next <lane> --claim` and
+     then said "if that does not print X, STOP". `--claim` *writes the queue
+     file*, so a STOP left a `CLAIMED` marker in a dirty worktree while the lane
+     — correctly, by its own lights — reported it had changed nothing. Check
+     with the read-only form; claim only after the check passes.
+   - **Emit a match test that is actually true.** "must print `<id>`" is false
+     on its face: `next` prints the whole heading, `### <id> — <title> [TODO]`.
+     A literal-minded lane is right to stop, and one did. Emit a containment
+     check it can evaluate — pipe to `grep -q '<id>'`, or word it as "must print
+     a heading whose id is `<id>`". Never assert equality against a substring.
 2. The lane→worktree path table lives in ONE committed structure in the tool.
    Windows paths (`C:/Users/leona/Dev/gx-spirit-caller/{decomper, scaffolder,
    kb-map, kb-types}`) are brain-verified as of 2026-08-22. Mac paths follow
