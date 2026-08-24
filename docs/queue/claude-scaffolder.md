@@ -1932,10 +1932,21 @@ a mis-carved symbol does not slip through as "probably fine", it fails the
 gate. `cm-restock-carve-10` shipped **739 files / 15,732 B in a single wave**
 with zero escapes. That is the proof that the method scales.
 
-So: **take the largest tranche you can gate cleanly in one round, and treat
-739 as a floor rather than a target.** If the pool supports 1,500 or 2,500
-files, take them. The binding constraint is the ~40-minute 3-region clean gate
-and the machine-wide toolchain lock, not your carving throughput.
+**Sizing guidance, corrected 2026-08-24 after owner feedback.** An earlier
+draft of this item told you to treat 739 as a floor and push toward 1,500-2,500
+files. That was wrong for this lane and is withdrawn. cntrl_alt_lenny's
+throughput ask was aimed at the two Codex lanes, which were clearing their
+queues in ~25 minutes; **this lane already runs long**, and its real cost is the
+~40-minute 3-region clean gate on a machine-wide-serialised toolchain that the
+CC Decomper also needs.
+
+So size the tranche to **what you can carve, gate and write up comfortably
+within one round** — roughly wave 10's scale is a fine default, larger only if
+the pool happens to make it cheap. Do not inflate the batch to hit a number.
+Finishing one well-gated wave and leaving the rest for wave 13 is strictly
+better than a bigger wave that runs past the round or crowds the Decomper off
+the machine. Queue depth is what keeps this lane busy now, not batch size —
+`cm-restock-carve-13` is already seeded behind this one.
 
 **What is NOT safe to scale, and must not be:** the canary-before-batch rule,
 the `screen_names_against_src` precondition, the per-candidate alignment check,
