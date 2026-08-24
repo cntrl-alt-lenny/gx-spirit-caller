@@ -734,7 +734,7 @@ clean + a test that shows the old behaviour would have reported "no functions"
 for a deliberately-broken objdump stub and the new behaviour reports the launch
 failure. Red-first, per control 7. Build-free.
 
-### q-worktree-gc — safe, repeatable cleanup of stale sweep worktrees [TODO]
+### q-worktree-gc — safe, repeatable cleanup of stale sweep worktrees [DONE]
 
 The Windows PC has accumulated 20+ registered worktrees from finished sweeps
 (`wfs1-batch1..5`, `sweep17-batch*`, `fix-14xx`, the codex-port series), all on
