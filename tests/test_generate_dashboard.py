@@ -31,8 +31,25 @@ def _run(*args: str) -> subprocess.CompletedProcess:
                           capture_output=True, text=True, cwd=ROOT)
 
 
+def _is_shallow() -> bool:
+    """True when the checkout has no real history (CI uses depth 1)."""
+    r = subprocess.run(["git", "rev-parse", "--is-shallow-repository"],
+                       capture_output=True, text=True, cwd=ROOT)
+    return r.stdout.strip() == "true"
+
+
 class TestCommittedDashboardIsCurrent(unittest.TestCase):
     def test_check_passes_on_the_committed_dashboard(self):
+        # The dashboard's trend section is derived from `git log --follow` over
+        # docs/state-table.md, so regenerating it in a SHALLOW clone produces a
+        # different (historyless) document and --check fails for a reason that
+        # has nothing to do with staleness. CI checks out at depth 1
+        # (actions/checkout@v4, no fetch-depth). Skip rather than assert against
+        # history the checkout does not have -- the same choice
+        # tests/test_kickoff_lint.py already makes for its history fixture.
+        # (Brain fix at merge, round 0824: green locally, red in CI.)
+        if _is_shallow():
+            self.skipTest("shallow clone: dashboard trend needs real git history")
         r = _run("--check")
         self.assertEqual(
             r.returncode, 0,
