@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**137 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**138 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (7)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (63)
+- [Uncategorised](#uncategorised) (64)
 
 ## Analysis / worklist
 
@@ -842,6 +842,12 @@ Brief 608 (docs/research/brief-608-wineprefix-spike.md) measured near-linear com
 **the autonomous self-chaining work queue (2026-07-20).**
 
 Named `work_queue.py`, not `queue.py`: running any `python3.13 tools/X.py` script puts `tools/` first on `sys.path`, so a file literally named `queue.py` there shadows the stdlib `queue` module for every script in this directory -- inclu…
+
+### `tools/worktree_gc.py`
+
+**Report and safely prune stale registered git worktrees.**
+
+Only a clean worktree whose HEAD is an ancestor of ``origin/main`` can be removed.  Unregistered worktree-like directories are reported for human review and are never removed by this tool.
 
 ### `tools/xmap_normalize.py`
 
