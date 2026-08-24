@@ -972,7 +972,7 @@ move as lanes append). Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-walls-catalog-index — 13,561 lines with no way in [TODO]
+### q-walls-catalog-index — 13,561 lines with no way in [DONE]
 
 `docs/research/codegen-walls.md` is **13,561 lines**. It is the campaign's most
 load-bearing document — every sweep consults it, `wall_aware_headroom.py`
