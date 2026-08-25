@@ -1171,7 +1171,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python
 tools/work_queue.py done codex-scaffolder q-make-kickoff-generator`; commit;
 then take the next queue item immediately.
 
-### q-wine-link-concurrency — the one experiment that could widen the machine's real bottleneck [TODO]
+### q-wine-link-concurrency — the one experiment that could widen the machine's real bottleneck [DONE]
 
 This is the highest-leverage item in your queue, because it targets the
 constraint that actually caps this project's throughput.
