@@ -92,7 +92,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | metric | bytes | of data bytes |
 | --- | ---: | ---: |
-| Typed-array | 211,020 | 4.42% |
+| Typed-array | 218,120 | 4.57% |
 | Named-struct | 73,876 | 1.55% |
 | *(total data bytes)* | 4,776,528 | |
 

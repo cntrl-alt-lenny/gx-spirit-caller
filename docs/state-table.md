@@ -41,7 +41,7 @@ Shipped `.text`: 415,606 B · remaining `.text`: 1,957,054 B · denominator: 2,3
 
 | metric | bytes | of data bytes |
 | --- | ---: | ---: |
-| Typed-array | 211,020 | 4.42% |
+| Typed-array | 218,120 | 4.57% |
 | Named-struct | 73,876 | 1.55% |
 | *(total data bytes)* | 4,776,528 | |
 
