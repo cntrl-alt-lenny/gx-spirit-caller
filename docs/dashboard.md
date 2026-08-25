@@ -137,7 +137,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 | Named-struct | 75,880 | 1.59% |
 | *(total data bytes)* | 4,776,528 | |
 
-Remaining zero-reader data pool (`main`, re-derived fresh via `data_worklist.py --include-data-readers`, not copied from a prior wave's writeup): **75 symbols / 2,448 bytes** with no function reader AND no data-pointer-table reader under the extended call graph (`cm-restock-carve-10`'s `edges_load_from_data`).
+Remaining zero-reader data pool (`main`, re-derived fresh via `data_worklist.py --include-data-readers`, not copied from a prior wave's writeup): **0 symbols / 0 bytes** with no function reader AND no data-pointer-table reader under the extended call graph (`cm-restock-carve-10`'s `edges_load_from_data`).
 
 ### Data opportunity disposition
 
@@ -145,7 +145,7 @@ Reproduce the current reachable total with `python tools/data_worklist.py --vers
 
 | disposition | symbols | bytes | command / evidence |
 | --- | ---: | ---: | --- |
-| reachable, reader-attributed | 5,321 | 187,760 | `data_worklist.py --include-data-readers --no-outputs` |
+| reachable, reader-attributed | 8,099 | 407,506 | `data_worklist.py --include-data-readers --no-outputs` |
 | proven recipe currently shippable |  |  | blank: the build-free worklist cannot classify the remaining shapes without compiled bytes |
 | blocked pending per-group verification |  |  | blank for the whole reachable pool; the latest scoped string-pool disposition is published in `cm-restock-carve-11-2026-08-24.md` |
 

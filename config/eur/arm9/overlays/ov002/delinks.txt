@@ -14252,3 +14252,6 @@ src/overlay002/data/data_ov002_022cce28.s:
 src/overlay002/data/data_ov002_022cd090.s:
     complete
     .data start:0x022cd090 end:0x022cd300
+src/overlay002/bss/data_ov002_bss.s:
+    complete
+    .bss start:0x022cd300 end:0x022d2980
