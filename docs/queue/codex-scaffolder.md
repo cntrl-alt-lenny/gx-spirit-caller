@@ -1253,7 +1253,7 @@ first.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-dispatch-log-lint — the log only helps if it is actually appended [TODO]
+### q-dispatch-log-lint — the log only helps if it is actually appended [DONE]
 
 `docs/dispatch-log.md` was created in round 0822b to close the campaign's most
 persistent failure class: nobody knowing which machine a round ran on, and

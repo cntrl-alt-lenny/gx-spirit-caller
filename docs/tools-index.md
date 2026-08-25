@@ -16,7 +16,7 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (8)
+- [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
 - [Uncategorised](#uncategorised) (69)
@@ -312,6 +312,10 @@ Failure mode (real incident: PR #1365, and #1360 blocked by it): a status check 
 **catch the duplicate-delink footgun before it burns a gate.**
 
 Failure mode (real incidents: PR #948, #198): a sweep PR carves a function at an address some *other* file on `main` already delinks. After the merge the region's `delinks.txt` lists that `.text start:ADDR` under two different source fil…
+
+### `tools/check_dispatch_log.py`
+
+**Require a new dispatch-log row when a round updates the state handoff.**
 
 ### `tools/check_match_invariants.py`
 
