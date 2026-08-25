@@ -1875,7 +1875,7 @@ note that `check_activation_invariant.py` correctly refuses a vacuous pass.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper cm-513-1023-census`.
 
-### cm-321-376-probe — the one band left unmeasured, and it is cheap [TODO]
+### cm-321-376-probe — the one band left unmeasured, and it is cheap [DONE]
 
 The code frontier is now mapped everywhere except here:
 
