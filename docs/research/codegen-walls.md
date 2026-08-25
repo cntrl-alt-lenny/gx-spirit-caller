@@ -12356,7 +12356,7 @@ presenting it as current. See `band-rate-vintage.md` for the full
 derivation and the `pool_freshness.py` precedent this extends from pool
 *sizes* to pool *ship rates*.
 
-### BR-3. The 257-320 B `.text` band (EUR, `>=4 bl/blx`, unattempted): PARTIAL SAMPLE, marginal signal, not a verdict
+### BR-3. The 257-320 B `.text` band (EUR, `>=4 bl/blx`, unattempted): PARTIAL SAMPLE — superseded by BR-4
 
 `cm-main-band-followthrough` sampled n=20 from the unattempted 257-320 B
 pool (283 candidates / 81,680 B after the `>=4 bl/blx` filter; stratified
@@ -12400,6 +12400,75 @@ first, leaving loop-and-bitpack residue behind.
 
 **Provenance:** `cm-main-band-followthrough` (this PR), `attempts.tsv`
 rows tagged `cm-main-band-followthrough`, `band-rate-vintage.md`.
+
+### BR-4. The 257-320 B `.text` band (EUR, `>=4 bl/blx`): full n=20 sample complete — MARGINAL (4/20 = 20%)
+
+`cm-main-band-finish` processed the 11 candidates BR-3 deferred, completing
+the n=20 sample BR-3 started. Same protocol, same 2-4-iteration budget,
+`attempts` populated on every row (this campaign's second consecutive
+round to do so, following `cm-main-band-followthrough`'s first).
+
+**Full n=20 result:**
+
+| | n | shipped | ship rate |
+|---|---:|---:|---:|
+| First 9 (`cm-main-band-followthrough`) | 9 | 2 | 22.2% |
+| Remaining 11 (`cm-main-band-finish`) | 11 | 2 | 18.2% |
+| **Full sample** | **20** | **4** | **20.0%** |
+
+Applying the pre-registered thresholds (>=25% band holds; <=10% frontier
+closed; 10-25% marginal) unchanged: **20.0% is MARGINAL.** Below the
+"band holds, drain it" line, above the "frontier closed, move to data"
+line. Per the thresholds' own pre-registered handling of this outcome:
+report the number, weigh it against the data lane's ROI, do not drain
+by default.
+
+**Two real, reusable levers found while processing the 11**, both worth
+carrying into future rounds on this same struct family:
+
+1. **17-bit-and-similar wide bitfield masks want real C bitfields, not a
+   single combined `& ~mask` constant.** `func_ov012_021ca6dc`'s `f18`
+   field (bits 0-16, mask `0x1ffff`) went from 10.3% to 85.9% in one
+   change: replacing `cfg.f18 = (cfg.f18 & ~0x1ffff) | 0x8000` with three
+   bitfield members (`unsigned f18a:7, f18b:7, f18c:3`) assigned
+   individually. A chained `& ~0x7f & ~0x3f80 & ~0x1c000` (three terms,
+   same final constant) made **no difference** — mwcc constant-folds a
+   chain of compile-time-constant masks before instruction selection, so
+   the fix has to be a real bitfield write, not a differently-punctuated
+   mask expression. The subsequent register-rotation fix (reordering
+   which field is read first in the following conditional block) took
+   the same function to 94.9%. Applying the identical bitfield lever to
+   `func_ov013_021ca15c`'s structurally-identical `f18` field did **not**
+   reproduce the gain (stayed at 2.6%, blocked by an unrelated
+   register-allocation issue) — the lever fixes the bitfield-mask
+   codegen specifically, it is not a general fix for every function that
+   touches this struct family.
+2. **A 16-bit byte-swap idiom's operand order in source can matter even
+   though `(x>>8)|(x<<8)` and `(x<<8)|(x>>8)` are mathematically
+   identical.** `func_02072f00` went from 61.2% to 78.8% purely by
+   switching every `(x >> 8) | (x << 8)` to `(x << 8) | (x >> 8)` — nine
+   textually-identical occurrences, one mechanical find/replace. Neither
+   the earlier `func_ov016_021b6f08` (P-20-mode-switch-selector family,
+   #1563) nor this round's `func_ov017_021b40d8` (which shipped with the
+   `>>`-first order intact, since it doesn't use this idiom at all) had
+   a byte-swap idiom to confirm this against, so treat this as a
+   single-instance finding, not yet a confirmed lever — worth
+   re-testing the next time this idiom appears in an unshipped
+   candidate.
+
+**Per-candidate detail, full risk notes, and the two shipped functions'
+diffs:** see `cm-main-band-finish-2026-08-25.md`.
+
+**Recommendation, unchanged from BR-3's provisional read and now backed
+by the complete sample:** do not drain 257-320 B by default. The 20.0%
+rate is real signal, not noise or an artifact of partial coverage
+(BR-2's concern) — the full n=20 denominator this round completes is
+exactly what the thresholds were pre-registered against. Report it and
+let it be weighed against the data lane's known 66,096 B (verifier
+`cm-restock-carve-12`) + 128,875 B (non-string shapes) pool.
+
+**Provenance:** `cm-main-band-followthrough` (#1563), `cm-main-band-finish`
+(this PR), `attempts.tsv` rows tagged with either brief.
 
 ## Open questions (not levers, not walls — genuinely unresolved)
 

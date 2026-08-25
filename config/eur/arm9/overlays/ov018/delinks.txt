@@ -104,7 +104,7 @@ src/overlay018/func_ov018_021ace14.c:
     complete
     .text start:0x021ace14 end:0x021ace68
 
-src/overlay018/func_ov018_021ace68.s:
+src/overlay018/func_ov018_021ace68.c:
     complete
     .text start:0x021ace68 end:0x021acf80
 

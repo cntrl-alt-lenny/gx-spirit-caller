@@ -1772,7 +1772,7 @@ each clean run.
 ONE PR; verify every claim against `git diff --stat` including the arithmetic;
 `python tools/work_queue.py done claude-decomper cm-main-band-followthrough`.
 
-### cm-main-band-finish — process the 11 you deferred, then apply the thresholds to a real n=20 [TODO]
+### cm-main-band-finish — process the 11 you deferred, then apply the thresholds to a real n=20 [DONE]
 
 `cm-main-band-followthrough` (#1563) did the hardest thing available to it: it
 sampled n=20 at 257-320 B, fully processed 9 (2 shipped, 7 parked), read and
