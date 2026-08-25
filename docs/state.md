@@ -27,6 +27,91 @@ by the executed toggle. (6) Local worktree GC on the PC (registered+merged only;
 orphaned dirs reported to the owner, never `rm -rf`'d).
 
 **Last updated:** 2026-08-25 — **(Windows PC, brain=Opus 5; roster unchanged.)
+Round 0825b: four PRs, and two of them reset the campaign's map. A Windows-only
+tooling bug had been hiding roughly half the data pool since `cm-restock-carve-10`
+landed. And the port backlog — deferred since the beginning — turns out to be
+**95% byte-identical**, which makes it the largest and cheapest thing on the
+board by a wide margin.**
+
+Merged **#1577** through **#1580**. All four lanes QUEUE-EMPTY.
+
+✅ **Transcript audit executed in full**, all four lanes on this host.
+
+**THE CODE FRONTIER IS CLOSED, except one pocket.** `cm-321-376-probe` (#1579)
+re-tested the last unmapped band and got **1/15 = 6.7% — CLOSED** by the
+pre-registered ≤10% threshold. Brain-verified: 15 rows, sizes **328-376 B**,
+`attempts` populated **15/15** (third consecutive round). Final map:
+
+| band | result | status |
+|---|---|---|
+| ≤192 B | drained to 0 | exhausted |
+| 193-256 B | 0/60 | CLOSED |
+| **257-320 B** | **4/20 = 20.0%** | **MARGINAL — the only pocket left** |
+| 321-376 B | **1/15 = 6.7%** | **CLOSED (this round)** |
+| 513-1023 B | 0/15 | effectively closed |
+| >1024 B | zero ever matched | hard ceiling |
+
+The 257-320 B pocket being live while both neighbours are closed is odd, but it
+is what three independent samples say. The lane called it *"a real signal, not a
+coverage gap"* and left the ROI judgement alone, which was right.
+
+⚠️ **THE ROUND'S BIGGEST FINDING IS A BUG, AND IT WAS HIDING HALF THE DATA
+POOL.** `cm-restock-carve-15` (#1580) was dispatched to classify "heavily-read
+`shape=unknown` symbols". It found the classification itself was wrong:
+`data_worklist.load_module_sections` derives a module's short name via
+`str(delinks_path.parent.relative_to(config_root)).startswith("arm9/overlays/")`,
+and `Path.relative_to` joins with the **platform** separator. On Windows — this
+project's actual build platform — that check **never matched for a single
+overlay/ITCM/DTCM module**. Every such data symbol's section degraded to
+`unknown`, shape to `SHAPE_UNKNOWN`, size to `0`.
+
+Brain reproduced it independently on `main` before accepting it: **26 of 27
+`modsecs_map` keys were raw backslash paths** instead of short names; only
+`main` (a single-component path needing no separator) ever worked.
+
+**The blast radius is larger than display.** `load_module_sections` also feeds
+`build_size_table`'s gap deduction, which `cm-restock-carve-10`'s
+`edges_load_from_data` depends on — so **every overlay-sourced data-reader edge
+has been invisible since that wave landed**, and the data campaign's focus on
+`src/main/data/` for four straight waves was partly an artifact of this. Measured
+post-fix on the integration tree: the reachable pool reads **8,099 symbols /
+407,506 B**, against the ~5,321 / 187,760 B previously visible. **The data
+frontier is roughly twice what anyone thought.**
+
+**Zero test coverage existed, and CI structurally could not catch it** — the
+`unittest` job runs on `ubuntu-latest` where forward-slash-native `str(rel)`
+masks it entirely. This is the same "green in CI, wrong on the platform that
+matters" class that `configure-windows` (brief 058) guards a *different*
+subsystem against. Fixed with `rel.parts`, plus two regression tests that fail
+against the pre-fix code with the real symptom.
+
+**#1580 also shipped 141 symbols / 22,144 B** — EUR's ov002 `.bss`, verified by
+the brain as exactly tiling `0x022cd300-0x022d2980` with zero gaps. ⚠️ **Report
+this correctly: it is `.bss` shipped as `.s`, so it is coverage hygiene, not
+natural C.** Measured: natural-C moved **411,758 → 412,102 B (+344)**, not
++22,144. USA and JPN have had this file since brief 169; EUR simply never claimed
+it.
+
+**THE PORT BACKLOG IS 95% FREE — and the brain supplied the half the lane could
+not.** `q-port-readiness-census` (#1577) costed the deferred option and correctly
+left byte-similarity **blank**, because `extract/` is absent on its build-free
+worktree. The brain worktree has `extract/`, so the missing half is now measured:
+
+| region | backlog | **byte-identical** | needs work |
+|---|---|---|---|
+| USA | 681 / 103,844 B | **651 / 98,844 B** | 30 / 5,000 B |
+| JPN | 683 / 104,388 B | **653 / 99,388 B** | 30 / 5,000 B |
+
+**~198,232 B across both regions is byte-identical.** Blockers re-derived and
+essentially unchanged from the `q-port-highconf-no-target` era: 62 HIGH-but-no-
+target (3,204 B) per region, 797 no-HIGH-sibling, 2 no-EUR-symbol.
+
+**Against that, the alternatives are small:** the 257-320 B pocket is ~53 ships
+(~15 KB) at its measured 20%, and the data lane's last three waves shipped
+15,732 / 7,100 / 2,004 B — though the bug fix has just doubled its visible pool.
+This is now a decision with numbers behind it rather than an argument.
+
+**Last updated (previous):** 2026-08-25 — **(Windows PC, brain=Opus 5; roster unchanged.)
 Round 0825: six PRs, and the code frontier now has a complete map. 257-320 B is
 **MARGINAL at 20.0%** on a full n=20 — not closed, not clearly drainable. Every
 other band is settled. The decision that remains is an ROI call, not a
@@ -591,7 +676,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-<!-- main-sha: 36659e5a2 -->
+<!-- main-sha: 1f5e77d18 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

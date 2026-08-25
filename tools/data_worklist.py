@@ -284,15 +284,25 @@ def load_module_sections(
     delinks_files = list(config_root.rglob("delinks.txt"))
     for delinks_path in delinks_files:
         rel = delinks_path.parent.relative_to(config_root)
-        rel_str = str(rel)
-        if rel_str == "arm9":
+        # `rel.parts` is an OS-independent tuple -- str(rel) joins with
+        # the platform separator, so a "arm9/overlays/".startswith()
+        # check against str(rel) silently never matches on Windows
+        # (backslash-joined), leaving modsecs_map keyed by the whole
+        # raw path instead of the short module name for every overlay/
+        # itcm/dtcm module. Only "main" (a single-component path with
+        # no separator either way) ever worked. This is a
+        # Windows-only bug: Linux/macOS's forward-slash-native
+        # `str(rel)` masked it, which is exactly why the CI unittest
+        # job (ubuntu-latest) never caught it (cm-restock-carve-15).
+        parts = rel.parts
+        if parts == ("arm9",):
             module = "main"
-        elif rel_str.startswith("arm9/overlays/"):
-            module = rel_str.split("/", 2)[-1]
-        elif rel_str.startswith("arm9/"):
-            module = rel_str.split("/", 1)[-1]
+        elif len(parts) >= 3 and parts[0] == "arm9" and parts[1] == "overlays":
+            module = parts[2]
+        elif len(parts) >= 2 and parts[0] == "arm9":
+            module = parts[1]
         else:
-            module = rel_str
+            module = str(rel)
         sections = _parse_section_header(delinks_path)
         load_addr = sections[0].start if sections else 0
         binary: bytes | None = None

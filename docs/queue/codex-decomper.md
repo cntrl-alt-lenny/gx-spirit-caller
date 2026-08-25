@@ -1228,7 +1228,7 @@ count stated. No hardcoded counts in tests — they move every round. Build-free
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — report QUEUE-EMPTY honestly if you genuinely reach it.
 
-### q-port-readiness-census — cost the one strategic option nobody has priced [TODO]
+### q-port-readiness-census — cost the one strategic option nobody has priced [DONE]
 
 The campaign faces a genuine fork and one of its branches has never been costed.
 EUR natural-C is now **17.21%**; USA and JPN sit at **11.84%** and **11.82%**.

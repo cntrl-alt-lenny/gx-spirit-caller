@@ -15,7 +15,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 411,758 | **17.26%** | 4,420 | 17.44% |
+| eur | 412,102 | **17.27%** | 4,420 | 17.46% |
 | usa | 282,428 | **11.84%** | 2,748 | 11.96% |
 | jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
 
@@ -74,8 +74,9 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `a898807f4` | 2026-08-24 | 410,626 | 17.21% | -560 |
 | `596be20f3` | 2026-08-25 | 411,758 | 17.26% | +1,132 |
 | `6befb1abc` | 2026-08-25 | 411,186 | 17.23% | -572 |
+| `c7ef460ef` | 2026-08-25 | 412,102 | 17.27% | +916 |
 
-49 points, one per commit that changed `docs/state-table.md` (oldest first).
+50 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 
@@ -88,7 +89,7 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | <=192 B | 1,160 | 135,268 |
 | 193-256 B | 460 | 102,472 |
 | 257-320 B | 411 | 118,200 |
-| 321-384 B | 277 | 97,324 |
+| 321-384 B | 262 | 92,108 |
 | 385+ B | 1,329 | 1,317,736 |
 
 ### Remaining unmatched `.text` by module
@@ -100,27 +101,27 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | module | permanent count | permanent bytes | unassessed count | unassessed bytes |
 | --- | ---: | ---: | ---: | ---: |
 | itcm | 0 | 0 | 12 | 2,020 |
-| main | 36 | 3,096 | 1,411 | 512,776 |
-| overlay000 | 0 | 0 | 47 | 15,448 |
-| overlay001 | 0 | 0 | 1 | 336 |
-| overlay002 | 44 | 6,636 | 1,657 | 891,500 |
+| main | 36 | 3,096 | 1,410 | 512,404 |
+| overlay000 | 0 | 0 | 46 | 15,096 |
+| overlay001 | 0 | 0 | 0 | 0 |
+| overlay002 | 44 | 6,636 | 1,655 | 890,828 |
 | overlay003 | 0 | 0 | 13 | 17,868 |
-| overlay004 | 7 | 1,472 | 75 | 50,512 |
-| overlay005 | 0 | 0 | 28 | 25,588 |
+| overlay004 | 7 | 1,472 | 74 | 50,136 |
+| overlay005 | 0 | 0 | 27 | 25,244 |
 | overlay006 | 0 | 0 | 70 | 61,696 |
 | overlay007 | 0 | 0 | 7 | 1,572 |
-| overlay008 | 0 | 0 | 45 | 25,792 |
-| overlay009 | 0 | 0 | 13 | 11,480 |
-| overlay010 | 0 | 0 | 37 | 20,264 |
+| overlay008 | 0 | 0 | 44 | 25,416 |
+| overlay009 | 0 | 0 | 12 | 11,120 |
+| overlay010 | 0 | 0 | 36 | 19,932 |
 | overlay011 | 0 | 0 | 46 | 24,064 |
-| overlay012 | 0 | 0 | 13 | 7,448 |
-| overlay013 | 0 | 0 | 7 | 5,668 |
-| overlay014 | 0 | 0 | 14 | 7,576 |
+| overlay012 | 0 | 0 | 12 | 7,112 |
+| overlay013 | 0 | 0 | 6 | 5,296 |
+| overlay014 | 0 | 0 | 13 | 7,244 |
 | overlay015 | 0 | 0 | 20 | 9,992 |
-| overlay016 | 0 | 0 | 36 | 22,748 |
+| overlay016 | 0 | 0 | 35 | 22,420 |
 | overlay017 | 0 | 0 | 21 | 19,240 |
 | overlay018 | 0 | 0 | 9 | 8,816 |
-| overlay019 | 0 | 0 | 18 | 10,444 |
+| overlay019 | 0 | 0 | 17 | 10,116 |
 | overlay020 | 0 | 0 | 20 | 10,620 |
 | overlay021 | 0 | 0 | 8 | 3,548 |
 | overlay022 | 0 | 0 | 9 | 3,984 |
@@ -137,7 +138,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 | Named-struct | 75,880 | 1.59% |
 | *(total data bytes)* | 4,776,528 | |
 
-Remaining zero-reader data pool (`main`, re-derived fresh via `data_worklist.py --include-data-readers`, not copied from a prior wave's writeup): **75 symbols / 2,448 bytes** with no function reader AND no data-pointer-table reader under the extended call graph (`cm-restock-carve-10`'s `edges_load_from_data`).
+Remaining zero-reader data pool (`main`, re-derived fresh via `data_worklist.py --include-data-readers`, not copied from a prior wave's writeup): **0 symbols / 0 bytes** with no function reader AND no data-pointer-table reader under the extended call graph (`cm-restock-carve-10`'s `edges_load_from_data`).
 
 ### Data opportunity disposition
 
@@ -145,7 +146,7 @@ Reproduce the current reachable total with `python tools/data_worklist.py --vers
 
 | disposition | symbols | bytes | command / evidence |
 | --- | ---: | ---: | --- |
-| reachable, reader-attributed | 5,321 | 187,760 | `data_worklist.py --include-data-readers --no-outputs` |
+| reachable, reader-attributed | 8,099 | 407,506 | `data_worklist.py --include-data-readers --no-outputs` |
 | proven recipe currently shippable |  |  | blank: the build-free worklist cannot classify the remaining shapes without compiled bytes |
 | blocked pending per-group verification |  |  | blank for the whole reachable pool; the latest scoped string-pool disposition is published in `cm-restock-carve-11-2026-08-24.md` |
 

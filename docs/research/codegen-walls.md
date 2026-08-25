@@ -12559,6 +12559,94 @@ is wide. Both are defensible; this doc does not pick one.
 **Provenance:** `cm-513-1023-census` (this PR), `attempts.tsv` rows
 tagged `cm-513-1023-census`, `band-rate-vintage.md`.
 
+### BR-6. The 321-376 B `.text` band: re-tested, CLOSED at 1/15 = 6.7% — the code frontier is now fully characterised
+
+`cm-321-376-probe` re-tested the last unmeasured gap in this campaign's
+size-band map. Sweep-7 (2026-08-17) had reported 2/17 = 11.8% for this
+band, but per `band-rate-vintage.md` that figure is vintage-stamped —
+the same vintage as the 193-256 B 27.6% that later collapsed to 0/60 on
+a disjoint sample (BR-1) — and had never been re-derived against the
+current unattempted population.
+
+**Sample:** n=15, stratified (14 modules carried candidates against the
+176-candidate / 61,396 B pool — `main` 56, `overlay002` 103, 12 other
+overlays with 1-3 each — a 1-per-module floor plus 1 extra to the
+largest pool exactly filled the n=15 target). Seed `20260826`. Screened
+clean against every documented wall before dispatch. Zero candidates in
+this sample carried the P-20-row-offset signature (unlike the 513-1023 B
+sample, where 40% did) — this band's residue happens not to overlap that
+wall family.
+
+**Result: 1/15 = 6.7% shipped.** `func_ov002_0220b488` (100%, 2
+attempts) — the one ship reused the byte-extract shift-pair lever
+(`(unsigned int)(x << 24) >> 24` instead of a `(u8)` cast, which
+collapses to a single `AND` and does not match a target using the
+shift-pair — see BR-4's lever list) to close a 69.8% near-miss to 100%
+in one fix. Median `match_pct` across the 14 parked: 20.4%. Three real
+near-misses came from genuine, disclosed effort beyond a single attempt:
+`func_ov002_021f8348` (57.8% -> 67.5%, 3 attempts — a condition-polarity
+flip closed the first 20 points, a residual epilogue-predication choice
+resisted two further attempts), `func_ov004_021d6a10` (49.5% -> 56.7%,
+2 attempts — same condition-polarity lever, but this function's second
+divergence turned out to hinge on a switch-case body layout question the
+round's remaining budget did not resolve), `func_ov000_021acaf8` (37.5%
+flat across 2 attempts — high self-reported confidence, resistant
+distributed register-letter swap, no movement from source-level caching).
+Two "high confidence" drafts (`func_ov010_021b7d60` at 0.0%,
+`func_0209cea4` reached only via 1 attempt at 20.4%) underperformed
+their own confidence rating, consistent with this campaign's now-repeated
+finding that drafting-agent confidence is a useful prior, not a
+substitute for the build (BR-4 made the same observation).
+
+**Threshold applied, unchanged:** `<=10%` (this round: 1/15 = 6.7%) is
+**CLOSED**. Recorded here with the evidence, per the pre-registered
+protocol.
+
+**Effort note:** 10 of 15 candidates received exactly 1 attempt, 4
+received 2, 1 received 3 — genuine 2-4-iteration effort was concentrated
+on the candidates that showed real first-attempt promise (all 4 "high
+confidence" drafts, plus every candidate that broke past ~40% on attempt
+1), while candidates showing an immediate, large structural mismatch
+(missing/extra stack allocation, a fully different saved-register set)
+were parked after one attempt — consistent with this campaign's repeated
+finding that this specific failure signature (large word-count or
+register-count mismatch on the very first words) essentially never
+resolves via source-level iteration, unlike a close-word-count,
+scattered-register-letter near-miss, which sometimes does. This is a
+narrower effort gap than `cm-513-1023-census` disclosed (there, only 2
+of 15 candidates got any iteration at all) — this round's larger
+candidates that showed promise all received genuine follow-up.
+
+**The code frontier is now fully characterised. Full map:**
+
+| Band | Result | Status |
+|---|---|---|
+| `<=192 B` | drained to 0 candidates | exhausted |
+| `193-256 B` | 0/60 | CLOSED (BR-1) |
+| `257-320 B` | 4/20 = 20.0% | MARGINAL (BR-4) |
+| `321-376 B` | 1/15 = 6.7% | CLOSED (BR-6, this round) |
+| `513-1023 B` | 0/15 | effectively closed (BR-5) |
+| `>1024 B` | zero functions ever matched | hard ceiling |
+
+Every band this method can reach has now been measured at least once
+under the matched-effort, wall-screened, ledgered protocol this campaign
+converged on across BR-1 through BR-6. The only pocket that is not
+closed is 257-320 B's marginal 20.0% — a real, defensible signal, not a
+gap in coverage. Nobody has to re-open "did we actually check this band"
+again; the recurring cost this queue item named is retired.
+
+**Recommendation:** with the map complete, the natural next comparison
+is 321-376 B's closed 6.7% and 513-1023 B's 0/15 against 257-320 B's
+marginal 20.0% and the data lane's own known pool (66,096 B behind the
+`cm-restock-carve` verifier line + 128,875 B of non-string shapes, per
+the `cm-main-band-followthrough`/`cm-main-band-finish` series). That
+weighing is an owner decision, not this doc's to make — but the evidence
+needed to make it, across the whole code-side size range this campaign
+can reach, now exists in one place.
+
+**Provenance:** `cm-321-376-probe` (this PR), `attempts.tsv` rows tagged
+`cm-321-376-probe`, `band-rate-vintage.md`, BR-1 through BR-5.
+
 ## Open questions (not levers, not walls — genuinely unresolved)
 
 ### OQ-1. Dead-branch preservation: a provably-dead compile-time-constant guard survives in the target but gets folded away by the same toolchain under every C reproduction tried

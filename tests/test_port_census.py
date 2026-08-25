@@ -12,7 +12,12 @@ _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
 import port_census  # noqa: E402
-from port_census import scan_eur_tree, scan_tree  # noqa: E402
+from port_census import (  # noqa: E402
+    scan_eur_tree,
+    scan_tree,
+    summarize_backlog,
+    summarize_nofile,
+)
 
 
 class TestRecursiveSourceDiscovery(unittest.TestCase):
@@ -122,6 +127,35 @@ class PortCensusMetadataTests(unittest.TestCase):
         )
         self.assertEqual(len(unresolved), 1)
         self.assertTrue(unresolved[0].endswith("data_ov006_021b2efc.c"))
+
+
+class TestPortCensusSummaries(unittest.TestCase):
+    def test_backlog_summary_preserves_module_bytes_and_unknown_sim(self) -> None:
+        summary = summarize_backlog([
+            {"module": "main", "size": 12, "byte_sim": 1.0},
+            {"module": "main", "size": 8, "byte_sim": 0.97},
+            {"module": "ov002", "size": 4, "byte_sim": None},
+        ])
+        self.assertEqual(summary["count"], 3)
+        self.assertEqual(summary["bytes"], 24)
+        self.assertEqual(summary["by_module"]["main"], {"count": 2, "bytes": 20})
+        self.assertEqual(
+            summary["by_byte_sim"]["unavailable"],
+            {"count": 1, "bytes": 4},
+        )
+        self.assertEqual(
+            summary["by_byte_sim"]["byte-identical"],
+            {"count": 1, "bytes": 12},
+        )
+
+    def test_no_target_summary_is_separate_new_work_cost(self) -> None:
+        summary = summarize_nofile([
+            {"module": "main", "size": 16},
+            {"module": "ov002", "size": 6},
+        ])
+        self.assertEqual(summary["count"], 2)
+        self.assertEqual(summary["bytes"], 22)
+        self.assertEqual(summary["by_module"]["ov002"], {"count": 1, "bytes": 6})
 
 
 if __name__ == "__main__":
