@@ -1192,7 +1192,7 @@ agreement pasted + proof that default `scan()` output is unchanged. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-effort-stratified-analytics — the attempts column has data in it now [TODO]
+### q-effort-stratified-analytics — the attempts column has data in it now [DONE]
 
 `q-ledger-effort-column` (#1544) added the `attempts` column and
 `cm-main-band-followthrough` (#1563) became the first lane to populate it — 9 of
