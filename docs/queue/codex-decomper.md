@@ -1147,7 +1147,7 @@ with its reproducing command. Build-free.
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — report QUEUE-EMPTY honestly if you genuinely reach it.
 
-### q-bl-filter-in-headroom — one canonical dispatch-pool source, not two [TODO]
+### q-bl-filter-in-headroom — one canonical dispatch-pool source, not two [DONE]
 
 `q-remaining-opportunity-census` (#1559) ran into this and documented it
 honestly: the campaign dispatches on `.text` size **AND** a `>=4 bl`/`blx`
@@ -1192,7 +1192,7 @@ agreement pasted + proof that default `scan()` output is unchanged. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-effort-stratified-analytics — the attempts column has data in it now [TODO]
+### q-effort-stratified-analytics — the attempts column has data in it now [DONE]
 
 `q-ledger-effort-column` (#1544) added the `attempts` column and
 `cm-main-band-followthrough` (#1563) became the first lane to populate it — 9 of
