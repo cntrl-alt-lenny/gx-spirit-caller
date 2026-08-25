@@ -12401,6 +12401,95 @@ first, leaving loop-and-bitpack residue behind.
 **Provenance:** `cm-main-band-followthrough` (this PR), `attempts.tsv`
 rows tagged `cm-main-band-followthrough`, `band-rate-vintage.md`.
 
+### BR-5. The 513-1023 B `.text` band (EUR, never characterised before this round): census + n=15 probe, 0/15 shipped — suggestive, not significant
+
+`cm-513-1023-census` is the first characterisation of this band. Above
+1024 B, zero functions have ever matched in this campaign — the one hard
+empirical ceiling this campaign tracks. 513-1023 B sits between the
+tractable region (all bands measured so far, up to 320 B) and that dead
+zone, and had never been sampled.
+
+**Census** (`wall_aware_headroom.scan(max_size=1023)` minus
+`scan(max_size=512)`, all modules, cross-checked directly against
+`scan()` rather than trusted from `pool_freshness.py` alone, per the
+#1534/#1542 main-only-default incident): **610 candidates / 431,016 B**
+raw, unattempted, all modules. Of these, **539 candidates / 381,048 B**
+pass the campaign's standing `>=4 bl/blx` filter used for every other
+band's probe sampling. The independent `scan()`-plus-manual-bl-filter
+re-derivation matched `pool_freshness.py`'s reported 539/381,048 exactly
+— the `--all-modules` fix from #1542 is holding.
+
+**Probe:** n=15, stratified module floor was infeasible this time (23
+modules carry candidates in this band, more than the n=15 target itself,
+unlike every smaller band this campaign has sampled), so the draw was a
+plain seeded random sample (`random.seed(20260825)`) from the full
+539-candidate pool instead. Landed 6 `main`, 8 `overlay002`, 1
+`overlay006` — reflecting those two modules' outsized share of the
+underlying pool (393/539 = 73%), not a sampling artifact.
+
+**Result: 0/15 shipped.** Median `match_pct` 12.0%; one real near-miss
+at 68.5% (`func_0204757c`, an instruction-scheduling residual in a
+26-field self-init block, resistant to one targeted reorder attempt).
+**6 of 15 (40%) carry the confirmed P-20-row-offset signature**
+(`(bit&1)*0x868` against `data_ov002_022cf16c`/`022cf17c`, cohort now
+63) — a new finding: this wall family was previously characterised only
+in the 200-400 B range, and is now confirmed present, at the same rate
+order of magnitude, in a band roughly 2-3x larger. All 6 wall-contaminated
+candidates scored 1.9-17.7%, consistent with the wall's established
+signature of "structurally plausible, never byte-exact" rather than a
+clean miss.
+
+**Honest statistics, per the queue item's explicit instruction — this is
+suggestive, not significant:**
+
+- 0/15 = 0% observed. But with zero events at n=15, the data alone
+  cannot rule out a true underlying ship rate as high as roughly 20%
+  (rule-of-three approximation, 3/n) — which is, notably, the same
+  order as the 257-320 B band's own measured 20.0% (BR-4). **This probe
+  cannot statistically distinguish "513-1023 B is meaningfully harder
+  than 257-320 B" from "513-1023 B is similar and this sample simply
+  drew zero successes."**
+- **Effort was not matched to the stated protocol.** The queue item
+  specified a full 2-4-iteration budget per candidate; in practice 13 of
+  15 candidates received exactly 1 attempt and 2 received 2, because
+  processing 15 candidates at roughly 2-4x the `.text` size (and
+  correspondingly more callees, struct fields, and control-flow
+  complexity) per candidate proved far more expensive than the
+  257-320 B band's candidates within one round's time budget. This is a
+  real, disclosed confound on top of the small-n problem, not a hidden
+  one — see `feedback_effort-confound` precedent
+  (`cm-main-exploit-drain-2`, `cm-main-boundary-rerun`). The one
+  candidate that DID get a second real iteration (`func_0204757c`)
+  improved from a clean compile to a 68.5% near-miss on the first pass
+  already, then held at 68.5% after one more targeted fix attempt failed
+  to close a resistant scheduling residual — the second data point
+  (`func_ov002_0225a978`, 34.6% -> 35.6%) moved only marginally. Neither
+  data point is enough to estimate what full 2-4-iteration effort would
+  do across the other 13, but the one near-miss is real evidence this
+  band is not *uniformly* unreachable.
+- The `4.2x model/observed disagreement` figure banked from round-0810
+  is **not quoted here**, per the queue item's explicit instruction and
+  `band-rate-vintage.md`'s standing warning against citing a historical
+  figure without re-deriving it. Re-deriving it would require
+  reconstructing that round's completion-model methodology, which is out
+  of scope for a 15-candidate probe — dropped, not re-derived.
+
+**Recommendation:** this is a probe, not a pilot, and it does not settle
+whether 513-1023 B is worth draining. What it does establish: the band
+is not obviously dead (one real 68.5% near-miss, and a 40% wall-hit rate
+that is itself informative rather than merely disqualifying), but a fair
+read requires the full 2-4-iteration protocol actually applied — which
+this round's time budget did not allow across all 15. A future round
+revisiting this band should either (a) budget for full-protocol
+iteration on a fresh n=15-or-larger sample, explicitly excluding the
+already-identified P-20-row-offset-contaminated addresses from the
+draw, or (b) treat this probe's 0/15 as sufficient to deprioritise this
+band relative to the data lane, accepting that the confidence interval
+is wide. Both are defensible; this doc does not pick one.
+
+**Provenance:** `cm-513-1023-census` (this PR), `attempts.tsv` rows
+tagged `cm-513-1023-census`, `band-rate-vintage.md`.
+
 ## Open questions (not levers, not walls — genuinely unresolved)
 
 ### OQ-1. Dead-branch preservation: a provably-dead compile-time-constant guard survives in the target but gets folded away by the same toolchain under every C reproduction tried

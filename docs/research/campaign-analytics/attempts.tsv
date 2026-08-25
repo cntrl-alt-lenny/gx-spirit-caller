@@ -1743,3 +1743,18 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b429c	ov015	268	default	unknown	shipped	100.0	n/a		cm-main-band-followthrough	5
 0x021b4294	ov014	292	default	unknown	shipped	100.0	n/a		cm-main-band-followthrough	2
 0x022178fc	ov002	296	default	unknown	parked	2.6	reg-alloc-stack-footprint-mismatch	PROVISIONAL:register-allocation	cm-main-band-followthrough	2
+0x021cc63c	ov002	840	default	unknown	parked	8.6	P-20-row-offset	P-20	cm-513-1023-census	1
+0x021d22c8	ov002	900	default	unknown	parked	1.3	P-20-row-offset	P-20	cm-513-1023-census	1
+0x02210810	ov002	992	default	unknown	parked	5.7	P-20-row-offset	P-20	cm-513-1023-census	1
+0x0222d6cc	ov002	732	default	unknown	parked	6.0	P-20-row-offset	P-20	cm-513-1023-census	1
+0x02230cdc	ov002	564	default	unknown	parked	17.7	P-20-row-offset	P-20	cm-513-1023-census	1
+0x02274880	ov002	608	default	unknown	parked	1.9	P-20-row-offset	P-20	cm-513-1023-census	1
+0x0204757c	main	648	default	unknown	parked	68.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-513-1023-census	2
+0x0204b410	main	540	default	unknown	parked	11.8	reg-alloc-stack-footprint-mismatch	PROVISIONAL:register-allocation	cm-513-1023-census	1
+0x0205d15c	main	868	default	unknown	parked	32.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-513-1023-census	1
+0x02299388	ov002	772	default	unknown	parked	21.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-513-1023-census	1
+0x021b6898	ov006	560	default	unknown	parked	12.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-513-1023-census	1
+0x0225a978	ov002	752	default	unknown	parked	35.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-513-1023-census	2
+0x020a6e4c	main	688	default	unknown	parked	9.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-513-1023-census	1
+0x02008fb8	main	572	default	unknown	parked	24.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-513-1023-census	1
+0x02037414	main	876	default	unknown	parked	14.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-513-1023-census	1
