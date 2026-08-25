@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**147 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**148 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (70)
+- [Uncategorised](#uncategorised) (71)
 
 ## Analysis / worklist
 
@@ -790,6 +790,12 @@ cm-ledger-park-bias (2026-08-17): `park_one.py` is the only recorder in regular 
 ### `tools/retrieval_eval.py`
 
 **Small pure-Python BM25 evaluation for the matched-pair corpora.**
+
+### `tools/roi_per_lane.py`
+
+**Join recent lane outcomes with the effort evidence that actually exists.**
+
+The ledger is the source of function-lane outcomes and recorded attempts. Research/PR evidence is normalized in ``roi-evidence.tsv`` for data-lane outcomes and documented full-gate counts, because those facts are not columns in attempts.…
 
 ### `tools/routing_suffixes.py`
 
