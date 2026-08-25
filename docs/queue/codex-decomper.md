@@ -1031,7 +1031,7 @@ Build-free.
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — and report QUEUE-EMPTY honestly if you genuinely reach it.
 
-### q-ledger-chronology — your contradiction audit reads row order as time, and for 485 rows that is wrong [TODO]
+### q-ledger-chronology — your contradiction audit reads row order as time, and for 485 rows that is wrong [DONE]
 
 `q-ledger-contradiction-audit` (#1546) is merged and the tool is good: 57
 repeated groups classified 53 legitimate / 3 contradictory / 1 ambiguous, with
