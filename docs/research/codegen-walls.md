@@ -12335,7 +12335,7 @@ drained (0 unattempted `>=4 bl` candidates remain, per
 
 **Provenance:** `cm-main-tier-sweep-7` (2026-08-17, PR unlisted here — see
 `cm-main-tier-sweep-series.md`); `cm-main-exploit-drain-2` (2026-08-22, PR
-#1536); `cm-main-boundary-rerun` (2026-08-22, PR #1545);
+PR #1536); `cm-main-boundary-rerun` (2026-08-22, PR #1545);
 `band-rate-vintage.md` (2026-08-24 brain finding).
 
 ### BR-2. General rule: band/pool ship-rates are vintage-stamped
