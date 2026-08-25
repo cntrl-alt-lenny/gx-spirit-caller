@@ -1,0 +1,11 @@
+round	lane	item	source	full_gate_runs	ledger_prefix	candidates	shipped	shipped_bytes
+0822	CC-D	cm-main-exploit-drain-2	docs/research/cm-main-exploit-drain-2-2026-08-22.md; PR #1536	3	cm-main-exploit-drain-2	-	-	-
+0822	CC-S	cm-restock-carve-10	docs/research/data/cm-restock-carve-10-2026-08-22.md; PR #1526	2	-	739	739	15732
+0822c	CC-D	cm-main-boundary-rerun	docs/research/cm-main-boundary-rerun-2026-08-22.md; PR #1545	3	cm-main-boundary-rerun	-	-	-
+0822c	CC-S	cm-restock-carve-11	docs/research/data/cm-restock-carve-11-2026-08-24.md; PR #1547	2	-	46	46	1060
+0824	CC-D	cm-main-band-followthrough	docs/research/cm-main-band-followthrough-2026-08-24.md; PR #1563	3	cm-main-band-followthrough	-	-	-
+0824	CC-S	cm-restock-carve-12	docs/research/data/cm-restock-carve-12-2026-08-24.md; PR #1561	1	-	575	0	0
+0824c	CC-S	cm-restock-carve-13	docs/research/data/cm-restock-carve-13-2026-08-24.md; PR #1565	2	-	201	201	7100
+0825	CC-D	cm-main-band-finish	docs/research/cm-main-band-finish-2026-08-25.md; PR #1572	3	cm-main-band-finish	-	-	-
+0825	CC-D	cm-513-1023-census	docs/research/cm-513-1023-census-2026-08-25.md; PR #1574	3	cm-513-1023-census	-	-	-
+0825	CC-S	cm-restock-carve-14	docs/research/data/cm-restock-carve-14-2026-08-25.md; PR #1573	2	-	167	167	2004

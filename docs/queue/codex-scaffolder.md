@@ -1311,7 +1311,7 @@ Build-free.
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — report QUEUE-EMPTY honestly if you genuinely reach it.
 
-### q-roi-per-lane — make the ROI question answerable with numbers [TODO]
+### q-roi-per-lane — make the ROI question answerable with numbers [DONE]
 
 The campaign has reached a point where the next decision is explicitly an ROI
 call — 257-320 B sits at 20.0% with 263 candidates / 75,980 B behind it, while
