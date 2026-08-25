@@ -57,6 +57,8 @@ Usage:
     python tools/wall_aware_headroom.py                # per-module table
     python tools/wall_aware_headroom.py --json         # machine-readable
     python tools/wall_aware_headroom.py --min 5        # only modules with >=5 candidates
+    python tools/wall_aware_headroom.py --min-bl-blx 4 --json
+                                                       # filter by exact calls
     python tools/wall_aware_headroom.py --coercible     # list coercible files + codes
 """
 from __future__ import annotations
@@ -114,6 +116,10 @@ def _classify_module(rel: str) -> str | None:
 _P_CITE_RE = re.compile(r"\bP-\d+[a-z]?\b")
 _C_CITE_RE = re.compile(r"\bC-\d+[a-z]?\b")
 
+# Exact call instructions. Conditional branches such as ``blt`` are not
+# calls, and must not enter the dispatch-pool count.
+_CALL_RE = re.compile(r"^\s*(?:bl|blx)(?:\s|$)", re.IGNORECASE)
+
 # Bare/unconditional mnemonic only, at the start of an instruction line (not
 # a comment: comment lines in this project's `.s` files start with `;`, so a
 # leading-whitespace-then-mnemonic match can't land on a comment's prose).
@@ -162,6 +168,13 @@ def classify_path(path: Path) -> Classification:
         return classify_text(path.read_text(encoding="utf-8", errors="ignore"))
     except OSError:
         return Classification("no_marker")
+
+
+def body_call_count(path: Path) -> int:
+    """Count exact ``bl``/``blx`` call instructions in an assembly body."""
+    text = path.read_text(encoding="utf-8", errors="replace")
+    body = text.split(".text", 1)[-1]
+    return sum(bool(_CALL_RE.match(line)) for line in body.splitlines())
 
 
 _SRC_REF_RE = re.compile(r"^(src/\S+\.(?:c|s)):")
@@ -349,7 +362,10 @@ def scan(
     exclude_attempted: bool = False,
     min_addr: int | None = None,
     max_addr: int | None = None,
+    min_bl_blx: int | None = None,
 ) -> dict[str, dict]:
+    if min_bl_blx is not None and min_bl_blx < 0:
+        raise ValueError("min_bl_blx must be non-negative")
     per: dict[str, dict] = {}
     live = _live_sources()
     text_sizes = _delink_text_sizes()
@@ -375,6 +391,8 @@ def scan(
             return
         if max_size is not None and (text_size is None or text_size > max_size):
             return
+        if min_bl_blx is not None and metadata.get("bl_blx", 0) < min_bl_blx:
+            return
         d["total"] += 1
         d[classification.kind] += 1
         if classification.kind == "coercible":
@@ -397,6 +415,8 @@ def scan(
         if rel not in live:  # orphaned dead file, not a build input — skip
             continue
         metadata = _file_metadata(rel, text_sizes, addresses)
+        if min_bl_blx is not None:
+            metadata["bl_blx"] = body_call_count(p)
         source_module = _source_module(rel)
         _consider(mod, source_module, metadata, classify_path(p))
 
@@ -450,6 +470,8 @@ def main(argv: list[str]) -> int:
                     help="only include files with `.text` span >= N bytes")
     ap.add_argument("--max-size", type=int, default=None,
                     help="only include files with `.text` span <= N bytes")
+    ap.add_argument("--min-bl-blx", type=int, default=None,
+                    help="only include files with at least N exact bl/blx calls")
     ap.add_argument("--min-addr", type=_parse_address, default=None,
                     help="only include functions at or above this address")
     ap.add_argument("--max-addr", type=_parse_address, default=None,
@@ -457,15 +479,15 @@ def main(argv: list[str]) -> int:
     args = ap.parse_args(argv[1:])
     if (args.min_size is not None and args.min_size < 0) or (
         args.max_size is not None and args.max_size < 0
-    ):
-        ap.error("size filters must be non-negative")
+    ) or (args.min_bl_blx is not None and args.min_bl_blx < 0):
+        ap.error("size and call filters must be non-negative")
     if args.min_size is not None and args.max_size is not None and args.min_size > args.max_size:
         ap.error("--min-size cannot exceed --max-size")
     if args.min_addr is not None and args.max_addr is not None and args.min_addr > args.max_addr:
         ap.error("--min-addr cannot exceed --max-addr")
     per = scan(
         args.min_size, args.max_size, args.exclude_attempted,
-        args.min_addr, args.max_addr,
+        args.min_addr, args.max_addr, args.min_bl_blx,
     )
     if not per:
         print(
