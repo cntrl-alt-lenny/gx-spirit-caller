@@ -60,6 +60,7 @@ from data_worklist import (  # noqa: E402
     _pointer_target_section,
     build_size_table,
     classify_shape,
+    load_module_sections,
     rank_data_symbols,
     render_markdown,
     render_stdout_summary,
@@ -651,6 +652,61 @@ class TestParseSectionHeader(unittest.TestCase):
         finally:
             tmp.unlink()
         self.assertEqual(len(sections), 2)
+
+
+class TestLoadModuleSections(unittest.TestCase):
+    """cm-restock-carve-15: `load_module_sections` derived each module's
+    short name (`main` / `ov002` / `itcm` / ...) by prefix-matching
+    `str(delinks_path.parent.relative_to(config_root))` against
+    literal forward-slash strings (`"arm9/overlays/"`, `"arm9/"`).
+    `Path.relative_to` joins with the PLATFORM separator, so on
+    Windows `str(rel)` is backslash-joined and neither prefix check
+    ever matched for any overlay/itcm/dtcm module -- only `main`
+    worked (a single-component path, no separator either way). The
+    fix uses `rel.parts` (an OS-independent tuple) instead. These
+    tests build a real multi-module config tree so they'd have
+    failed against the old string-matching implementation on Windows
+    (and pass identically on POSIX, where forward-slash `str(rel)`
+    happened to mask the bug all along -- exactly why CI's
+    ubuntu-latest `unittest` job never caught it)."""
+
+    def _make_tree(self, tmp_root: Path) -> Path:
+        config_dir = tmp_root / "config" / "eur"
+        arm9 = config_dir / "arm9"
+        for rel in ("", "itcm", "dtcm", "overlays/ov000", "overlays/ov002"):
+            d = arm9 / rel if rel else arm9
+            d.mkdir(parents=True, exist_ok=True)
+            (d / "delinks.txt").write_text(
+                "    .bss        start:0x02000000 end:0x02000100 kind:bss align:32\n"
+            )
+        return config_dir
+
+    def test_module_keys_are_short_names_not_raw_paths(self):
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            config_dir = self._make_tree(Path(tmp))
+            modsecs_map = load_module_sections(
+                config_dir, "eur", load_binaries=False,
+            )
+        self.assertEqual(
+            set(modsecs_map.keys()),
+            {"main", "itcm", "dtcm", "ov000", "ov002"},
+        )
+
+    def test_overlay_sections_are_actually_reachable_by_short_name(self):
+        # The real-world symptom: section_for_symbol looks modsecs_map
+        # up BY the symbol's own short module name ("ov002"). If the
+        # map were keyed by a raw path instead, this lookup misses and
+        # every overlay symbol's section (and therefore its shape)
+        # silently degrades to "unknown".
+        import tempfile
+        with tempfile.TemporaryDirectory() as tmp:
+            config_dir = self._make_tree(Path(tmp))
+            modsecs_map = load_module_sections(
+                config_dir, "eur", load_binaries=False,
+            )
+        sym = _data_sym("ov002", 0x02000010)
+        self.assertEqual(section_for_symbol(modsecs_map, sym), "bss")
 
 
 class TestSectionForSymbol(unittest.TestCase):

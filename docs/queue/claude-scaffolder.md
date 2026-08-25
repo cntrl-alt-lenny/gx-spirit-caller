@@ -2088,7 +2088,7 @@ carry freshness guards now.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-14`.
 
-### cm-restock-carve-15 — the high-reader unknown-shape symbols [TODO]
+### cm-restock-carve-15 — the high-reader unknown-shape symbols [DONE]
 
 `cm-restock-carve-14` (#1573) shipped 167 single-embedded-pointer records
 (2,004 B) and did it the right way — a **real symbol reference** for the pointer
