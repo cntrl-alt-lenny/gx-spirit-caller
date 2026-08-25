@@ -2087,3 +2087,58 @@ carry freshness guards now.
 
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-14`.
+
+### cm-restock-carve-15 — the high-reader unknown-shape symbols [TODO]
+
+`cm-restock-carve-14` (#1573) shipped 167 single-embedded-pointer records
+(2,004 B) and did it the right way — a **real symbol reference** for the pointer
+field, which closes a call-graph hole instead of opaquing it, and no `const` so
+the record stays in `.data`.
+
+The bytes are small because that shape is small. Look at what
+`data_worklist.py --include-data-readers` now ranks at the top and a different
+population is obvious:
+
+```text
+ov002  data_ov002_022d0e6c  shape=unknown  readers=123
+ov002  data_ov002_022ce950  shape=unknown  readers=107
+ov002  data_ov002_022cf1ac  shape=unknown  readers=106
+main   data_020faca0        shape=array    size=0x3a0  data_readers=65
+```
+
+These are **heavily-used symbols with no classified shape** — 123 readers is core
+game data, not a stray table. They have been passed over by every wave so far
+precisely because `shape=unknown` gives no recipe to apply.
+
+**Scope, in order:**
+
+1. **Classify before carving.** Take the top ~20 by reader count and work out
+   what they actually are, from the relocation pattern, the access widths at the
+   reader sites, and `sec=`. Several show `sec=unknown size=?`, which is itself a
+   finding — the worklist cannot size them, and knowing why is prerequisite to
+   anything else.
+2. **Pick the single largest tractable class** that emerges and write its recipe
+   with **one gated worked example**, the way `cluster-c-recipe.md` and
+   `cluster-b-pointer-pool.md` were established.
+3. **Then a bounded tranche within that one class.** Do not batch across shapes —
+   carve-13 established why.
+
+**A high reader count is a reason for care, not speed.** A symbol read from 123
+sites has 123 chances to expose a wrong field split. The project's standing
+no-invented-structure convention applies with full force: leave a prefix as
+`unsigned char[N]` unless the reader evidence actually proves a finer split, and
+say what the evidence was.
+
+**If these turn out to be genuinely unclassifiable without more tooling**, that
+is the finding — report it with what you tried and what tooling would close it.
+Five waves have corrected an inherited assumption and the series is trusted
+because of it.
+
+**Gate:** full `python tools/gate3.py --scope all --clean` — three SHA1 PASS
+lines verbatim plus the pytest tail. `typed_array_bytes` / `named_struct_bytes`
+before -> after with the BEFORE stashed for real, delta reconciled against the
+files shipped. `git restore assets/` after the clean run. Regenerate every derived
+artifact your content invalidates.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-restock-carve-15`.

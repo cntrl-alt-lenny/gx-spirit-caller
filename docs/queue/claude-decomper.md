@@ -1874,3 +1874,49 @@ note that `check_activation_invariant.py` correctly refuses a vacuous pass.
 
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper cm-513-1023-census`.
+
+### cm-321-376-probe — the one band left unmeasured, and it is cheap [TODO]
+
+The code frontier is now mapped everywhere except here:
+
+| band | result | status |
+|---|---|---|
+| <=192 B | drained to 0 | exhausted |
+| 193-256 B | 0/60 | CLOSED |
+| 257-320 B | **4/20 = 20.0%** | MARGINAL |
+| **321-376 B** | **2/17 = 11.8% (sweep-7, 2026-08-17)** | **never re-tested** |
+| 513-1023 B | 0/15 | effectively closed |
+| >1024 B | zero ever matched | hard ceiling |
+
+That 11.8% is **vintage-stamped** and must not be treated as current.
+`docs/research/band-rate-vintage.md` documents why: sweep-7 measured 193-256 B at
+27.6% and a disjoint sample of the identical band later returned **0/60**. Every
+historical band rate describes the pool at measurement time, and this one has
+never been re-derived.
+
+**Scope: n=15 at 321-376 B**, drawn from the unattempted population (brain
+measured **176 candidates / 61,396 B** remaining at `>=4 bl`), full
+2-4-iteration protocol, `attempts` populated, both results ledgered. This is a
+probe to finish the map, not a drain.
+
+**Thresholds, pre-registered:** `>=25%` the band is live and worth a decision;
+`<=10%` closed, record it in the catalog with the evidence; `10-25%` marginal,
+report it alongside 257-320 B's 20.0% so the two can be weighed together.
+
+**Why it is worth a round even though the prior is poor:** 321-376 B is the only
+gap left. Once it is measured, the code frontier is fully characterised and
+nobody has to re-open the question — and the campaign stops paying the recurring
+cost of "we never actually checked". If it comes back closed, that is a clean
+end to the mapping phase.
+
+Do not adjust the sample or thresholds to reach a number. Four rounds running
+have been trustworthy because nobody did.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, `gate3.py --scope tests`. If the round ships zero, say so
+and note the invariant correctly refuses a vacuous pass. `git restore assets/`
+after each clean run. Regenerate any derived artifact your content invalidates.
+
+ONE PR; verify every claim against `git diff --stat` including the arithmetic;
+`python tools/work_queue.py done claude-decomper cm-321-376-probe`.

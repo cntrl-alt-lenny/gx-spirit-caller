@@ -1227,3 +1227,44 @@ count stated. No hardcoded counts in tests — they move every round. Build-free
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — report QUEUE-EMPTY honestly if you genuinely reach it.
+
+### q-port-readiness-census — cost the one strategic option nobody has priced [TODO]
+
+The campaign faces a genuine fork and one of its branches has never been costed.
+EUR natural-C is now **17.21%**; USA and JPN sit at **11.84%** and **11.82%**.
+`phased-eur-first` has deferred the ports since the beginning on the reasoning
+that they are derivative and cheap *after* EUR content lands — but nobody has
+measured how much has now landed, or how much of it would port.
+
+This is a **census, not a port**. Do not port anything.
+
+**Deliverable:**
+
+1. **How much EUR content is portable today.** `tools/port_to_region.py` and the
+   `src/<region>/` convention already exist and were exercised in the brief-064
+   era. How many EUR `.c` files have a USA/JPN counterpart still shipped as `.s`?
+   Bytes, per region, per module.
+2. **How much is byte-identical-portable versus needs work.** The campaign has
+   prior art here — `q-port-harvest-complete` drained 322 free byte-identical
+   cross-region ports. Re-derive what remains of that class now.
+3. **What the known blockers are.** `q-port-highconf-no-target` scoped a
+   63-per-region HIGH-but-no-target-file class; is it still 63? The
+   `port_census.py` tool exists — reuse it rather than re-implementing, and read
+   its own source first per the standing rule.
+4. **A per-region bottom line**: bytes reachable by the existing port path, and
+   bytes needing new work.
+
+**Do not recommend a direction.** cntrl_alt_lenny decides whether ports become
+active; your job is to make the option costed instead of hypothetical. If a
+figure cannot be derived honestly, leave it blank and say why — a blank is a
+fact, an estimate is not, and #1559 set that precedent well.
+
+⚠️ Watch the vintage rule. Any figure inherited from the brief-064 or
+`q-port-harvest-*` era describes the tree as it was; re-derive against the
+current one. See `docs/research/band-rate-vintage.md`.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
+annotated with its reproducing command. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.

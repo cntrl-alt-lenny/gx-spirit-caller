@@ -1310,3 +1310,42 @@ Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — report QUEUE-EMPTY honestly if you genuinely reach it.
+
+### q-roi-per-lane — make the ROI question answerable with numbers [TODO]
+
+The campaign has reached a point where the next decision is explicitly an ROI
+call — 257-320 B sits at 20.0% with 263 candidates / 75,980 B behind it, while
+the data lane ships smaller but steadier tranches. **Nobody can currently answer
+"which lane returns more per hour of machine time", because the data to answer it
+has only just started existing.**
+
+Three ingredients landed in the last two rounds and none is joined up: the
+`attempts` column (#1544, now populated by two consecutive Decomper rounds),
+attempt-stratified analytics (#1570), and the dashboard (#1553).
+
+**Build the join.** Per lane, per round: bytes shipped, candidates attempted,
+ship rate, and — the missing axis — an honest proxy for machine cost. You will
+not find wall-clock in the ledger, so say what you use and why: gate runs are the
+dominant cost and are countable from the round's own research docs and PR bodies,
+and `attempts` sums give a per-candidate effort proxy. **If a defensible cost
+proxy cannot be derived from committed data, say so and stop at the parts that
+can** — an ROI table with an invented denominator would be worse than none.
+
+**Two hard constraints:**
+
+- **Blank is not zero.** Over 1,700 historical rows have no `attempts` value.
+  Any effort-derived figure must state how many rows it excluded, every run —
+  #1570 established that pattern, follow it.
+- **Do not rank the lanes or recommend one.** Produce the table; the judgement is
+  cntrl_alt_lenny's. A tool that editorialises about which lane to fund would be
+  read as authoritative and it has no standing to be.
+
+**Tooling budget:** consolidates duplicated infrastructure — the brain assembles
+fragments of this by hand every review — and directly informs a live decision.
+
+**Gate:** pytest + unittest green (paste both tails) + `ruff check` clean + the
+table produced for the last three rounds, with excluded-row counts stated. No
+hardcoded counts in tests; they move every round. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
+the next item — report QUEUE-EMPTY honestly if you genuinely reach it.

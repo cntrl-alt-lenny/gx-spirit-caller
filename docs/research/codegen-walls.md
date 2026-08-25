@@ -12481,7 +12481,7 @@ zone, and had never been sampled.
 **Census** (`wall_aware_headroom.scan(max_size=1023)` minus
 `scan(max_size=512)`, all modules, cross-checked directly against
 `scan()` rather than trusted from `pool_freshness.py` alone, per the
-#1534/#1542 main-only-default incident): **610 candidates / 431,016 B**
+PR #1534/#1542 main-only-default incident): **610 candidates / 431,016 B**
 raw, unattempted, all modules. Of these, **539 candidates / 381,048 B**
 pass the campaign's standing `>=4 bl/blx` filter used for every other
 band's probe sampling. The independent `scan()`-plus-manual-bl-filter
