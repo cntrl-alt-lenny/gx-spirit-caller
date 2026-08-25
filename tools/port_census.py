@@ -189,6 +189,53 @@ def scan_eur_tree(base: Path) -> tuple[list[tuple[str, int, Path]], list[str]]:
     return eur_c, eur_unparsed
 
 
+def _sim_bucket(byte_sim: float | None) -> str:
+    """Classify a backlog entry without inventing a result when bytes are absent."""
+    if byte_sim is None:
+        return "unavailable"
+    return "byte-identical" if byte_sim >= 0.9999 else "needs-work"
+
+
+def summarize_backlog(entries: list[dict]) -> dict[str, object]:
+    """Return count/byte totals by module and byte-sim evidence bucket."""
+    by_module: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"count": 0, "bytes": 0}
+    )
+    by_sim: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"count": 0, "bytes": 0}
+    )
+    for entry in entries:
+        size = int(entry["size"])
+        module = str(entry["module"])
+        by_module[module]["count"] += 1
+        by_module[module]["bytes"] += size
+        bucket = _sim_bucket(entry.get("byte_sim"))
+        by_sim[bucket]["count"] += 1
+        by_sim[bucket]["bytes"] += size
+    return {
+        "count": len(entries),
+        "bytes": sum(int(entry["size"]) for entry in entries),
+        "by_module": dict(sorted(by_module.items())),
+        "by_byte_sim": dict(sorted(by_sim.items())),
+    }
+
+
+def summarize_nofile(entries: list[dict]) -> dict[str, object]:
+    """Return the byte-cost of HIGH matches with no target source file."""
+    by_module: dict[str, dict[str, int]] = defaultdict(
+        lambda: {"count": 0, "bytes": 0}
+    )
+    for entry in entries:
+        module = str(entry["module"])
+        by_module[module]["count"] += 1
+        by_module[module]["bytes"] += int(entry["size"])
+    return {
+        "count": len(entries),
+        "bytes": sum(int(entry["size"]) for entry in entries),
+        "by_module": dict(sorted(by_module.items())),
+    }
+
+
 def main() -> int:
     # --- EUR baseline .c files ---------------------------------------------
     eur_c, eur_unparsed = scan_eur_tree(ROOT / "src")
@@ -273,7 +320,10 @@ def main() -> int:
                 })
             else:
                 results[rname]["HIGH-but-no-target-file"] += 1
-                nofile_list[rname].append((str(path.name), f"0x{taddr:08x}", mod))
+                nofile_list[rname].append({
+                    "eur": str(path), "tgt_addr": f"0x{taddr:08x}",
+                    "module": mod, "size": fn.size,
+                })
         if i % 500 == 0:
             print(f"  {i}/{len(eur_c)}", file=sys.stderr)
 
@@ -285,10 +335,36 @@ def main() -> int:
         print(f"  backlog byte-sim dist: {dict(simdist[rname])}")
         total_b = sum(x["size"] for x in backlog[rname])
         print(f"  backlog total bytes: {total_b}")
+        summary = summarize_backlog(backlog[rname])
+        module_text = ", ".join(
+            f"{module}={data['count']}/{data['bytes']} B"
+            for module, data in summary["by_module"].items()
+        )
+        print(f"  backlog by module (count/bytes): {module_text}")
+        sim_text = ", ".join(
+            f"{bucket}={data['count']}/{data['bytes']} B"
+            for bucket, data in summary["by_byte_sim"].items()
+        )
+        print(f"  backlog byte-sim evidence (count/bytes): {sim_text}")
+        nofile = summarize_nofile(nofile_list[rname])
+        print(
+            "  HIGH-but-no-target-file bytes: "
+            f"{nofile['bytes']} ({nofile['count']} entries)"
+        )
 
     SCRATCH.mkdir(parents=True, exist_ok=True)
     with open(SCRATCH / "port_backlog.json", "w") as fh:
-        json.dump({"backlog": backlog, "nofile": nofile_list}, fh, indent=1)
+        json.dump({
+            "backlog": backlog,
+            "nofile": nofile_list,
+            "summary": {
+                rname: {
+                    "backlog": summarize_backlog(backlog[rname]),
+                    "high_no_target": summarize_nofile(nofile_list[rname]),
+                }
+                for rname in ("usa", "jpn")
+            },
+        }, fh, indent=1)
     print("\nwrote", SCRATCH / "port_backlog.json")
     return 0
 
