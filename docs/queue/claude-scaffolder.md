@@ -2029,7 +2029,7 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-13`; then take the
 next item — report QUEUE-EMPTY honestly if you genuinely reach it.
 
-### cm-restock-carve-14 — carve the pointer tables themselves, the thing every other route keeps hitting [TODO]
+### cm-restock-carve-14 — carve the pointer tables themselves, the thing every other route keeps hitting [DONE]
 
 Two of your own findings now point at the same target, so this wave takes it
 head-on.
