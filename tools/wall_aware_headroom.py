@@ -301,6 +301,7 @@ def _new_module_entry() -> dict:
     return {
         "total": 0, "permanent": 0, "coercible": 0, "unknown": 0, "no_marker": 0,
         "candidate": 0, "excluded_attempted": 0,
+        "permanent_files": [],  # list of {path, addr, text_size}
         "coercible_files": [],  # list of {path, addr, text_size, codes}
         "unknown_files": [],  # list of {path, addr, text_size}
         "no_marker_files": [],  # list of {path, addr, text_size}
@@ -385,6 +386,8 @@ def scan(
         elif classification.kind == "no_marker":
             d["candidate"] += 1
             d["no_marker_files"].append(metadata)
+        elif classification.kind == "permanent":
+            d["permanent_files"].append(metadata)
 
     for p in (ROOT / "src").rglob("*.s"):
         rel = p.relative_to(ROOT).as_posix()

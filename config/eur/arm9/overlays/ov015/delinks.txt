@@ -369,7 +369,7 @@ src/overlay015/func_ov015_021b405c.s:
     complete
     .text start:0x021b405c end:0x021b429c
 
-src/overlay015/func_ov015_021b429c.s:
+src/overlay015/func_ov015_021b429c.c:
     complete
     .text start:0x021b429c end:0x021b43a8
 

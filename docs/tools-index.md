@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**144 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**147 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,10 +16,10 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (8)
+- [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (68)
+- [Uncategorised](#uncategorised) (70)
 
 ## Analysis / worklist
 
@@ -312,6 +312,10 @@ Failure mode (real incident: PR #1365, and #1360 blocked by it): a status check 
 **catch the duplicate-delink footgun before it burns a gate.**
 
 Failure mode (real incidents: PR #948, #198): a sweep PR carves a function at an address some *other* file on `main` already delinks. After the merge the region's `delinks.txt` lists that `.text start:ADDR` under two different source fil…
+
+### `tools/check_dispatch_log.py`
+
+**Require a new dispatch-log row when a round updates the state handoff.**
 
 ### `tools/check_match_invariants.py`
 
@@ -711,6 +715,10 @@ mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
 
 **Mechanically reclassify the main small-tier worklist from .s bodies.**
 
+### `tools/make_kickoff.py`
+
+**Emit and self-lint the mechanical part of an agent kickoff.**
+
 ### `tools/naming_census.py`
 
 **Count placeholder and real function names in committed symbol tables.**
@@ -840,6 +848,12 @@ Failure mode: ``attempts.tsv`` is consumed as machine data, but previously only 
 **byte-compare a compiled function against its dsd-delinked gap**
 
 object. The scaffolder's direct-mwcc per-pick gate (EUR objdiff 100%); the brain reproduces the 3-region SHA1 on merge.
+
+### `tools/verify_composed_group.py`
+
+**cm-restock-carve-12: automate the standalone-**
+
+compile-then-inspect check `alignment-wall-tu-composition-recipe.md`'s standing rule requires before any n>=3 composed TU is trusted.
 
 ### `tools/wall_aware_headroom.py`
 

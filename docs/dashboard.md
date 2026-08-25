@@ -15,7 +15,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 410,626 | **17.21%** | 4,420 | 17.40% |
+| eur | 411,186 | **17.23%** | 4,420 | 17.42% |
 | usa | 282,428 | **11.84%** | 2,748 | 11.96% |
 | jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
 
@@ -70,12 +70,14 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `c4e221eb8` | 2026-08-22 | 410,018 | 17.18% | +0 |
 | `181000b78` | 2026-08-22 | 410,626 | 17.21% | +608 |
 | `6b45ab651` | 2026-08-24 | 410,626 | 17.21% | +0 |
+| `f75bad565` | 2026-08-24 | 411,186 | 17.23% | +560 |
+| `a898807f4` | 2026-08-24 | 410,626 | 17.21% | -560 |
 
-45 points, one per commit that changed `docs/state-table.md` (oldest first).
+47 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 
-**These are NOT the dispatch-ready pools -- read this before the table.** The campaign dispatches on `.text` size AND a branch-link (>=4 `bl`/`blx` instructions) filter together; no committed, reusable tool computes the `bl`/`blx` count today (`wall_aware_headroom.scan()` filters only by `.text` size and address -- confirmed by reading its own CLI), so the table below applies the size half only. That halves-the-story gap is large: `docs/state.md` hand-measured the `bl`-filtered `<=192 B` pool at **34 candidates / 5,224 B**, roughly 3% of this table's size-only `<=192 B` row. Per the reuse-don't-reimplement rule this page does not invent a `bl`-counting tool to close that gap; see `docs/state.md` for the hand-verified dispatch figures until one is committed, and `PR #1534` (unmerged as of this page) for the proposed direction -- sanity-check its output against `scan()` directly before trusting it, per that PR's own held-back defect (a silently `main`-only default population reported as staleness).
+**These are NOT the dispatch-ready pools -- read this before the table.** The campaign dispatches on `.text` size AND a branch-link (>=4 `bl`/`blx` instructions) filter together, while `wall_aware_headroom.scan()` filters only by `.text` size and address, so the table below applies the size half only. **Brain correction at merge (round 0824c):** an earlier draft of this paragraph said no committed tool computes the `bl`/`blx` count and pointed at `PR #1534` as unmerged. Both were already false when written -- `tools/pool_freshness.py` was on `main` at this branch's own base commit, its `body_call_count()` counts exactly those instructions, and #1534 is CLOSED, superseded by #1542 which merged the rescoped tool. For the dispatch-ready figure use `python tools/pool_freshness.py --pool wall-bl4-small --max-size <hi> --exclude-attempted --all-modules`, and sanity-check its scope against `scan()` -- #1534 was held precisely for a silently `main`-only default reported as staleness, which #1542 fixed.
 
 Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --min-size <lo> --max-size <hi> --json` (this table sums every module's `candidate` count and each candidate file's own `text_size`).
 
@@ -83,8 +85,45 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | --- | ---: | ---: |
 | <=192 B | 1,160 | 135,268 |
 | 193-256 B | 460 | 102,472 |
-| 257-320 B | 431 | 123,900 |
+| 257-320 B | 422 | 121,376 |
 | 321-384 B | 277 | 97,324 |
+| 385+ B | 1,344 | 1,328,648 |
+
+### Remaining unmatched `.text` by module
+
+This is the same wall-aware, attempted-excluded candidate population as the band table, split by module. Confirmed permanent walls are not included in these candidate columns.
+
+Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; each row below sums that JSON module's `coercible_files`, `unknown_files`, and `no_marker_files`.
+
+| module | permanent count | permanent bytes | unassessed count | unassessed bytes |
+| --- | ---: | ---: | ---: | ---: |
+| itcm | 0 | 0 | 12 | 2,020 |
+| main | 36 | 3,096 | 1,419 | 517,548 |
+| overlay000 | 0 | 0 | 47 | 15,448 |
+| overlay001 | 0 | 0 | 1 | 336 |
+| overlay002 | 44 | 6,636 | 1,666 | 897,972 |
+| overlay003 | 0 | 0 | 14 | 18,132 |
+| overlay004 | 7 | 1,472 | 75 | 50,512 |
+| overlay005 | 0 | 0 | 29 | 25,872 |
+| overlay006 | 0 | 0 | 71 | 62,256 |
+| overlay007 | 0 | 0 | 7 | 1,572 |
+| overlay008 | 0 | 0 | 45 | 25,792 |
+| overlay009 | 0 | 0 | 13 | 11,480 |
+| overlay010 | 0 | 0 | 37 | 20,264 |
+| overlay011 | 0 | 0 | 46 | 24,064 |
+| overlay012 | 0 | 0 | 14 | 7,760 |
+| overlay013 | 0 | 0 | 8 | 5,980 |
+| overlay014 | 0 | 0 | 14 | 7,576 |
+| overlay015 | 0 | 0 | 20 | 9,992 |
+| overlay016 | 0 | 0 | 36 | 22,748 |
+| overlay017 | 0 | 0 | 22 | 19,532 |
+| overlay018 | 0 | 0 | 10 | 9,096 |
+| overlay019 | 0 | 0 | 19 | 10,716 |
+| overlay020 | 0 | 0 | 21 | 10,888 |
+| overlay021 | 0 | 0 | 8 | 3,548 |
+| overlay022 | 0 | 0 | 9 | 3,984 |
+
+Permanent-wall bytes are not inferred from counts here: the scan's permanent classification is the exclusion source, while its candidate file metadata is the byte source. This keeps the two sides auditable when a wall citation or source span changes.
 
 ## Data readability (EUR)
 
@@ -92,11 +131,23 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | metric | bytes | of data bytes |
 | --- | ---: | ---: |
-| Typed-array | 211,020 | 4.42% |
+| Typed-array | 218,120 | 4.57% |
 | Named-struct | 73,876 | 1.55% |
 | *(total data bytes)* | 4,776,528 | |
 
 Remaining zero-reader data pool (`main`, re-derived fresh via `data_worklist.py --include-data-readers`, not copied from a prior wave's writeup): **75 symbols / 2,448 bytes** with no function reader AND no data-pointer-table reader under the extended call graph (`cm-restock-carve-10`'s `edges_load_from_data`).
+
+### Data opportunity disposition
+
+Reproduce the current reachable total with `python tools/data_worklist.py --version eur --include-data-readers --no-outputs`. This is the live unmatched placeholder data/bss population with function or data readers; it is not a forecast and does not claim every shape has a proven recipe.
+
+| disposition | symbols | bytes | command / evidence |
+| --- | ---: | ---: | --- |
+| reachable, reader-attributed | 5,488 | 189,764 | `data_worklist.py --include-data-readers --no-outputs` |
+| proven recipe currently shippable |  |  | blank: the build-free worklist cannot classify the remaining shapes without compiled bytes |
+| blocked pending per-group verification |  |  | blank for the whole reachable pool; the latest scoped string-pool disposition is published in `cm-restock-carve-11-2026-08-24.md` |
+
+The latest scoped string-pool note records 46/1,060 B shipped by a proven same-size composition recipe and 3,069/66,096 B deferred pending group verification. Those are a dated sub-pool disposition, not silently promoted to a project-wide split.
 
 ## The honest ceiling
 

@@ -36,7 +36,10 @@ class TestLedgerContradictions(unittest.TestCase):
         )
 
     def test_park_then_ship_is_legitimate(self) -> None:
-        rows = [_row(), _row(brief="brief-b", result="shipped", park_class="n/a")]
+        rows = [
+            _row(brief="PR#1414:aaaaaaaa"),
+            _row(brief="PR#1435:bbbbbbbb", result="shipped", park_class="n/a"),
+        ]
         self.assertEqual(audit.audit_rows(rows)[0].classification, "LEGITIMATE")
 
     def test_shipped_twice_is_contradictory(self) -> None:
@@ -46,12 +49,34 @@ class TestLedgerContradictions(unittest.TestCase):
         self.assertIn("more than one shipped", group.reason)
 
     def test_ship_then_park_is_contradictory(self) -> None:
-        rows = [_row(result="shipped"), _row(brief="brief-b")]
+        rows = [
+            _row(brief="PR#1435:bbbbbbbb", result="shipped"),
+            _row(brief="PR#1440:cccccccc"),
+        ]
         self.assertEqual(audit.audit_rows(rows)[0].classification, "CONTRADICTORY")
 
-    def test_same_brief_different_result_is_contradictory(self) -> None:
+    def test_same_brief_different_result_without_tool_anomaly_is_ambiguous(self) -> None:
         rows = [_row(), _row(result="shipped")]
-        self.assertEqual(audit.audit_rows(rows)[0].classification, "CONTRADICTORY")
+        self.assertEqual(audit.audit_rows(rows)[0].classification, "AMBIGUOUS")
+
+    def test_tool_anomaly_retry_then_ship_is_legitimate(self) -> None:
+        rows = [
+            _row(park_class="tool-anomaly"),
+            _row(result="shipped", park_class="n/a"),
+        ]
+        self.assertEqual(audit.audit_rows(rows)[0].classification, "LEGITIMATE")
+
+    def test_unprovenanced_ship_then_park_is_ambiguous(self) -> None:
+        rows = [_row(result="shipped"), _row(brief="brief-b")]
+        self.assertEqual(audit.audit_rows(rows)[0].classification, "AMBIGUOUS")
+
+    def test_backfilled_park_then_ship_uses_pr_order_not_row_order(self) -> None:
+        rows = [
+            _row(brief="PR#1435:55bd0f94", result="shipped"),
+            _row(brief="PR#1414:bb6e87a4"),
+        ]
+        group = audit.audit_rows(rows)[0]
+        self.assertEqual(group.classification, "LEGITIMATE")
 
     def test_exact_repeat_is_ambiguous(self) -> None:
         group = audit.audit_rows([_row(), _row()])[0]

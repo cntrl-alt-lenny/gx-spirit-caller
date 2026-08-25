@@ -1102,7 +1102,7 @@ ONE PR; verify every PR-body claim against `git diff --stat`; `python3.13
 tools/work_queue.py done codex-scaffolder q-unittest-required-evidence`; commit;
 then take the next queue item immediately.
 
-### q-make-kickoff-generator — the machine writes the preflight, the brain writes the prose [TODO]
+### q-make-kickoff-generator — the machine writes the preflight, the brain writes the prose [DONE]
 
 ⚠️ **Ordering: take this AFTER `q-pool-freshness-tool`** — it consumes that
 tool's output. If you reach this item and pool-freshness is not yet merged,
@@ -1218,7 +1218,7 @@ statement per run. No pin or lock change adopted in this PR.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-gate-resumability — a 40-minute gate is a terrible unit of work to lose [TODO]
+### q-gate-resumability — a 40-minute gate is a terrible unit of work to lose [DONE]
 
 `cm-main-exploit-drain-1` (#1524) lost roughly **2,500 build steps** to a
 mid-EUR interruption and adopted a workaround it then recommended to everyone:
@@ -1253,7 +1253,7 @@ first.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-dispatch-log-lint — the log only helps if it is actually appended [TODO]
+### q-dispatch-log-lint — the log only helps if it is actually appended [DONE]
 
 `docs/dispatch-log.md` was created in round 0822b to close the campaign's most
 persistent failure class: nobody knowing which machine a round ran on, and
@@ -1282,7 +1282,7 @@ tooling PR that edits `state.md` incidentally. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-required-checks-coverage-audit — four checks are required; are they the right four? [TODO]
+### q-required-checks-coverage-audit — four checks are required; are they the right four? [DONE]
 
 Round 0822b made `unittest` required (#1531) and it earned its place within
 hours: it caught a CI-shallow-clone test dependency on the very next

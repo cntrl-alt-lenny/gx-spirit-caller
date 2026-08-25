@@ -1031,7 +1031,7 @@ Build-free.
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — and report QUEUE-EMPTY honestly if you genuinely reach it.
 
-### q-ledger-chronology — your contradiction audit reads row order as time, and for 485 rows that is wrong [TODO]
+### q-ledger-chronology — your contradiction audit reads row order as time, and for 485 rows that is wrong [DONE]
 
 `q-ledger-contradiction-audit` (#1546) is merged and the tool is good: 57
 repeated groups classified 53 legitimate / 3 contradictory / 1 ambiguous, with
@@ -1095,7 +1095,7 @@ classifies LEGITIMATE. Assert the shape, never the counts — they move. Build-f
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-remaining-opportunity-census — the small-code frontier just closed; say honestly what is left [TODO]
+### q-remaining-opportunity-census — the small-code frontier just closed; say honestly what is left [DONE]
 
 This item exists because the campaign reached a real inflection point on
 2026-08-24 and nobody has written down the resulting picture in one place with
@@ -1143,6 +1143,87 @@ points next.
 
 **Gate:** pytest + unittest green + `ruff check` clean + every figure annotated
 with its reproducing command. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
+the next item — report QUEUE-EMPTY honestly if you genuinely reach it.
+
+### q-bl-filter-in-headroom — one canonical dispatch-pool source, not two [TODO]
+
+`q-remaining-opportunity-census` (#1559) ran into this and documented it
+honestly: the campaign dispatches on `.text` size **AND** a `>=4 bl`/`blx`
+filter, but `wall_aware_headroom.scan()` — the tool everything else consults —
+applies only the size half. The census's band table is therefore size-only and
+roughly **30x larger** than the real dispatch pool (its own `<=192 B` row versus
+the hand-measured 34 candidates / 5,224 B from the era when that pool was live).
+
+`tools/pool_freshness.py` does compute the `bl` count (`body_call_count()`), so
+the capability exists — it just lives in a second tool with its own population
+notion. That is exactly the two-sources-of-truth split that
+`q-pool-freshness-tool`'s own ⚠️ warned about: *"a second, differently-defined
+notion of the pool would create exactly the disagreement this item exists to
+end."*
+
+**Consolidate.** Expose the `bl`/`blx` count from the canonical
+`wall_aware_headroom` path — as an opt-in filter and as per-file metadata in its
+`--json` output — and have `pool_freshness.py` consume that rather than
+re-deriving it. One definition, one implementation, both tools agreeing by
+construction.
+
+**Requirements:**
+
+1. **Default behaviour of `scan()` is unchanged.** Every existing consumer must
+   produce byte-identical output when the new filter is not requested. Say in
+   the PR which consumers you checked and how — `cm-restock-carve-10` set the
+   precedent by verifying all 16 `build_call_graph` call sites.
+2. **One implementation of the count.** Do not leave two regexes that could
+   drift; the campaign has already paid for a `bl` regex subtlety once
+   (conditional forms like `blt` are branches, not calls, and must not count).
+3. **Cross-check, don't assume.** After wiring, both tools must return the same
+   count for the same population on the live tree. Paste that comparison.
+4. **Then the census can be corrected** — but that is the *next* item, not this
+   one. Ship the tool consolidation alone.
+
+**Tooling budget:** consolidates duplicated infrastructure and closes a
+demonstrated disagreement between two committed tools.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + the two-tool
+agreement pasted + proof that default `scan()` output is unchanged. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
+
+### q-effort-stratified-analytics — the attempts column has data in it now [TODO]
+
+`q-ledger-effort-column` (#1544) added the `attempts` column and
+`cm-main-band-followthrough` (#1563) became the first lane to populate it — 9 of
+9 rows, values 0 through 5. Until now the campaign's ship-rates silently assumed
+constant effort per candidate, and the one round where that assumption broke
+(#1536) cost a full 40-candidate experiment.
+
+Extend `tools/ledger_analytics.py` to stratify by `attempts`:
+
+1. Ship rate and `match_pct` distribution **grouped by attempt count**, so
+   "how much does iteration actually buy?" becomes a measured question rather
+   than an argued one.
+2. Flag any brief whose rows are **effort-inhomogeneous** — a wide spread of
+   attempt counts within one brief — since that is precisely the shape that made
+   #1536's headline uninterpretable.
+3. Handle the blank majority correctly: 1,700+ historical rows have **no**
+   attempts value, and blank is not zero. Exclude them from effort-stratified
+   views and say how many were excluded, every run. A statistic computed over 9
+   rows while implying 1,700 would be worse than no statistic.
+
+⚠️ Keep the standing caveat the tool already prints: `match_pct` is
+agent-reported, so a cross-lane comparison is weaker than a within-lane one.
+Adding an effort axis makes the tool more persuasive, which makes the caveat
+matter more, not less.
+
+**Tooling budget:** catches a demonstrated failure class — the round-0822c
+confound, now measurable for the first time.
+
+**Gate:** pytest + unittest green (paste both tails) + `ruff check` clean + the
+stratified output for `cm-main-band-followthrough`'s 9 rows, with the excluded-row
+count stated. No hardcoded counts in tests — they move every round. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; then take
 the next item — report QUEUE-EMPTY honestly if you genuinely reach it.
