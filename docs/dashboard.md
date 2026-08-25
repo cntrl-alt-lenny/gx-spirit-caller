@@ -72,8 +72,10 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `6b45ab651` | 2026-08-24 | 410,626 | 17.21% | +0 |
 | `f75bad565` | 2026-08-24 | 411,186 | 17.23% | +560 |
 | `a898807f4` | 2026-08-24 | 410,626 | 17.21% | -560 |
+| `596be20f3` | 2026-08-25 | 411,758 | 17.26% | +1,132 |
+| `6befb1abc` | 2026-08-25 | 411,186 | 17.23% | -572 |
 
-47 points, one per commit that changed `docs/state-table.md` (oldest first).
+49 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 
@@ -98,25 +100,14 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | module | permanent count | permanent bytes | unassessed count | unassessed bytes |
 | --- | ---: | ---: | ---: | ---: |
 | itcm | 0 | 0 | 12 | 2,020 |
-<<<<<<< HEAD
-| main | 36 | 3,096 | 1,417 | 516,968 |
+| main | 36 | 3,096 | 1,411 | 512,776 |
 | overlay000 | 0 | 0 | 47 | 15,448 |
 | overlay001 | 0 | 0 | 1 | 336 |
-| overlay002 | 44 | 6,636 | 1,665 | 897,660 |
+| overlay002 | 44 | 6,636 | 1,657 | 891,500 |
 | overlay003 | 0 | 0 | 13 | 17,868 |
 | overlay004 | 7 | 1,472 | 75 | 50,512 |
 | overlay005 | 0 | 0 | 28 | 25,588 |
-| overlay006 | 0 | 0 | 71 | 62,256 |
-=======
-| main | 36 | 3,096 | 1,413 | 513,356 |
-| overlay000 | 0 | 0 | 47 | 15,448 |
-| overlay001 | 0 | 0 | 1 | 336 |
-| overlay002 | 44 | 6,636 | 1,658 | 891,812 |
-| overlay003 | 0 | 0 | 14 | 18,132 |
-| overlay004 | 7 | 1,472 | 75 | 50,512 |
-| overlay005 | 0 | 0 | 29 | 25,872 |
 | overlay006 | 0 | 0 | 70 | 61,696 |
->>>>>>> origin/claude/cm-513-1023-census
 | overlay007 | 0 | 0 | 7 | 1,572 |
 | overlay008 | 0 | 0 | 45 | 25,792 |
 | overlay009 | 0 | 0 | 13 | 11,480 |
