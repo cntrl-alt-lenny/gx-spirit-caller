@@ -70,8 +70,10 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `c4e221eb8` | 2026-08-22 | 410,018 | 17.18% | +0 |
 | `181000b78` | 2026-08-22 | 410,626 | 17.21% | +608 |
 | `6b45ab651` | 2026-08-24 | 410,626 | 17.21% | +0 |
+| `f75bad565` | 2026-08-24 | 411,186 | 17.23% | +560 |
+| `a898807f4` | 2026-08-24 | 410,626 | 17.21% | -560 |
 
-45 points, one per commit that changed `docs/state-table.md` (oldest first).
+47 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 
@@ -97,23 +99,23 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | --- | ---: | ---: | ---: | ---: |
 | itcm | 0 | 0 | 12 | 2,020 |
 | main | 36 | 3,096 | 1,419 | 517,548 |
-| overlay000 | 0 | 0 | 48 | 15,712 |
+| overlay000 | 0 | 0 | 47 | 15,448 |
 | overlay001 | 0 | 0 | 1 | 336 |
-| overlay002 | 44 | 6,636 | 1,669 | 898,816 |
+| overlay002 | 44 | 6,636 | 1,666 | 897,972 |
 | overlay003 | 0 | 0 | 14 | 18,132 |
 | overlay004 | 7 | 1,472 | 75 | 50,512 |
 | overlay005 | 0 | 0 | 29 | 25,872 |
 | overlay006 | 0 | 0 | 71 | 62,256 |
 | overlay007 | 0 | 0 | 7 | 1,572 |
-| overlay008 | 0 | 0 | 46 | 26,108 |
+| overlay008 | 0 | 0 | 45 | 25,792 |
 | overlay009 | 0 | 0 | 13 | 11,480 |
-| overlay010 | 0 | 0 | 38 | 20,544 |
+| overlay010 | 0 | 0 | 37 | 20,264 |
 | overlay011 | 0 | 0 | 46 | 24,064 |
 | overlay012 | 0 | 0 | 14 | 7,760 |
 | overlay013 | 0 | 0 | 8 | 5,980 |
-| overlay014 | 0 | 0 | 15 | 7,868 |
-| overlay015 | 0 | 0 | 21 | 10,260 |
-| overlay016 | 0 | 0 | 37 | 23,008 |
+| overlay014 | 0 | 0 | 14 | 7,576 |
+| overlay015 | 0 | 0 | 20 | 9,992 |
+| overlay016 | 0 | 0 | 36 | 22,748 |
 | overlay017 | 0 | 0 | 22 | 19,532 |
 | overlay018 | 0 | 0 | 10 | 9,096 |
 | overlay019 | 0 | 0 | 19 | 10,716 |
@@ -141,7 +143,7 @@ Reproduce the current reachable total with `python tools/data_worklist.py --vers
 
 | disposition | symbols | bytes | command / evidence |
 | --- | ---: | ---: | --- |
-| reachable, reader-attributed | 5,689 | 196,864 | `data_worklist.py --include-data-readers --no-outputs` |
+| reachable, reader-attributed | 5,488 | 189,764 | `data_worklist.py --include-data-readers --no-outputs` |
 | proven recipe currently shippable |  |  | blank: the build-free worklist cannot classify the remaining shapes without compiled bytes |
 | blocked pending per-group verification |  |  | blank for the whole reachable pool; the latest scoped string-pool disposition is published in `cm-restock-carve-11-2026-08-24.md` |
 
