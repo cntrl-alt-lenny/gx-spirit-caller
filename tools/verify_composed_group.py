@@ -92,7 +92,7 @@ import json
 import re
 import sys
 import tempfile
-from dataclasses import dataclass, field
+from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
@@ -235,7 +235,7 @@ def classify_group(members: list[Member], compiled_sections: list[bytes] | None,
             f"per cm-restock-carve-11), got {len(compiled_sections)} -- "
             f"the compiled shape doesn't match this recipe's assumption",
         )
-    for i, (m, sec) in enumerate(zip(members, compiled_sections)):
+    for i, (m, sec) in enumerate(zip(members, compiled_sections, strict=True)):
         if sec != m.content:
             return VerifyResult(
                 "reject",
