@@ -1834,7 +1834,7 @@ all carry freshness guards now and the suite will tell you.
 ONE PR; verify every claim against `git diff --stat` including the arithmetic;
 `python tools/work_queue.py done claude-decomper cm-main-band-finish`.
 
-### cm-513-1023-census — the probe that never got fully specified [TODO]
+### cm-513-1023-census — the probe that never got fully specified [DONE]
 
 ⚠️ Take this only after `cm-main-band-finish`, and only if that item did not open
 a band worth draining. If it did, draining is worth more — say so and stop here.

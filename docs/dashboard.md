@@ -87,7 +87,7 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | 193-256 B | 460 | 102,472 |
 | 257-320 B | 411 | 118,200 |
 | 321-384 B | 277 | 97,324 |
-| 385+ B | 1,344 | 1,328,648 |
+| 385+ B | 1,329 | 1,317,736 |
 
 ### Remaining unmatched `.text` by module
 
@@ -98,6 +98,7 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | module | permanent count | permanent bytes | unassessed count | unassessed bytes |
 | --- | ---: | ---: | ---: | ---: |
 | itcm | 0 | 0 | 12 | 2,020 |
+<<<<<<< HEAD
 | main | 36 | 3,096 | 1,417 | 516,968 |
 | overlay000 | 0 | 0 | 47 | 15,448 |
 | overlay001 | 0 | 0 | 1 | 336 |
@@ -106,6 +107,16 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | overlay004 | 7 | 1,472 | 75 | 50,512 |
 | overlay005 | 0 | 0 | 28 | 25,588 |
 | overlay006 | 0 | 0 | 71 | 62,256 |
+=======
+| main | 36 | 3,096 | 1,413 | 513,356 |
+| overlay000 | 0 | 0 | 47 | 15,448 |
+| overlay001 | 0 | 0 | 1 | 336 |
+| overlay002 | 44 | 6,636 | 1,658 | 891,812 |
+| overlay003 | 0 | 0 | 14 | 18,132 |
+| overlay004 | 7 | 1,472 | 75 | 50,512 |
+| overlay005 | 0 | 0 | 29 | 25,872 |
+| overlay006 | 0 | 0 | 70 | 61,696 |
+>>>>>>> origin/claude/cm-513-1023-census
 | overlay007 | 0 | 0 | 7 | 1,572 |
 | overlay008 | 0 | 0 | 45 | 25,792 |
 | overlay009 | 0 | 0 | 13 | 11,480 |
