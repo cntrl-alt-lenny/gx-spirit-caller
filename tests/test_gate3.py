@@ -115,6 +115,91 @@ class TestInfrastructureAttribution(unittest.TestCase):
         self.assertIn("GATE FAIL", output)
 
 
+class TestResumability(unittest.TestCase):
+    def _run_all(self, *, state=None, sha="sha-a", clean_tree=True, clean=False):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tools").mkdir()
+            (root / "tools" / "configure.py").write_text("# fixture\n")
+            if state is not None:
+                state_path = root / "build" / "gate3-state.json"
+                state_path.parent.mkdir()
+                state_path.write_text(gate3.json.dumps(state), encoding="utf-8")
+            built = []
+
+            def fake_gate(region, requested_clean):
+                built.append((region, requested_clean))
+                return gate3.RegionResult(True, pass_line=f"[{region}] SHA1 PASS")
+
+            stdout = io.StringIO()
+            with patch.object(gate3, "ROOT", root), \
+                    patch.object(gate3, "STATE_PATH", root / "build" / "gate3-state.json"), \
+                    patch.object(gate3, "current_commit_sha", return_value=sha), \
+                    patch.object(gate3, "worktree_clean", return_value=clean_tree), \
+                    patch.object(gate3, "gate_region", side_effect=fake_gate), \
+                    patch.object(gate3, "check_dsd_binary", return_value=True), \
+                    patch.object(gate3, "run", return_value=gate3.CommandResult(0)), \
+                    contextlib.redirect_stdout(stdout):
+                exit_code = gate3.main(["--scope", "all", "--no-tests"] + (["--clean"] if clean else []))
+            recorded = None
+            state_path = root / "build" / "gate3-state.json"
+            if state_path.exists():
+                recorded = gate3.json.loads(state_path.read_text(encoding="utf-8"))
+            return exit_code, built, stdout.getvalue(), recorded
+
+    def test_missing_state_runs_every_region_and_records_pass_lines(self):
+        exit_code, built, output, recorded = self._run_all()
+        self.assertEqual(exit_code, 0)
+        self.assertEqual([region for region, _ in built], gate3.REGIONS)
+        self.assertEqual(recorded["sha"], "sha-a")
+        self.assertEqual(recorded["regions"]["eur"]["pass"], "[eur] SHA1 PASS")
+        self.assertIn("state missing", output)
+
+    def test_same_sha_clean_tree_skips_saved_regions_loudly(self):
+        state = {
+            "sha": "sha-a",
+            "regions": {
+                region: {"sha": "sha-a", "pass": f"[{region}] SHA1 PASS"}
+                for region in gate3.REGIONS
+            },
+        }
+        exit_code, built, output, _ = self._run_all(state=state)
+        self.assertEqual(exit_code, 0)
+        self.assertEqual(built, [])
+        self.assertIn("[eur] SKIP", output)
+        self.assertIn("[jpn] SKIP", output)
+
+    def test_changed_sha_runs_every_region_fail_closed(self):
+        state = {"sha": "sha-old", "regions": {
+            region: {"sha": "sha-old", "pass": f"[{region}] SHA1 PASS"}
+            for region in gate3.REGIONS
+        }}
+        exit_code, built, output, _ = self._run_all(state=state, sha="sha-new")
+        self.assertEqual(exit_code, 0)
+        self.assertEqual([region for region, _ in built], gate3.REGIONS)
+        self.assertIn("state missing or from another commit", output)
+
+    def test_dirty_tree_runs_every_region_fail_closed(self):
+        state = {"sha": "sha-a", "regions": {
+            region: {"sha": "sha-a", "pass": f"[{region}] SHA1 PASS"}
+            for region in gate3.REGIONS
+        }}
+        exit_code, built, output, _ = self._run_all(state=state, clean_tree=False)
+        self.assertEqual(exit_code, 0)
+        self.assertEqual([region for region, _ in built], gate3.REGIONS)
+        self.assertIn("working tree is dirty", output)
+
+    def test_clean_flag_invalidates_saved_regions(self):
+        state = {"sha": "sha-a", "regions": {
+            region: {"sha": "sha-a", "pass": f"[{region}] SHA1 PASS"}
+            for region in gate3.REGIONS
+        }}
+        exit_code, built, output, _ = self._run_all(state=state, clean=True)
+        self.assertEqual(exit_code, 0)
+        self.assertEqual([region for region, _ in built], gate3.REGIONS)
+        self.assertIn("--clean invalidates", output)
+
+
 
 class TestDsdBinaryProbe(unittest.TestCase):
     """Windows ships dsd.exe; probing only the extensionless name made every
