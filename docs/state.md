@@ -27,6 +27,98 @@ by the executed toggle. (6) Local worktree GC on the PC (registered+merged only;
 orphaned dirs reported to the owner, never `rm -rf`'d).
 
 **Last updated:** 2026-08-24 — **(Windows PC, brain=Opus 5; roster unchanged.)
+Round 0824c: nine PRs, and the two frontiers moved in opposite directions. The
+composition route into the data pool is DEAD on a clean 0/575. But 257-320 B
+came back qualitatively different from the band below it — and the round's own
+lane refused to call a partial sample a verdict, which is why it is being
+finished rather than spent.**
+
+Merged **#1557** through **#1565** — nine PRs. `q-wine-link-concurrency` was
+correctly DEFERRED, not failed.
+
+✅ **Transcript audit executed in full**, all four lanes on this host.
+
+**#1563 — 193-256 B closed, 257-320 B is NOT.** Part 1 recorded the closure in
+`codegen-walls.md` as **BR-1** (both runs' evidence) and **BR-2** (the general
+vintage-stamping rule, which the lane tied back to its own earlier unrecognised
+instance in drain-2 Part 1 — it generalised a mistake it had made itself). Part 2
+sampled n=20 at 257-320 B and fully processed **9**: 2 shipped, 7 parked, 11 read
+and deferred as disproportionately complex for one round's budget.
+
+**The lane declined to call 2/9 = 22.2% a verdict**, on the grounds that the
+thresholds were written against an n=20 denominator and rounding a partial
+sample up "would repeat the exact vintage-stamping mistake BR-2 exists to name."
+That is the round's new lesson being applied to its own result within hours.
+
+Brain-verified: 9 rows, sizes **260-316 B** (no band drift), and — a first —
+the **`attempts` column populated on 9/9 rows** (values 0-5). The confound that
+cost #1536 its headline is now data.
+
+**The two bands are qualitatively different, and this is the finding to carry
+forward:**
+
+| | n | shipped | parked median `match_pct` | flat 0% | >=50% |
+|---|---:|---:|---:|---:|---:|
+| 193-256 B | 60 | **0** | **11.2%** (matched-effort subset: 5.2%) | 11 | 8 |
+| 257-320 B | 9 | 2 | **55.2%** | **0** | 3 of 5 |
+
+Every 257-320 B candidate had a workable C structure; none was a dead draft.
+Both bands are **100% register-class parks** — so this is not "small functions
+die on reg-alloc, large ones don't"; it is the same wall family with the drafts
+landing ten times closer. Honest bounds on the band: **10%** (all 11 deferred
+fail) to **22.2%** (deferred behave like processed), straddling the pre-registered
+"closed" threshold. Not a verdict either way. `cm-main-band-finish` completes the
+sample — the 11 are already identified and read, so it is cheap.
+
+**#1561 — the composition route into the data pool is DEAD, cleanly.** The
+verifier ran across all 575 content-valid windows: **0 pass.** 561 rejected
+pre-compile as mixed-size (correctly applying wave 11's own finding), 14
+same-size compiled and mismatched. **New finding: same-size does not generalise
+from n=2 to n>=3 either** — synthetic 3-member groups compiled `zebra/apple/mango`
+to file order `apple/zebra/mango`, and no declaration-order, alphabetical or
+byte-value rule predicts it. The 66,096 B does not unlock this way. That is a
+negative result worth more than a speculative positive: nobody will spend another
+wave on composition.
+
+**#1565 — and the lane found a different route the same round.** 201 symbols /
+**7,100 B** shipped as opaque `unsigned char[N]` from the array shape's
+zero-internal-reloc subset (brain-verified: 201 files, 201 declarations, 7,100
+declared bytes, exact). The structural finding: **both `array` and `struct`
+shapes are dominated by embedded pointers rather than plain scalar data**, which
+is why the zero-reloc subset is small — 201 of 788.
+
+**Codex Decomper — my chronology finding confirmed and fixed.** #1558 re-ran the
+audit with PR-number ordering: **50 LEGITIMATE / 0 CONTRADICTORY / 7 AMBIGUOUS**.
+Both false positives resolve as ordinary park-then-ship; the `ov007` tool-anomaly
+retry was judged legitimate on its merits. A timestamp column was *recommended
+with reasoning*, not added unilaterally. #1559 published the census and left the
+data-recipe split **blank** where build-free evidence could not prove it.
+
+**Codex Scaffolder — 4 of 5, and the 5th was the right call.**
+`q-wine-link-concurrency` found live `ninja`/`mwccarm` on its required
+pre-measurement check and **deferred rather than publish a contaminated timing
+result**. The item stays TODO. It also declined to report QUEUE-EMPTY because its
+four PRs were unmerged — the same honesty as last round.
+
+⚠️ **Two brain findings against merged work.** (1) The census's headline caveat
+claimed *"no committed, reusable tool computes the `bl`/`blx` count today"* and
+pointed at **PR #1534 as unmerged**. Both were already false when written —
+`pool_freshness.py` was on `main` at the census branch's own base commit
+(verified with `git cat-file`), and #1534 is closed, superseded by the
+merged PR #1542. Corrected in the generator at merge. (2) **#1561's `Python (ruff)`
+required check was RED** despite its PR body claiming ruff clean — `F401` unused
+`dataclasses.field` and `B905` `zip()` without `strict=`. Both fixed at merge;
+`strict=True` is semantically exact there because the two lines above the loop
+already guarantee equal lengths. Its 21 tests still pass.
+
+**Brain error this round, recorded because it nearly cost someone else's work:**
+after committing, the tree was clean, so a `git stash -u` stashed nothing — and
+the following `git stash pop` popped **the Codex lane's old stash** from a
+different branch, creating a conflict in `docs/queue/codex-scaffolder.md`. Reset
+the file to HEAD; the stash entry survived intact and was left in place. Never
+pair a speculative `stash` with an unconditional `pop`.
+
+**Last updated (previous):** 2026-08-24 — **(Windows PC, brain=Opus 5; roster unchanged.)
 Round 0824: eleven PRs merged and the campaign reached a real inflection. The
 193-256 B band came back 0/20 at MATCHED effort, so the small-code frontier is
 closed on evidence rather than on a confounded number. The data pool is the
@@ -422,7 +514,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-<!-- main-sha: 5d59cd34f -->
+<!-- main-sha: 061f16bef -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

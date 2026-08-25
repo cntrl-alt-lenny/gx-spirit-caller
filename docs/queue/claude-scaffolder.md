@@ -2028,3 +2028,62 @@ BEFORE stashed, reconciliation item by item, README regenerated last.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-13`; then take the
 next item — report QUEUE-EMPTY honestly if you genuinely reach it.
+
+### cm-restock-carve-14 — carve the pointer tables themselves, the thing every other route keeps hitting [TODO]
+
+Two of your own findings now point at the same target, so this wave takes it
+head-on.
+
+`cm-restock-carve-12` (#1561) proved the composition route is **dead**: 0 of 575
+content-valid windows pass, 561 rejected pre-compile as mixed-size, 14 same-size
+compiled and mismatched, plus the new finding that same-size does not generalise
+from n=2 to n>=3 either. Nobody should spend another wave on composition — that
+negative is worth more than a speculative positive.
+
+`cm-restock-carve-13` (#1565) shipped 201 symbols / 7,100 B as opaque
+`unsigned char[N]` and reported *why* it was only 201 of 788: **both the `array`
+and `struct` shapes are dominated by embedded pointers rather than plain scalar
+data.** The zero-internal-reloc subset is the small part.
+
+So the remaining data pool is largely **pointer tables**, and they are the one
+shape this campaign has a strong reason to want carved properly rather than
+opaquely. `cm-restock-carve-10` only became possible because the call graph
+learned to follow data->data edges — every uncarved pointer table is still a
+hole in that graph. Carving one as `unsigned char[N]` ships bytes but keeps the
+hole; carving it with real symbol references closes it.
+
+**Scope:**
+
+1. **Census the pointer-shaped population honestly.** How many of the ~587
+   with-reloc array-shape symbols (and the struct-shape equivalents) are
+   *pure* pointer tables — every internal relocation pointing at a resolvable
+   symbol — versus mixed data-with-pointers? Report both, and the bytes.
+2. **Prove the recipe on ONE table, gated alone**, before any batch. Emit real
+   references (`void *const tbl[] = { &sym, ... }` or the shape the target
+   actually wants) and gate it on 3-region SHA1 by itself.
+   ⚠️ `const` placement decides `.data` vs `.rodata` and this project has been
+   burned by it: `&symbol` always relocates into `.data`, so a literal-cast
+   pointer array needs `void *const`. Get that wrong and the section moves.
+3. **Only then take a bounded tranche**, sized to one comfortable round.
+4. **Report the call-graph effect.** After carving, does
+   `analyze_symbols.build_call_graph` attribute readers it previously could not?
+   That is the second half of the value and it is measurable.
+
+**Where a table points at a function still shipped as `.s`**, say so and handle
+it explicitly — `cm-restock-carve-13`'s own caution applies: an emission can gate
+green in isolation and break when a sibling later flips to C. Screen every target
+against `src/` and against the delinks routing.
+
+**If the pure-pointer-table population turns out small**, that is the finding.
+Four waves running have corrected an inherited count and the series is trusted
+because of it.
+
+**Gate:** full `python tools/gate3.py --scope all --clean` — three SHA1 PASS
+lines verbatim plus the pytest tail. `typed_array_bytes` / `named_struct_bytes`
+before -> after with the BEFORE stashed for real, delta reconciled against the
+files shipped. `git restore assets/` after the clean run. Regenerate every derived
+artifact your content invalidates — dashboard, state-table and walls-index all
+carry freshness guards now.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-restock-carve-14`.
