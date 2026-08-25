@@ -85,6 +85,43 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | 193-256 B | 460 | 102,472 |
 | 257-320 B | 422 | 121,376 |
 | 321-384 B | 277 | 97,324 |
+| 385+ B | 1,344 | 1,328,648 |
+
+### Remaining unmatched `.text` by module
+
+This is the same wall-aware, attempted-excluded candidate population as the band table, split by module. Confirmed permanent walls are not included in these candidate columns.
+
+Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; each row below sums that JSON module's `coercible_files`, `unknown_files`, and `no_marker_files`.
+
+| module | permanent count | permanent bytes | unassessed count | unassessed bytes |
+| --- | ---: | ---: | ---: | ---: |
+| itcm | 0 | 0 | 12 | 2,020 |
+| main | 36 | 3,096 | 1,419 | 517,548 |
+| overlay000 | 0 | 0 | 48 | 15,712 |
+| overlay001 | 0 | 0 | 1 | 336 |
+| overlay002 | 44 | 6,636 | 1,669 | 898,816 |
+| overlay003 | 0 | 0 | 14 | 18,132 |
+| overlay004 | 7 | 1,472 | 75 | 50,512 |
+| overlay005 | 0 | 0 | 29 | 25,872 |
+| overlay006 | 0 | 0 | 71 | 62,256 |
+| overlay007 | 0 | 0 | 7 | 1,572 |
+| overlay008 | 0 | 0 | 46 | 26,108 |
+| overlay009 | 0 | 0 | 13 | 11,480 |
+| overlay010 | 0 | 0 | 38 | 20,544 |
+| overlay011 | 0 | 0 | 46 | 24,064 |
+| overlay012 | 0 | 0 | 14 | 7,760 |
+| overlay013 | 0 | 0 | 8 | 5,980 |
+| overlay014 | 0 | 0 | 15 | 7,868 |
+| overlay015 | 0 | 0 | 21 | 10,260 |
+| overlay016 | 0 | 0 | 37 | 23,008 |
+| overlay017 | 0 | 0 | 22 | 19,532 |
+| overlay018 | 0 | 0 | 10 | 9,096 |
+| overlay019 | 0 | 0 | 19 | 10,716 |
+| overlay020 | 0 | 0 | 21 | 10,888 |
+| overlay021 | 0 | 0 | 8 | 3,548 |
+| overlay022 | 0 | 0 | 9 | 3,984 |
+
+Permanent-wall bytes are not inferred from counts here: the scan's permanent classification is the exclusion source, while its candidate file metadata is the byte source. This keeps the two sides auditable when a wall citation or source span changes.
 
 ## Data readability (EUR)
 
@@ -97,6 +134,18 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 | *(total data bytes)* | 4,776,528 | |
 
 Remaining zero-reader data pool (`main`, re-derived fresh via `data_worklist.py --include-data-readers`, not copied from a prior wave's writeup): **75 symbols / 2,448 bytes** with no function reader AND no data-pointer-table reader under the extended call graph (`cm-restock-carve-10`'s `edges_load_from_data`).
+
+### Data opportunity disposition
+
+Reproduce the current reachable total with `python tools/data_worklist.py --version eur --include-data-readers --no-outputs`. This is the live unmatched placeholder data/bss population with function or data readers; it is not a forecast and does not claim every shape has a proven recipe.
+
+| disposition | symbols | bytes | command / evidence |
+| --- | ---: | ---: | --- |
+| reachable, reader-attributed | 5,689 | 196,864 | `data_worklist.py --include-data-readers --no-outputs` |
+| proven recipe currently shippable |  |  | blank: the build-free worklist cannot classify the remaining shapes without compiled bytes |
+| blocked pending per-group verification |  |  | blank for the whole reachable pool; the latest scoped string-pool disposition is published in `cm-restock-carve-11-2026-08-24.md` |
+
+The latest scoped string-pool note records 46/1,060 B shipped by a proven same-size composition recipe and 3,069/66,096 B deferred pending group verification. Those are a dated sub-pool disposition, not silently promoted to a project-wide split.
 
 ## The honest ceiling
 

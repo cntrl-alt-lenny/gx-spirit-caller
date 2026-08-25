@@ -1095,7 +1095,7 @@ classifies LEGITIMATE. Assert the shape, never the counts — they move. Build-f
 
 ONE PR; verify claims against `git diff --stat`; `work_queue.py done`; next item.
 
-### q-remaining-opportunity-census — the small-code frontier just closed; say honestly what is left [TODO]
+### q-remaining-opportunity-census — the small-code frontier just closed; say honestly what is left [DONE]
 
 This item exists because the campaign reached a real inflection point on
 2026-08-24 and nobody has written down the resulting picture in one place with

@@ -114,12 +114,24 @@ class TestRenderShape(unittest.TestCase):
         self.assertIn("NOT the dispatch-ready pools", self.text)
         self.assertIn("bl", self.text)
 
+    def test_module_census_separates_permanent_and_unassessed(self):
+        self.assertIn("### Remaining unmatched `.text` by module", self.text)
+        self.assertIn("| module | permanent count | permanent bytes |", self.text)
+        self.assertIn("unassessed count", self.text)
+        self.assertIn("--json --exclude-attempted", self.text)
+
     def test_data_readability_section_present_with_reproduce_command(self):
         self.assertIn("## Data readability (EUR)", self.text)
         self.assertIn("summarize_data_readability", self.text)
         self.assertIn("Typed-array", self.text)
         self.assertIn("Named-struct", self.text)
         self.assertIn("zero-reader data pool", self.text)
+
+    def test_data_opportunity_section_is_explicit_about_unknown_split(self):
+        self.assertIn("### Data opportunity disposition", self.text)
+        self.assertIn("data_worklist.py --version eur --include-data-readers", self.text)
+        self.assertIn("proven recipe currently shippable", self.text)
+        self.assertIn("blank", self.text)
 
     def test_honest_ceiling_section_links_both_docs(self):
         self.assertIn("## The honest ceiling", self.text)
