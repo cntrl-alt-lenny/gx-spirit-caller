@@ -20,6 +20,19 @@ import wall_aware_headroom as w  # noqa: E402
 
 
 class ClassifyText(unittest.TestCase):
+    def test_body_call_count_excludes_conditional_branches(self):
+        with tempfile.TemporaryDirectory() as tmp:
+            path = Path(tmp) / "calls.s"
+            path.write_text(
+                ".text\n"
+                " bl target\n"
+                " blx r3\n"
+                " blt .L_loop\n"
+                " ble .L_done\n",
+                encoding="utf-8",
+            )
+            self.assertEqual(w.body_call_count(path), 2)
+
     def test_p_series_citation_is_permanent(self):
         c = w.classify_text("; P-16 dispatcher residue\n.text\n")
         self.assertEqual(c.kind, "permanent")
@@ -207,6 +220,36 @@ class ScanCandidateAccounting(unittest.TestCase):
             "addr": None,
             "text_size": 0,
         }])
+
+    def test_call_filter_is_opt_in_and_adds_per_file_metadata(self):
+        import tempfile
+        from unittest import mock
+
+        with tempfile.TemporaryDirectory() as tmp:
+            root = Path(tmp)
+            (root / "config").mkdir()
+            (root / "src" / "main").mkdir(parents=True)
+            files = {
+                "src/main/calls.s": ".text\n bl target\n blx r3\n blt .L_loop\n",
+                "src/main/branch-only.s": ".text\n blt .L_loop\n",
+            }
+            lines = []
+            for rel, body in files.items():
+                (root / rel).write_text(body, encoding="utf-8")
+                lines.append(f"{rel}:\n    complete\n")
+            (root / "config" / "delinks.txt").write_text(
+                "\n".join(lines), encoding="utf-8",
+            )
+
+            with mock.patch.object(w, "ROOT", root):
+                default = w.scan()
+                filtered = w.scan(min_bl_blx=2)
+
+        self.assertEqual(default["main"]["candidate"], 2)
+        self.assertEqual(filtered["main"]["candidate"], 1)
+        self.assertEqual(
+            filtered["main"]["no_marker_files"][0]["bl_blx"], 2,
+        )
 
     def test_json_module_backward_compat_keys(self):
         d = w._new_module_entry()

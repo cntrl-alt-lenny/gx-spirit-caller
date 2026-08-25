@@ -21,13 +21,13 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 import data_worklist  # noqa: E402
 import wall_aware_headroom  # noqa: E402
+from wall_aware_headroom import body_call_count  # noqa: E402,F401
 
 
 DATA_STRING_SHAPES = frozenset({
     data_worklist.SHAPE_STRING,
     data_worklist.SHAPE_STRING_ASCII4,
 })
-_CALL_RE = re.compile(r"^\s*(?:bl|blx)(?:\s|$)", re.IGNORECASE)
 _POOL_FIGURE_RE = re.compile(
     r"(?P<count>[0-9][0-9,]*)\s+(?P<label>symbols?|candidates?)"
     r"\s*(?:/\s*(?P<bytes>[0-9][0-9,]*)\s*B)?",
@@ -109,13 +109,6 @@ def _data_string_pool(version: str) -> PoolMeasurement:
     )
 
 
-def body_call_count(path: Path) -> int:
-    """Count exact ``bl``/``blx`` call instructions in an assembly body."""
-    text = path.read_text(encoding="utf-8", errors="replace")
-    body = text.split(".text", 1)[-1]
-    return sum(bool(_CALL_RE.match(line)) for line in body.splitlines())
-
-
 def _wall_files(per: dict[str, dict], module: str | None) -> list[dict]:
     files: list[dict] = []
     modules = [module] if module is not None else sorted(per)
@@ -145,27 +138,21 @@ def _wall_bl4_pool(
     per = wall_aware_headroom.scan(
         max_size=max_size,
         exclude_attempted=exclude_attempted,
+        min_bl_blx=4,
     )
     selected: list[dict[str, object]] = []
-    missing_files = 0
     for item in _wall_files(per, module):
         text_size = int(item["text_size"] or 0)
         if text_size < min_size:
             continue
-        path = wall_aware_headroom.ROOT / item["path"]
-        if not path.is_file():
-            missing_files += 1
-            continue
-        calls = body_call_count(path)
-        if calls >= 4:
-            selected.append({
-                "path": item["path"],
-                "text_size": item["text_size"],
-                "bl_blx": calls,
-            })
+        selected.append({
+            "path": item["path"],
+            "text_size": item["text_size"],
+            "bl_blx": item["bl_blx"],
+        })
     size_arg = f" --min-size {min_size}" if min_size else ""
     module_arg = f" --module {module}" if module is not None else " --all-modules"
-    attempted_arg = " --exclude-attempted" if exclude_attempted else ""
+    attempted_arg = " --exclude-attempted" if exclude_attempted else " --no-exclude-attempted"
     command = (
         "python tools/pool_freshness.py --pool wall-bl4-small"
         f"{size_arg} --max-size {max_size}{attempted_arg}{module_arg}"
@@ -177,7 +164,8 @@ def _wall_bl4_pool(
         revision=_revision(),
         command=command,
         definition=(
-            "wall_aware_headroom.scan(max_size=N, exclude_attempted=True), "
+            "wall_aware_headroom.scan(max_size=N, "
+            f"exclude_attempted={exclude_attempted}, min_bl_blx=4), "
             "candidate files whose assembly body contains at least four exact "
             "bl/blx call instructions"
         ),
@@ -187,7 +175,6 @@ def _wall_bl4_pool(
             "exclude_attempted": exclude_attempted,
             "module": module,
             "min_bl_blx": 4,
-            "missing_files": missing_files,
             "files": selected,
         },
     )

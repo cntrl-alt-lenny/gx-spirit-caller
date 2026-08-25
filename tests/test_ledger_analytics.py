@@ -33,7 +33,22 @@ class TestLedgerAnalytics(unittest.TestCase):
         self.assertEqual(report["below_50"], 1)
         self.assertEqual(report["shipped_bytes"], 12)
         self.assertEqual(report["attempts_recorded"], 1)
+        self.assertEqual(report["attempts_excluded"], 1)
+        self.assertEqual(report["effort_strata"][2]["shipped"], 1)
+        self.assertEqual(report["effort_strata"][3]["numeric_match_pct"], 1)
         self.assertIn("reg-alloc", report["park_class"])
+
+    def test_effort_strata_excludes_blank_and_flags_mixed_brief(self) -> None:
+        rows = [
+            _row("lane", "40", attempts="1"),
+            _row("lane", "80", attempts="3"),
+            _row("lane", "unknown"),
+        ]
+        report = summarize(rows)
+        self.assertEqual(report["attempts_excluded"], 1)
+        self.assertEqual(set(report["effort_strata"]), {1, 3})
+        self.assertEqual(report["effort_strata"][1]["ship_rate"], 0)
+        self.assertEqual(report["effort_inhomogeneous"]["lane"], (1, 3))
 
     def test_select_rows_preserves_comparison_order(self) -> None:
         rows = [_row("b", "20"), _row("a", "80")]
@@ -45,7 +60,9 @@ class TestLedgerAnalytics(unittest.TestCase):
         output = render({"one": [_row("one", "50")]})
         self.assertIn("agent-reported", output)
         self.assertIn("park_class", output)
-        self.assertIn("attempts", output)
+        self.assertIn("Effort-stratified views", output)
+        self.assertIn("attempts excluded (blank/non-integer) = 1", output)
+        self.assertIn("effort-inhomogeneous briefs: none", output)
 
     def test_live_brief_can_be_selected_without_pinning_cardinality(self) -> None:
         from ledger_analytics import load_rows

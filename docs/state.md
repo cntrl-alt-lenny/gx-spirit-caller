@@ -26,7 +26,84 @@ the fleet redirects the day it lands. (4) Three queue seeds: `cm-progress-dashbo
 by the executed toggle. (6) Local worktree GC on the PC (registered+merged only;
 orphaned dirs reported to the owner, never `rm -rf`'d).
 
-**Last updated:** 2026-08-24 — **(Windows PC, brain=Opus 5; roster unchanged.)
+**Last updated:** 2026-08-25 — **(Windows PC, brain=Opus 5; roster unchanged.)
+Round 0825: six PRs, and the code frontier now has a complete map. 257-320 B is
+**MARGINAL at 20.0%** on a full n=20 — not closed, not clearly drainable. Every
+other band is settled. The decision that remains is an ROI call, not a
+measurement.**
+
+Merged **#1569** through **#1574**. All four lanes reported QUEUE-EMPTY honestly.
+
+✅ **Transcript audit executed in full**, all four lanes on this host.
+
+**THE CODE FRONTIER, COMPLETE.** For the first time this campaign has a
+characterised map rather than a moving edge:
+
+| band | result | status |
+|---|---|---|
+| ≤192 B | pool drained to 0 | exhausted |
+| 193-256 B | **0/60** (0/40 + 0/20 matched-effort) | CLOSED |
+| **257-320 B** | **4/20 = 20.0%** | **MARGINAL** |
+| 321-376 B | 2/17 = 11.8% (sweep-7, vintage-stamped) | stale, never re-tested |
+| 513-1023 B | **0/15**, suggestive not significant | effectively closed |
+| >1024 B | zero ever matched | hard ceiling |
+
+`cm-main-band-finish` (#1572) completed the n=20 that #1563 deliberately left
+partial: the 11 deferred candidates shipped 2, giving 2+2 = **4/20 = 20.0%**.
+Brain-verified — 11 rows, sizes 260-320 B, `attempts` populated **11/11**
+(second consecutive round). The remaining-11 parked median was **27.3%** against
+the first nine's 55.2%, exactly as predicted: they were deferred for complexity
+and they were indeed harder.
+
+**20.0% is MARGINAL by the pre-registered thresholds** (≥25% drain, ≤10% closed),
+and both lanes honoured that boundary rather than rounding toward a story. What
+sits behind it: **263 candidates / 75,980 B** remaining at 257-320 B, so ~53
+ships at the measured rate. That is a real but unspectacular return, and whether
+to spend rounds on it is an ROI judgement against the data lane — which is
+cntrl_alt_lenny's call, not a number anyone still needs to go measure.
+
+`cm-513-1023-census` (#1574) is the first characterisation of that band:
+**610 candidates / 431,016 B** raw, **539 / 381,048 B** after the ≥4 bl filter,
+and **0/15** on the probe. It cross-checked `pool_freshness.py` against `scan()`
+directly rather than trusting it — the #1542 `--all-modules` fix is holding — and
+called its own result *suggestive, not significant* at n=15 rather than
+declaring the band dead.
+
+**#1573 `cm-restock-carve-14` — small bytes, right method.** 167
+single-embedded-pointer records, **2,004 B** (brain-verified: 167 × [8-byte
+prefix + 4-byte pointer]; a naive `[N]` scan reads 1,336 and misses the pointer
+word — the claim is correct). Crucially it emits the pointer as a **real symbol
+reference**, so it closes a call-graph hole rather than opaquing it, and it
+explicitly avoided the `const` → `.rodata` trap that has burned this project
+before.
+
+**#1569 consolidated the dispatch-pool definition, verified independently.**
+`scan()` now takes `min_bl_blx` and `pool_freshness.py` consumes it. Brain
+compared both tools at three caps: `≤192 B` 0/0, `≤320 B` 467/122,060,
+`≤1023 B` 1,516/707,900 — **exact agreement at every one**. The
+two-sources-of-truth split the census complained about is closed.
+
+⚠️ **The wine-link experiment ran cleanly and the brain's framing of it was
+wrong — correcting that here.** #1571 measured 12 uncontended runs at widths 1-4:
+median wall 54.0 / 59.2 / 64.9 / 68.9 s, binaries **deterministic at every
+width** (only `.xMAP` metadata varied, correctly identified as map ordering, not
+corruption). Read as throughput that is ~3.1× at width 4, which the doc's "wall
+time rose" phrasing understates.
+
+**But it does not license relaxing anything, and it was never going to help this
+machine.** `configure.py:750` skips the lock when `platform.system == "windows"`
+— and `platform` there is the project's own `get_platform()` object, not the
+stdlib module, so the comparison is a real string test that evaluates correctly.
+Verified: `get_platform().system == 'windows'`, the guard is False, and the
+generated `mwld` rule contains no lock. **The lock has never been active on the
+PC.** The two CC lanes' slowness here is plain CPU/disk contention from two full
+3-region builds, not serialisation. The experiment also ran native `mwldarm`, not
+Wine — so it does not test the environment the lock exists for. The lane's own
+caution ("does not prove the lock can be relaxed: the production gate uses Wine")
+was exactly right, and the brain's earlier billing of this item as "most likely to
+change your CC timings" was wrong for this host.
+
+**Last updated (previous):** 2026-08-24 — **(Windows PC, brain=Opus 5; roster unchanged.)
 Round 0824c: nine PRs, and the two frontiers moved in opposite directions. The
 composition route into the data pool is DEAD on a clean 0/575. But 257-320 B
 came back qualitatively different from the band below it — and the round's own
@@ -514,7 +591,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-<!-- main-sha: e6d228a9a -->
+<!-- main-sha: ad75640a2 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

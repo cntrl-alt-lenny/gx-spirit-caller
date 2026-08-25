@@ -25,6 +25,17 @@ def _number(value: str | None) -> float | None:
         return None
 
 
+def _attempt_value(row: dict[str, str]) -> int | None:
+    raw = (row.get("attempts") or "").strip()
+    if not raw:
+        return None
+    try:
+        value = int(raw)
+    except ValueError:
+        return None
+    return value if value >= 0 else None
+
+
 def select_rows(rows: list[dict[str, str]], briefs: list[str]) -> dict[str, list[dict[str, str]]]:
     return {
         brief: [row for row in rows if row.get("brief", "") == brief]
@@ -45,10 +56,44 @@ def summarize(rows: list[dict[str, str]]) -> dict[str, object]:
         and row.get("text_size", "").strip().isdigit()
     )
     attempts = [
-        int(row["attempts"])
-        for row in parked_rows
-        if row.get("attempts", "").strip().lstrip("-").isdigit()
+        value for row in parked_rows
+        if (value := _attempt_value(row)) is not None
     ]
+    effort_rows = [
+        (value, row) for row in rows
+        if (value := _attempt_value(row)) is not None
+    ]
+    effort_strata: dict[int, dict[str, object]] = {}
+    for value in sorted({value for value, _ in effort_rows}):
+        selected = [row for attempt, row in effort_rows if attempt == value]
+        parked = [
+            row for row in selected
+            if row.get("result", "").strip().lower() == "parked"
+        ]
+        match_values = [
+            pct for pct in (_number(row.get("match_pct")) for row in parked)
+            if pct is not None
+        ]
+        shipped = sum(
+            row.get("result", "").strip().lower() == "shipped"
+            for row in selected
+        )
+        effort_strata[value] = {
+            "n": len(selected),
+            "shipped": shipped,
+            "ship_rate": shipped / len(selected),
+            "numeric_match_pct": len(match_values),
+            "median": statistics.median(match_values) if match_values else None,
+            "mean": statistics.fmean(match_values) if match_values else None,
+        }
+    by_brief: dict[str, list[int]] = {}
+    for value, row in effort_rows:
+        by_brief.setdefault(row.get("brief", "") or "(blank brief)", []).append(value)
+    effort_inhomogeneous = {
+        brief: (min(values), max(values))
+        for brief, values in by_brief.items()
+        if min(values) != max(values)
+    }
     return {
         "n": len(parked_rows),
         "numeric_match_pct": len(percentages),
@@ -63,6 +108,9 @@ def summarize(rows: list[dict[str, str]]) -> dict[str, object]:
         "shipped_bytes": shipped_bytes,
         "attempts": Counter(attempts),
         "attempts_recorded": len(attempts),
+        "attempts_excluded": len(rows) - len(effort_rows),
+        "effort_strata": effort_strata,
+        "effort_inhomogeneous": effort_inhomogeneous,
     }
 
 
@@ -90,15 +138,38 @@ def render(groups: dict[str, list[dict[str, str]]]) -> str:
             f"{report['at_least_85']} | {report['at_least_75']} | {report['below_50']} | "
             f"{report['shipped_bytes']} | {park_class} |"
         )
-    attempts_seen = [summarize(rows)["attempts_recorded"] for rows in groups.values()]
-    if any(attempts_seen):
-        lines.extend(("", "attempts (recorded values only):"))
-        for label, rows in groups.items():
-            counter = summarize(rows)["attempts"]
-            values = ", ".join(f"{value}={count}" for value, count in sorted(counter.items()))
-            lines.append(f"- {label}: {values or 'none'}")
-    else:
-        lines.extend(("", "attempts: not available in this ledger schema or no values recorded"))
+    lines.extend(("", "Effort-stratified views (blank/non-integer attempts are excluded):"))
+    lines.extend((
+        "",
+        "| group | attempts | n | shipped | ship rate | numeric match_pct | median | mean |",
+        "| --- | ---: | ---: | ---: | ---: | ---: | ---: | ---: |",
+    ))
+    for label, rows in groups.items():
+        effort_strata = summarize(rows)["effort_strata"]
+        for attempts, report in effort_strata.items():
+            lines.append(
+                f"| {label} | {attempts} | {report['n']} | {report['shipped']} | "
+                f"{report['ship_rate']:.1%} | {report['numeric_match_pct']} | "
+                f"{_format_number(report['median'])} | {_format_number(report['mean'])} |"
+            )
+        if not effort_strata:
+            lines.append(f"| {label} | none recorded | 0 | 0 | n/a | 0 | n/a | n/a |")
+    lines.extend(("", "Attempt-recording coverage:"))
+    for label, rows in groups.items():
+        report = summarize(rows)
+        lines.append(
+            f"- {label}: attempts excluded (blank/non-integer) = "
+            f"{report['attempts_excluded']}; recorded = {sum(report['effort_strata'][value]['n'] for value in report['effort_strata'])}."
+        )
+        inhomogeneous = report["effort_inhomogeneous"]
+        if inhomogeneous:
+            ranges = ", ".join(
+                f"{brief} ({low}-{high})"
+                for brief, (low, high) in sorted(inhomogeneous.items())
+            )
+            lines.append(f"- effort-inhomogeneous briefs: {ranges}")
+        else:
+            lines.append("- effort-inhomogeneous briefs: none")
     lines.extend(("", "park_class breakdowns above are raw evidence, not taxonomy judgments."))
     return "\n".join(lines)
 

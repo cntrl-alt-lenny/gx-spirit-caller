@@ -12356,7 +12356,7 @@ presenting it as current. See `band-rate-vintage.md` for the full
 derivation and the `pool_freshness.py` precedent this extends from pool
 *sizes* to pool *ship rates*.
 
-### BR-3. The 257-320 B `.text` band (EUR, `>=4 bl/blx`, unattempted): PARTIAL SAMPLE, marginal signal, not a verdict
+### BR-3. The 257-320 B `.text` band (EUR, `>=4 bl/blx`, unattempted): PARTIAL SAMPLE — superseded by BR-4
 
 `cm-main-band-followthrough` sampled n=20 from the unattempted 257-320 B
 pool (283 candidates / 81,680 B after the `>=4 bl/blx` filter; stratified
@@ -12400,6 +12400,164 @@ first, leaving loop-and-bitpack residue behind.
 
 **Provenance:** `cm-main-band-followthrough` (this PR), `attempts.tsv`
 rows tagged `cm-main-band-followthrough`, `band-rate-vintage.md`.
+
+### BR-4. The 257-320 B `.text` band (EUR, `>=4 bl/blx`): full n=20 sample complete — MARGINAL (4/20 = 20%)
+
+`cm-main-band-finish` processed the 11 candidates BR-3 deferred, completing
+the n=20 sample BR-3 started. Same protocol, same 2-4-iteration budget,
+`attempts` populated on every row (this campaign's second consecutive
+round to do so, following `cm-main-band-followthrough`'s first).
+
+**Full n=20 result:**
+
+| | n | shipped | ship rate |
+|---|---:|---:|---:|
+| First 9 (`cm-main-band-followthrough`) | 9 | 2 | 22.2% |
+| Remaining 11 (`cm-main-band-finish`) | 11 | 2 | 18.2% |
+| **Full sample** | **20** | **4** | **20.0%** |
+
+Applying the pre-registered thresholds (>=25% band holds; <=10% frontier
+closed; 10-25% marginal) unchanged: **20.0% is MARGINAL.** Below the
+"band holds, drain it" line, above the "frontier closed, move to data"
+line. Per the thresholds' own pre-registered handling of this outcome:
+report the number, weigh it against the data lane's ROI, do not drain
+by default.
+
+**Two real, reusable levers found while processing the 11**, both worth
+carrying into future rounds on this same struct family:
+
+1. **17-bit-and-similar wide bitfield masks want real C bitfields, not a
+   single combined `& ~mask` constant.** `func_ov012_021ca6dc`'s `f18`
+   field (bits 0-16, mask `0x1ffff`) went from 10.3% to 85.9% in one
+   change: replacing `cfg.f18 = (cfg.f18 & ~0x1ffff) | 0x8000` with three
+   bitfield members (`unsigned f18a:7, f18b:7, f18c:3`) assigned
+   individually. A chained `& ~0x7f & ~0x3f80 & ~0x1c000` (three terms,
+   same final constant) made **no difference** — mwcc constant-folds a
+   chain of compile-time-constant masks before instruction selection, so
+   the fix has to be a real bitfield write, not a differently-punctuated
+   mask expression. The subsequent register-rotation fix (reordering
+   which field is read first in the following conditional block) took
+   the same function to 94.9%. Applying the identical bitfield lever to
+   `func_ov013_021ca15c`'s structurally-identical `f18` field did **not**
+   reproduce the gain (stayed at 2.6%, blocked by an unrelated
+   register-allocation issue) — the lever fixes the bitfield-mask
+   codegen specifically, it is not a general fix for every function that
+   touches this struct family.
+2. **A 16-bit byte-swap idiom's operand order in source can matter even
+   though `(x>>8)|(x<<8)` and `(x<<8)|(x>>8)` are mathematically
+   identical.** `func_02072f00` went from 61.2% to 78.8% purely by
+   switching every `(x >> 8) | (x << 8)` to `(x << 8) | (x >> 8)` — nine
+   textually-identical occurrences, one mechanical find/replace. Neither
+   the earlier `func_ov016_021b6f08` (P-20-mode-switch-selector family,
+   #1563) nor this round's `func_ov017_021b40d8` (which shipped with the
+   `>>`-first order intact, since it doesn't use this idiom at all) had
+   a byte-swap idiom to confirm this against, so treat this as a
+   single-instance finding, not yet a confirmed lever — worth
+   re-testing the next time this idiom appears in an unshipped
+   candidate.
+
+**Per-candidate detail, full risk notes, and the two shipped functions'
+diffs:** see `cm-main-band-finish-2026-08-25.md`.
+
+**Recommendation, unchanged from BR-3's provisional read and now backed
+by the complete sample:** do not drain 257-320 B by default. The 20.0%
+rate is real signal, not noise or an artifact of partial coverage
+(BR-2's concern) — the full n=20 denominator this round completes is
+exactly what the thresholds were pre-registered against. Report it and
+let it be weighed against the data lane's known 66,096 B (verifier
+`cm-restock-carve-12`) + 128,875 B (non-string shapes) pool.
+
+**Provenance:** `cm-main-band-followthrough` (#1563), `cm-main-band-finish`
+(this PR), `attempts.tsv` rows tagged with either brief.
+
+### BR-5. The 513-1023 B `.text` band (EUR, never characterised before this round): census + n=15 probe, 0/15 shipped — suggestive, not significant
+
+`cm-513-1023-census` is the first characterisation of this band. Above
+1024 B, zero functions have ever matched in this campaign — the one hard
+empirical ceiling this campaign tracks. 513-1023 B sits between the
+tractable region (all bands measured so far, up to 320 B) and that dead
+zone, and had never been sampled.
+
+**Census** (`wall_aware_headroom.scan(max_size=1023)` minus
+`scan(max_size=512)`, all modules, cross-checked directly against
+`scan()` rather than trusted from `pool_freshness.py` alone, per the
+PR #1534/#1542 main-only-default incident): **610 candidates / 431,016 B**
+raw, unattempted, all modules. Of these, **539 candidates / 381,048 B**
+pass the campaign's standing `>=4 bl/blx` filter used for every other
+band's probe sampling. The independent `scan()`-plus-manual-bl-filter
+re-derivation matched `pool_freshness.py`'s reported 539/381,048 exactly
+— the `--all-modules` fix from #1542 is holding.
+
+**Probe:** n=15, stratified module floor was infeasible this time (23
+modules carry candidates in this band, more than the n=15 target itself,
+unlike every smaller band this campaign has sampled), so the draw was a
+plain seeded random sample (`random.seed(20260825)`) from the full
+539-candidate pool instead. Landed 6 `main`, 8 `overlay002`, 1
+`overlay006` — reflecting those two modules' outsized share of the
+underlying pool (393/539 = 73%), not a sampling artifact.
+
+**Result: 0/15 shipped.** Median `match_pct` 12.0%; one real near-miss
+at 68.5% (`func_0204757c`, an instruction-scheduling residual in a
+26-field self-init block, resistant to one targeted reorder attempt).
+**6 of 15 (40%) carry the confirmed P-20-row-offset signature**
+(`(bit&1)*0x868` against `data_ov002_022cf16c`/`022cf17c`, cohort now
+63) — a new finding: this wall family was previously characterised only
+in the 200-400 B range, and is now confirmed present, at the same rate
+order of magnitude, in a band roughly 2-3x larger. All 6 wall-contaminated
+candidates scored 1.9-17.7%, consistent with the wall's established
+signature of "structurally plausible, never byte-exact" rather than a
+clean miss.
+
+**Honest statistics, per the queue item's explicit instruction — this is
+suggestive, not significant:**
+
+- 0/15 = 0% observed. But with zero events at n=15, the data alone
+  cannot rule out a true underlying ship rate as high as roughly 20%
+  (rule-of-three approximation, 3/n) — which is, notably, the same
+  order as the 257-320 B band's own measured 20.0% (BR-4). **This probe
+  cannot statistically distinguish "513-1023 B is meaningfully harder
+  than 257-320 B" from "513-1023 B is similar and this sample simply
+  drew zero successes."**
+- **Effort was not matched to the stated protocol.** The queue item
+  specified a full 2-4-iteration budget per candidate; in practice 13 of
+  15 candidates received exactly 1 attempt and 2 received 2, because
+  processing 15 candidates at roughly 2-4x the `.text` size (and
+  correspondingly more callees, struct fields, and control-flow
+  complexity) per candidate proved far more expensive than the
+  257-320 B band's candidates within one round's time budget. This is a
+  real, disclosed confound on top of the small-n problem, not a hidden
+  one — see `feedback_effort-confound` precedent
+  (`cm-main-exploit-drain-2`, `cm-main-boundary-rerun`). The one
+  candidate that DID get a second real iteration (`func_0204757c`)
+  improved from a clean compile to a 68.5% near-miss on the first pass
+  already, then held at 68.5% after one more targeted fix attempt failed
+  to close a resistant scheduling residual — the second data point
+  (`func_ov002_0225a978`, 34.6% -> 35.6%) moved only marginally. Neither
+  data point is enough to estimate what full 2-4-iteration effort would
+  do across the other 13, but the one near-miss is real evidence this
+  band is not *uniformly* unreachable.
+- The `4.2x model/observed disagreement` figure banked from round-0810
+  is **not quoted here**, per the queue item's explicit instruction and
+  `band-rate-vintage.md`'s standing warning against citing a historical
+  figure without re-deriving it. Re-deriving it would require
+  reconstructing that round's completion-model methodology, which is out
+  of scope for a 15-candidate probe — dropped, not re-derived.
+
+**Recommendation:** this is a probe, not a pilot, and it does not settle
+whether 513-1023 B is worth draining. What it does establish: the band
+is not obviously dead (one real 68.5% near-miss, and a 40% wall-hit rate
+that is itself informative rather than merely disqualifying), but a fair
+read requires the full 2-4-iteration protocol actually applied — which
+this round's time budget did not allow across all 15. A future round
+revisiting this band should either (a) budget for full-protocol
+iteration on a fresh n=15-or-larger sample, explicitly excluding the
+already-identified P-20-row-offset-contaminated addresses from the
+draw, or (b) treat this probe's 0/15 as sufficient to deprioritise this
+band relative to the data lane, accepting that the confidence interval
+is wide. Both are defensible; this doc does not pick one.
+
+**Provenance:** `cm-513-1023-census` (this PR), `attempts.tsv` rows
+tagged `cm-513-1023-census`, `band-rate-vintage.md`.
 
 ## Open questions (not levers, not walls — genuinely unresolved)
 

@@ -15,7 +15,7 @@ quote. `asm-C` is inline-asm coverage hygiene, counted separately on purpose.
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 411,186 | **17.23%** | 4,420 | 17.42% |
+| eur | 411,758 | **17.26%** | 4,420 | 17.44% |
 | usa | 282,428 | **11.84%** | 2,748 | 11.96% |
 | jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
 
@@ -29,20 +29,20 @@ much of the project is still locked in functions of that size.
 | --- | ---: | ---: | ---: | ---: | ---: |
 | 1–148 | 4,446 | 1,252 | 78.0% | 5.40 | 102 |
 | 149–256 | 583 | 1,094 | 34.8% | 9.26 | 201 |
-| 257–512 | 128 | 1,264 | 9.2% | 19.00 | 358 |
+| 257–512 | 130 | 1,262 | 9.3% | 18.98 | 358 |
 | 513–1023 | 11 | 614 | 1.8% | 18.16 | 705 |
 | 1024–2047 | 0 | 221 | 0.0% | 12.99 | 1,401 |
 | 2048+ | 0 | 114 | 0.0% | 17.22 | 3,603 |
-| **total** | **5,168** | **4,559** | | **82.02** | |
+| **total** | **5,170** | **4,557** | | **82.00** | |
 
-Shipped `.text`: 415,606 B · remaining `.text`: 1,957,054 B · denominator: 2,385,948 B
+Shipped `.text`: 416,178 B · remaining `.text`: 1,956,482 B · denominator: 2,385,948 B
 
 ## EUR data typing
 
 | metric | bytes | of data bytes |
 | --- | ---: | ---: |
 | Typed-array | 218,120 | 4.57% |
-| Named-struct | 73,876 | 1.55% |
+| Named-struct | 75,880 | 1.59% |
 | *(total data bytes)* | 4,776,528 | |
 
 `Typed-array` counts any file-scope array declaration, including opaque
