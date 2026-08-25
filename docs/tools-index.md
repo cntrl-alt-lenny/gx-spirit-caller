@@ -711,6 +711,10 @@ mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
 
 **Mechanically reclassify the main small-tier worklist from .s bodies.**
 
+### `tools/make_kickoff.py`
+
+**Emit and self-lint the mechanical part of an agent kickoff.**
+
 ### `tools/naming_census.py`
 
 **Count placeholder and real function names in committed symbol tables.**
