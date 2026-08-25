@@ -591,7 +591,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-<!-- main-sha: ad75640a2 -->
+<!-- main-sha: 36659e5a2 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
