@@ -74,8 +74,9 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `a898807f4` | 2026-08-24 | 410,626 | 17.21% | -560 |
 | `596be20f3` | 2026-08-25 | 411,758 | 17.26% | +1,132 |
 | `6befb1abc` | 2026-08-25 | 411,186 | 17.23% | -572 |
+| `c7ef460ef` | 2026-08-25 | 412,102 | 17.27% | +916 |
 
-49 points, one per commit that changed `docs/state-table.md` (oldest first).
+50 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 
