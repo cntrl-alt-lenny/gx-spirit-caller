@@ -15,7 +15,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 411,186 | **17.23%** | 4,420 | 17.42% |
+| eur | 411,758 | **17.26%** | 4,420 | 17.44% |
 | usa | 282,428 | **11.84%** | 2,748 | 11.96% |
 | jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
 
@@ -85,7 +85,7 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | --- | ---: | ---: |
 | <=192 B | 1,160 | 135,268 |
 | 193-256 B | 460 | 102,472 |
-| 257-320 B | 422 | 121,376 |
+| 257-320 B | 411 | 118,200 |
 | 321-384 B | 277 | 97,324 |
 | 385+ B | 1,344 | 1,328,648 |
 
@@ -98,28 +98,28 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | module | permanent count | permanent bytes | unassessed count | unassessed bytes |
 | --- | ---: | ---: | ---: | ---: |
 | itcm | 0 | 0 | 12 | 2,020 |
-| main | 36 | 3,096 | 1,419 | 517,548 |
+| main | 36 | 3,096 | 1,417 | 516,968 |
 | overlay000 | 0 | 0 | 47 | 15,448 |
 | overlay001 | 0 | 0 | 1 | 336 |
-| overlay002 | 44 | 6,636 | 1,666 | 897,972 |
-| overlay003 | 0 | 0 | 14 | 18,132 |
+| overlay002 | 44 | 6,636 | 1,665 | 897,660 |
+| overlay003 | 0 | 0 | 13 | 17,868 |
 | overlay004 | 7 | 1,472 | 75 | 50,512 |
-| overlay005 | 0 | 0 | 29 | 25,872 |
+| overlay005 | 0 | 0 | 28 | 25,588 |
 | overlay006 | 0 | 0 | 71 | 62,256 |
 | overlay007 | 0 | 0 | 7 | 1,572 |
 | overlay008 | 0 | 0 | 45 | 25,792 |
 | overlay009 | 0 | 0 | 13 | 11,480 |
 | overlay010 | 0 | 0 | 37 | 20,264 |
 | overlay011 | 0 | 0 | 46 | 24,064 |
-| overlay012 | 0 | 0 | 14 | 7,760 |
-| overlay013 | 0 | 0 | 8 | 5,980 |
+| overlay012 | 0 | 0 | 13 | 7,448 |
+| overlay013 | 0 | 0 | 7 | 5,668 |
 | overlay014 | 0 | 0 | 14 | 7,576 |
 | overlay015 | 0 | 0 | 20 | 9,992 |
 | overlay016 | 0 | 0 | 36 | 22,748 |
-| overlay017 | 0 | 0 | 22 | 19,532 |
-| overlay018 | 0 | 0 | 10 | 9,096 |
-| overlay019 | 0 | 0 | 19 | 10,716 |
-| overlay020 | 0 | 0 | 21 | 10,888 |
+| overlay017 | 0 | 0 | 21 | 19,240 |
+| overlay018 | 0 | 0 | 9 | 8,816 |
+| overlay019 | 0 | 0 | 18 | 10,444 |
+| overlay020 | 0 | 0 | 20 | 10,620 |
 | overlay021 | 0 | 0 | 8 | 3,548 |
 | overlay022 | 0 | 0 | 9 | 3,984 |
 
