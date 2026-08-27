@@ -2142,3 +2142,35 @@ artifact your content invalidates.
 
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-15`.
+
+### cm-port-drain-jpn — the same drain, JPN side [TODO]
+
+Identical scope to `cm-port-drain-usa`, targeting **JPN**. Read that item's
+scoping section in full first — the standing "do not re-run the loop" warning,
+why it does not apply to the post-2026-08-05 rows, and the
+`byte_sim ≠ portable` distinction all apply here unchanged.
+
+Brain's measurement for this side: **JPN sim=1.0 backlog 653 rows / 99,388 B
+byte-identical**, of which **650 files are natural C (99,140 B)** and 3 are
+`asm`-escaped. The new-versus-known-refusing split will be close to USA's
+509/142 — re-derive it yourself rather than assuming, using
+`git log --diff-filter=A` on each candidate's EUR source against 2026-08-05.
+
+⚠️ **You and the other lane are draining different regions of the same tool.**
+Do not touch `src/usa/` or `config/usa/`; that is the other lane's territory
+this round, and a cross-region collision at integration is expensive to unpick.
+If `port_harvest.py` offers no region flag, drive `port_to_region.py --target
+jpn` directly and say so in the PR.
+
+⚠️ **The mwcc toolchain serialises machine-wide.** Both lanes ROM-gate every
+batch. Run `tasklist | grep -iE 'mwcc|mwld|mwasm|ninja'` before starting and
+poll on a bounded schedule if the other lane is building — do not report blocked
+on a single instantaneous check, and do not build concurrently. Say what you saw
+either way.
+
+**Gate:** as above — harness per-batch ROM gates, then
+`python tools/gate3.py --scope all` with three SHA1 PASS lines pasted verbatim,
+`check_activation_invariant.py`, and before/after `port_census.py` counts.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-port-drain-jpn`.

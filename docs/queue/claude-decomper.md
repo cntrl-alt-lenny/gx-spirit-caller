@@ -1920,3 +1920,67 @@ after each clean run. Regenerate any derived artifact your content invalidates.
 
 ONE PR; verify every claim against `git diff --stat` including the arithmetic;
 `python tools/work_queue.py done claude-decomper cm-321-376-probe`.
+
+### cm-port-drain-usa — the EUR-ship-triggered USA drain that is now due [TODO]
+
+**Read this scoping section before running anything. There is a standing warning
+against re-running this loop, and the reason it does not apply now is specific.**
+
+`q-port-harvest-complete` drained the byte-identical port backlog on 2026-08-05
+and its successor recorded: *"The sim=1.0 pool is drained to genuine refusals…
+do not re-run the loop."* PR #1459's full re-drain shipped **zero** — all 292
+remaining `sim=1.0` rows refused below the HIGH/EXACT confidence floor. That
+warning is real and it is why this item exists with a scope rather than as a
+free-for-all.
+
+**But the same item also says the backlog regrows on EUR ships, and that
+"full drains are now triggered by EUR-ship rounds, not a standing TODO."** EUR
+natural-C has gone **14.11% → 17.27%** since that drain — roughly 124 KB of new
+EUR sources, each one a potential new port candidate. Brain measured the split
+today:
+
+```text
+USA sim=1.0 backlog:                       651 rows
+  EUR source added AFTER 2026-08-05:       509 rows / 70,792 B   <- NEVER attempted
+  EUR source predates it:                  142 rows              <- in #1459's refused set
+```
+
+So this is the triggered drain the queue prescribes, not the re-run it forbids.
+
+⚠️ **`byte_sim = 1.0` does NOT mean portable.** They are different gates:
+byte-similarity compares the bytes; `port_to_region.py` refuses unless every
+symbol resolves at the HIGH/EXACT floor. #1459 is the proof — a whole pool of
+byte-identical rows refused on the floor. **Treat 70,792 B as an upper bound,
+not a forecast**, and expect refusals to be the common outcome. An honest
+"N shipped, M refused with reasons" is the deliverable.
+
+**Scope:**
+
+1. Run `python tools/port_census.py` first and paste the before counts.
+2. Run `python tools/port_harvest.py --batch 20` in a loop. The harness
+   re-censuses, filters to `sim==1.0` at the HIGH floor, ports, and ROM-gates
+   each batch itself — this is mechanical and gated at every step, which is
+   why it is safe to run in bulk.
+3. **Never force a below-floor candidate.** A refusal for a real reason is the
+   expected outcome and must be recorded, not worked around. Do not pass
+   `--no-auto-promote` off or reach for a lower `--confidence-floor` to make a
+   number move.
+4. **Skip the 142 known-refusing rows** rather than re-fighting them; they were
+   settled by #1459 and their named residues are tracked separately
+   (`q-port-residual-fix`, `q-port-highconf-no-target`).
+5. Stop when the new rows are drained or genuinely refuse. **Ending non-zero is
+   normal and expected** — the item's own success line is "drained or genuinely
+   refuse", not "zero remaining".
+
+**What you are shipping is natural C, not coverage padding.** Brain checked the
+composition: of the byte-identical USA backlog, **648 files are natural C
+(98,596 B) and only 3 are `asm`-escaped (248 B)**. This moves the real headline.
+
+**Gate:** the harness ROM-gates each batch itself. Finish with
+`python tools/gate3.py --scope all` (three SHA1 PASS lines pasted verbatim plus
+the pytest tail) + `python tools/check_activation_invariant.py origin/main..HEAD`
++ before/after `port_census.py` counts pasted. `git restore assets/` if a
+`--clean` run deletes the heatmap SVGs.
+
+ONE PR; verify every claim against `git diff --stat` before writing the body;
+`python tools/work_queue.py done claude-decomper cm-port-drain-usa`.
