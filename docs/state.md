@@ -26,8 +26,8 @@ the fleet redirects the day it lands. (4) Three queue seeds: `cm-progress-dashbo
 by the executed toggle. (6) Local worktree GC on the PC (registered+merged only;
 orphaned dirs reported to the owner, never `rm -rf`'d).
 
-**Last updated:** 2026-08-25 — **(Windows PC, brain=Opus 5; roster unchanged.)
-Round 0825b: four PRs, and two of them reset the campaign's map. A Windows-only
+**Round 0825b (2026-08-25, Windows PC, brain=Opus 5; roster unchanged):**
+** four PRs, and two of them reset the campaign's map. A Windows-only
 tooling bug had been hiding roughly half the data pool since `cm-restock-carve-10`
 landed. And the port backlog — deferred since the beginning — turns out to be
 **95% byte-identical**, which makes it the largest and cheapest thing on the
@@ -676,7 +676,89 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-<!-- main-sha: efb512d32 -->
+**Last updated:** 2026-08-27 — **(Windows PC, brain=Opus 5; two lanes only,
+both run outside Claude Code and Codex.) Round 0827: the port lane delivered the
+largest single-round regional gain the campaign has recorded — USA natural-C
+11.84% -> 13.43% off 283 mechanical ports — and the second lane produced nothing
+because the brain scheduled two toolchain-bound lanes onto one serialising
+machine.**
+
+Merged **#1584**. `main` at `97bdb5158`.
+
+⚠️ **Transcript audit NOT executable this round.** Both lanes ran outside Claude
+Code and outside Codex (owner is trialling other models on the two lanes), so
+neither `mcp__ccd_session_mgmt__*` nor `~/.codex/sessions/**` holds a transcript.
+AGENTS.md control 12 was therefore **skipped, not performed** — every finding
+below comes from git, the diff, and the tools, never from a lane's narrative.
+This is the first round since the control was written where it could not run at
+all, and it is a direct cost of the roster change.
+
+**#1584 — 283 USA ports, independently verified.** The lane claimed 283 ports /
+365 confidence-floor refusals / 2 needs-symbol skips / 1 prefilter refusal / 0
+gate failures across 15 self-gated batches. Brain re-derived rather than
+accepted: `git diff` gives exactly **283 `.c` added and 283 `.s` deleted**, all
+under `src/usa/` and `config/usa/`, **zero JPN paths**;
+`check_activation_invariant` returns 283/283/283; `check_delink_dupes` clean over
+81 delinks files; brain's own `gate3.py --scope all --clean` on the merged tree
+exits 0 with `GATE PASS`. Every claim in the PR body held.
+
+**The 44% pre-dispatch estimate was right, and that matters.** Before dispatch
+the brain sampled the pool by replicating `port_to_region.py`'s own floor rule
+and predicted ~44% acceptance. Actual: **283 / 651 = 43.5%**. The floor-rule
+replication is a trustworthy way to cost a port pool before spending a lane on
+it, and should be reused rather than re-invented.
+
+**`port_harvest.py` has no region flag — and that invalidated the round's
+shape.** `tools/port_harvest.py:23` is `REGIONS = ("usa", "jpn")` and the tool
+iterates both. The USA lane's report that the harness "unexpectedly advanced into
+JPN" was **the tool working as designed**, not a malfunction; the lane correctly
+backed the JPN work out and the merged diff confirms no JPN path survived.
+Splitting one region-iterating tool across two lanes was a brain error at the
+root: it created a collision the lane had to unpick by hand and bought nothing.
+
+**The JPN lane produced nothing, and the cause is scheduling, not competence.**
+Its worktree holds a claim commit and one untracked file,
+`src/jpn/main/func_0200ab94.c` (630 B, written 18:30, never activated —
+`config/jpn/arm9/delinks.txt` still routes that address to `.s`). The USA lane
+held the machine-wide-serialising toolchain **continuously from 18:08 to 20:08**,
+gating a batch every 4-6 minutes. The JPN kickoff made a full three-region
+`gate3.py --scope all` the required next step after its first accepted port, and
+forbade concurrent builds. It got its acceptance at 18:30, found the toolchain
+permanently busy, and correctly stopped. **The lane obeyed the instructions; the
+instructions were unsatisfiable.** The file is preserved, not reset.
+
+**Durable scheduling rule, adopted this round:** at most **one toolchain-bound
+lane per machine per round**; any second lane gets **build-free** work. The
+campaign has known since the `machine-wide-toolchain-contention` note that mwcc
+serialises, but it had never been turned into a dispatch constraint, and this
+round is what that omission costs — a whole lane-round for one unactivated
+function.
+
+**Where the regions now stand:** EUR **17.27%** natural-C (unchanged), USA
+**13.43%** (+1.59 points, the largest regional jump the ports have produced), JPN
+**11.82%** (unchanged — the drain never ran). USA's byte-identical backlog fell
+651 -> 368 rows, 98,844 -> 60,884 B. The JPN pool is untouched at roughly 653
+rows / 99,388 B; at USA's observed 43.5% that is worth on the order of 280 ports
+and a comparable ~1.6-point gain, which makes it the clearest remaining item on
+the board.
+
+⚠️ **Brain evidence-handling slip, recorded so it does not recur.** The brain
+piped its own gate through `tail -40`, which discarded the three per-region
+`SHA1 PASS` lines the project requires verbatim. The verdict still holds —
+`GATE PASS` at `tools/gate3.py:390-410` is unreachable unless every region
+passes, and the run exited 0 — but the brain held itself to a weaker standard
+than it holds the lanes to. **Tee gate output; never pipe it through `tail`.**
+
+⚠️ **Known structural nuisance, diagnosed this round.** The dashboard's trend
+table records the **commit SHA** of every commit touching `docs/state-table.md`,
+so squash-merging any such PR rewrites that SHA and leaves `docs/dashboard.md`
+stale the instant it lands — `56ba06693` became `97bdb5158` here. The lane did
+regenerate correctly; the freshness test is simply **unsatisfiable for the PR
+that introduces the change**. The brain regenerates it in the follow-up doc PR
+each round, which works but silently costs a round-trip. Worth a real fix (drop
+the SHA column, or resolve it post-merge) rather than continuing to absorb it.
+
+<!-- main-sha: 97bdb5158 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

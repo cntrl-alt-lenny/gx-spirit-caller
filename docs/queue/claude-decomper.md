@@ -1984,3 +1984,73 @@ the pytest tail) + `python tools/check_activation_invariant.py origin/main..HEAD
 
 ONE PR; verify every claim against `git diff --stat` before writing the body;
 `python tools/work_queue.py done claude-decomper cm-port-drain-usa`.
+
+### q-port-refusal-taxonomy — 365 fresh refusals with reasons, and nobody has read them [TODO]
+
+**This item is BUILD-FREE. Do not compile, do not run `ninja`, do not run
+`gate3.py` against a region.** The other lane owns the compiler toolchain for
+this entire round and it serialises machine-wide — a single concurrent build
+costs that lane its round, which is exactly what happened on 2026-08-27. If you
+find yourself needing a ROM build to answer something, that is the finding:
+say so and stop.
+
+**What just changed.** PR #1584 drained the USA byte-identical port pool: **283
+ported, 365 refused at the confidence floor, 2 needs-symbol skips, 1 prefilter
+refusal** — a 43.5% acceptance rate over 651 candidates. That leaves USA at
+**368 rows / 60,884 B** of byte-identical-but-unportable backlog, freshly
+measured and never analysed. The refusals are not noise: each one carries a named
+below-floor symbol, and `port_to_region.py` refuses for a *specific reason* every
+time.
+
+**Nobody has ever asked whether those reasons cluster.** If 300 of the 365 refuse
+on a handful of recurring unresolved symbols, that is a small, targeted unlock
+worth far more than its size suggests — the same fix would apply to the JPN
+residue too. If they refuse for 365 unrelated reasons, the pool is genuinely dead
+and the campaign can stop eyeing it. **Both answers are valuable and you must not
+prefer either.**
+
+**Deliverable:**
+
+1. **Re-derive the refusal set yourself.** Run `port_to_region.py` in
+   `--dry-run` over the current USA backlog. ⚠️ **Read the tool's source before
+   you trust its dry-run output** — the brain found that `--dry-run` **skips the
+   confidence-floor rejection branch entirely** (the `if failed and not
+   args.dry_run:` guard), so a naive dry-run reports candidates as passing that
+   the real run refuses. Replicate the floor rule (`floor_rank`, HIGH/EXACT)
+   yourself over the resolutions rather than reading the tool's headline verdict.
+   The brain used exactly this method to predict 44% against an actual 43.5%, so
+   it is known to work — reuse it, and state the reproducing command.
+2. **Group the refusals by cause**, with counts and bytes: which symbol failed to
+   resolve, at what confidence, and how many candidates each distinct blocker
+   accounts for. Rank blockers by bytes unlocked if resolved.
+3. **Cross-check against JPN.** The JPN pool is being drained this round by the
+   other lane, so its residue may not be final — derive what you can from the
+   current tree, state the timestamp, and mark anything provisional as
+   provisional rather than guessing at the post-drain state.
+4. **Say which blockers, if any, are actually fixable** and by what mechanism —
+   the existing `q-port-residual-fix` and `q-port-highconf-no-target` items
+   scoped adjacent classes; check whether they are the same class before
+   proposing anything new.
+
+**Do not port anything and do not recommend a direction.** Your job is to turn
+365 opaque refusals into a ranked, costed table. Whether the campaign spends a
+lane on the top blocker is cntrl_alt_lenny's call.
+
+⚠️ **Blank is not zero, and an estimate is not a fact.** If a figure cannot be
+derived honestly from the tree, leave it blank and say why. PR #1559 set that
+precedent and it is the reason these censuses are trusted.
+
+⚠️ **Watch the vintage rule.** Any figure inherited from the `q-port-harvest-*`
+or brief-064 era describes a tree that no longer exists — 283 rows moved
+yesterday. Re-derive against the current tree; see
+`docs/research/band-rate-vintage.md`.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
+annotated with its reproducing command. **Build-free — no region gate, and
+`gate3.py --scope tests` only if you need it.**
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-port-refusal-taxonomy`; then report
+QUEUE-EMPTY honestly if you reach it.
+
