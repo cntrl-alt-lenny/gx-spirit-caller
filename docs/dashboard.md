@@ -16,7 +16,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
 | eur | 412,102 | **17.27%** | 4,420 | 17.46% |
-| usa | 282,428 | **11.84%** | 2,748 | 11.96% |
+| usa | 320,356 | **13.43%** | 2,780 | 13.55% |
 | jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
 
 ## Trend: EUR natural-C over time
