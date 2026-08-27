@@ -2143,34 +2143,72 @@ artifact your content invalidates.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-15`.
 
-### cm-port-drain-jpn — the same drain, JPN side [TODO]
+### cm-port-drain-jpn — the same drain, JPN side, with the machine to yourself [TODO]
 
-Identical scope to `cm-port-drain-usa`, targeting **JPN**. Read that item's
-scoping section in full first — the standing "do not re-run the loop" warning,
-why it does not apply to the post-2026-08-05 rows, and the
-`byte_sim ≠ portable` distinction all apply here unchanged.
+**Status: re-issued. You did not fail this last round — the schedule did.** Your
+worktree still holds your claim commit and one accepted port,
+`src/jpn/main/func_0200ab94.c`. It is preserved deliberately. The other lane held
+the compiler toolchain continuously from 18:08 to 20:08 while ROM-gating 15
+batches, and the previous kickoff required a full three-region gate as your very
+next step while forbidding concurrent builds. That was unsatisfiable, and
+stopping was the correct read. **This round you are the only toolchain-bound lane
+on the machine.**
 
-Brain's measurement for this side: **JPN sim=1.0 backlog 653 rows / 99,388 B
-byte-identical**, of which **650 files are natural C (99,140 B)** and 3 are
-`asm`-escaped. The new-versus-known-refusing split will be close to USA's
-509/142 — re-derive it yourself rather than assuming, using
-`git log --diff-filter=A` on each candidate's EUR source against 2026-08-05.
+**The pipeline is proven, at scale.** The USA side of this exact item shipped
+**283 ports in 15 self-gated batches, every one `usa sha1 OK`**, and the merged
+result passed a full three-region clean gate. Nothing about the tooling is in
+doubt. USA natural-C went **11.84% -> 13.43%** on it.
 
-⚠️ **You and the other lane are draining different regions of the same tool.**
-Do not touch `src/usa/` or `config/usa/`; that is the other lane's territory
-this round, and a cross-region collision at integration is expensive to unpick.
-If `port_harvest.py` offers no region flag, drive `port_to_region.py --target
-jpn` directly and say so in the PR.
+**What to expect, measured rather than guessed.** USA accepted **283 of 651**
+candidates — a **43.5%** acceptance rate, with 365 confidence-floor refusals, 2
+needs-symbol skips and 1 prefilter refusal. The brain had predicted ~44% by
+replicating `port_to_region.py`'s own floor rule, so treat that rate as a sound
+prior for JPN. **Refusals are the expected outcome for more than half the pool
+and are a success, not a shortfall.** "N shipped, M refused with reasons" is the
+deliverable.
 
-⚠️ **The mwcc toolchain serialises machine-wide.** Both lanes ROM-gate every
-batch. Run `tasklist | grep -iE 'mwcc|mwld|mwasm|ninja'` before starting and
-poll on a bounded schedule if the other lane is building — do not report blocked
-on a single instantaneous check, and do not build concurrently. Say what you saw
-either way.
+**Your pool:** roughly **653 rows / 99,388 B** byte-identical, of which 650 files
+are natural C. Re-derive it yourself with `python tools/port_census.py` and paste
+the before counts — do not inherit the number. At USA's rate this is on the order
+of **280 ports and a ~1.6-point JPN gain**, which is the largest single item on
+the board.
 
-**Gate:** as above — harness per-batch ROM gates, then
-`python tools/gate3.py --scope all` with three SHA1 PASS lines pasted verbatim,
-`check_activation_invariant.py`, and before/after `port_census.py` counts.
+⚠️ **`byte_sim = 1.0` does NOT mean portable.** Byte-similarity compares bytes;
+the port tool refuses unless every symbol resolves at the HIGH/EXACT floor.
+PR #1459 is the proof — an entire byte-identical pool refused on the floor.
+Treat 99,388 B as an **upper bound**. **Never force a below-floor candidate**: do
+not lower `--confidence-floor` and do not disable auto-promotion to move a
+number.
 
-ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-port-drain-jpn`.
+⚠️ **`port_harvest.py` iterates BOTH regions — this is by design, not a bug.**
+`tools/port_harvest.py:23` is `REGIONS = ("usa", "jpn")` and there is no region
+flag. It will walk the USA remainder first; USA is already drained to 368
+genuinely-refusing rows, so expect it to pass through them quickly and land on
+JPN. **That is correct behaviour — let it run.** Do not try to force a
+JPN-only invocation, and if you do drive `port_to_region.py --target jpn`
+directly instead, say so in the PR.
+
+**Territory: you own the whole tool this round.** No other lane is touching
+`src/usa/`, `src/jpn/`, or the toolchain. If the harness ports a few residual USA
+rows on its way through, that is fine and in scope — do not hand-unpick them.
+
+**Sequence.** `python tools/port_census.py` first; verify its exit status and
+read `build/port_backlog.json` rather than trusting a silent run. Then drive
+`python tools/port_harvest.py --batch 20` in a loop until the pool is drained or
+genuinely refuses. **Ending non-zero is normal**; the success line is "drained or
+genuinely refuse", never "zero remaining".
+
+**No canary this round.** The pipeline has 283 gated ports behind it and the
+machine is yours; a single-port pre-gate would only cost you a batch cycle. Just
+start batching — the harness ROM-gates every batch itself, so a bad port cannot
+get past batch one.
+
+**Gate:** the harness ROM-gates each batch. Finish with `python tools/gate3.py
+--scope all` and paste **all three SHA1 PASS lines verbatim** plus the pytest
+tail, then `python tools/check_activation_invariant.py origin/main..HEAD`, then
+before/after `port_census.py` counts. Do not pipe the gate through `tail` — the
+brain did that this round and clipped its own evidence; use `tee` if you need a
+log. `git restore assets/` if a `--clean` run deletes the heatmap SVGs.
+
+ONE PR; verify every number against `git diff --stat` before writing the body;
+`python tools/work_queue.py done claude-scaffolder cm-port-drain-jpn`.
