@@ -123,7 +123,7 @@ src/usa/overlay000/func_ov000_021ab60c.s:
 src/usa/overlay000/func_ov000_021ab660.s:
     complete
     .text start:0x021ab660 end:0x021ab6b8
-src/usa/overlay000/func_ov000_021ab6b8.s:
+src/usa/overlay000/func_ov000_021ab6b8.c:
     complete
     .text start:0x021ab6b8 end:0x021ab770
 src/usa/overlay000/func_ov000_021ab770.s:
