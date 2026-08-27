@@ -215,7 +215,7 @@ src/usa/overlay016/func_ov016_021b745c.s:
 src/usa/overlay016/func_ov016_021b7528.s:
     complete
     .text start:0x021b7528 end:0x021b75ac
-src/usa/overlay016/func_ov016_021b75ac.s:
+src/usa/overlay016/func_ov016_021b75ac.c:
     complete
     .text start:0x021b75ac end:0x021b7658
 src/usa/overlay016/func_ov016_021b7658.s:
