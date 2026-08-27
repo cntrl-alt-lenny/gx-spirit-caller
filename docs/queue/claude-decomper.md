@@ -1921,7 +1921,7 @@ after each clean run. Regenerate any derived artifact your content invalidates.
 ONE PR; verify every claim against `git diff --stat` including the arithmetic;
 `python tools/work_queue.py done claude-decomper cm-321-376-probe`.
 
-### cm-port-drain-usa — the EUR-ship-triggered USA drain that is now due [CLAIMED]
+### cm-port-drain-usa — the EUR-ship-triggered USA drain that is now due [DONE]
 
 **Read this scoping section before running anything. There is a standing warning
 against re-running this loop, and the reason it does not apply now is specific.**
