@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**149 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**150 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (72)
+- [Uncategorised](#uncategorised) (73)
 
 ## Analysis / worklist
 
@@ -648,6 +648,12 @@ This is a deliberately narrow lexical census.  It counts a source file once per 
 **Find candidate producer sites for a field without claiming they are writes.**
 
 The older field-exposure census intentionally handles only explicit member access and direct load/store pairs.  That leaves three common producer shapes unreported: masked read-modify-write sequences, fills whose range contains a field,…
+
+### `tools/fingerprint_signal_evidence.py`
+
+**READ-ONLY measurement: does any signal beyond size+reloc fingerprinting**
+
+separate a CORRECT cross-region sibling resolution from an INCORRECT one? (q-fingerprint-promotion-evidence)
 
 ### `tools/fix_delink_suffixes.py`
 
