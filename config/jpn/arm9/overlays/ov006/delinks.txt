@@ -42,7 +42,7 @@ src/jpn/overlay006/func_ov006_021b25e0.c:
     complete
     .text start:0x021b25e0 end:0x021b2660
 
-src/jpn/overlay006/func_ov006_021b2660.s:
+src/jpn/overlay006/func_ov006_021b2660.c:
     complete
     .text start:0x021b2660 end:0x021b2704
 src/jpn/overlay006/func_ov006_021b2704.c:
@@ -53,7 +53,7 @@ src/jpn/overlay006/func_ov006_021b277c.c:
     complete
     .text start:0x021b277c end:0x021b27c0
 
-src/jpn/overlay006/func_ov006_021b27c0.s:
+src/jpn/overlay006/func_ov006_021b27c0.c:
     complete
     .text start:0x021b27c0 end:0x021b2870
 src/jpn/overlay006/func_ov006_021b2870.c:
@@ -63,7 +63,7 @@ src/jpn/overlay006/func_ov006_021b2870.c:
 src/jpn/overlay006/func_ov006_021b28b0.s:
     complete
     .text start:0x021b28b0 end:0x021b2958
-src/jpn/overlay006/func_ov006_021b2958.s:
+src/jpn/overlay006/func_ov006_021b2958.c:
     complete
     .text start:0x021b2958 end:0x021b2a08
 src/jpn/overlay006/func_ov006_021b2a08.s:
@@ -72,7 +72,7 @@ src/jpn/overlay006/func_ov006_021b2a08.s:
 src/jpn/overlay006/func_ov006_021b2a28.s:
     complete
     .text start:0x021b2a28 end:0x021b2ad4
-src/jpn/overlay006/func_ov006_021b2ad4.s:
+src/jpn/overlay006/func_ov006_021b2ad4.c:
     complete
     .text start:0x021b2ad4 end:0x021b2b9c
 src/jpn/overlay006/func_ov006_021b2b9c.s:
@@ -161,7 +161,7 @@ src/jpn/overlay006/func_ov006_021b377c.c:
     complete
     .text start:0x021b377c end:0x021b37fc
 
-src/jpn/overlay006/func_ov006_021b37fc.s:
+src/jpn/overlay006/func_ov006_021b37fc.c:
     complete
     .text start:0x021b37fc end:0x021b38a4
 src/jpn/overlay006/func_ov006_021b38a4.c:
@@ -393,7 +393,7 @@ src/jpn/overlay006/func_ov006_021b592c.c:
 src/jpn/overlay006/func_ov006_021b5954.s:
     complete
     .text start:0x021b5954 end:0x021b5a70
-src/jpn/overlay006/func_ov006_021b5a70.s:
+src/jpn/overlay006/func_ov006_021b5a70.c:
     complete
     .text start:0x021b5a70 end:0x021b5b24
 src/jpn/overlay006/func_ov006_021b5b24.s:
@@ -488,7 +488,7 @@ src/jpn/overlay006/func_ov006_021b6d3c.s:
 src/jpn/overlay006/func_ov006_021b6e18.s:
     complete
     .text start:0x021b6e18 end:0x021b6e50
-src/jpn/overlay006/func_ov006_021b6e50.s:
+src/jpn/overlay006/func_ov006_021b6e50.c:
     complete
     .text start:0x021b6e50 end:0x021b6f10
 src/jpn/overlay006/func_ov006_021b6f10.s:
