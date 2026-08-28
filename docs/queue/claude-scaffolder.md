@@ -2360,3 +2360,73 @@ second, each after the commit it describes has landed.
 
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-verified-neighbor-tranche`.
+
+### cm-verified-neighbor-drain — the ceiling comes off [TODO]
+
+`cm-verified-neighbor-tranche` (PR #1594) was written as a falsification test and
+**the signal did not fail**: 95 ports across **9** consecutive gated batches
+(brain re-counted the commits — the PR body says 8 in prose, its own table and
+the commit log both say 9), zero gate failures, zero bisects. USA went to
+**14.15%**, JPN to **14.07%**. The first batch took **14 of 20** candidates that
+had been refusing for two prior rounds.
+
+The 100-port cap existed only because the signal was unproven. It is now proven
+across 9 independent ROM gates in both regions. **Take the cap off and drain.**
+
+**Remaining pool, brain-measured on `main` after PR #1594 merged:**
+
+```text
+=== USA ===  BACKLOG-s: 285   sim=1.0: 255
+=== JPN ===  BACKLOG-s: 299   sim=1.0: 269
+```
+
+524 byte-identical rows across both regions. At the tranche's observed rate this
+is the largest remaining mechanical block on the board.
+
+**Scope:** run `python tools/port_harvest.py --batch 20` in a loop across both
+regions until the pool is drained or genuinely refuses. **Ending non-zero is
+normal** — the success line is "drained or genuinely refuse", never "zero
+remaining". The harness ROM-gates every batch itself.
+
+⚠️ **THE STOP RULE FROM LAST ROUND STILL STANDS AND IS NOT RELAXED BY THE
+EVIDENCE.** Nine clean gates bound the error rate lower than PR #1589's ≤0.1%
+estimate; they do not make it zero. **If any batch fails the gate, STOP
+IMMEDIATELY.** Do not narrow the filter, do not exclude the failing candidate
+and retry, do not adjust a threshold. Report which candidate failed, what
+`verified_neighbor` predicted, what the fingerprinter would have picked, and what
+the truth is. A failure this late is *more* informative than one in the tranche,
+not less — it would mark the edge of the signal's validity.
+
+⚠️ **Do not weaken any guard to reach the bottom of the pool.** Do not touch
+`--confidence-floor`, `auto_promote_low`, or the MEDIUM ceiling. Candidates that
+refuse for byte-mismatch, genuine MEDIUM ambiguity, or a missing `symbols.txt`
+line are **different blocker classes** and are supposed to refuse — PR #1594
+identified them correctly and you should expect the same.
+
+⚠️ **Refresh the census between harvest calls.** PR #1594 found that a stale
+`build/port_backlog.json` makes `--limit` re-report the same window as "already
+ported (live dedup) — skip". Re-run `port_census.py` between calls.
+
+**Second, smaller task once the drain is done or has genuinely stalled.**
+PR #1594 deliberately kept **two copies** of `verified_neighbor_signal()` — one
+in `port_to_region.py`, one in `fingerprint_signal_evidence.py` — arguing the
+latter is frozen published evidence with a different calling convention. That
+argument is reasonable, **but `FLOOR_RANK` in this same codebase had already
+drifted across two copies before PR #1590 consolidated it**, so the precedent
+cuts the other way. Either unify them behind one implementation with the
+evidence copy as a thin adapter, **or** add a test that fails if the two
+algorithms ever diverge. Your call which — but pick one and say why.
+
+**DO NOT USE SUB-AGENTS.** They share this worktree rather than getting isolated
+copies, so parallel writers corrupt `src/`, `config/` and the git index; and the
+compiler serialises machine-wide, so parallel builders queue. Single-threaded.
+
+**Gate:** per-batch ROM gates, then `python tools/gate3.py --scope all` with all
+three SHA1 PASS lines pasted verbatim plus the pytest tail, then
+`check_activation_invariant.py origin/main..HEAD`, then before/after
+`port_census.py` for BOTH regions. Use `tee`, never `tail`. `git restore assets/`
+after a `--clean` run.
+
+ONE PR; verify every number against `git diff --stat` **including the batch
+count** — last round's body miscounted its own batches; `python
+tools/work_queue.py done claude-scaffolder cm-verified-neighbor-drain`.

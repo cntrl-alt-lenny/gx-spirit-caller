@@ -2367,3 +2367,89 @@ that breaks it today and show it passing. Build-free.
 
 ONE PR; verify claims against `git diff --stat`; `python tools/work_queue.py done
 claude-decomper q-derived-artifact-selfreference`.
+
+### q-eur-next-frontier — what moves EUR, now that the ports are about to run out [TODO]
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+**Why now, and why this is not premature.** EUR has sat at **17.27%** for five
+consecutive rounds. Everything shipped in that time is *derivative*: USA and JPN
+ports of EUR content that already existed. Those regions have gone 11.82% ->
+**14.15%** and **14.07%**, and the remaining byte-identical pool is **524 rows**
+which the other lane is draining right now. **When that pool empties, all three
+regions stall unless EUR itself moves.** Nobody has asked what moves EUR since
+the code frontier was mapped, and the answer should exist *before* the ports run
+out, not after.
+
+**This is a census and a costing. Do not decompile anything and do not carve
+anything.**
+
+**What has changed since the last time anyone looked, all of which invalidates
+the old numbers:**
+
+- **The Windows `load_module_sections` bug** (PR #1580) had hidden every overlay
+  and ITCM/DTCM data symbol since `cm-restock-carve-10`. The reachable data pool
+  went **187,760 B -> 407,506 B** once fixed. Any data figure predating that fix
+  describes half the tree.
+- **The code frontier was mapped and mostly closed**: <=192 B drained; 193-256 B
+  closed at 0/60; **257-320 B MARGINAL at 4/20 = 20.0%** with 263 candidates /
+  75,980 B behind it; 321-376 B closed at 1/15; 513-1023 B 0/15; >1024 B never
+  matched.
+- **Composition into the data pool is DEAD** (0/575, `cm-restock-carve-12`).
+
+**Deliverable — a costed table of every remaining EUR avenue, with bytes:**
+
+1. **Code.** What is actually left, per band, at current pool state — re-derive,
+   do not inherit. Is the 257-320 B pocket still 20%, and how many candidates
+   remain behind it now?
+2. **Data.** The 407,506 B reachable pool is the largest single number on the
+   board and the carve series has been shipping it in tranches of a few hundred
+   to a few thousand bytes. What is the actual per-round yield, what shapes
+   remain unclassified, and what would raise the rate?
+3. **Anything else.** `.bss` was measured at 85% of data bytes and 0% C-owned
+   (`cm-bss-carve-scope`). Overlay/ITCM regions the Windows bug had hidden.
+   Anything the earlier censuses could not see.
+4. **A bottom line per avenue:** bytes reachable, observed or best-evidenced
+   ship rate, and what the blocker is.
+
+⚠️ **Watch the vintage rule — it is the whole point of this item.** Every
+historical band rate describes the pool *at measurement time*.
+`docs/research/band-rate-vintage.md` documents why: sweep-7 measured 193-256 B at
+27.6% and a disjoint sample of the identical band later returned **0/60**.
+**Re-derive against the current tree and stamp every figure with its date and
+reproducing command.** A figure you inherited without re-deriving is worse than a
+blank.
+
+⚠️ **Blank is not zero, and do not recommend a direction.** If an avenue cannot
+be costed honestly, leave it blank and say why. Your job is to make the choice
+*informed*, not to make it. cntrl_alt_lenny decides where the campaign goes next.
+
+**CANARY.** Before costing anything else, re-derive **one** figure that already
+has a published value — the 257-320 B band's remaining candidate count — and
+compare it to the 263 recorded above. If your number differs materially, STOP and
+report the discrepancy before continuing, because it would mean the population
+has shifted under every other figure in the campaign's records too. If it
+matches, proceed.
+
+**SUB-AGENTS ARE PERMITTED AND ENCOURAGED, WITH TWO HARD RULES.** This partitions
+cleanly — one worker per avenue (code bands, data shapes, `.bss`, overlay/ITCM),
+then a synthesis pass that puts them on common units, then a critic pass asking
+which figure has the weakest provenance. **Rule one: sub-agents must be
+READ-ONLY** — they share this worktree, not isolated copies, so parallel writers
+corrupt each other; you do all writing, committing and git operations. **Rule
+two: no sub-agent runs a build, `ninja`, or a region gate.** Single-threaded is
+fine too.
+
+⚠️ **Verify your workers rather than relaying them.** `q-collision-pair-audit`
+(PR #1592) spot-checked a sub-agent's brief-435 finding directly against
+`relocs.txt` and the committed source instead of trusting it — and brain
+confirmed that finding independently. Hold the same standard.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
+annotated with its reproducing command **and its derivation date**. Build-free.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-eur-next-frontier`; then report
+QUEUE-EMPTY honestly if you reach it.
