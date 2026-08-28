@@ -50,7 +50,7 @@ src/usa/overlay012/func_ov012_021ca734.s:
 src/usa/overlay012/func_ov012_021ca884.s:
     complete
     .text start:0x021ca884 end:0x021cadc8
-src/usa/overlay012/func_ov012_021cadc8.s:
+src/usa/overlay012/func_ov012_021cadc8.c:
     complete
     .text start:0x021cadc8 end:0x021cae64
 src/usa/overlay012/func_ov012_021cae64.c:
