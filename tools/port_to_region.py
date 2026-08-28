@@ -198,7 +198,10 @@ class Resolution:
                              # 'SYNTHESIZED' (brief 526) for data, or
                              # 'EXACT_NAME' (port-refusal-taxonomy.md
                              # Finding 2) for a func resolved via the
-                             # target's own committed symbols.txt name
+                             # target's own committed symbols.txt name, or
+                             # 'VERIFIED_NEIGHBOR' (fingerprint-signal-
+                             # evidence.md) for a func resolved via a
+                             # proven-neighbor shift consensus
     notes: str               # human-readable rationale
     # Brief 526 — set only when confidence == "SYNTHESIZED": the exact new
     # symbols.txt line the target region needs (structured, not re-parsed
@@ -210,14 +213,16 @@ class Resolution:
 # Confidence-floor ranking, shared with port_refusal_taxonomy.py (which
 # imports this rather than keeping its own copy — the two dicts drifting
 # out of sync would silently misclassify whatever confidence tier the
-# drift affects). EXACT_ADDR / SYNTHESIZED (data) and EXACT_NAME (func,
-# port-refusal-taxonomy.md Finding 2) all rank HIGH-equivalent: each is a
+# drift affects). EXACT_ADDR / SYNTHESIZED (data), EXACT_NAME (func,
+# port-refusal-taxonomy.md Finding 2), and VERIFIED_NEIGHBOR (func,
+# fingerprint-signal-evidence.md) all rank HIGH-equivalent: each is a
 # committed, already-reviewed ground-truth lookup, not a fingerprint
 # guess, so none of them should ever be capped by a lower
 # --confidence-floor the way an actual fingerprint match would be.
 FLOOR_RANK = {
     "HIGH": 3, "MEDIUM": 2, "LOW": 1, "NONE": 0,
     "EXACT_ADDR": 3, "SYNTHESIZED": 3, "EXACT_NAME": 3,
+    "VERIFIED_NEIGHBOR": 3,
 }
 # Data/func resolution mechanisms that are HIGH-equivalent ground truth
 # rather than a fingerprint match — see FLOOR_RANK's docstring above.
@@ -225,7 +230,9 @@ FLOOR_RANK = {
 # can never appear in `failed` for any floor in {HIGH, MEDIUM, LOW}) —
 # kept as an explicit, self-documenting belt-and-suspenders filter rather
 # than relying on that arithmetic implicitly.
-GROUND_TRUTH_CONFIDENCES = ("EXACT_ADDR", "SYNTHESIZED", "EXACT_NAME")
+GROUND_TRUTH_CONFIDENCES = (
+    "EXACT_ADDR", "SYNTHESIZED", "EXACT_NAME", "VERIFIED_NEIGHBOR",
+)
 
 
 # --------------------------------------------------------------------------- #
@@ -609,6 +616,128 @@ def compute_neighbor_shift_consensus(
     return None, shifts
 
 
+def verified_neighbor_signal(
+    eur_addr: int,
+    module: str,
+    eur_regions: dict[str, list],
+    verified_neighbor_index: dict[tuple[str, int], int],
+    *,
+    n_neighbors: int = 5,
+    search_radius: int = 30,
+    min_agreement: int = 3,
+) -> tuple[int | None, list[int]]:
+    """fingerprint-signal-evidence.md — the SAME neighbor-shift-consensus
+    idea as `compute_neighbor_shift_consensus`, but sampling PROVEN
+    neighbor mappings (`verified_neighbor_index`, built from already
+    ROM-gate-verified ports — see `load_verified_neighbor_index`) instead
+    of `find_siblings_fn`'s own unverified per-neighbor guess.
+
+    Measured at 98.7% coverage / 100.0% accuracy (2960/2960) on the hard
+    MEDIUM-population proxy, unchanged at the strictest zero-reloc
+    threshold (16/16), and correctly predicts the true answer on all 4
+    known-wrong historical incidents (briefs 673/675) — see
+    `docs/research/campaign-analytics/fingerprint-signal-evidence.md`.
+    `compute_neighbor_shift_consensus` is vulnerable to exactly the
+    failure those incidents documented: two adjacent same-size EUR
+    siblings can BOTH independently fingerprint-resolve to the SAME
+    (wrong, for one of them) target at HIGH confidence, so trusting
+    `find_siblings_fn`'s own per-neighbor HIGH claim can silently launder
+    a correlated error into the consensus. A `verified_neighbor_index`
+    entry only exists for a neighbor whose mapping already survived a
+    real ROM SHA1 gate — independent ground truth, not another guess.
+
+    Returns `(predicted_target_addr, sampled_shifts)` — same shape as
+    `compute_neighbor_shift_consensus`, for direct comparison.
+    `predicted_target_addr` is arithmetic only (`eur_addr + consensus
+    shift`); the caller MUST still confirm a real target function exists
+    at that exact address before trusting it (see `resolve_symbol`'s call
+    site) — this function has no visibility into the target region's
+    function table at all, only the proven-mapping index.
+
+    Parameters (identical defaults to `compute_neighbor_shift_consensus`
+    for direct comparability):
+      n_neighbors    — number of verified neighbors to sample (default 5)
+      search_radius  — max ordinal distance to walk (default 30)
+      min_agreement  — minimum agreeing-shift count to declare
+                       consensus (default 3, i.e. ≥3 of 5)
+    """
+    from collections import Counter
+
+    eur_module_funcs = sorted(
+        eur_regions.get(module, []), key=lambda f: f.addr,
+    )
+    pivot = next(
+        (i for i, f in enumerate(eur_module_funcs) if f.addr == eur_addr),
+        None,
+    )
+    if pivot is None:
+        return None, []
+
+    shifts: list[int] = []
+    for delta in range(1, search_radius + 1):
+        for sign in (1, -1):
+            idx = pivot + sign * delta
+            if idx < 0 or idx >= len(eur_module_funcs):
+                continue
+            neighbor = eur_module_funcs[idx]
+            tgt_addr = verified_neighbor_index.get((module, neighbor.addr))
+            if tgt_addr is None:
+                continue
+            shifts.append(tgt_addr - neighbor.addr)
+            if len(shifts) >= n_neighbors:
+                break
+        if len(shifts) >= n_neighbors:
+            break
+
+    if len(shifts) < min_agreement:
+        return None, shifts
+
+    most_common_shift, count = Counter(shifts).most_common(1)[0]
+    if count >= min_agreement:
+        return eur_addr + most_common_shift, shifts
+    return None, shifts
+
+
+def load_verified_neighbor_index(region: str) -> dict[tuple[str, int], int]:
+    """Load the precomputed, already-deduped EUR->target ground-truth
+    mapping `build/known_correct_set.json` (written by
+    `fingerprint_signal_evidence.py`) and filter it to one region, keyed
+    `(eur_module, eur_addr) -> tgt_addr`.
+
+    Deliberately NOT recomputed here: `build_known_correct_set` re-derives
+    it by fingerprint-matching every already-ported EUR function against
+    its target twin — ~7800 rows, "~1 min" per the tool's own progress
+    message. `port_to_region.py`'s CLI is invoked as a FRESH SUBPROCESS
+    per candidate by `batch_port.py` (`ops.port()` shells out, one call
+    per backlog entry — most of which refuse and never reach a build
+    step), so doing that rebuild inside `main()` would pay the full ~1
+    minute cost on every single candidate checked, not just the ones that
+    port — turning a several-minute batch into hours. Precomputing once
+    via `python tools/fingerprint_signal_evidence.py` and reading the
+    cheap JSON here (a handful of ms to parse ~7800 rows, dwarfed by the
+    ninja/compiler cost per candidate either way) is the same
+    build/cache-then-consume pattern `port_backlog.json` already uses.
+
+    Returns `{}` (verified_neighbor abstains for every ref, no different
+    from the file simply having no evidence) if the cache is missing or
+    unreadable — never raises, and never triggers the expensive rebuild
+    itself. Callers needing fresh data must run the generator explicitly.
+    """
+    path = ROOT / "build" / "known_correct_set.json"
+    if not path.is_file():
+        return {}
+    try:
+        rows = json.loads(path.read_text(encoding="utf-8"))
+    except (json.JSONDecodeError, OSError):
+        return {}
+    out: dict[tuple[str, int], int] = {}
+    for row in rows:
+        if row.get("region") != region:
+            continue
+        out[(row["eur_module"], row["eur_addr"])] = row["tgt_addr"]
+    return out
+
+
 def _exact_name_lookup(eur_func, target_funcs: list):
     """port-refusal-taxonomy.md Finding 2 — look up `eur_func`'s name
     directly in the target region's own (module-scoped) function list
@@ -698,6 +827,7 @@ def resolve_symbol(
     auto_promote_low: bool = True,
     consensus_cache: dict[tuple[str, str], tuple[int | None, list[int]]] | None = None,
     eur_data_kinds: dict[str, dict[int, str]] | None = None,
+    verified_neighbor_index: dict[tuple[str, int], int] | None = None,
 ) -> Resolution:
     """Resolve one EUR symbol reference to its target-region name.
 
@@ -733,6 +863,17 @@ def resolve_symbol(
     `load_region_data_symbol_kinds("eur")`) supplies the `kind:` field
     for that proposed line; omit it only for callers that don't need
     the message (defaults to `data`).
+
+    fingerprint-signal-evidence.md — `verified_neighbor_index`
+    (`load_verified_neighbor_index(target_region)`, func-only, `None`/`{}`
+    means abstain): for `func_*` refs, consulted AFTER the exact-name
+    lookup and BEFORE `find_siblings_fn`'s structural fingerprinting.
+    Measured at 98.7% coverage / 100.0% accuracy on the hard MEDIUM-
+    population proxy and correctly predicts all 4 known-wrong historical
+    incidents (see `verified_neighbor_signal`'s docstring) — a third
+    ground-truth source alongside `EXACT_NAME`, not a lowered floor:
+    does not touch `--confidence-floor`, `auto_promote_low`, or the
+    existing D2 v2 MEDIUM ceiling.
     """
     if ref.kind == "data":
         # Try the parallel-reloc-derived mapping first (most
@@ -860,6 +1001,34 @@ def resolve_symbol(
                       f"symbols.txt ({eur_func.name} @0x{exact.addr:08x}, "
                       f"size={exact.size})",
             )
+
+    # fingerprint-signal-evidence.md — consult the neighbor-shift
+    # consensus of PROVEN (already ROM-gate-verified) mappings before
+    # falling back to structural fingerprinting. `vn_pred` is arithmetic
+    # only (eur_addr + consensus shift); it is trusted ONLY if a real,
+    # same-size target function actually exists at that exact address —
+    # verified_neighbor_signal has no visibility into the target's
+    # function table at all, so that check happens here, not there.
+    if verified_neighbor_index:
+        vn_pred, vn_shifts = verified_neighbor_signal(
+            ref.addr, ref.module, eur_regions, verified_neighbor_index,
+        )
+        if vn_pred is not None:
+            vn_func = next(
+                (f for f in target_regions.get(ref.module, [])
+                 if f.addr == vn_pred and f.size == eur_func.size),
+                None,
+            )
+            if vn_func is not None:
+                return Resolution(
+                    eur_ref=ref,
+                    target_name=vn_func.name,
+                    confidence="VERIFIED_NEIGHBOR",
+                    notes=f"verified-neighbor consensus in "
+                          f"{target_region}/{ref.module} -> "
+                          f"0x{vn_func.addr:08x} ({len(vn_shifts)} proven "
+                          f"neighbor(s) sampled)",
+                )
 
     matches = find_siblings_fn(
         eur_func, target_regions,
@@ -1431,6 +1600,11 @@ def main() -> int:
     # Brief 526 — EUR's own kind:data/kind:bss field, needed to propose a
     # correctly-kinded new symbols.txt line for any synthesized data symbol.
     eur_data_kinds = load_region_data_symbol_kinds("eur")
+    # fingerprint-signal-evidence.md — precomputed proven-neighbor ground
+    # truth; {} (abstain) if build/known_correct_set.json hasn't been
+    # generated this session (see load_verified_neighbor_index's docstring
+    # for why this is loaded, never rebuilt, here).
+    verified_neighbor_index = load_verified_neighbor_index(args.target)
 
     if not eur:
         print("error: config/eur/ not found", file=sys.stderr)
@@ -1495,6 +1669,7 @@ def main() -> int:
         find_siblings,
         auto_promote_low=not args.no_auto_promote,
         consensus_cache=consensus_cache,
+        verified_neighbor_index=verified_neighbor_index,
     )
 
     # Build the parallel-reloc data-symbol map for THIS function,
@@ -1552,6 +1727,7 @@ def main() -> int:
                 auto_promote_low=not args.no_auto_promote,
                 consensus_cache=consensus_cache,
                 eur_data_kinds=eur_data_kinds,
+                verified_neighbor_index=verified_neighbor_index,
             ))
 
     # Check confidence floor.
