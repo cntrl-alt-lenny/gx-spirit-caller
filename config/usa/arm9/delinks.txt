@@ -5957,13 +5957,13 @@ src/usa/main/func_0205312c.legacy_sp3.c:
 src/usa/main/func_0205314c.s:
     complete
     .text start:0x0205314c end:0x020531bc
-src/usa/main/func_020531bc.s:
+src/usa/main/func_020531bc.legacy_sp3.c:
     complete
     .text start:0x020531bc end:0x02053280
 src/usa/main/func_02053280.s:
     complete
     .text start:0x02053280 end:0x02053308
-src/usa/main/func_02053308.s:
+src/usa/main/func_02053308.legacy_sp3.c:
     complete
     .text start:0x02053308 end:0x02053398
 src/usa/main/func_02053398.s:
