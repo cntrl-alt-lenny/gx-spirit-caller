@@ -178,6 +178,143 @@ class TestTrendParsing(unittest.TestCase):
         self.assertIsNone(gd._EUR_ROW_RE.search(fixture))
 
 
+class TestDashboardIsCurrent(unittest.TestCase):
+    """q-derived-artifact-selfreference: `--check` must tolerate ONLY a
+    squash-merge-rewritten SHA on the trend table's trailing row, and
+    nothing else -- these are the pure-function tests; see
+    TestCheckToleratesSquashMergedTrailingSha below for the real
+    subprocess-level regression demonstrating the actual failure mode."""
+
+    HEADER = (
+        "## Trend: EUR natural-C over time\n\n"
+        "| commit | date | EUR natural-C | EUR natural-C % | Δ bytes |\n"
+        "| --- | --- | ---: | ---: | ---: |\n"
+    )
+
+    def _doc(self, rows: list[str]) -> str:
+        return "prefix section\n\n" + self.HEADER + "".join(rows) + "\nsuffix section\n"
+
+    def test_exact_match_is_current(self):
+        doc = self._doc(["| `abc123456` | 2026-08-01 | 100 | 1.00% |  |\n"])
+        ok, detail = gd._dashboard_is_current(doc, doc)
+        self.assertTrue(ok)
+        self.assertEqual(detail, "exact match")
+
+    def test_trailing_row_sha_only_difference_is_current(self):
+        committed = self._doc([
+            "| `aaa000000` | 2026-08-01 | 100 | 1.00% |  |\n",
+            "| `bbb111111` | 2026-08-02 | 200 | 2.00% | +100 |\n",
+        ])
+        fresh = self._doc([
+            "| `aaa000000` | 2026-08-01 | 100 | 1.00% |  |\n",
+            "| `ccc222222` | 2026-08-02 | 200 | 2.00% | +100 |\n",
+        ])
+        ok, detail = gd._dashboard_is_current(committed, fresh)
+        self.assertTrue(ok)
+        self.assertIn("bbb111111", detail)
+        self.assertIn("ccc222222", detail)
+
+    def test_trailing_row_content_difference_is_stale(self):
+        """The real staleness case: the trailing row's BYTES moved, not
+        just its SHA -- must still fail, squash-merge tolerance or not."""
+        committed = self._doc(["| `aaa000000` | 2026-08-01 | 100 | 1.00% |  |\n"])
+        fresh = self._doc(["| `bbb111111` | 2026-08-01 | 999 | 9.00% |  |\n"])
+        ok, detail = gd._dashboard_is_current(committed, fresh)
+        self.assertFalse(ok)
+
+    def test_non_trailing_row_sha_difference_is_stale(self):
+        """Already-merged history must never legitimately drift -- only
+        the LAST row gets the tolerance."""
+        committed = self._doc([
+            "| `aaa000000` | 2026-08-01 | 100 | 1.00% |  |\n",
+            "| `bbb111111` | 2026-08-02 | 200 | 2.00% | +100 |\n",
+        ])
+        fresh = self._doc([
+            "| `zzz999999` | 2026-08-01 | 100 | 1.00% |  |\n",
+            "| `bbb111111` | 2026-08-02 | 200 | 2.00% | +100 |\n",
+        ])
+        ok, detail = gd._dashboard_is_current(committed, fresh)
+        self.assertFalse(ok)
+
+    def test_two_differences_including_trailing_sha_is_stale(self):
+        """A legitimate trailing-SHA drift must not mask an UNRELATED real
+        staleness elsewhere in the document."""
+        committed = (
+            "prefix section OLD\n\n" + self.HEADER
+            + "| `aaa000000` | 2026-08-01 | 100 | 1.00% |  |\n"
+            + "\nsuffix section\n"
+        )
+        fresh = (
+            "prefix section NEW\n\n" + self.HEADER
+            + "| `bbb111111` | 2026-08-01 | 100 | 1.00% |  |\n"
+            + "\nsuffix section\n"
+        )
+        ok, detail = gd._dashboard_is_current(committed, fresh)
+        self.assertFalse(ok)
+        self.assertIn("2 line(s)", detail)
+
+    def test_no_trend_rows_falls_back_to_stale_on_any_difference(self):
+        committed = "prefix section\n\nno trend table here\n"
+        fresh = "prefix section\n\nno trend table here, different\n"
+        ok, detail = gd._dashboard_is_current(committed, fresh)
+        self.assertFalse(ok)
+
+    def test_middle_row_sha_change_disguised_as_trailing_is_stale(self):
+        """If the fresh render's row COUNT differs (e.g. a new row was
+        added since the committed file was generated), the differing line
+        cannot be validated as "the trailing row" and must fail."""
+        committed = self._doc([
+            "| `aaa000000` | 2026-08-01 | 100 | 1.00% |  |\n",
+        ])
+        fresh = self._doc([
+            "| `aaa000000` | 2026-08-01 | 100 | 1.00% |  |\n",
+            "| `bbb111111` | 2026-08-02 | 200 | 2.00% | +100 |\n",
+        ])
+        ok, detail = gd._dashboard_is_current(committed, fresh)
+        self.assertFalse(ok)
+
+
+class TestCheckToleratesSquashMergedTrailingSha(unittest.TestCase):
+    """The real regression: reproduce the actual failure mode against the
+    REAL committed docs/dashboard.md via the real --check subprocess (not
+    just the pure helper), by simulating exactly what a squash-merge does
+    -- rewrite the trailing trend row's SHA to something the committed
+    file could not have predicted -- and showing `--check` now passes."""
+
+    def test_check_passes_when_trailing_sha_is_squash_rewritten(self):
+        if _is_shallow():
+            self.skipTest("shallow clone: dashboard trend needs real git history")
+        original = OUT.read_text(encoding="utf-8")
+        try:
+            m = gd._TREND_ROW_RE.search(original)
+            if m is None:
+                self.skipTest("no trend rows in the committed dashboard to mutate")
+            # Simulate a squash-merge: replace ONLY the trailing row's SHA
+            # (found by locating the LAST match) with a fake-but-well-formed
+            # different one -- exactly what happens when GitHub squash-merges
+            # the PR that introduced this exact row.
+            all_matches = list(gd._TREND_ROW_RE.finditer(original))
+            last = all_matches[-1]
+            real_sha = last.group(1)
+            fake_sha = ("f" if real_sha[0] != "f" else "e") + real_sha[1:]
+            self.assertNotEqual(real_sha, fake_sha)
+            mutated = (
+                original[:last.start(1)] + fake_sha + original[last.end(1):]
+            )
+            OUT.write_text(mutated, encoding="utf-8")
+
+            r = _run("--check")
+            self.assertEqual(
+                r.returncode, 0,
+                msg="a trailing-row-only SHA rewrite (the exact effect of a "
+                    "squash merge) must not be reported as staleness\n"
+                    + r.stdout + r.stderr,
+            )
+            self.assertIn("current", r.stdout)
+        finally:
+            OUT.write_text(original, encoding="utf-8")
+
+
 class TestBandTotals(unittest.TestCase):
     """Pure-logic tests of the band-bucketing arithmetic, against a fake
     scan() result — never against real repo counts (those drift every

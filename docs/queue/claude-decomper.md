@@ -2197,7 +2197,11 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-fingerprint-promotion-evidence`;
 then report QUEUE-EMPTY honestly if you reach it.
 
-### q-collision-pair-audit — seven unvalidated pairs sitting inside already-shipped ports [TODO]
+### q-collision-pair-audit — seven unvalidated pairs sitting inside already-shipped ports [DONE]
+
+> Patched locally: shipped as PR #1592 (not yet merged into origin/main as
+> of this branch — known `work_queue.py` staleness gap, a fresh branch cut
+> from origin/main re-surfaces a shipped-but-unmerged item as TODO).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round. Round 0827 is what
@@ -2266,7 +2270,42 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-collision-pair-audit`; then report
 QUEUE-EMPTY honestly if you reach it.
 
-### q-derived-artifact-selfreference — the staleness that has cost three rounds running [TODO]
+### q-derived-artifact-selfreference — the staleness that has cost three rounds running [DONE]
+
+**Result (this PR):** root cause confirmed precisely — `docs/dashboard.md`'s
+trend table cites the SHA of the most recent commit touching
+`docs/state-table.md`, which is normally the PR's own commit; a squash-merge
+gives that same logical change a brand-new SHA nothing on the branch could
+predict, so the very next `--check` sees a real, derived mismatch on exactly
+that one cell. **Chose option 3** (tolerate a not-yet-final trailing-row
+SHA), not option 1 (drop the column — it's the only way to `git show
+<sha>:docs/state-table.md` a historical snapshot, genuinely useful, not
+"load-bearing" for any code but valuable for a reader) or option 2 (defer
+SHA resolution to post-merge — doesn't avoid a follow-up step, which is the
+exact pain being removed). Implemented as `_dashboard_is_current()`: the
+comparison now tolerates AT MOST one differing line between committed and
+freshly-rendered text, and only if that line is the trend table's LAST row
+differing SOLELY in its SHA column — verified to be the trailing row (not a
+disguised middle one) by re-matching against the fresh render's own row
+list. Every other row's SHA, and the trailing row's own date/bytes/pct/delta,
+are still compared byte-for-byte; a real staleness (a moved number, a
+missing section, ANY non-trailing SHA, or a content change alongside a SHA
+drift) still fails immediately, unchanged from before. **What the check
+still guarantees:** every number on the page is proven current against a
+fresh re-derivation; every historical trend-row SHA (already-merged, never
+rewritten again) is proven current; the newest row's byte/pct/date is proven
+current. **What it no longer guarantees:** that the newest row's SHA display
+exactly matches — because that specific fact is provably unknowable at
+generation time when the enclosing PR's own final SHA depends on a merge
+operation outside the PR. Demonstrated empirically, not just asserted: with
+the fix temporarily reverted, a squash-merge-simulated trailing-row SHA
+rewrite makes `--check` FAIL (exit 1) on the real committed
+`docs/dashboard.md`; with the fix restored, the identical mutation PASSES
+(exit 0) — both runs pasted verbatim in the PR body. Added a real regression
+test (`TestCheckToleratesSquashMergedTrailingSha`) that performs this same
+mutation against the live committed file via subprocess, so this doesn't
+regress silently. `generate_state_table.py` has no analogous self-reference
+(it doesn't cite its own commit history) and needed no change.
 
 **BUILD-FREE.** Take this only after `q-collision-pair-audit`.
 
