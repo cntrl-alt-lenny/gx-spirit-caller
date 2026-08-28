@@ -758,7 +758,7 @@ that introduces the change**. The brain regenerates it in the follow-up doc PR
 each round, which works but silently costs a round-trip. Worth a real fix (drop
 the SHA column, or resolve it post-merge) rather than continuing to absorb it.
 
-**Last updated:** 2026-08-28 — **(Windows PC, brain=Opus 5; two lanes, moving to
+**Round 0828 (2026-08-28, Windows PC, brain=Opus 5; two lanes, moving to
 Claude Sonnet 5 at `xhigh` effort.) Round 0828: the scheduling fix worked — both
 lanes delivered. JPN natural-C 11.82% -> 13.41%, which brings the two derived
 regions level with each other, and the analysis lane found a concrete ~15 KB
@@ -838,7 +838,80 @@ worktree rather than getting isolated copies, so parallel writers corrupt the
 tree, and the compiler serialises machine-wide, so parallel builders would
 recreate round 0827's contention failure inside a single lane.
 
-<!-- main-sha: 7bf1e5ae8 -->
+**Last updated:** 2026-08-28 — **(Windows PC, brain=Opus 5; both lanes now
+Claude Sonnet 5 at `max` effort, swarm scoped to the build-free lane.) Round
+0828b: the strongest lane pairing the campaign has produced — the two lanes
+independently corroborated each other, and one of them may have just reopened
+~60 KB per region that the previous round called dead.**
+
+Merged **PR #1589** and **PR #1590**. `main` at `9f2994cc1`.
+
+| region | before | after |
+|---|---|---|
+| EUR | 17.27% | 17.27% |
+| USA | 13.43% | **13.79%** |
+| JPN | 13.41% | **13.79%** |
+
+Both derived regions now sit at exactly 328,816 B — identical port sets.
+
+**PR #1590 — the resolver fix banked 119 ports** (59 USA + 60 JPN), invariant
+119/119/119, dup-scan clean, brain's own three-region `--clean` gate PASS. The
+lane exceeded the spec in three ways worth keeping: a **distinct `EXACT_NAME`
+tier** rather than overloading an existing one, the placeholder-twin guard
+applied **before** the lookup runs (PR #1462's failure mode), and it caught that
+`FLOOR_RANK` **existed in two copies that had already drifted** and consolidated
+them. It ran control 7 on itself — every fix has a test seen failing first via
+`git stash`.
+
+**PR #1589 — the more consequential result. The 95.3% MEDIUM wall may not be a
+wall.** `verified_neighbor`, rebuilt on **proven** neighbour mappings instead of
+`find_siblings`' own unverified guess, covers **98.7% of the ambiguous
+population at 100% accuracy (2,960/2,960)**, holds at the strictest zero-reloc
+threshold (16/16), and correctly predicts all 4 known-wrong rows.
+`cross_region_agreement` returned a **clean null** — 100% "agree" on both
+labelled sets, zero discriminative power.
+
+**Two lanes converged on the same truth from opposite directions, without
+coordinating.** PR #1589 found by measurement that the fingerprinter's `Copy32`
+pick is wrong; PR #1590 fixed it by reading the authoritative source. Brain
+verified the ground truth directly:
+
+```text
+config/usa/arm9/symbols.txt:3543:Copy32 kind:function(arm,size=0x18) addr:0x020943e0
+config/usa/arm9/symbols.txt:3544:func_020943f8 kind:function(arm,size=0x18) addr:0x020943f8
+```
+
+The fingerprinter picks an **unnamed placeholder of identical size**. PR #1589
+also **corrects PR #1586's own Finding 3**, which had framed `Copy32` as a
+same-address rename, and independently rediscovered **brief 673's proven-wrong
+pair** with no prior knowledge of that brief. Brain mutation-tested the new
+suite: 2 of 26 went red correctly.
+
+**The next round is written as a falsification test, not a rollout.** PR #1589
+was explicit that 0 errors in 2,964 trials bounds the error rate at only
+**≤0.1% by the rule of three, not zero**, and that **n=2** known-wrong incidents
+cannot bound false positives. So `cm-verified-neighbor-tranche` implements the
+signal, gates a **bounded 20-candidate tranche first**, caps the round at **100
+ported**, and states that **a gate failure is the most valuable outcome — stop
+immediately, do not narrow the filter and retry.** The ROM gate is the one
+arbiter the thin sample cannot argue with.
+
+⚠️ **The derived-artifact self-reference has now cost three consecutive rounds**
+— a brain regeneration in 0827, **two full gate runs** for the port lane here,
+and a genuine **merge conflict between the two lanes** that the brain resolved by
+hand at integration. `q-derived-artifact-selfreference` is seeded to fix the
+mechanism, with an explicit constraint not to weaken the freshness check into
+uselessness.
+
+⚠️ **Control 12 NOT executable, third consecutive round** — both lanes run
+outside Claude Code and Codex. Every finding above is git- and tool-derived.
+
+⚠️ **Brain note:** the first recon of this round caught the scaffolder
+mid-flight (44 dirty files, 3 live toolchain processes, no PR). Gating then
+would have corrupted its build. **Check for live toolchain processes before
+concluding a lane produced nothing.**
+
+<!-- main-sha: 9f2994cc1 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

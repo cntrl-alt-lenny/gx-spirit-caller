@@ -2196,3 +2196,110 @@ only if you want the invariants.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-fingerprint-promotion-evidence`;
 then report QUEUE-EMPTY honestly if you reach it.
+
+### q-collision-pair-audit — seven unvalidated pairs sitting inside already-shipped ports [TODO]
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round. Round 0827 is what
+ignoring this costs.
+
+While building its labelled set, `q-fingerprint-promotion-evidence` (#1589)
+dropped **32 rows as unresolved fingerprint collisions** — **8 distinct EUR
+pairs, 16 rows, recurring identically in both regions**. One of those eight is
+`func_0209bb60`/`func_0209bc20`, **the exact pair brief 673 already proved
+wrong** — rediscovered independently, with no prior knowledge of that brief.
+
+**The other seven have never been checked.** They are listed in
+`docs/research/campaign-analytics/fingerprint-signal-evidence.md`; start there.
+
+**Why this matters more than its size suggests.** These collisions sit inside
+**already-committed, already-gated ports**. That one of eight turned out to be a
+known-wrong pair is not reassuring — it is the base rate you have. The obvious
+objection is "the ROM gate passed, so the code must be right", and that objection
+is **half true and worth stating precisely in your writeup**: a byte-identical
+ROM proves the *built bytes* are correct, which is not the same as proving every
+*symbol attribution* in the source is correct. A `.c` that calls the wrong name
+for the right address, or picks the wrong member of an interchangeable pair,
+gates green and is still wrong in the source. Work out which of those two things
+each pair is.
+
+**Deliverable, per pair:**
+
+1. What the two candidates actually are, from `symbols.txt`, `relocs.txt` and
+   the delink objects — sizes, addresses, relocation profiles, readers.
+2. Whether the shipped port resolved to the right one, and **the evidence**.
+   Where a committed name exists in the target region, that is authoritative —
+   that is exactly how #1589 settled `Copy32` and how #1590's `EXACT_NAME`
+   lookup works.
+3. If a pair is genuinely **interchangeable** — same size, same relocations, no
+   observable difference — say so. That is a legitimate finding and means the
+   collision is harmless, not that it is unchecked.
+4. A verdict per pair: **CORRECT / WRONG / INTERCHANGEABLE / UNDECIDABLE**, with
+   the reasoning. `UNDECIDABLE` is an acceptable answer when the evidence does
+   not settle it — do not force a verdict to avoid a blank.
+
+**If you find a WRONG one, that is the headline** — report the pair, the shipped
+resolution, the correct one, and which committed ports are affected. **Do not fix
+it in this PR**; a source correction inside shipped ports needs its own gated
+round, and the other lane owns the toolchain. Scope it for the brain instead.
+
+⚠️ **Do not re-derive #1589's measurement or re-litigate `verified_neighbor`.**
+The other lane is testing that against the ROM gate this round. Your job is the
+seven pairs.
+
+⚠️ **Blank is not zero.** State how many pairs you resolved, how many you could
+not, and why. PR #1559 set the precedent.
+
+**SUB-AGENTS ARE PERMITTED AND ENCOURAGED, WITH TWO HARD RULES.** This
+partitions cleanly — one worker per pair, then a synthesis pass that looks for a
+shared mechanism across whatever the verdicts turn out to be. **Rule one:
+sub-agents must be READ-ONLY.** They share this worktree, not isolated copies,
+so parallel writers corrupt each other; you do all writing, committing and git
+operations. **Rule two: no sub-agent runs a build, `ninja`, or a region gate.**
+Single-threaded is fine too — the verdicts matter, not the parallelism.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
+annotated with its reproducing command. Build-free.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-collision-pair-audit`; then report
+QUEUE-EMPTY honestly if you reach it.
+
+### q-derived-artifact-selfreference — the staleness that has cost three rounds running [TODO]
+
+**BUILD-FREE.** Take this only after `q-collision-pair-audit`.
+
+`docs/dashboard.md`'s trend table records the **commit SHA** of every commit
+that touches `docs/state-table.md`. Squash-merging any such PR rewrites that
+SHA, so the dashboard is stale the instant it lands — **the freshness test is
+unsatisfiable for the PR that introduces the change.** Three consecutive rounds
+have paid for this:
+
+- round 0827: brain regenerated it in the follow-up doc PR (`56ba06693` ->
+  `97bdb5158`, a one-line hash).
+- round 0828b: the port lane burned **two full gate runs** discovering it had to
+  regenerate `state-table.md` first and `dashboard.md` second, each after the
+  commit it describes had landed.
+- round 0828b integration: it produced a genuine **merge conflict** between the
+  two lanes that the brain resolved by hand.
+
+**Fix the mechanism, not the symptom.** Options worth weighing — pick one and
+justify it: drop the SHA column (is it load-bearing for anything?); resolve the
+SHA post-merge rather than recording it at generation time; or make the
+freshness check tolerate a trailing row whose SHA is not yet final. **Whichever
+you choose, the acceptance criterion is the same: a PR that touches
+`docs/state-table.md` must be able to land without its own dashboard going
+stale.** Demonstrate that, do not just assert it.
+
+⚠️ **Do not weaken the freshness test into uselessness.** It exists because a
+stale dashboard silently misreports campaign state. A fix that makes the check
+pass by checking less is worse than the current cost. Say explicitly what the
+test still guarantees after your change.
+
+**Gate:** pytest + unittest green (paste both tails) + `ruff check` clean, plus a
+demonstration that the failure mode is actually gone — construct the situation
+that breaks it today and show it passing. Build-free.
+
+ONE PR; verify claims against `git diff --stat`; `python tools/work_queue.py done
+claude-decomper q-derived-artifact-selfreference`.

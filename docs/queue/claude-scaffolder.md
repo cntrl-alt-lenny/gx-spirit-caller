@@ -2280,3 +2280,83 @@ heatmap SVGs. Regenerate `docs/dashboard.md` if it goes stale.
 
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-port-exact-name-unlock`.
+
+### cm-verified-neighbor-tranche — the 95.3% wall, tested against the ROM gate [TODO]
+
+`q-fingerprint-promotion-evidence` (#1589) measured what `q-port-refusal-taxonomy`
+(#1586) had only judged. Read
+`docs/research/campaign-analytics/fingerprint-signal-evidence.md` in full first —
+it is the specification and it already did the measurement. **Do not re-derive
+it.**
+
+**What it found.** `verified_neighbor` — the neighbour-shift check rebuilt on
+*proven* neighbour mappings instead of `find_siblings`' own unverified per-neighbour
+guess — covers **98.7% of the ambiguous population at 100% accuracy
+(2,960/2,960)**, holds at the strictest zero-relocation threshold (16/16), and
+correctly predicts the true answer on **all 4 known-wrong rows**, reproducing by
+measurement what briefs 673/675 established by hand. `cross_region_agreement`
+came back a clean null (100% "agree" on both labelled sets — no discriminative
+power). Brain independently confirmed the `Copy32` case:
+
+```text
+config/usa/arm9/symbols.txt:3543:Copy32 kind:function(arm,size=0x18) addr:0x020943e0
+config/usa/arm9/symbols.txt:3544:func_020943f8 kind:function(arm,size=0x18) addr:0x020943f8
+```
+
+The fingerprinter picks `…3f8`, an unnamed placeholder of identical size;
+`verified_neighbor` predicts `…3e0`, where `Copy32` is actually named.
+
+**Why this is worth a lane, stated honestly.** If the signal holds, roughly
+60 KB per region that #1586 called very likely dead becomes reachable. If it
+does not, we learn that at a bounded cost and the question closes for good.
+
+⚠️ **THE STATED WEAKNESS IS REAL AND THIS ITEM IS ITS FALSIFICATION TEST.**
+PR #1589 was explicit: 0 errors in 2,964 trials bounds the error rate at only
+**≤0.1% by the rule of three, not zero**, and the known-wrong set is **n=2
+distinct incidents** — far too small to bound false positives statistically. It
+also warns the evaluation population is a **proxy** for the real MEDIUM
+population, not identical to it. **You are not here to confirm the finding. You
+are here to give it a real chance to fail against the only arbiter that cannot
+be argued with.**
+
+**Scope, in order. Each step separately gated — do not batch them.**
+
+1. **Implement `verified_neighbor` as a new confidence source** in
+   `port_to_region.py`, in the same shape #1590 added `EXACT_NAME`: a distinct
+   tier, consulted in a defined order, **without** touching `--confidence-floor`,
+   auto-promotion, or the MEDIUM ceiling. Reuse the shared `FLOOR_RANK` constant
+   #1590 consolidated — do not add a third copy.
+2. **A BOUNDED first tranche of at most 20 candidates**, gated as one batch,
+   before anything else. Paste that batch's three SHA1 PASS lines.
+3. **Only if that batch gates clean**, continue in batches of 20 to a **hard
+   ceiling of 100 ported this round.** Stop there even if more are available.
+   The point is a measured trial, not a drain — a later round widens it once
+   this one has evidence.
+
+⚠️ **A GATE FAILURE IS THE MOST VALUABLE OUTCOME THIS ITEM CAN PRODUCE.** If any
+batch fails, **STOP immediately.** Do not narrow the filter, do not exclude the
+failing candidate and retry, do not adjust a threshold. Report which candidate
+failed, what `verified_neighbor` predicted, what the fingerprinter would have
+picked, and what the truth was. That single data point is worth more than 100
+successful ports, because it is the false positive the n=2 sample could not
+bound.
+
+⚠️ **Do not weaken any existing guard to make a number move.** #1586 recommended
+keeping the MEDIUM conservatism and #1590 respected that. You are adding a
+third ground-truth source alongside `EXACT_NAME`, not lowering a floor.
+
+**DO NOT USE SUB-AGENTS FOR THIS ITEM.** They share this worktree rather than
+getting isolated copies, so parallel writers corrupt `src/`, `config/` and the
+git index; and the compiler serialises machine-wide, so parallel builders queue
+instead of going faster. Single-threaded.
+
+**Gate:** per-batch ROM gates, then `python tools/gate3.py --scope all` with all
+three SHA1 PASS lines pasted verbatim plus the pytest tail, then
+`check_activation_invariant.py origin/main..HEAD`, then before/after
+`port_census.py` for BOTH regions. Use `tee`, never `tail` — the SHA1 lines are
+emitted before the four-minute pytest block. `git restore assets/` after a
+`--clean` run. Regenerate `docs/state-table.md` first and `docs/dashboard.md`
+second, each after the commit it describes has landed.
+
+ONE PR; verify every number against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-verified-neighbor-tranche`.
