@@ -11,13 +11,16 @@ Run locally:
 
 from __future__ import annotations
 
+import json
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
 
+import port_to_region  # noqa: E402 -- module object, for ROOT patching
 from port_to_region import (  # noqa: E402
     FILENAME_RE,
     FLOOR_RANK,
@@ -36,6 +39,7 @@ from port_to_region import (  # noqa: E402
     find_rename_collisions,
     function_symbol_for,
     infer_module_from_path,
+    load_verified_neighbor_index,
     module_to_src_dir,
     normalize_module_name,
     parse_filename_stem,
@@ -45,6 +49,7 @@ from port_to_region import (  # noqa: E402
     symbols_txt_path_for,
     synthesize_data_symbol_name,
     target_stem_for_prefix,
+    verified_neighbor_signal,
 )
 
 
@@ -1054,6 +1059,91 @@ class TestComputeNeighborShiftConsensus(unittest.TestCase):
         self.assertEqual(sampled, [])
 
 
+class TestVerifiedNeighborSignal(unittest.TestCase):
+    """fingerprint-signal-evidence.md — verified_neighbor_signal() is the
+    SAME neighbor-shift-consensus algorithm as compute_neighbor_shift_
+    consensus above, but sampling a precomputed ground-truth index
+    (already ROM-gate-verified mappings) instead of calling
+    find_siblings_fn per neighbor. No find_siblings_fn stub needed here —
+    that is the whole point: this signal never calls it."""
+
+    def _eur_region(self) -> dict[str, list]:
+        addrs = [
+            0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+            0x02006e00, 0x02006e40, 0x02006e54, 0x02006e80,
+        ]
+        return {"main": [_FakeFunc(addr=a, rank=i)
+                         for i, a in enumerate(addrs)]}
+
+    def test_consensus_from_5_verified_neighbors(self):
+        eur = self._eur_region()
+        index = {
+            ("main", a): a + 0x8
+            for a in (0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+                      0x02006e00, 0x02006e40, 0x02006e80)
+        }
+        pred, sampled = verified_neighbor_signal(
+            0x02006e54, "main", eur, index,
+        )
+        self.assertEqual(pred, 0x02006e54 + 0x8)
+        self.assertEqual(len(sampled), 5)
+
+    def test_no_consensus_when_split_2_2_1(self):
+        eur = self._eur_region()
+        addrs = [0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0, 0x02006e00]
+        index = {
+            ("main", addrs[0]): addrs[0] + 0x8,
+            ("main", addrs[1]): addrs[1] + 0x10,
+            ("main", addrs[2]): addrs[2] + 0x8,
+            ("main", addrs[3]): addrs[3] + 0x10,
+            ("main", addrs[4]): addrs[4] + 0x18,
+        }
+        pred, sampled = verified_neighbor_signal(
+            0x02006e54, "main", eur, index,
+        )
+        self.assertIsNone(pred)
+        self.assertEqual(len(sampled), 5)
+
+    def test_no_consensus_when_too_few_verified_neighbors(self):
+        eur = self._eur_region()
+        index = {
+            ("main", 0x02006d00): 0x02006d08,
+            ("main", 0x02006d40): 0x02006d48,
+        }
+        pred, sampled = verified_neighbor_signal(
+            0x02006e54, "main", eur, index,
+        )
+        self.assertIsNone(pred)
+        self.assertEqual(len(sampled), 2)
+
+    def test_pivot_not_in_module_returns_none(self):
+        eur = self._eur_region()
+        pred, sampled = verified_neighbor_signal(
+            0xdeadbeef, "main", eur, {},
+        )
+        self.assertIsNone(pred)
+        self.assertEqual(sampled, [])
+
+    def test_empty_index_abstains(self):
+        eur = self._eur_region()
+        pred, sampled = verified_neighbor_signal(
+            0x02006e54, "main", eur, {},
+        )
+        self.assertIsNone(pred)
+        self.assertEqual(sampled, [])
+
+    def test_neighbor_in_different_module_never_sampled(self):
+        # An index entry keyed to a DIFFERENT module must never leak in,
+        # even if the address happens to collide numerically.
+        eur = self._eur_region()
+        index = {("ov002", 0x02006d00): 0x02006d08}
+        pred, sampled = verified_neighbor_signal(
+            0x02006e54, "main", eur, index,
+        )
+        self.assertIsNone(pred)
+        self.assertEqual(sampled, [])
+
+
 class TestResolveSymbolAutoPromote(unittest.TestCase):
     """Brief 095 D2 v2 — resolve_symbol promotes LOW→MEDIUM when
     the candidate's shift matches the neighbor consensus."""
@@ -1584,6 +1674,214 @@ class TestResolveSymbolExactName(unittest.TestCase):
         # exclusion filter).
         self.assertEqual(FLOOR_RANK["EXACT_NAME"], FLOOR_RANK["HIGH"])
         self.assertIn("EXACT_NAME", GROUND_TRUTH_CONFIDENCES)
+
+
+class TestResolveSymbolVerifiedNeighbor(unittest.TestCase):
+    """fingerprint-signal-evidence.md — resolve_symbol's func branch
+    consults verified_neighbor_index AFTER exact-name and BEFORE calling
+    find_siblings_fn at all — proven by making the stub find_siblings_fn
+    raise if it's ever invoked, exactly like TestResolveSymbolExactName
+    does for the exact-name tier."""
+
+    def _raising_find_siblings_fn(self, *_a, **_kw):
+        raise AssertionError(
+            "find_siblings_fn must not be called when a verified-"
+            "neighbor consensus already resolved the symbol"
+        )
+
+    def _eur_region(self, target_addr):
+        # 8 EUR functions in "main"; the pivot (index 6) is the
+        # candidate being resolved, its shift is NOT itself in the
+        # index (as real neighbor consensus never trusts a candidate's
+        # own shift — only its NEIGHBORS').
+        addrs = [
+            0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+            0x02006e00, 0x02006e40, 0x02006e54, 0x02006e80,
+        ]
+        return {"main": [_FakeFunc(addr=a, name=f"func_{a:08x}", size=0x18,
+                                    rank=i)
+                         for i, a in enumerate(addrs)]}
+
+    def _shift8_index(self):
+        # All 7 non-pivot neighbors verified-mapped at a consistent +0x8
+        # shift — same shape as TestVerifiedNeighborSignal's consensus
+        # case, reused here through the full resolve_symbol path.
+        return {
+            ("main", a): a + 0x8
+            for a in (0x02006d00, 0x02006d40, 0x02006d80, 0x02006dc0,
+                      0x02006e00, 0x02006e40, 0x02006e80)
+        }
+
+    def test_verified_neighbor_resolves_before_fingerprint_fallback(self):
+        eur = self._eur_region(0x02006e5c)
+        target = {"main": [_FakeFunc(addr=0x02006e5c,
+                                      name="func_02006e5c", size=0x18)]}
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        res = resolve_symbol(
+            ref, "usa", eur, target, {},
+            self._raising_find_siblings_fn,
+            verified_neighbor_index=self._shift8_index(),
+        )
+        self.assertEqual(res.confidence, "VERIFIED_NEIGHBOR")
+        self.assertEqual(res.target_name, "func_02006e5c")
+        self.assertIn("verified-neighbor consensus", res.notes)
+
+    def test_this_is_the_copy32_shape_a_real_named_target_too(self):
+        # The Copy32 case from the research doc: the predicted address
+        # can carry a REAL (non-placeholder) name in the target — the
+        # resolution just returns whatever name is actually there.
+        eur = self._eur_region(0x02006e5c)
+        target = {"main": [_FakeFunc(addr=0x02006e5c, name="Copy32",
+                                      size=0x18)]}
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        res = resolve_symbol(
+            ref, "usa", eur, target, {},
+            self._raising_find_siblings_fn,
+            verified_neighbor_index=self._shift8_index(),
+        )
+        self.assertEqual(res.confidence, "VERIFIED_NEIGHBOR")
+        self.assertEqual(res.target_name, "Copy32")
+
+    def test_no_real_function_at_predicted_address_falls_through(self):
+        # Consensus predicts 0x02006e5c, but NO function actually lives
+        # there in the target — must fall through to find_siblings_fn,
+        # not fabricate a resolution from bare arithmetic.
+        eur = self._eur_region(0x02006e5c)
+        target = {"main": []}   # nothing at the predicted address
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        fn = _make_find_siblings_fn({
+            0x02006e54: _FakeMatch(
+                _FakeFunc(addr=0x02006e70, name="func_02006e70"),
+                "MEDIUM", rationale="reloc bag match",
+            ),
+        })
+        res = resolve_symbol(ref, "usa", eur, target, {}, fn,
+                             verified_neighbor_index=self._shift8_index())
+        self.assertEqual(res.confidence, "MEDIUM")
+        self.assertEqual(res.target_name, "func_02006e70")
+
+    def test_size_mismatch_at_predicted_address_falls_through(self):
+        # A function DOES exist at the predicted address, but its size
+        # disagrees with the EUR candidate's — must not trust it.
+        eur = self._eur_region(0x02006e5c)
+        target = {"main": [_FakeFunc(addr=0x02006e5c,
+                                      name="func_02006e5c", size=0x20)]}
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        fn = _make_find_siblings_fn({
+            0x02006e54: _FakeMatch(
+                _FakeFunc(addr=0x02006e70, name="func_02006e70"),
+                "LOW", rationale="size+ish match, no relocs to compare",
+            ),
+        })
+        res = resolve_symbol(ref, "usa", eur, target, {}, fn,
+                             verified_neighbor_index=self._shift8_index())
+        self.assertEqual(res.confidence, "LOW")
+
+    def test_no_index_falls_through_to_fingerprint_normally(self):
+        # verified_neighbor_index=None (the default) must behave
+        # identically to before this feature existed.
+        eur = self._eur_region(0x02006e5c)
+        target = {"main": [_FakeFunc(addr=0x02006e5c,
+                                      name="func_02006e5c", size=0x18)]}
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        fn = _make_find_siblings_fn({
+            0x02006e54: _FakeMatch(
+                _FakeFunc(addr=0x02006e70, name="func_02006e70"),
+                "MEDIUM", rationale="reloc bag match",
+            ),
+        })
+        res = resolve_symbol(ref, "usa", eur, target, {}, fn)
+        self.assertEqual(res.confidence, "MEDIUM")
+
+    def test_empty_index_falls_through_same_as_none(self):
+        eur = self._eur_region(0x02006e5c)
+        target = {"main": [_FakeFunc(addr=0x02006e5c,
+                                      name="func_02006e5c", size=0x18)]}
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        fn = _make_find_siblings_fn({
+            0x02006e54: _FakeMatch(
+                _FakeFunc(addr=0x02006e70, name="func_02006e70"),
+                "MEDIUM", rationale="reloc bag match",
+            ),
+        })
+        res = resolve_symbol(ref, "usa", eur, target, {}, fn,
+                             verified_neighbor_index={})
+        self.assertEqual(res.confidence, "MEDIUM")
+
+    def test_exact_name_still_wins_over_verified_neighbor(self):
+        # Ordering: exact-name is consulted FIRST and returns early —
+        # verified_neighbor_index is never even touched when it applies.
+        # Use a poisoned index (wrong prediction) to prove exact-name's
+        # result isn't overridden.
+        eur = {"main": [_FakeFunc(addr=0x020937a4, name="OS_DisableIrq",
+                                   size=0x14)]}
+        target = {"main": [_FakeFunc(addr=0x020936bc, name="OS_DisableIrq",
+                                      size=0x14)]}
+        ref = SymbolRef(text="OS_DisableIrq", kind="func",
+                        module="main", addr=0x020937a4)
+        poisoned_index = {("main", 0x02006d00): 0xdeadbeef}
+        res = resolve_symbol(
+            ref, "usa", eur, target, {},
+            self._raising_find_siblings_fn,
+            verified_neighbor_index=poisoned_index,
+        )
+        self.assertEqual(res.confidence, "EXACT_NAME")
+
+    def test_verified_neighbor_is_high_equivalent_at_the_confidence_floor(self):
+        self.assertEqual(FLOOR_RANK["VERIFIED_NEIGHBOR"], FLOOR_RANK["HIGH"])
+        self.assertIn("VERIFIED_NEIGHBOR", GROUND_TRUTH_CONFIDENCES)
+
+
+class TestLoadVerifiedNeighborIndex(unittest.TestCase):
+    """fingerprint-signal-evidence.md — load_verified_neighbor_index()
+    reads the precomputed build/known_correct_set.json cache and NEVER
+    rebuilds it (rebuilding costs ~1 minute via fingerprint matching, and
+    port_to_region.py runs as a fresh subprocess per candidate — see the
+    loader's own docstring)."""
+
+    def setUp(self):
+        self._tmp = tempfile.TemporaryDirectory()
+        self.tmp = Path(self._tmp.name)
+        (self.tmp / "build").mkdir()
+        self._orig_root = port_to_region.ROOT
+        port_to_region.ROOT = self.tmp
+
+    def tearDown(self):
+        port_to_region.ROOT = self._orig_root
+        self._tmp.cleanup()
+
+    def test_missing_file_returns_empty_dict_not_raises(self):
+        self.assertEqual(load_verified_neighbor_index("usa"), {})
+
+    def test_malformed_json_returns_empty_dict_not_raises(self):
+        (self.tmp / "build" / "known_correct_set.json").write_text(
+            "{not valid json", encoding="utf-8")
+        self.assertEqual(load_verified_neighbor_index("usa"), {})
+
+    def test_valid_file_filtered_by_region_and_keyed_correctly(self):
+        rows = [
+            {"eur_module": "main", "eur_addr": 0x02006164, "region": "usa",
+             "tgt_addr": 0x02006148, "tgt_name": "func_02006148"},
+            {"eur_module": "main", "eur_addr": 0x02006200, "region": "jpn",
+             "tgt_addr": 0x020061f0, "tgt_name": "func_020061f0"},
+            {"eur_module": "ov002", "eur_addr": 0x021b0000, "region": "usa",
+             "tgt_addr": 0x021b0100, "tgt_name": "func_ov002_021b0100"},
+        ]
+        (self.tmp / "build" / "known_correct_set.json").write_text(
+            json.dumps(rows), encoding="utf-8")
+        index = load_verified_neighbor_index("usa")
+        self.assertEqual(index, {
+            ("main", 0x02006164): 0x02006148,
+            ("ov002", 0x021b0000): 0x021b0100,
+        })
+        # The jpn row must not leak into the usa index.
+        self.assertNotIn(("main", 0x02006200), index)
 
 
 class TestCollectNewSymbolsTxtLines(unittest.TestCase):

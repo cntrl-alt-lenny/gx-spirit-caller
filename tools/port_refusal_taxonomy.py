@@ -55,6 +55,7 @@ from port_to_region import (  # noqa: E402
     load_full_relocs,
     load_region_data_symbol_kinds,
     load_region_data_symbols,
+    load_verified_neighbor_index,
     parse_filename_stem,
     parse_symbols_in_source,
     repair_rename_collisions,
@@ -87,6 +88,7 @@ def classify_candidate(
     eur_data_kinds: dict,
     named_functions: dict,
     find_siblings_fn,
+    verified_neighbor_index: dict | None = None,
 ) -> dict:
     """Replicate port_to_region.py main()'s per-file resolution + floor/
     collision/needs-symbol checks for one backlog entry. Returns
@@ -117,6 +119,7 @@ def classify_candidate(
     main_res = resolve_symbol(
         main_func_ref, target, eur_regions, target_regions, target_data_symbols,
         find_siblings_fn, auto_promote_low=True, consensus_cache=consensus_cache,
+        verified_neighbor_index=verified_neighbor_index,
     )
 
     data_addr_map: dict = {}
@@ -147,6 +150,7 @@ def classify_candidate(
                 find_siblings_fn, data_addr_map=data_addr_map,
                 auto_promote_low=True, consensus_cache=consensus_cache,
                 eur_data_kinds=eur_data_kinds,
+                verified_neighbor_index=verified_neighbor_index,
             ))
 
     failed = [r for r in resolutions if FLOOR_RANK.get(r.confidence, 0) < FLOOR]
@@ -289,6 +293,7 @@ def _load_all(target: str):
     eur_full_relocs = load_full_relocs("eur")
     target_full_relocs = load_full_relocs(target)
     eur_data_kinds = load_region_data_symbol_kinds("eur")
+    verified_neighbor_index = load_verified_neighbor_index(target)
     named_functions = {
         f.name: (mod, f.addr)
         for mod, funcs in eur.items()
@@ -296,12 +301,14 @@ def _load_all(target: str):
         if not is_placeholder_function_name(f.name)
     }
     return (eur, target_regions, target_data, eur_full_relocs,
-            target_full_relocs, eur_data_kinds, named_functions, find_siblings)
+            target_full_relocs, eur_data_kinds, verified_neighbor_index,
+            named_functions, find_siblings)
 
 
 def run(target: str, backlog_path: Path, limit: int | None = None) -> list[dict]:
     (eur, target_regions, target_data, eur_full_relocs, target_full_relocs,
-     eur_data_kinds, named_functions, find_siblings) = _load_all(target)
+     eur_data_kinds, verified_neighbor_index, named_functions,
+     find_siblings) = _load_all(target)
 
     data = json.loads(backlog_path.read_text(encoding="utf-8"))
     backlog = data.get("backlog", {}).get(target, [])
@@ -316,6 +323,7 @@ def run(target: str, backlog_path: Path, limit: int | None = None) -> list[dict]
             entry, source_text, target, eur, target_regions, target_data,
             eur_full_relocs, target_full_relocs, eur_data_kinds,
             named_functions, find_siblings,
+            verified_neighbor_index=verified_neighbor_index,
         ))
     return out
 
