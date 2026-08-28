@@ -17,7 +17,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 | --- | ---: | ---: | ---: | ---: |
 | eur | 412,102 | **17.27%** | 4,420 | 17.46% |
 | usa | 320,356 | **13.43%** | 2,780 | 13.55% |
-| jpn | 282,000 | **11.82%** | 2,756 | 11.94% |
+| jpn | 319,928 | **13.41%** | 2,788 | 13.53% |
 
 ## Trend: EUR natural-C over time
 
