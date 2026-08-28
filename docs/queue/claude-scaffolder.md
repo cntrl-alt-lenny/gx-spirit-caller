@@ -2281,7 +2281,7 @@ heatmap SVGs. Regenerate `docs/dashboard.md` if it goes stale.
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-port-exact-name-unlock`.
 
-### cm-verified-neighbor-tranche — the 95.3% wall, tested against the ROM gate [CLAIMED]
+### cm-verified-neighbor-tranche — the 95.3% wall, tested against the ROM gate [DONE]
 
 `q-fingerprint-promotion-evidence` (#1589) measured what `q-port-refusal-taxonomy`
 (#1586) had only judged. Read
