@@ -2212,3 +2212,71 @@ log. `git restore assets/` if a `--clean` run deletes the heatmap SVGs.
 
 ONE PR; verify every number against `git diff --stat` before writing the body;
 `python tools/work_queue.py done claude-scaffolder cm-port-drain-jpn`.
+
+### cm-port-exact-name-unlock — the 49-candidate blocker #1586 found, fixed and banked [TODO]
+
+`q-port-refusal-taxonomy` (#1586) did the analysis this item acts on. Read
+`docs/research/campaign-analytics/port-refusal-taxonomy.md` in full first — it is
+the specification for this work and it already did the measurement, so **do not
+re-derive the taxonomy**.
+
+**The finding.** `resolve_symbol` in `tools/port_to_region.py` resolves a
+callee by structural fingerprint matching and never checks whether the target
+region's own `symbols.txt` **already names that symbol identically**. It is
+authoritative, committed ground truth sitting unread. Brain verified the
+example independently:
+
+```text
+config/eur/arm9/symbols.txt:3506:OS_DisableIrq kind:function(arm,size=0x14) addr:0x020937a4
+config/usa/arm9/symbols.txt:3506:OS_DisableIrq kind:function(arm,size=0x14) addr:0x020936bc
+config/jpn/arm9/symbols.txt:3506:OS_DisableIrq kind:function(arm,size=0x14) addr:0x020936bc
+```
+
+Same name, all three regions, different addresses. The fingerprint matcher
+lands on MEDIUM and the candidate refuses, when an exact-name lookup would
+resolve it outright.
+
+**Scope, in order. Each numbered step is separately gated — do not batch them.**
+
+1. **Add the exact-name lookup to `resolve_symbol`**, consulted BEFORE the
+   fingerprint fallback, returning a HIGH-equivalent confidence. #1586 measured
+   the impact: **49 USA candidates (7,692 B) refused SOLELY on this**, 38 more
+   (6,156 B) partially helped, and JPN reproduces it at ~50 / 8,120 B.
+2. **Fix the two small bugs #1586 identified**, each with a test that you have
+   seen fail before it passes: the comment-parsing false positive in
+   `parse_symbols_in_source` (same bug class `q-invariants-green` already fixed
+   in `check_match_invariants.py`, never applied here — 3 sole candidates), and
+   the `find_region_siblings.load_region()` ITCM-module coverage gap (2 sole
+   candidates).
+3. **Then re-run `python tools/port_harvest.py --batch 20`** over both regions
+   and bank whatever the fix unlocks. The harness ROM-gates every batch.
+
+⚠️ **A name match is a hypothesis, not a proof, and this project has been bitten
+by exactly this.** Briefs 673/676 fixed a wrong-sibling bug class, and #1462
+fixed a placeholder-twin recurrence. The existing MEDIUM conservatism is there
+for a reason and #1586 explicitly recommends NOT weakening it. **You are adding
+a new authoritative source, not lowering the floor.** Do not touch
+`--confidence-floor`, do not disable auto-promotion, and do not promote
+fingerprint results. If a name-matched symbol still fails the ROM gate, that is
+the finding — stop and report it rather than working around it.
+
+⚠️ **Guard against the placeholder class.** Some `symbols.txt` names are
+injected placeholders from `dsd init --allow-unknown-function-calls`, not real
+recovered names. An exact-name match against a placeholder twin is precisely
+the PR #1462 failure. Decide explicitly how you exclude them and say what rule
+you used.
+
+⚠️ **The ROM gate is the arbiter and it cannot be fooled.** If the lookup
+resolves a symbol wrongly, the batch gate fails and the batch is rejected. That
+is your safety net — but a gate failure on step 1 means the lookup is unsound,
+so **stop and report rather than retrying with a narrower filter.**
+
+**Gate:** the harness ROM-gates each batch. Finish with `python tools/gate3.py
+--scope all` — all three SHA1 PASS lines pasted verbatim plus the pytest tail —
+then `python tools/check_activation_invariant.py origin/main..HEAD`, then
+before/after `port_census.py` counts for BOTH regions. Do not pipe the gate
+through `tail`; use `tee`. `git restore assets/` if a `--clean` run removes the
+heatmap SVGs. Regenerate `docs/dashboard.md` if it goes stale.
+
+ONE PR; verify every number against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-port-exact-name-unlock`.
