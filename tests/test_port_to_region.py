@@ -20,10 +20,13 @@ sys.path.insert(0, str(_TOOLS))
 
 from port_to_region import (  # noqa: E402
     FILENAME_RE,
+    FLOOR_RANK,
+    GROUND_TRUTH_CONFIDENCES,
     KIND_DATA_RE,
     SYMBOL_RE,
     SymbolRef,
     Resolution,
+    _exact_name_lookup,
     _fmt_shift,
     apply_substitutions,
     collect_new_symbols_txt_lines,
@@ -162,6 +165,71 @@ int func_0201ed28(int a, int unused1, int unused2, int d) {
         refs = parse_symbols_in_source(src, default_module="ov002")
         ref = next(iter(refs.values()))
         self.assertEqual(ref.module, "main")
+
+    def test_bare_func_in_itcm_range_routes_to_itcm(self):
+        # port-refusal-taxonomy.md Finding 5: a bare func_<addr> whose
+        # address falls in the fixed ITCM range (0x01ff8000..0x01ff8880)
+        # must route to module "itcm", not the "main" default — else
+        # find_region_siblings can never find it (it lives in a
+        # different symbols.txt entirely).
+        src = "extern void func_01ff8180(void);\n"
+        refs = parse_symbols_in_source(src, default_module="main")
+        ref = next(iter(refs.values()))
+        self.assertEqual(ref.module, "itcm")
+        self.assertEqual(ref.addr, 0x01ff8180)
+
+    def test_bare_func_just_outside_itcm_range_stays_main(self):
+        # One past the end of the ITCM range (0x01ff8880 is
+        # exclusive) must NOT be misrouted.
+        src = "extern void func_01ff8880(void);\n"
+        refs = parse_symbols_in_source(src, default_module="main")
+        ref = next(iter(refs.values()))
+        self.assertEqual(ref.module, "main")
+
+    def test_comment_bare_mention_of_overlay_function_not_parsed(self):
+        # port-refusal-taxonomy.md Finding 4 (real example, paraphrased
+        # from src/overlay002/func_ov002_02295b08.legacy_sp3.c's header
+        # comment): a doc comment abbreviates an overlay function's name
+        # by dropping its `_ovNNN_` prefix as disassembly shorthand,
+        # while the real code correctly calls the fully-qualified name.
+        # The bare mention must NOT parse as a phantom separate
+        # main-module reference.
+        src = """\
+/* Disassembly:
+ *   bl func_02259f74(b0)
+ */
+extern void func_ov002_02259f74(void);
+void func_ov002_02295b08(void *b0) {
+    func_ov002_02259f74(b0);
+}
+"""
+        refs = parse_symbols_in_source(src, default_module="ov002")
+        keys = set(refs.keys())
+        self.assertIn(("func", "ov002", 0x02259f74), keys)
+        self.assertNotIn(("func", "main", 0x02259f74), keys)
+
+    def test_comment_see_also_bare_filename_stem_not_parsed(self):
+        # Second real example: a "see also" comment names other
+        # source files by their bare stem (func_02023f98), which must
+        # not be parsed as a real reference either.
+        src = """\
+// see also func_0202a1ec.c, func_02023f98.c
+void func_02026fd8(void) {
+}
+"""
+        refs = parse_symbols_in_source(src, default_module="main")
+        keys = {k[2] for k in refs.keys()}
+        self.assertIn(0x02026fd8, keys)
+        self.assertNotIn(0x0202a1ec, keys)
+        self.assertNotIn(0x02023f98, keys)
+
+    def test_string_literal_bare_mention_not_parsed(self):
+        # Belt-and-suspenders: a string literal (not just comments) must
+        # also be blanked before scanning — _strip_c_comments_and_literals
+        # blanks both in one pass.
+        src = 'const char *s = "see func_02006c0c for details";\n'
+        refs = parse_symbols_in_source(src, default_module="main")
+        self.assertEqual(refs, {})
 
 
 class TestApplySubstitutions(unittest.TestCase):
@@ -1398,6 +1466,124 @@ class TestResolveSymbolAutoPromote(unittest.TestCase):
         # Second call must NOT re-walk the neighbors — only the
         # candidate's own find_siblings call counts.
         self.assertEqual(call_count[0], first_call_count + 1)
+
+
+class TestExactNameLookup(unittest.TestCase):
+    """port-refusal-taxonomy.md Finding 2 — _exact_name_lookup() consults
+    the target region's own committed symbols.txt name before any
+    fingerprint guessing happens."""
+
+    def test_unique_name_and_size_match_resolves(self):
+        eur = _FakeFunc(addr=0x020937a4, name="OS_DisableIrq", size=0x14)
+        target_funcs = [
+            _FakeFunc(addr=0x020936bc, name="OS_DisableIrq", size=0x14),
+            _FakeFunc(addr=0x02093700, name="OS_RestoreIrq", size=0x18),
+        ]
+        result = _exact_name_lookup(eur, target_funcs)
+        self.assertIsNotNone(result)
+        self.assertEqual(result.name, "OS_DisableIrq")
+        self.assertEqual(result.addr, 0x020936bc)
+
+    def test_no_name_match_returns_none(self):
+        eur = _FakeFunc(addr=0x020937a4, name="OS_DisableIrq", size=0x14)
+        target_funcs = [_FakeFunc(addr=0x02093700, name="Something_Else",
+                                   size=0x14)]
+        self.assertIsNone(_exact_name_lookup(eur, target_funcs))
+
+    def test_ambiguous_duplicate_name_returns_none(self):
+        # Two target functions sharing the exact same name is a
+        # data-quality anomaly, not something to guess through —
+        # fall through to fingerprinting instead.
+        eur = _FakeFunc(addr=0x020937a4, name="OS_DisableIrq", size=0x14)
+        target_funcs = [
+            _FakeFunc(addr=0x020936bc, name="OS_DisableIrq", size=0x14),
+            _FakeFunc(addr=0x02099999, name="OS_DisableIrq", size=0x14),
+        ]
+        self.assertIsNone(_exact_name_lookup(eur, target_funcs))
+
+    def test_size_mismatch_returns_none(self):
+        # A name match with disagreeing sizes is a red flag, not
+        # ground truth — don't trust it.
+        eur = _FakeFunc(addr=0x020937a4, name="OS_DisableIrq", size=0x14)
+        target_funcs = [_FakeFunc(addr=0x020936bc, name="OS_DisableIrq",
+                                   size=0x18)]
+        self.assertIsNone(_exact_name_lookup(eur, target_funcs))
+
+
+class TestResolveSymbolExactName(unittest.TestCase):
+    """resolve_symbol's func branch consults the exact-name lookup BEFORE
+    calling find_siblings_fn at all — proven here by making the stub
+    find_siblings_fn raise if it's ever invoked."""
+
+    def _raising_find_siblings_fn(self, *_a, **_kw):
+        raise AssertionError(
+            "find_siblings_fn must not be called when an exact-name "
+            "match already resolved the symbol"
+        )
+
+    def test_named_extern_ref_resolves_via_exact_name_before_fingerprint(self):
+        # Mirrors the real OS_DisableIrq case: EUR and the target both
+        # already name this function identically, at different
+        # addresses, with no relocations to fingerprint at all.
+        eur = {"main": [_FakeFunc(addr=0x020937a4, name="OS_DisableIrq",
+                                   size=0x14)]}
+        target = {"main": [_FakeFunc(addr=0x020936bc, name="OS_DisableIrq",
+                                      size=0x14)]}
+        ref = SymbolRef(text="OS_DisableIrq", kind="func",
+                        module="main", addr=0x020937a4)
+        res = resolve_symbol(
+            ref, "usa", eur, target, {},
+            self._raising_find_siblings_fn,
+        )
+        self.assertEqual(res.confidence, "EXACT_NAME")
+        self.assertEqual(res.target_name, "OS_DisableIrq")
+        self.assertIn("exact-name match", res.notes)
+
+    def test_bare_addr_ref_with_real_eur_name_also_resolves(self):
+        # The ref TEXT can still be address-keyed (func_<addr>) even
+        # when the underlying EUR symbol already has a real name in
+        # symbols.txt — resolution is keyed off eur_func.name, not
+        # ref.text.
+        eur = {"main": [_FakeFunc(addr=0x020937a4, name="OS_DisableIrq",
+                                   size=0x14)]}
+        target = {"main": [_FakeFunc(addr=0x020936bc, name="OS_DisableIrq",
+                                      size=0x14)]}
+        ref = SymbolRef(text="func_020937a4", kind="func",
+                        module="main", addr=0x020937a4)
+        res = resolve_symbol(
+            ref, "usa", eur, target, {},
+            self._raising_find_siblings_fn,
+        )
+        self.assertEqual(res.confidence, "EXACT_NAME")
+
+    def test_placeholder_eur_name_falls_through_to_fingerprint(self):
+        # EUR's own name is still an address-keyed placeholder — no real
+        # identity to look up, so this must NOT short-circuit, even if
+        # (contrived) the target happens to carry a same-spelled
+        # placeholder string at a different address.
+        eur = {"main": [_FakeFunc(addr=0x02006e54, name="func_02006e54",
+                                   size=0x14)]}
+        target = {"main": [_FakeFunc(addr=0x02006e60, name="func_02006e54",
+                                      size=0x14)]}
+        ref = SymbolRef(text="func_02006e54", kind="func",
+                        module="main", addr=0x02006e54)
+        fn = _make_find_siblings_fn({
+            0x02006e54: _FakeMatch(
+                _FakeFunc(addr=0x02006e70, name="func_02006e70"),
+                "MEDIUM", rationale="reloc bag match",
+            ),
+        })
+        res = resolve_symbol(ref, "usa", eur, target, {}, fn)
+        self.assertEqual(res.confidence, "MEDIUM")
+        self.assertEqual(res.target_name, "func_02006e70")
+
+    def test_exact_name_is_high_equivalent_at_the_confidence_floor(self):
+        # FLOOR_RANK / GROUND_TRUTH_CONFIDENCES — EXACT_NAME must never
+        # be capped by --confidence-floor the way a real fingerprint
+        # match would be (see main()'s two-stage floor + ground-truth
+        # exclusion filter).
+        self.assertEqual(FLOOR_RANK["EXACT_NAME"], FLOOR_RANK["HIGH"])
+        self.assertIn("EXACT_NAME", GROUND_TRUTH_CONFIDENCES)
 
 
 class TestCollectNewSymbolsTxtLines(unittest.TestCase):

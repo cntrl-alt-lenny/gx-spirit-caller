@@ -44,6 +44,8 @@ sys.path.insert(0, str(Path(__file__).resolve().parent))
 
 from batch_port import filter_sim1_backlog  # noqa: E402
 from port_to_region import (  # noqa: E402
+    FLOOR_RANK,
+    GROUND_TRUTH_CONFIDENCES,
     SymbolRef,
     collect_new_symbols_txt_lines,
     derive_data_address_mapping,
@@ -61,8 +63,11 @@ from port_to_region import (  # noqa: E402
 )
 from routing_suffixes import split_routing_suffix  # noqa: E402
 
-FLOOR_RANK = {"HIGH": 3, "MEDIUM": 2, "LOW": 1, "NONE": 0,
-              "EXACT_ADDR": 3, "SYNTHESIZED": 3}
+# FLOOR_RANK imported from port_to_region (not duplicated) — this tool
+# must replicate main()'s exact floor semantics, and the two dicts had
+# already drifted once before this refactor (port-refusal-taxonomy.md's
+# own Finding 2 fix added a new confidence tier neither copy could get
+# out of sync with).
 FLOOR = FLOOR_RANK["HIGH"]
 
 
@@ -145,7 +150,7 @@ def classify_candidate(
             ))
 
     failed = [r for r in resolutions if FLOOR_RANK.get(r.confidence, 0) < FLOOR]
-    failed = [r for r in failed if r.confidence not in ("EXACT_ADDR", "SYNTHESIZED")]
+    failed = [r for r in failed if r.confidence not in GROUND_TRUTH_CONFIDENCES]
 
     if failed:
         blockers = [_blocker_dict(r) for r in failed]

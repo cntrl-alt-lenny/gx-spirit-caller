@@ -344,6 +344,21 @@ def load_region(region: str) -> dict[str, list[Function]]:
     main_relocs = parse_relocs(config_root / "relocs.txt")
     out["main"] = _build_functions("main", main_symbols, main_relocs)
 
+    # ITCM — a small fixed-address code block copied to 0x01ff8000 by
+    # every region's ARM9 crt0 (NOT overlay-relocated; base_address +
+    # code_size are identical across eur/usa/jpn — see
+    # extract/<region>/arm9/itcm.yaml). `config/<region>/arm9/itcm/`
+    # carries its own symbols.txt/relocs.txt exactly like `main`, but
+    # this loader never read it (port-refusal-taxonomy.md Finding 5) —
+    # any EUR reference to an ITCM function/data symbol looked up as
+    # "no candidate" in every target region even though the data was
+    # sitting right there, committed.
+    itcm_dir = config_root / "itcm"
+    if (itcm_dir / "symbols.txt").is_file():
+        itcm_symbols = parse_symbols(itcm_dir / "symbols.txt", "itcm")
+        itcm_relocs = parse_relocs(itcm_dir / "relocs.txt")
+        out["itcm"] = _build_functions("itcm", itcm_symbols, itcm_relocs)
+
     # Overlays
     overlays_dir = config_root / "overlays"
     if overlays_dir.is_dir():

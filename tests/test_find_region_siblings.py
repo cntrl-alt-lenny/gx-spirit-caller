@@ -25,7 +25,10 @@ from find_region_siblings import (  # noqa: E402
     _byte_similarity,
     _mask_relocs,
     _score,
+    load_region,
 )
+
+ROOT = _TOOLS.parent
 
 
 class TestByteSimilarity(unittest.TestCase):
@@ -144,6 +147,51 @@ class TestScore(unittest.TestCase):
         b = self._func(addr=0x200, reloc_sig=b_sig)
         score, _rationale, conf = _score(a, b)
         self.assertEqual(conf, "MEDIUM")
+
+
+class TestLoadRegionItcm(unittest.TestCase):
+    """port-refusal-taxonomy.md Finding 5: load_region() never built an
+    "itcm" module bucket, so any EUR reference to an ITCM function/data
+    symbol had no candidate in ANY target region even though
+    config/<region>/arm9/itcm/{symbols,relocs}.txt are committed for all
+    three regions. Runs against the real repo config data (this loader
+    is a filesystem reader, not a pure function — there's no fixture
+    smaller than the real symbols.txt worth maintaining separately)."""
+
+    @unittest.skipUnless(
+        (ROOT / "config" / "eur" / "arm9" / "itcm" / "symbols.txt").is_file(),
+        "config/eur/arm9/itcm/symbols.txt not present in this checkout",
+    )
+    def test_eur_itcm_module_loaded(self):
+        eur = load_region("eur")
+        self.assertIn("itcm", eur)
+        self.assertGreater(len(eur["itcm"]), 0)
+
+    @unittest.skipUnless(
+        (ROOT / "config" / "eur" / "arm9" / "itcm" / "symbols.txt").is_file(),
+        "config/eur/arm9/itcm/symbols.txt not present in this checkout",
+    )
+    def test_itcm_functions_have_correct_module_and_known_symbol(self):
+        eur = load_region("eur")
+        by_addr = {f.addr: f for f in eur["itcm"]}
+        # func_01ff8180 is one of the two Finding-5 sole-blocked EUR
+        # callees (referenced from src/main/func_0207c934.legacy.c and
+        # Entry.c) — pin its presence and module tag directly.
+        self.assertIn(0x01ff8180, by_addr)
+        func = by_addr[0x01ff8180]
+        self.assertEqual(func.module, "itcm")
+        self.assertEqual(func.size, 0x58)
+
+    @unittest.skipUnless(
+        (ROOT / "config" / "usa" / "arm9" / "itcm" / "symbols.txt").is_file(),
+        "config/usa/arm9/itcm/symbols.txt not present in this checkout",
+    )
+    def test_usa_itcm_module_loaded_too(self):
+        # Finding 5 blocks USA and JPN identically — the target regions
+        # need the same itcm coverage as the EUR source side.
+        usa = load_region("usa")
+        self.assertIn("itcm", usa)
+        self.assertGreater(len(usa["itcm"]), 0)
 
 
 if __name__ == "__main__":
