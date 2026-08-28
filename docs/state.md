@@ -911,7 +911,7 @@ mid-flight (44 dirty files, 3 live toolchain processes, no PR). Gating then
 would have corrupted its build. **Check for live toolchain processes before
 concluding a lane produced nothing.**
 
-**Last updated:** 2026-08-29 — **(Windows PC, brain=Opus 5; both lanes Claude
+**Round 0829 (2026-08-29, Windows PC, brain=Opus 5; both lanes Claude
 Sonnet 5 at `max` effort, swarm on the build-free lane only.) Round 0829: the
 falsification test came back negative — `verified_neighbor` survived 9
 consecutive ROM gates and 95 ports, all 7 unchecked collision pairs audited
@@ -994,7 +994,80 @@ EUR moves.** `q-eur-next-frontier` is seeded to cost every remaining EUR avenue
 ⚠️ **Control 12 NOT executable, fourth consecutive round** — both lanes run
 outside Claude Code and Codex. Every finding above is git- and tool-derived.
 
-<!-- main-sha: a3a5ce6fc -->
+**Last updated:** 2026-08-30 — **(Windows PC, brain=Opus 5; both lanes Claude
+Sonnet 5 at `max` effort, swarm on the build-free lane only.) Round 0830: the
+port campaign is DONE — 489 final ports take USA and JPN to 15.85% and leave 17
+and 18 rows. And the code frontier was never closed: it was under-sampled. 87%
+of the code pool sits behind 83 logged attempts.**
+
+Merged **PR #1596** and **PR #1597**. `main` at `81c879c13`.
+
+| region | before | after |
+|---|---|---|
+| EUR | 17.27% | 17.27% |
+| USA | 14.15% | **15.85%** |
+| JPN | 14.07% | **15.85%** |
+
+**THE PORTS ARE FINISHED.** PR #1597 drained the pool the `verified_neighbor`
+signal unlocked: **489 ports (USA 238, JPN 251) across 26 gated batches**, zero
+failures. The byte-identical backlog went **524 -> 35 rows** (17 USA / 18 JPN).
+Brain verified 489 `.c` added / 489 `.s` deleted, invariant 489/489/489,
+per-region batch sums, dup-scan clean, own three-region `--clean` gate PASS.
+**There is no derivative work left; from here only EUR moves anything.**
+
+The lane **verified its own batch count programmatically**, citing last round's
+miscount, and chose **unification** over a divergence test for the duplicated
+`verified_neighbor_signal()` — reasoning that a test only *detects* drift while
+unification eliminates it. It proved the refactor behaviour-identical by running
+the measurement before and after, with the known-wrong cases predicting
+byte-identical addresses.
+
+⚠️ **PR #1596 CORRECTED THE BRAIN TWICE. Both corrections are load-bearing.**
+
+**1. "EUR stuck at 17.27%" is a `.text`-only claim.** `progress.py`'s natural-C
+metric — the same function `state-table.md` and `dashboard.md` both use — never
+scans `.data`/`.bss`/`.rodata`. Brain confirmed directly: it returns "readable-C
+`.text` bytes" and `CODE_SECTIONS = {".text", ".init"}`. **The data/carve lane's
+work cannot move the headline number no matter how well it does**, and the brain
+had been using "EUR is flat" as a strategic driver without that qualification.
+The 407,506 B data pool moves a **separate, non-combined** metric.
+
+**2. The "closed" bands were never exhausted — those were ATTEMPT counts, not
+populations.** Brain re-derived from `attempts.tsv` directly:
+
+```text
+   193-256: 267 attempts      321-376:  70
+   377-512:  66               513-1023: 16
+    >=1024:   1
+```
+
+204 and 161 fresh never-tried candidates sit behind the "closed" 193-256 B and
+321-376 B samples. **And the three largest bands hold 1,211,260 B dispatch-ready
+— 87% of the entire 1,389,500 B code pool — against 83 attempts between them.**
+`>=1024 B` has been attempted **once** in the whole ledger. **377-512 B appears
+in no prior band recap at all.**
+
+PR #1596 left the ship rate **blank** for all three rather than extrapolate from
+83 attempts — correct, and consistent with `band-rate-vintage.md`, where a
+same-band resample collapsed 27.6% to 0/60. It also corrected the item's own
+premise (**ITCM has zero data symbols**; the Windows bug's hidden pool was 100%
+overlay data) and the brain's "~220,000 B hidden" figure (true delta
+**+241,590 B**). Its critic pass named its own weakest-provenance figure.
+
+**Strategic consequence, and it is a real pivot.** The campaign spent months
+believing the code frontier was mapped and mostly closed. It is not: it is
+**barely sampled above 376 B**. `cm-377-512-probe` is seeded as a
+pre-registered n=20 probe into the largest *reachable* untried band, and
+`q-large-band-reachability` tests whether the toolchain can even feed those
+bands — `m2c_feed.py`'s `find_object()` globs **only** `_dsd_gap@*.o` (brain
+verified, around line 373) and may be structurally blind to the ~10,000
+per-source delink objects. If so, the 83 attempts are a **tooling artefact**,
+not a verdict on difficulty.
+
+⚠️ **Control 12 NOT executable, fifth consecutive round** — both lanes run
+outside Claude Code and Codex. Every finding above is git- and tool-derived.
+
+<!-- main-sha: 81c879c13 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

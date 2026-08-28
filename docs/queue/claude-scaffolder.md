@@ -2430,3 +2430,71 @@ after a `--clean` run.
 ONE PR; verify every number against `git diff --stat` **including the batch
 count** — last round's body miscounted its own batches; `python
 tools/work_queue.py done claude-scaffolder cm-verified-neighbor-drain`.
+
+### cm-377-512-probe — the first real probe into the band nobody has tried [TODO]
+
+**The ports are done.** After `cm-verified-neighbor-drain` (PR #1597) the
+byte-identical pool is **17 USA / 18 JPN rows** — down from 524. USA and JPN
+both sit at **15.85%**, EUR at **17.27%**. There is no derivative work left;
+from here the only thing that moves any region is EUR itself.
+
+`q-eur-next-frontier` (PR #1596) then showed the frontier was never closed —
+it was **under-sampled**. Brain verified the ledger directly:
+
+```text
+   193-256: 267 attempts      321-376:  70
+   377-512:  66               513-1023: 16
+    >=1024:   1
+```
+
+**The three largest bands hold 1,211,260 B dispatch-ready — 87% of the entire
+1,389,500 B code pool — against 83 logged attempts between them.** `>=1024 B`
+has been attempted **once** in the whole ledger. **377-512 B does not appear in
+any prior band recap at all.**
+
+Read `docs/research/campaign-analytics/eur-next-frontier.md` in full first. It
+is the specification and it already did the census — **do not re-derive it**.
+
+**Scope: n=20 at 377-512 B**, drawn from the unattempted population, full
+2-4-iteration protocol, `attempts` column populated, **both results ledgered**.
+This is a probe to find out whether the band is live, not a drain.
+
+**Thresholds, pre-registered — write them down before you start and do not move
+them:** `>=25%` the band is live and this becomes the campaign's main line;
+`<=10%` closed, record it in the wall catalog with the evidence; `10-25%`
+marginal, report it as such. **Do not adjust the sample or the thresholds to
+reach a number.** Every band probe this campaign has run has been trustworthy
+because nobody did, and PR #1596 held that line by leaving three ship rates
+**blank** rather than extrapolating from 83 attempts.
+
+⚠️ **Expect this to be harder than the small bands, and do not read difficulty
+as failure.** Larger functions have more registers live across more branches;
+the historical prior is poor. **A clean null here is a genuinely valuable
+result** — it would mean the 1.2 MB is not reachable by the current method and
+the campaign needs a different one, which is worth knowing definitively rather
+than assuming in either direction.
+
+⚠️ **Watch the vintage rule.** `docs/research/band-rate-vintage.md`: sweep-7
+measured 193-256 B at 27.6%, and a disjoint sample of the identical band later
+returned **0/60**. Your 20 are evidence about *your* 20 and the population you
+drew them from — say what that population was and how you sampled it.
+
+⚠️ **If `m2c_feed.py` cannot produce a candidate**, record it as a
+**tooling blocker, not a match failure**, and keep it out of your ship-rate
+denominator. The other lane is measuring exactly that this round
+(`find_object` globs only `_dsd_gap@*.o` and may be blind to per-source delink
+objects). Say how many of your 20 you lost to it, if any.
+
+**DO NOT USE SUB-AGENTS.** They share this worktree rather than getting isolated
+copies, so parallel writers corrupt `src/`, `config/` and the git index; the
+compiler serialises machine-wide. Single-threaded.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, `gate3.py --scope tests`. Use `tee`, never `tail`.
+**If the round ships zero, say so** and note the invariant correctly refuses a
+vacuous pass. `git restore assets/` after each clean run.
+
+ONE PR; verify every number against `git diff --stat` including the arithmetic
+and the attempt count; `python tools/work_queue.py done claude-scaffolder
+cm-377-512-probe`.

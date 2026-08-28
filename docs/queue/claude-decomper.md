@@ -2490,3 +2490,79 @@ annotated with its reproducing command **and its derivation date**. Build-free.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-eur-next-frontier`; then report
 QUEUE-EMPTY honestly if you reach it.
+
+### q-large-band-reachability — can the toolchain even feed a large function? [TODO]
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+`q-eur-next-frontier` (PR #1596) established that the three largest bands hold
+**1,211,260 B — 87% of the code pool — against 83 logged attempts**, and that
+`>=1024 B` has been attempted **once** in the entire ledger. The obvious reading
+is that nobody has tried. **There is a second possible reading nobody has
+tested: that the tooling cannot produce candidates there at all.**
+
+**The specific suspicion, brain-verified as far as reading the source goes.**
+`tools/m2c_feed.py`'s `find_object()` (around line 363) resolves a function's
+defining object by globbing **only** `_dsd_gap@*.o`:
+
+```python
+primary = sorted(delinks.glob(f"_dsd_gap@{module}_*.o"))
+rest = [Path(p) for p in sorted(delinks.glob("_dsd_gap@*.o")) if p not in primary]
+```
+
+and raises when a function is not found in one of those. The project also builds
+**per-source delink objects** — on the order of 10,000 of them — which that glob
+never sees. If large functions disproportionately live in per-source objects
+rather than gap objects, then **the feed is structurally blind to them** and the
+83-attempt count is a tooling artefact rather than a judgement about difficulty.
+
+**That is a hypothesis, not a finding. Test it, and be willing to kill it.**
+
+**Deliverable:**
+
+1. **Per band, what fraction of candidates can `m2c_feed.py` actually resolve?**
+   Do not run the compiler — determine reachability from the object inventory
+   and `find_object`'s own rule. Report coverage per band, with counts and
+   bytes.
+2. **Is the pattern size-dependent?** The hypothesis only bites if large
+   functions are *more* likely to sit in per-source objects. If coverage is flat
+   across bands, the hypothesis is **dead** and the 83 attempts really do just
+   mean nobody tried — **say so plainly; that is an equally useful answer.**
+3. **If the feed is blind to a material share**, scope what closing it would
+   take — is it a glob widening, or does the per-source object layout break an
+   assumption further down the pipeline? Do not implement it.
+4. **Cross-check against the ledger.** Of the 83 logged attempts in those three
+   bands, how many came from gap objects? If all 83 did, that is corroboration.
+
+⚠️ **Do not fix `m2c_feed.py` in this PR.** It is on the toolchain lane's
+critical path this round and a change there could invalidate their probe
+mid-flight. Scope it for the brain instead.
+
+⚠️ **Blank is not zero, and do not recommend a direction.** State every
+population size and every exclusion. PR #1596 set the standard by leaving three
+ship rates blank rather than extrapolating from 83 attempts — hold that line.
+
+**CANARY.** Before surveying all seven bands, take the **one** `>=1024 B`
+attempt that exists in `attempts.tsv` and determine how its candidate was
+produced. That single row is the only direct evidence in the campaign about
+whether the large-band path works at all. If you cannot determine its
+provenance, STOP and report that — it would mean the ledger cannot answer
+questions about its own rows, which is a finding in itself.
+
+**SUB-AGENTS ARE PERMITTED AND ENCOURAGED, WITH TWO HARD RULES.** One worker per
+band for the coverage survey, then a synthesis pass on common units, then a
+critic pass asking whether the coverage metric itself is measuring the right
+thing. **Rule one: sub-agents must be READ-ONLY** — they share this worktree,
+not isolated copies. You do all writing, committing and git operations.
+**Rule two: no sub-agent runs a build, `ninja`, or a region gate.**
+Single-threaded is fine too. **Verify your workers rather than relaying them** —
+you set that standard yourself with the brief-435 spot-check in PR #1592.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
+annotated with its reproducing command and derivation date. Build-free.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-large-band-reachability`; then report
+QUEUE-EMPTY honestly if you reach it.
