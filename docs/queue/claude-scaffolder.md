@@ -2213,7 +2213,7 @@ log. `git restore assets/` if a `--clean` run deletes the heatmap SVGs.
 ONE PR; verify every number against `git diff --stat` before writing the body;
 `python tools/work_queue.py done claude-scaffolder cm-port-drain-jpn`.
 
-### cm-port-exact-name-unlock — the 49-candidate blocker #1586 found, fixed and banked [TODO]
+### cm-port-exact-name-unlock — the 49-candidate blocker #1586 found, fixed and banked [CLAIMED]
 
 `q-port-refusal-taxonomy` (#1586) did the analysis this item acts on. Read
 `docs/research/campaign-analytics/port-refusal-taxonomy.md` in full first — it is
