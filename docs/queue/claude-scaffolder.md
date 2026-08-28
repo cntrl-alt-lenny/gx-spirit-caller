@@ -2361,7 +2361,7 @@ second, each after the commit it describes has landed.
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-verified-neighbor-tranche`.
 
-### cm-verified-neighbor-drain — the ceiling comes off [TODO]
+### cm-verified-neighbor-drain — the ceiling comes off [CLAIMED]
 
 `cm-verified-neighbor-tranche` (PR #1594) was written as a falsification test and
 **the signal did not fail**: 95 ports across **9** consecutive gated batches
