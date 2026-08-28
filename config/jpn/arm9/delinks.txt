@@ -5355,7 +5355,7 @@ src/jpn/main/func_02048e60.c:
     complete
     .text start:0x02048e60 end:0x02048e90
 
-src/jpn/main/func_02048e90.s:
+src/jpn/main/func_02048e90.legacy_sp3.c:
     complete
     .text start:0x02048e90 end:0x02048f24
 src/jpn/main/func_02048f24.c:
@@ -5408,10 +5408,10 @@ src/jpn/main/func_020495e8.legacy.c:
 src/jpn/main/func_02049610.s:
     complete
     .text start:0x02049610 end:0x0204969c
-src/jpn/main/func_0204969c.s:
+src/jpn/main/func_0204969c.legacy_sp3.c:
     complete
     .text start:0x0204969c end:0x02049734
-src/jpn/main/func_02049734.s:
+src/jpn/main/func_02049734.c:
     complete
     .text start:0x02049734 end:0x02049850
 src/jpn/main/func_02049850.c:
