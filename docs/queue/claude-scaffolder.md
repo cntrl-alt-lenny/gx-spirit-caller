@@ -2143,7 +2143,7 @@ artifact your content invalidates.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-restock-carve-15`.
 
-### cm-port-drain-jpn — the same drain, JPN side, with the machine to yourself [TODO]
+### cm-port-drain-jpn — the same drain, JPN side, with the machine to yourself [CLAIMED]
 
 **Status: re-issued. You did not fail this last round — the schedule did.** Your
 worktree still holds your claim commit and one accepted port,
