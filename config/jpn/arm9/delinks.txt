@@ -12793,7 +12793,7 @@ src/jpn/main/func_020a650c.c:
     complete
     .text start:0x020a650c end:0x020a6520
 
-src/jpn/main/func_020a6520.s:
+src/jpn/main/func_020a6520.legacy.c:
     complete
     .text start:0x020a6520 end:0x020a65b0
 libs/nitro/func_020a66a4.legacy.c:
