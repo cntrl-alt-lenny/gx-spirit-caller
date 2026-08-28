@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**150 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**151 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (73)
+- [Uncategorised](#uncategorised) (74)
 
 ## Analysis / worklist
 
@@ -622,6 +622,12 @@ measure each permutation against the ground truth.
 **whole-function-as-data emitter (brief 578).**
 
 WHY THIS EXISTS --------------- `batch_carve.py` only carves FUNCTIONS: its `--whole-function` strategy (`asm_escape.py --whole-function`) disassembles the original bytes into ARM/Thumb instructions and re-emits them as a `.s` TU, then g…
+
+### `tools/eur_frontier_census.py`
+
+**READ-ONLY census: what remains of the EUR code frontier, by size band,**
+
+at current pool state (q-eur-next-frontier).
 
 ### `tools/export_matched_pairs.py`
 
