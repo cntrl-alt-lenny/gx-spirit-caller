@@ -2085,3 +2085,77 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-port-refusal-taxonomy`; then report
 QUEUE-EMPTY honestly if you reach it.
 
+
+### q-fingerprint-promotion-evidence — is the 95.3% MEDIUM wall real, or just unmeasured? [TODO]
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round. This is a hard
+constraint, not a preference — see round 0827, where two toolchain-bound lanes
+cost one of them its entire round.
+
+`q-port-refusal-taxonomy` (#1586) found that **348 of 365 USA refusals (95.3%)**
+are blocked by at least one same-size, no-relocation reference that the
+fingerprint matcher can only place at MEDIUM or below, and judged this "very
+likely intentional conservatism... **not recommended for a fix**". That
+judgement is probably right and it was made honestly. **But it was a judgement,
+not a measurement**, and it is load-bearing: it is the difference between
+"~60 KB per region is permanently dead" and "~60 KB is reachable". Nobody has
+tested it.
+
+**The question, stated so it can come back either way:** does any signal exist
+that separates a CORRECT sibling resolution from an INCORRECT one, beyond the
+size-and-relocation fingerprint already used?
+
+**You now have a large labelled set, which is why this is answerable today and
+was not before.** 566 ports shipped across #1584 (283 USA) and #1587 (283 JPN),
+every one ROM-gate-verified — those are **known-correct** resolutions. The
+known-wrong side is documented: the wrong-sibling class in briefs 673/676, and
+the placeholder-twin recurrence `q-port-residual-fix` (#1462) fixed. Build the
+labelled set from committed artifacts and say exactly how you constructed it.
+
+**Candidate signals to test — these are suggestions, not a checklist. Add your
+own and say which you rejected and why:** position in the call graph
+(`relocs.txt` gives real edges — `cm-restock-carve-10` established they are
+reloc-driven, not source-state-driven); containing-TU / delink-object identity;
+whether immediate neighbours in the address space are already confidently
+resolved; symbol-name evidence from the EUR side; access widths at reader sites.
+
+**The deliverable is a measurement, not a fix.** For each signal: how many of
+the 566 known-correct resolutions it would have ranked correctly, how many
+known-wrong cases it would have caught, and its false-positive rate. **If no
+signal separates them, say so plainly — that closes the question permanently
+and is a genuinely valuable result.** A clean null here is worth as much as a
+positive, and this campaign has published several.
+
+⚠️ **Do not implement a promotion, do not touch `port_to_region.py`, and do not
+recommend a direction.** You are costing an option, not exercising it. A tool
+that promotes on an unvalidated signal would silently ship wrong code into a
+region — the exact class briefs 673/676 exist to prevent.
+
+⚠️ **Blank is not zero and an estimate is not a fact.** State the size of every
+population you compute over, and how many rows you excluded. #1559 set that
+precedent.
+
+⚠️ **The other lane is changing `resolve_symbol` this round** (adding an
+exact-name lookup, `cm-port-exact-name-unlock`). Your labelled set comes from
+already-committed ports so it is stable, but any refusal-set snapshot you take
+will move under you — timestamp it and mark it provisional.
+
+**SWARM GUIDANCE — this item is a good fit and here is the safe shape.** The
+work partitions naturally: one worker per candidate signal, each measuring
+against the same labelled set, then a synthesis pass that compares them on
+common metrics. Two hard rules: **(1) sub-agents must be READ-ONLY.** They share
+this worktree — they do not get isolated copies — so parallel writers corrupt
+each other. You do the writing, the committing, and every git operation
+yourself. **(2) No sub-agent runs a build, `ninja`, or a region gate**, for the
+same machine-wide reason above. If you would rather work it single-threaded,
+that is entirely fine — the measurement is what matters, not the parallelism.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
+annotated with its reproducing command. Build-free; `gate3.py --scope tests`
+only if you want the invariants.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-fingerprint-promotion-evidence`;
+then report QUEUE-EMPTY honestly if you reach it.

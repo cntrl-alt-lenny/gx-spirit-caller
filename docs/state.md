@@ -676,7 +676,7 @@ Codex Scaffolder additionally produced **nothing** this round — branch created
 on this Mac for 2026-08-18, so that lane's cause is **unread, not diagnosed**.
 Both Codex queues are now **three items deep**.
 
-**Last updated:** 2026-08-27 — **(Windows PC, brain=Opus 5; two lanes only,
+**Round 0827 (2026-08-27, Windows PC, brain=Opus 5; two lanes only,
 both run outside Claude Code and Codex.) Round 0827: the port lane delivered the
 largest single-round regional gain the campaign has recorded — USA natural-C
 11.84% -> 13.43% off 283 mechanical ports — and the second lane produced nothing
@@ -758,7 +758,87 @@ that introduces the change**. The brain regenerates it in the follow-up doc PR
 each round, which works but silently costs a round-trip. Worth a real fix (drop
 the SHA column, or resolve it post-merge) rather than continuing to absorb it.
 
-<!-- main-sha: 97bdb5158 -->
+**Last updated:** 2026-08-28 — **(Windows PC, brain=Opus 5; two lanes, moving to
+Claude Sonnet 5 at `xhigh` effort.) Round 0828: the scheduling fix worked — both
+lanes delivered. JPN natural-C 11.82% -> 13.41%, which brings the two derived
+regions level with each other, and the analysis lane found a concrete ~15 KB
+unlock nobody had scoped.**
+
+Merged **#1586** and **#1587**. `main` at `7bf1e5ae8`.
+
+| region | before | after |
+|---|---|---|
+| EUR | 17.27% | 17.27% |
+| USA | 13.43% | 13.43% |
+| JPN | **11.82%** | **13.41%** |
+
+Two rounds of ports have closed most of the regional gap: USA and JPN are now
+within 0.02 points of each other against EUR's 17.27%.
+
+**The one-toolchain-lane rule worked and should stay.** Round 0827 lost a whole
+lane to contention; this round both lanes delivered, with the build-free lane
+producing the more valuable PR. Keep pairing one toolchain-bound lane with one
+build-free lane.
+
+**#1587 — 283 JPN ports at 43.3%, against USA's 43.5%.** Brain verified 283 `.c`
+added / 283 `.s` deleted, zero `src/usa/` paths, invariant 283/283/283,
+dup-scan clean, own `gate3.py --scope all --clean` with all three SHA1 PASS
+lines captured. **The two regions agreeing to within 0.2 points retroactively
+validates the floor-rule sampling method** as a way to forecast port yield.
+
+⚠️ **A brain instruction caused a real incident.** The kickoff told the lane to
+preserve the previous round's stranded `func_0200ab94.c` across the checkout.
+That file was a `.c` sitting beside its **still-routed** `.s` — delinks was never
+flipped — which collides in ninja (`multiple rules generate .../func_0200ab94.o`)
+and **silently blocked the ENTIRE JPN harvest region before any candidate was
+attempted** (first run: 0 ported, `tool_errors: 1`). The lane diagnosed it,
+reverted the file, and the harvest re-ported that same function cleanly inside
+its normal run. **Rule: a half-applied port is completed or reverted, never
+preserved half-flipped.**
+
+**#1586 — the taxonomy, and the more valuable PR of the two.** It answered its
+question in both directions honestly: the 365 USA refusals do **not** cluster on
+a few symbols (264 distinct blockers, largest touching 10), but **348/365
+(95.3%)** share one mechanism — a same-size, no-relocation reference the
+fingerprint matcher can only place at MEDIUM. It explicitly recommended **not**
+weakening that conservatism, which guards the wrong-sibling class of briefs
+673/676.
+
+**The headline finding, brain-verified independently.** `resolve_symbol` never
+checks whether the target region's own `symbols.txt` **already names a symbol
+identically** before falling back to structural fingerprinting:
+
+```text
+config/eur/arm9/symbols.txt:3506:OS_DisableIrq kind:function(arm,size=0x14) addr:0x020937a4
+config/usa/arm9/symbols.txt:3506:OS_DisableIrq kind:function(arm,size=0x14) addr:0x020936bc
+config/jpn/arm9/symbols.txt:3506:OS_DisableIrq kind:function(arm,size=0x14) addr:0x020936bc
+```
+
+Committed ground truth, unread. **49 USA candidates (7,692 B) refuse solely on
+this**, 38 more (6,156 B) partially, and JPN reproduces at ~50 / 8,120 B. Plus
+two small bugs: a comment-parsing false positive in `parse_symbols_in_source`
+(the bug class `q-invariants-green` already fixed elsewhere and never applied
+here) and a `find_region_siblings.load_region()` ITCM coverage gap.
+
+**Brain ran control 7 rather than trusting the new tests.** Mutating the
+sole-blocker predicate in `tools/port_refusal_taxonomy.py` turned exactly one of
+the 17 tests red — the suite is real, not decorative.
+
+⚠️ **Control 12 still NOT executable** — both lanes ran outside Claude Code and
+Codex, so no transcript exists on any host. Second consecutive round. All
+findings git-derived.
+
+**Roster change, and the kickoffs were re-tuned for it.** Both lanes move to
+**Claude Sonnet 5** on Ultracode. Two changes adopted: effort tier raised from
+`high` to **`xhigh`** (documented as the best setting for coding/agentic work
+and Claude Code's own default; effort matters more on this generation than
+prior models in its tier), and **sub-agent fan-out permitted in the build-free
+lane only**. The port lane forbids it explicitly: sub-agents share the lane's
+worktree rather than getting isolated copies, so parallel writers corrupt the
+tree, and the compiler serialises machine-wide, so parallel builders would
+recreate round 0827's contention failure inside a single lane.
+
+<!-- main-sha: 7bf1e5ae8 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
