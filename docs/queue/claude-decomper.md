@@ -2086,7 +2086,44 @@ tools/work_queue.py done claude-decomper q-port-refusal-taxonomy`; then report
 QUEUE-EMPTY honestly if you reach it.
 
 
-### q-fingerprint-promotion-evidence — is the 95.3% MEDIUM wall real, or just unmeasured? [TODO]
+### q-fingerprint-promotion-evidence — is the 95.3% MEDIUM wall real, or just unmeasured? [DONE]
+
+**Result (this PR):** built `tools/fingerprint_signal_evidence.py`
+(read-only, build-free). Labelled set: 7,774 known-correct resolutions
+(from 7,808 already-ROM-gate-verified ports, 32 dropped as unresolved
+fingerprint-collisions in this reconstruction — including an independent
+rediscovery, with zero prior knowledge, of the exact `func_0209bb60`/
+`func_0209bc20` pair brief 673 already proved wrong) + 2 hand-verified
+known-wrong historical incidents (briefs 673/675, 4 rows across USA/JPN).
+**The judgement was half right.** `call_graph` (18.1% coverage) and
+`exact_name` (1.1% coverage) confirm there's no hidden abundance of
+untapped fingerprint evidence — but `verified_neighbor` (the existing D2
+v2 idea, rebuilt on PROVEN neighbor mappings instead of `find_siblings`'
+own unverified guess) covers **98.7% of the hard/ambiguous population at
+100% accuracy (2,960/2,960)**, holds at the strictest zero-reloc threshold
+(16/16), and correctly predicts the true answer on **all 4 known-wrong
+rows** — reproducing by measurement what the briefs did by hand.
+`cross_region_agreement` is a clean NULL: it says "agree" on 100% of
+BOTH the known-correct (2998/2998) and known-wrong (4/4) sets, so it
+carries zero discriminative information (both regions get fooled
+identically). Applied to the CURRENT live USA/JPN refusal population,
+`verified_neighbor` predicts confidently on ~95.5% of distinct blockers;
+9 of those (identical in both regions) disagree with the tool's current
+best guess, and one — `Copy32` — is independently confirmed via committed
+`symbols.txt` to be a case where `verified_neighbor` is right and the
+current fingerprint pick is wrong, which also **corrects**
+`q-port-refusal-taxonomy`'s Finding 3 (`Copy32` isn't a same-address
+"needs a rename" case; its fingerprint-picked address was a same-size
+decoy). 0 errors in 2,964 trials bounds the true error rate at ≤~0.1%
+(rule of three) — not proof of zero, and the known-wrong sample (n=2
+incidents) is too small to bound false positives with real statistical
+confidence on its own; both caveats stated explicitly. No promotion
+implemented, no direction recommended, per the item's own instruction.
+Full measurement, every reproducing command, and the 7-pair unvalidated
+collision list:
+[`docs/research/campaign-analytics/fingerprint-signal-evidence.md`](../research/campaign-analytics/fingerprint-signal-evidence.md).
+
+**Original brief text below, preserved for context:**
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round. This is a hard
