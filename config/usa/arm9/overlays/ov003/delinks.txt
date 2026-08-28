@@ -98,7 +98,7 @@ src/usa/overlay003/func_ov003_021cea48.s:
 src/usa/overlay003/func_ov003_021ceae8.s:
     complete
     .text start:0x021ceae8 end:0x021cecbc
-src/usa/overlay003/func_ov003_021cecbc.s:
+src/usa/overlay003/func_ov003_021cecbc.c:
     complete
     .text start:0x021cecbc end:0x021ced78
 src/usa/overlay003/func_ov003_021ced78.c:
