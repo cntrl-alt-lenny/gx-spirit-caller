@@ -52,7 +52,21 @@ from port_to_region import (  # noqa: E402
     load_region_data_symbol_kinds,
     load_region_data_symbols,
     resolve_symbol,
+    verified_neighbor_signal,
 )
+
+# verified_neighbor_signal imported from port_to_region, NOT duplicated here
+# (cm-verified-neighbor-drain, reversing cm-verified-neighbor-tranche's
+# earlier "keep two copies, this one is frozen evidence" call — FLOOR_RANK's
+# own two copies had already drifted once before that precedent, and it cut
+# the same way here). This file's two call sites below adapt to
+# port_to_region's canonical (eur_addr, module, eur_regions, ...) signature
+# by wrapping their pre-sliced per-module list in a single-key
+# {module: [...]} dict -- `eur_regions.get(module, [])` inside the canonical
+# function then returns exactly that list back out, so this is a pure
+# calling-convention adapter, not an algorithm change. Verified
+# before/after on the same tree: identical hard-population accuracy
+# (2,974/2,974) and identical known-wrong accuracy (4/4).
 
 CALL_KINDS = ("arm_call", "arm_call_thumb")
 DATA_KINDS = ("load",)
@@ -187,52 +201,6 @@ def call_graph_signal(
     }
 
 
-def verified_neighbor_signal(
-    eur_module: str,
-    eur_addr: int,
-    eur_functions_sorted: list,
-    verified_region_index: dict[tuple[str, int], int],
-    *,
-    n_neighbors: int = 5,
-    search_radius: int = 30,
-    min_agreement: int = 3,
-) -> tuple[int | None, list[int]]:
-    """The D2 v2 neighbor-shift-consensus idea, rebuilt on GROUND TRUTH
-    neighbors (`verified_region_index`, from already-shipped ports) instead
-    of `find_siblings`' own unverified top-guess for each neighbor (which
-    `port_to_region.py`'s existing `compute_neighbor_shift_consensus` uses
-    — that function calls `find_siblings` again per neighbor, so a
-    neighbor that is ITSELF ambiguous silently pollutes the consensus).
-    Returns (predicted_target_addr, sampled_shifts) — mirrors that
-    function's return shape for direct comparison. `eur_functions_sorted`
-    must be the module's function list sorted by address (rank order)."""
-    pivot = next((i for i, f in enumerate(eur_functions_sorted)
-                  if f.addr == eur_addr), None)
-    if pivot is None:
-        return None, []
-    shifts: list[int] = []
-    for delta in range(1, search_radius + 1):
-        for sign in (1, -1):
-            idx = pivot + sign * delta
-            if idx < 0 or idx >= len(eur_functions_sorted):
-                continue
-            neighbor = eur_functions_sorted[idx]
-            tgt = verified_region_index.get((eur_module, neighbor.addr))
-            if tgt is None:
-                continue
-            shifts.append(tgt - neighbor.addr)
-            if len(shifts) >= n_neighbors:
-                break
-        if len(shifts) >= n_neighbors:
-            break
-    if len(shifts) < min_agreement:
-        return None, shifts
-    most_common, count = Counter(shifts).most_common(1)[0]
-    if count >= min_agreement:
-        return eur_addr + most_common, shifts
-    return None, shifts
-
-
 def exact_name_signal(eur_name: str, target_name_index: dict[str, int]) -> int | None:
     """A named (non-placeholder) EUR symbol whose exact name is already
     committed in the target region's own symbols.txt — ground truth, not a
@@ -351,7 +319,8 @@ def evaluate_row(
     cg_pred = cg["predicted"][1] if cg["predicted"] else None
 
     vn_pred, vn_shifts = verified_neighbor_signal(
-        module, eur_addr, eur_functions_sorted, verified_region_target_index)
+        eur_addr, module, {module: eur_functions_sorted},
+        verified_region_target_index)
     vn_pred_valid = vn_pred if vn_pred in candidates else None
 
     name_pred = exact_name_signal(eur_name, target_name_index) if eur_name else None
@@ -434,7 +403,7 @@ def evaluate_live_refusals(
         if fn is None:
             continue
         vn_pred, vn_shifts = verified_neighbor_signal(
-            mod, addr, eur_sorted[mod], verified_index[target])
+            addr, mod, {mod: eur_sorted[mod]}, verified_index[target])
         current = resolve_symbol(
             SymbolRef(text=b["text"], kind="func", module=mod, addr=addr),
             target, eur, target_regions[target], target_data, find_siblings,

@@ -161,12 +161,20 @@ class TestCallGraphSignal(unittest.TestCase):
 
 
 class TestVerifiedNeighborSignal(unittest.TestCase):
-    def _eur_sorted(self):
+    """verified_neighbor_signal is imported from port_to_region (not
+    duplicated here — cm-verified-neighbor-drain unified the two prior
+    copies), so this exercises the SAME implementation resolve_symbol
+    calls, just through this file's own {module: [...]} adapter shape at
+    its two call sites (see the import comment in
+    fingerprint_signal_evidence.py). Canonical signature:
+    (eur_addr, module, eur_regions, verified_index, ...)."""
+
+    def _eur_regions(self):
         addrs = [0x1000, 0x1040, 0x1080, 0x10c0, 0x1100, 0x1140, 0x1154, 0x1180]
-        return [_FakeFunc(addr=a, rank=i) for i, a in enumerate(addrs)]
+        return {"main": [_FakeFunc(addr=a, rank=i) for i, a in enumerate(addrs)]}
 
     def test_consensus_shift_predicts_target(self):
-        eur_sorted = self._eur_sorted()
+        eur_regions = self._eur_regions()
         # 3 verified neighbors all shift by +8, nothing for the pivot itself.
         verified = {
             ("main", 0x1000): 0x1008,
@@ -174,38 +182,38 @@ class TestVerifiedNeighborSignal(unittest.TestCase):
             ("main", 0x1080): 0x1088,
         }
         pred, shifts = verified_neighbor_signal(
-            "main", 0x10c0, eur_sorted, verified,
+            0x10c0, "main", eur_regions, verified,
             n_neighbors=3, min_agreement=3,
         )
         self.assertEqual(pred, 0x10c8)
         self.assertEqual(len(shifts), 3)
 
     def test_no_consensus_below_min_agreement_abstains(self):
-        eur_sorted = self._eur_sorted()
+        eur_regions = self._eur_regions()
         verified = {("main", 0x1000): 0x1008}  # only 1 sample
         pred, shifts = verified_neighbor_signal(
-            "main", 0x10c0, eur_sorted, verified,
+            0x10c0, "main", eur_regions, verified,
             n_neighbors=5, min_agreement=3,
         )
         self.assertIsNone(pred)
 
     def test_disagreeing_shifts_abstain(self):
-        eur_sorted = self._eur_sorted()
+        eur_regions = self._eur_regions()
         verified = {
             ("main", 0x1000): 0x1008,
             ("main", 0x1040): 0x1050,   # different shift
             ("main", 0x1080): 0x10a0,   # different shift again
         }
         pred, shifts = verified_neighbor_signal(
-            "main", 0x10c0, eur_sorted, verified,
+            0x10c0, "main", eur_regions, verified,
             n_neighbors=3, min_agreement=3,
         )
         self.assertIsNone(pred)
 
     def test_pivot_not_found_abstains(self):
-        eur_sorted = self._eur_sorted()
+        eur_regions = self._eur_regions()
         pred, shifts = verified_neighbor_signal(
-            "main", 0xdeadbeef, eur_sorted, {},
+            0xdeadbeef, "main", eur_regions, {},
         )
         self.assertIsNone(pred)
         self.assertEqual(shifts, [])
@@ -213,10 +221,10 @@ class TestVerifiedNeighborSignal(unittest.TestCase):
     def test_only_same_module_neighbors_considered(self):
         # verified_region_index keys are (module, addr) -- a same-address
         # entry under a DIFFERENT module must not be picked up.
-        eur_sorted = self._eur_sorted()
+        eur_regions = self._eur_regions()
         verified = {("ov002", 0x1000): 0x9999}
         pred, shifts = verified_neighbor_signal(
-            "main", 0x10c0, eur_sorted, verified, min_agreement=1,
+            0x10c0, "main", eur_regions, verified, min_agreement=1,
         )
         self.assertIsNone(pred)
         self.assertEqual(shifts, [])
