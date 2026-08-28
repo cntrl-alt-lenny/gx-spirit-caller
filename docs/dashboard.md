@@ -16,8 +16,8 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
 | eur | 412,102 | **17.27%** | 4,420 | 17.46% |
-| usa | 337,556 | **14.15%** | 2,780 | 14.27% |
-| jpn | 335,548 | **14.07%** | 2,788 | 14.19% |
+| usa | 377,920 | **15.85%** | 2,924 | 15.97% |
+| jpn | 377,920 | **15.85%** | 2,932 | 15.97% |
 
 ## Trend: EUR natural-C over time
 
@@ -78,9 +78,10 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `97bdb5158` | 2026-08-27 | 412,102 | 17.27% | +0 |
 | `7bf1e5ae8` | 2026-08-28 | 412,102 | 17.27% | +0 |
 | `1afa974be` | 2026-08-28 | 412,102 | 17.27% | +0 |
-| `282a7d66e` | 2026-08-28 | 412,102 | 17.27% | +0 |
+| `edaf46ae0` | 2026-08-28 | 412,102 | 17.27% | +0 |
+| `e5de8cd03` | 2026-08-28 | 412,102 | 17.27% | +0 |
 
-54 points, one per commit that changed `docs/state-table.md` (oldest first).
+55 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 

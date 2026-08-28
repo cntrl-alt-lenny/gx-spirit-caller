@@ -1,0 +1,58 @@
+/* func_ov010_021b45a8: get a threshold n from func_ov005_021ac8c0; if
+ * positive, compute a velocity v via func_020b377c. Bail early unless
+ * a global mode field is 2, and unless the remaining span (a1->f6-a1->f2)
+ * is >= n. If v already equals the cached field_e0, just set a status
+ * bit; otherwise re-target via func_ov010_021b3914 and dispatch
+ * func_020371b8 with the standard (id,-1,0,1) convention.
+ */
+
+typedef struct {
+    char _pad2[2];
+    short f2;
+    char _pad4[2];
+    short f6;
+} Arg1T;
+
+extern struct {
+    char _pad_12c[0x12c];
+    int field_12c;
+} data_ov010_021b90b4;
+
+typedef struct {
+    int field_0;
+    int field_4;
+    char _pad_84[0x84 - 8];
+    char at_84[1];
+    char _pad_e0[0xe0 - 0x84 - 1];
+    int field_e0;
+    char _pad_220[0x220 - 0xe0 - 4];
+    int field_220;
+} Data9260;
+extern Data9260 data_ov010_021b9160;
+
+extern int func_ov005_021ac8c0(int h);
+extern int func_020b377c(int a, int b);
+extern void func_ov010_021b3914(void *p, int v);
+extern int func_020371b8(int a, int b, int c, int d);
+
+void func_ov010_021b45a8(int a0, Arg1T *a1) {
+    Data9260 *d = &data_ov010_021b9160;
+    int n = func_ov005_021ac8c0(data_ov010_021b90b4.field_12c);
+    int v = 0;
+
+    if (n > 0) {
+        v = func_020b377c(a1->f2 - 0x24, n);
+    }
+
+    if (d->field_4 != 2) return;
+    if ((a1->f6 - a1->f2) < n) return;
+
+    if (v == d->field_e0) {
+        d->field_220 |= 0x10;
+        return;
+    }
+
+    func_ov010_021b3914(d->at_84, v);
+    d->field_0 = a0;
+    func_020371b8(0x38, 0x38 - 0x39, 0, 1);
+}

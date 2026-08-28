@@ -200,7 +200,7 @@ src/usa/overlay015/ov015_021b3f28.c:
 src/usa/overlay015/func_ov015_021b3f44.s:
     complete
     .text start:0x021b3f44 end:0x021b4184
-src/usa/overlay015/func_ov015_021b4184.s:
+src/usa/overlay015/func_ov015_021b4184.c:
     complete
     .text start:0x021b4184 end:0x021b4290
 src/usa/overlay015/func_ov015_021b4290.s:

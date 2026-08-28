@@ -12,7 +12,7 @@ src/usa/overlay020/func_ov020_021aa5ec.c:
     complete
     .text start:0x021aa5ec end:0x021aa620
 
-src/usa/overlay020/func_ov020_021aa620.s:
+src/usa/overlay020/func_ov020_021aa620.c:
     complete
     .text start:0x021aa620 end:0x021aa6cc
 src/usa/overlay020/func_ov020_021aa6cc.c:
