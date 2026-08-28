@@ -95,6 +95,7 @@ from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
 from cross_region_aliases import load_blocklist  # noqa: E402
+from progress import _strip_c_comments_and_literals  # noqa: E402
 from routing_suffixes import ROUTING_SUFFIXES, split_routing_suffix  # noqa: E402, F401
 
 
@@ -135,6 +136,28 @@ def is_placeholder_function_name(name: str) -> bool:
     return bool(_PLACEHOLDER_FUNC_RE.fullmatch(name))
 
 
+# port-refusal-taxonomy.md Finding 5 — ITCM is a small fixed-address code
+# block copied to a hardware-fixed address by every region's ARM9 crt0, NOT
+# an overlay-relocated module: extract/<region>/arm9/itcm.yaml's
+# base_address (0x01ff8000) and code_size (0x880) are byte-identical across
+# eur/usa/jpn (verified directly), so a single hardcoded half-open range is
+# safe here in a way it would not be for any overlay module. `SYMBOL_RE`'s
+# bare `func_<addr>` / `data_<addr>` forms carry no module qualifier and
+# used to default unconditionally to "main"; a reference whose address
+# falls in this range is routed to "itcm" instead so it can actually be
+# found in `eur_regions`/`target_regions` once loaded (see
+# find_region_siblings.load_region()'s matching fix).
+ITCM_ADDR_RANGE = (0x01FF8000, 0x01FF8880)
+
+
+def _addr_module(addr: int, default: str) -> str:
+    """Module for a bare (non-overlay-prefixed) SYMBOL_RE address match."""
+    lo, hi = ITCM_ADDR_RANGE
+    if lo <= addr < hi:
+        return "itcm"
+    return default
+
+
 # Filename validation — broader than SYMBOL_RE for source parsing.
 # Accepts the four address-keyed translation-unit conventions
 # decomper uses in this project (brief 065 wave 1 hit ~10 sources
@@ -172,13 +195,37 @@ class Resolution:
     eur_ref: SymbolRef
     target_name: str | None  # target region's symbol name; None if unresolved
     confidence: str          # 'HIGH', 'MEDIUM', 'LOW', 'NONE', 'EXACT_ADDR' or
-                             # 'SYNTHESIZED' (brief 526) for data
+                             # 'SYNTHESIZED' (brief 526) for data, or
+                             # 'EXACT_NAME' (port-refusal-taxonomy.md
+                             # Finding 2) for a func resolved via the
+                             # target's own committed symbols.txt name
     notes: str               # human-readable rationale
     # Brief 526 — set only when confidence == "SYNTHESIZED": the exact new
     # symbols.txt line the target region needs (structured, not re-parsed
     # from `notes`) plus the relative config/ path it belongs in.
     new_symbols_txt_line: str | None = None
     new_symbols_txt_path: str | None = None
+
+
+# Confidence-floor ranking, shared with port_refusal_taxonomy.py (which
+# imports this rather than keeping its own copy — the two dicts drifting
+# out of sync would silently misclassify whatever confidence tier the
+# drift affects). EXACT_ADDR / SYNTHESIZED (data) and EXACT_NAME (func,
+# port-refusal-taxonomy.md Finding 2) all rank HIGH-equivalent: each is a
+# committed, already-reviewed ground-truth lookup, not a fingerprint
+# guess, so none of them should ever be capped by a lower
+# --confidence-floor the way an actual fingerprint match would be.
+FLOOR_RANK = {
+    "HIGH": 3, "MEDIUM": 2, "LOW": 1, "NONE": 0,
+    "EXACT_ADDR": 3, "SYNTHESIZED": 3, "EXACT_NAME": 3,
+}
+# Data/func resolution mechanisms that are HIGH-equivalent ground truth
+# rather than a fingerprint match — see FLOOR_RANK's docstring above.
+# Provably redundant given FLOOR_RANK's own values (all rank 3, so they
+# can never appear in `failed` for any floor in {HIGH, MEDIUM, LOW}) —
+# kept as an explicit, self-documenting belt-and-suspenders filter rather
+# than relying on that arithmetic implicitly.
+GROUND_TRUTH_CONFIDENCES = ("EXACT_ADDR", "SYNTHESIZED", "EXACT_NAME")
 
 
 # --------------------------------------------------------------------------- #
@@ -384,9 +431,20 @@ def parse_symbols_in_source(
 
     Returns dict keyed by (kind, module, addr) → SymbolRef so duplicate
     references collapse to one resolution.
+
+    port-refusal-taxonomy.md Finding 4 — scans comment-and-literal-blanked
+    text (`_strip_c_comments_and_literals`, the same helper
+    `check_match_invariants.py` already uses for the identical problem: a
+    doc-comment abbreviating an overlay function's name by dropping its
+    `_ovNNN_` prefix, or naming another file by its bare stem, used to
+    parse as a phantom *separate* main-module reference that then failed
+    to resolve. Blanking (not deleting) keeps every match's text/offsets
+    identical to a raw scan of real code — only comment/string/char
+    content stops being scanned.
     """
+    scan_text = _strip_c_comments_and_literals(source_text)
     out: dict[tuple[str, str, int], SymbolRef] = {}
-    for m in SYMBOL_RE.finditer(source_text):
+    for m in SYMBOL_RE.finditer(scan_text):
         text = m.group(0)
         kind = m.group("kind")
         overlay = m.group("overlay")
@@ -394,15 +452,16 @@ def parse_symbols_in_source(
         if overlay is not None:
             module = "ov" + overlay.zfill(3)
         else:
-            # Bare symbol — defaults to main-module reference
-            # regardless of referrer module.
-            module = "main"
+            # Bare symbol — defaults to main-module reference regardless
+            # of referrer module, EXCEPT the small fixed ITCM address
+            # range (Finding 5 — see `_addr_module`).
+            module = _addr_module(addr, "main")
         key = (kind, module, addr)
         if key not in out:
             out[key] = SymbolRef(text=text, kind=kind, module=module,
                                  addr=addr)
     if named_functions:
-        for m in NAMED_EXTERN_RE.finditer(source_text):
+        for m in NAMED_EXTERN_RE.finditer(scan_text):
             name = m.group("name")
             resolved = named_functions.get(name)
             if resolved is None:
@@ -548,6 +607,51 @@ def compute_neighbor_shift_consensus(
     if count >= min_agreement:
         return most_common_shift, shifts
     return None, shifts
+
+
+def _exact_name_lookup(eur_func, target_funcs: list):
+    """port-refusal-taxonomy.md Finding 2 — look up `eur_func`'s name
+    directly in the target region's own (module-scoped) function list
+    before falling back to structural fingerprint matching.
+
+    Committed, human-reviewed ground truth: if the target region already
+    names an identically-sized function with the exact same name, that
+    already-reviewed symbols.txt entry IS the sibling — no heuristic
+    fingerprint guess required. This is the same short-circuit-before-
+    fingerprinting shape `resolve_symbol`'s data branch already uses for
+    `EXACT_ADDR` (an exact match on the more-authoritative signal always
+    wins over inferring one from weaker evidence).
+
+    Returns the matching target `Function`, or `None` (caller falls
+    through to fingerprint matching) when:
+
+      - `eur_func.name` is itself an address-keyed placeholder — checked
+        by the CALLER, not here (a placeholder name is not a real,
+        human-reviewed identity to look up; see below).
+      - more than one target function in the same module carries that
+        exact name (ambiguous; a genuine data-quality anomaly, not
+        expected in practice, but not something to guess through).
+      - the sizes disagree — EUR and the target compile the same
+        SDK/runtime function to the same byte length; a size mismatch on
+        a name match is a red flag worth falling through on, not ground
+        truth to trust blindly.
+
+    Does NOT separately re-check whether the matched target function's
+    OWN name is a placeholder (the PR #1462 failure mode this guards
+    against): a placeholder name matches `_PLACEHOLDER_FUNC_RE`
+    (`func_(?:ov\\d+_)?[0-9a-fA-F]{8}`), which a real recovered name like
+    "OS_DisableIrq" can never equal — so requiring the CALLER's
+    `eur_func.name` to already be non-placeholder before this is even
+    invoked is sufficient; a name-equal target candidate is provably
+    non-placeholder too.
+    """
+    candidates = [f for f in target_funcs if f.name == eur_func.name]
+    if len(candidates) != 1:
+        return None
+    cand = candidates[0]
+    if cand.size != eur_func.size:
+        return None
+    return cand
 
 
 def _synthesize_data_resolution(
@@ -736,6 +840,26 @@ def resolve_symbol(
             notes=f"no EUR symbol at {ref.module}/0x{ref.addr:08x} — "
                   f"may be a renamed symbol (not yet supported by v1)",
         )
+
+    # port-refusal-taxonomy.md Finding 2 — consult the target region's own
+    # committed symbols.txt for an exact-name match BEFORE falling back to
+    # structural fingerprinting. Only meaningful when EUR's own name is a
+    # real recovered name, not an address-keyed placeholder (a placeholder
+    # carries no identity to look up, and could never equal a real target
+    # name anyway — see `_exact_name_lookup`'s docstring).
+    if not is_placeholder_function_name(eur_func.name):
+        exact = _exact_name_lookup(
+            eur_func, target_regions.get(ref.module, []),
+        )
+        if exact is not None:
+            return Resolution(
+                eur_ref=ref,
+                target_name=exact.name,
+                confidence="EXACT_NAME",
+                notes=f"exact-name match in {target_region}/{ref.module} "
+                      f"symbols.txt ({eur_func.name} @0x{exact.addr:08x}, "
+                      f"size={exact.size})",
+            )
 
     matches = find_siblings_fn(
         eur_func, target_regions,
@@ -1431,16 +1555,15 @@ def main() -> int:
             ))
 
     # Check confidence floor.
-    floor_rank = {"HIGH": 3, "MEDIUM": 2, "LOW": 1, "NONE": 0,
-                  "EXACT_ADDR": 3, "SYNTHESIZED": 3}
-    floor = floor_rank[args.confidence_floor]
+    floor = FLOOR_RANK[args.confidence_floor]
     failed = [r for r in resolutions
-              if floor_rank.get(r.confidence, 0) < floor]
-    # Data symbols: EXACT_ADDR / SYNTHESIZED are HIGH-equivalent — the
-    # address is derived identically reliably in both; SYNTHESIZED just
-    # additionally needs the new symbols.txt line surfaced below.
+              if FLOOR_RANK.get(r.confidence, 0) < floor]
+    # Ground-truth resolutions (EXACT_ADDR / SYNTHESIZED for data,
+    # EXACT_NAME for func) are HIGH-equivalent — see FLOOR_RANK's
+    # docstring. SYNTHESIZED additionally needs the new symbols.txt line
+    # surfaced below.
     failed = [r for r in failed
-              if r.confidence not in ("EXACT_ADDR", "SYNTHESIZED")]
+              if r.confidence not in GROUND_TRUTH_CONFIDENCES]
 
     if failed and not args.dry_run:
         # Refuse to write; surface the failures.
@@ -1594,7 +1717,7 @@ def main() -> int:
         print(delinks_entry, end="")
         # Resolution summary
         n_high = sum(1 for r in resolutions
-                     if r.confidence in ("HIGH", "EXACT_ADDR", "SYNTHESIZED"))
+                     if r.confidence == "HIGH" or r.confidence in GROUND_TRUTH_CONFIDENCES)
         n_total = len(resolutions)
         print(f"# {n_high}/{n_total} symbols resolved at HIGH/EXACT/SYNTHESIZED")
         if new_symbols_txt:
