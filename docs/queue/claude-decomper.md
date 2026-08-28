@@ -2197,7 +2197,36 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-fingerprint-promotion-evidence`;
 then report QUEUE-EMPTY honestly if you reach it.
 
-### q-collision-pair-audit — seven unvalidated pairs sitting inside already-shipped ports [TODO]
+### q-collision-pair-audit — seven unvalidated pairs sitting inside already-shipped ports [DONE]
+
+**Result (this PR):** audited all 7 previously-unchecked collision pairs by
+directly reading the committed EUR/USA/JPN source, `symbols.txt`,
+`relocs.txt`, and `delinks.txt` — no fingerprint re-derivation. Canary
+first: independently reproduced brief 673's verdict on the known pair
+(`func_0209bb60`/`func_0209bc20`) by reading the actual files, confirming
+the method before touching the 7 unknowns. **All 7 are CORRECT** — the
+committed, shipped source at every disputed address structurally matches
+its true EUR twin; the 1-in-8 rate from the known-wrong case does not
+generalize. 2 of the 7 (`0x02032fac`/`0x02032fe4` and `0x02033000`/
+`0x0203301c`) turned out to be facets of the same underlying 8-function
+IRQ-bracketed chain, so this covers 6 independent structural situations.
+For 5 of the 7 (plus the canary), a real discriminator survives in the
+full (non-stripped) relocation data — a self+size self-call, a
+callee-size mismatch, or a literal data pointer, each resolvable through a
+uniform module-wide address delta — that the tool's `reloc_sig` throws
+away by design. For 2 of the 7 (the IRQ chain), no relocation-based
+discriminator can ever exist; they still shipped correct by raw
+byte-content match, not resolvable symbolic evidence. **No new WRONG pair
+found, so nothing is scoped for a fix.** One bonus finding along the way,
+independently spot-checked against `relocs.txt` and the committed source
+directly: `docs/research/brief-435-region-port-wave7.md` has two symbol
+names swapped in its own prose (the code was never actually wrong; only
+the brief's explanation is backwards) — flagged, not fixed, out of this
+item's scope. Full per-pair evidence, the synthesis of the shared
+mechanism, and a critic pass naming the weakest-evidence pair:
+[`docs/research/campaign-analytics/collision-pair-audit.md`](../research/campaign-analytics/collision-pair-audit.md).
+
+**Original brief text below, preserved for context:**
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round. Round 0827 is what
