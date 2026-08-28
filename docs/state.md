@@ -838,7 +838,7 @@ worktree rather than getting isolated copies, so parallel writers corrupt the
 tree, and the compiler serialises machine-wide, so parallel builders would
 recreate round 0827's contention failure inside a single lane.
 
-**Last updated:** 2026-08-28 — **(Windows PC, brain=Opus 5; both lanes now
+**Round 0828b (2026-08-28, Windows PC, brain=Opus 5; both lanes
 Claude Sonnet 5 at `max` effort, swarm scoped to the build-free lane.) Round
 0828b: the strongest lane pairing the campaign has produced — the two lanes
 independently corroborated each other, and one of them may have just reopened
@@ -911,7 +911,90 @@ mid-flight (44 dirty files, 3 live toolchain processes, no PR). Gating then
 would have corrupted its build. **Check for live toolchain processes before
 concluding a lane produced nothing.**
 
-<!-- main-sha: 9f2994cc1 -->
+**Last updated:** 2026-08-29 — **(Windows PC, brain=Opus 5; both lanes Claude
+Sonnet 5 at `max` effort, swarm on the build-free lane only.) Round 0829: the
+falsification test came back negative — `verified_neighbor` survived 9
+consecutive ROM gates and 95 ports, all 7 unchecked collision pairs audited
+CORRECT, and the dashboard self-reference is fixed. USA 14.15%, JPN 14.07%.**
+
+Merged **PR #1592**, **PR #1593**, **PR #1594**. `main` at `a3a5ce6fc`.
+
+| region | before | after |
+|---|---|---|
+| EUR | 17.27% | 17.27% |
+| USA | 13.79% | **14.15%** |
+| JPN | 13.79% | **14.07%** |
+
+**THE SIGNAL SURVIVED ITS OWN FALSIFICATION TEST.** `cm-verified-neighbor-tranche`
+was deliberately written so a failure would be the valuable outcome. It did not
+fail: **95 ports across 9 consecutive gated batches**, zero gate failures, zero
+bisects, both regions. The first batch took **14 of 20** candidates that had
+refused for two prior rounds. Brain verified 95 `.c` added / 95 `.s` deleted,
+invariant 95/95/95, dup-scan clean, own three-region `--clean` gate PASS.
+
+**Three things made PR #1594 trustworthy and are worth reusing.** It
+**re-derived PR #1589's measurement against the current, larger tree before
+running anything** (2,972/3,010 at 100%) rather than reusing a stale snapshot.
+The predicted address is **arithmetic only**, and the call site verifies a real
+size-matching target actually exists there before trusting it — the signal
+cannot fabricate a resolution. And it wired `port_refusal_taxonomy.py` to the
+same index so the measurement tool cannot silently drift from the resolver.
+
+⚠️ **Tracked risk carried into the next item.** PR #1594 deliberately kept **two
+copies** of `verified_neighbor_signal()`, arguing the evidence copy is frozen and
+published with a different calling convention. That is reasonable — **but
+`FLOOR_RANK` in this same codebase had already drifted across two copies** before
+PR #1590 consolidated it, so the precedent cuts the other way.
+`cm-verified-neighbor-drain` asks for either unification or a divergence test.
+
+⚠️ **PR body miscount.** PR #1594's prose says "8 consecutive gated batches"
+twice while its own table and the commit log both show **9**
+(2+3+12+12+13+13+12+14+14 = 95). Material claims were all correct. **Verify
+counts, not just totals.**
+
+**PR #1592 — all 7 unchecked collision pairs are CORRECT**, canary reproducing
+brief 673's verdict first. **The 1-in-8 known-wrong rate does not generalise.**
+It found the shared mechanism:
+`find_region_siblings.Function.reloc_sig` **deliberately excludes the relocation
+target address** for cross-region portability — exactly the information that
+would separate two same-size siblings calling different callees. 5 of 7 have a
+surviving discriminator in the full reloc data; **2 (an IRQ chain) can never have
+one** and shipped correct by raw byte match alone. It ran a critic pass naming
+its own weakest verdict, and spot-checked its sub-agent's bonus finding rather
+than relaying it.
+
+**Bonus finding, brain-confirmed independently:**
+`docs/research/brief-435-region-port-wave7.md` has two symbol names swapped **in
+its prose only** — `src/usa/main/func_0209a8c4.legacy.c` calls `func_0209a900`,
+and the two functions differ in size (0x50 vs 0x54), so they are not even
+same-size siblings. The code was always right; only the brief's sentence is
+backwards. Not fixed — out of that item's scope.
+
+**PR #1593 — the derived-artifact self-reference is RESOLVED**, after costing
+three consecutive rounds. The freshness check now tolerates **at most one**
+differing line, only the trend table's **trailing** row, differing **solely** in
+its SHA column, re-matched against the fresh render rather than assumed by
+position. It states what the check still guarantees and what it no longer does,
+and **demonstrated** the fix — pre-fix `--check` FAILs and post-fix PASSes on the
+same squash-simulated mutation, with a regression test that performs it live.
+
+**Remaining port pool, brain-measured on `main`:** USA 285 backlog / **255
+sim=1.0**; JPN 299 / **269 sim=1.0** — 524 rows. The 100-port cap existed only
+because the signal was unproven; `cm-verified-neighbor-drain` takes it off while
+keeping the **stop-on-gate-failure rule unrelaxed**: nine clean gates bound the
+error rate below PR #1589's ≤0.1% estimate, they do not make it zero.
+
+⚠️ **THE STRATEGIC POINT.** **EUR has been flat at 17.27% for five consecutive
+rounds.** Every gain since is derivative — USA and JPN porting EUR content that
+already existed. When the 524-row pool empties, **all three regions stall unless
+EUR moves.** `q-eur-next-frontier` is seeded to cost every remaining EUR avenue
+— code bands, the 407,506 B data pool the Windows path bug had hidden, `.bss` —
+**before** the ports run out rather than after.
+
+⚠️ **Control 12 NOT executable, fourth consecutive round** — both lanes run
+outside Claude Code and Codex. Every finding above is git- and tool-derived.
+
+<!-- main-sha: a3a5ce6fc -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
