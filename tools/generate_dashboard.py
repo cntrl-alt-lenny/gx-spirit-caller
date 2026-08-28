@@ -128,12 +128,92 @@ _EUR_ROW_RE = re.compile(
     r"^\|\s*eur\s*\|\s*([\d,]+)\s*\|\s*\*\*([\d.]+)%\*\*", re.MULTILINE,
 )
 
+# Matches one rendered trend-table row: `| `sha` | date | bytes | pct% | delta |`
+# (delta is blank for the first row -- `[^|]*` accepts that). Group 1 is the
+# SHA; groups 2-5 are everything the trailing-row tolerance below still
+# requires to match exactly.
+_TREND_ROW_RE = re.compile(
+    r"^\| `([0-9a-fA-F]+)` \| (\S+) \| ([\d,]+) \| ([\d.]+)% \| ([^|]*) \|$",
+    re.MULTILINE,
+)
+
 
 def _run_git(*args: str) -> str:
     r = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True)
     if r.returncode != 0:
         raise RuntimeError(f"git {' '.join(args)} failed: {r.stderr.strip()}")
     return r.stdout
+
+
+# --------------------------------------------------------------------------- #
+# Trailing-row SHA tolerance (q-derived-artifact-selfreference)
+# --------------------------------------------------------------------------- #
+#
+# The trend table's LAST row cites the commit SHA of the most recent commit
+# that touched docs/state-table.md -- almost always the very commit this PR
+# is introducing. Squash-merging that PR gives it a BRAND NEW SHA that
+# nothing on the branch could have predicted at generation time, so the very
+# next `--check` (in CI right after merge, or a later round's regeneration)
+# sees a real, derived mismatch on exactly that one cell -- staleness that
+# is unsatisfiable to avoid by sequencing commits differently, because the
+# rewrite happens outside the PR entirely, at merge time.
+#
+# `_dashboard_is_current` tolerates ONLY this specific, single-cell drift:
+# the trailing trend row's SHA column may differ between the committed file
+# and a fresh render, and nothing else may. Every other row's SHA, and the
+# trailing row's own date/bytes/pct/delta, are still compared exactly --
+# real staleness (a moved number, a missing section, any non-trailing SHA)
+# still fails `--check` immediately, exactly as before this change.
+
+
+def _dashboard_is_current(committed: str, fresh: str) -> tuple[bool, str]:
+    """Compare a committed dashboard against a freshly-rendered one.
+
+    Returns (is_current, detail) -- `detail` is a human-readable reason
+    either way. Tolerates AT MOST one differing line, and only if that
+    line is the trend table's trailing row differing solely in its SHA
+    column (see module note above). Any other difference -- more than one
+    line, a non-trailing row, a non-SHA field of the trailing row -- is
+    real staleness and returns `is_current=False`.
+    """
+    if committed == fresh:
+        return True, "exact match"
+
+    committed_lines = committed.splitlines(keepends=True)
+    fresh_lines = fresh.splitlines(keepends=True)
+    if len(committed_lines) != len(fresh_lines):
+        return False, "stale (line count differs)"
+
+    diffs = [i for i, (c, f) in enumerate(zip(committed_lines, fresh_lines, strict=True))
+             if c != f]
+    if len(diffs) != 1:
+        return False, f"stale ({len(diffs)} line(s) differ)"
+
+    c_line = committed_lines[diffs[0]].rstrip("\n")
+    f_line = fresh_lines[diffs[0]].rstrip("\n")
+    c_m = _TREND_ROW_RE.match(c_line)
+    f_m = _TREND_ROW_RE.match(f_line)
+    if not (c_m and f_m):
+        return False, "stale (the differing line is not a trend-table row)"
+    if c_m.groups()[1:] != f_m.groups()[1:]:
+        return False, "stale (trend row content beyond the SHA differs)"
+    if c_m.group(1) == f_m.group(1):
+        return False, "stale (line text differs but the SHA is identical)"
+
+    # Must be the LAST trend row in the fresh render, not a middle one --
+    # a middle row's SHA is already-merged history and should never drift.
+    fresh_trend_rows = _TREND_ROW_RE.findall(fresh)
+    if not fresh_trend_rows or fresh_trend_rows[-1] != f_m.groups():
+        return False, "stale (differing row is not the trend table's trailing row)"
+
+    return True, (
+        f"current except the trend table's trailing-row commit SHA "
+        f"(committed `{c_m.group(1)}`, fresh `{f_m.group(1)}`) -- expected "
+        f"when a squash-merge rewrites the most recent commit touching "
+        f"docs/state-table.md after this file was generated; not staleness. "
+        f"Re-run `python tools/generate_dashboard.py` on the next regeneration "
+        f"to pick up the settled SHA."
+    )
 
 
 def _trend_rows(limit: int | None = None) -> list[tuple[str, str, int, float]]:
@@ -490,11 +570,16 @@ def main(argv: list[str] | None = None) -> int:
         return 0
 
     if args.check:
-        if OUT.read_text(encoding="utf-8") != text:
-            print(f"{OUT} is out of date. Re-run "
+        is_current, detail = _dashboard_is_current(
+            OUT.read_text(encoding="utf-8"), text)
+        if not is_current:
+            print(f"{OUT} is out of date ({detail}). Re-run "
                   f"`python tools/generate_dashboard.py` and commit.", file=sys.stderr)
             return 1
-        print(f"{OUT} is current.")
+        if detail == "exact match":
+            print(f"{OUT} is current.")
+        else:
+            print(f"{OUT} is current ({detail}).")
         return 0
 
     OUT.parent.mkdir(parents=True, exist_ok=True)
