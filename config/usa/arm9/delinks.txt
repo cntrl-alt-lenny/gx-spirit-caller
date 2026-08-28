@@ -13150,7 +13150,7 @@ src/usa/main/func_020b0398.s:
 src/usa/main/func_020b0464.s:
     complete
     .text start:0x020b0464 end:0x020b05e8
-src/usa/main/func_020b05e8.s:
+src/usa/main/func_020b05e8.c:
     complete
     .text start:0x020b05e8 end:0x020b0684
 src/usa/main/func_020b0684.s:
@@ -13306,7 +13306,7 @@ src/usa/main/func_020b40f4.s:
 src/usa/main/func_020b4104.s:
     complete
     .text start:0x020b4104 end:0x020b4154
-src/usa/main/func_020b4154.s:
+src/usa/main/func_020b4154.c:
     complete
     .text start:0x020b4154 end:0x020b4188
 src/usa/main/func_020b4188.s:
