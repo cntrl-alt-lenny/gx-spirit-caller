@@ -2368,7 +2368,44 @@ that breaks it today and show it passing. Build-free.
 ONE PR; verify claims against `git diff --stat`; `python tools/work_queue.py done
 claude-decomper q-derived-artifact-selfreference`.
 
-### q-eur-next-frontier — what moves EUR, now that the ports are about to run out [TODO]
+### q-eur-next-frontier — what moves EUR, now that the ports are about to run out [DONE]
+
+**Result (this PR):** canary reproduced 257-320 B's 263/75,980 B exactly,
+after a real near-miss — an unfiltered first pass returned 411/118,200 and
+would have wrongly triggered a STOP until re-checking `docs/dashboard.md`'s
+own dispatch-filter caveat (`.text` size alone isn't the real criterion).
+**Headline finding: "stuck at 17.27%" is a `.text`-only claim** —
+`progress.py`'s natural-C metric never scans `.data`/`.bss`/`.rodata`, so
+only the CODE avenue can move that specific number; the 407,506 B data
+pool moves a separate, non-combined metric entirely. **Code:** re-derived
+all 7 bands fresh (`tools/eur_frontier_census.py`, new, single-scan). The
+small bands (193-256 B: 204 cand/46,080 B; 321-376 B: 161/56,180) are NOT
+exhausted — "closed at 0/60"/"1/15" described a round's attempt count, not
+the population; `attempts.tsv` cross-checked directly (267/70 logged
+attempts respectively) confirms these are fresh, never-tried rows behind
+the already-failed sample. **The largest finding: 377-512/513-1023/≥1024 B
+hold 1,211,260 B dispatch-ready — 87% of the whole code pool — against
+only 83 total logged attempts combined**, one of the three bands (377-512)
+never even appearing in this project's prior recaps. Ship rate left
+blank for all three — 83 attempts against 1,186 candidates cannot be
+honestly extrapolated. **Data:** reachable pool unchanged at 407,506 B
+since the Windows-bug fix landed; built the full 15-round `cm-restock-carve`
+yield table (2,225 symbols/82,652 B, mean 5,510 B/round, median 1,864,
+80% of bytes from 4 outlier rounds) from primary sources via a research
+agent, independently spot-checked. **`.bss`:** reconciled two genuinely
+different, non-contradictory measurements — 85.2% project-wide raw share
+(4,776,528 B denominator) vs. 2.56% of the reachable worklist (407,506 B
+denominator) — `.bss` is huge in raw bytes but nearly invisible to the
+tool this campaign actually uses to find carve targets. **Overlay/ITCM:**
+corrected the item's own premise — ITCM has zero data symbols (code-only)
+and DTCM has 5 total; the hidden pool was 100% overlay data (217,298 B
+remaining, only 9.2% of the post-fix-visible portion carved in the one
+round since). Composition reconfirmed dead (0/575). Named the weakest-
+provenance figure (the 1.2 MB unswept-bands claim, single-classifier-
+sourced) rather than presenting uniform confidence. No direction
+recommended; blank left wherever a rate could not be honestly derived.
+Full costed table, every figure dated and reproducible:
+[`docs/research/campaign-analytics/eur-next-frontier.md`](../research/campaign-analytics/eur-next-frontier.md).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.
