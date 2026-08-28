@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**148 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**149 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (71)
+- [Uncategorised](#uncategorised) (72)
 
 ## Analysis / worklist
 
@@ -762,6 +762,12 @@ Reproduces the r10 method (find_region_siblings HIGH + byte-sim) against the cur
 **Standing cross-region sim==1.0 port harvest.**
 
 This is a thin, fail-closed entry point around port_census + batch_port. It always re-censuses first, hard-codes the proven HIGH confidence floor, and delegates fastmatch and ROM-gated staging/commits to batch_port.
+
+### `tools/port_refusal_taxonomy.py`
+
+**READ-ONLY taxonomy of HIGH-floor cross-region port refusals (q-port-refusal-taxonomy).**
+
+`batch_port.py` only reports a coarse per-run count of refused candidates. This tool replicates `port_to_region.py`'s own confidence-floor resolution (`resolve_symbol()` / `FLOOR_RANK`, see that module's `main()`) over EVERY symbol refer…
 
 ### `tools/predict_walls.py`
 

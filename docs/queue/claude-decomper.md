@@ -1985,7 +1985,38 @@ the pytest tail) + `python tools/check_activation_invariant.py origin/main..HEAD
 ONE PR; verify every claim against `git diff --stat` before writing the body;
 `python tools/work_queue.py done claude-decomper cm-port-drain-usa`.
 
-### q-port-refusal-taxonomy — 365 fresh refusals with reasons, and nobody has read them [TODO]
+### q-port-refusal-taxonomy — 365 fresh refusals with reasons, and nobody has read them [DONE]
+
+**Result (this PR):** built `tools/port_refusal_taxonomy.py` (read-only,
+build-free), which replicates `port_to_region.py`'s own confidence-floor
+resolution over every symbol reference in each candidate — canary-verified
+5/5 against the real non-dry-run tool. **Both hoped-for answers were half
+right:** the 365 refusals do NOT cluster on a handful of blocking symbols
+(264 distinct blockers, largest touches only 10 candidates), but 95.3% DO
+cluster on one mechanism — a same-size, no-relocation callee/data reference
+the fingerprint matcher can only place at MEDIUM-or-below, which is very
+likely intentional conservatism guarding against the wrong-sibling bug
+class this project has hit and fixed before (briefs 673/676). Buried inside
+that majority: a genuinely concentrated, previously-unscoped, low-risk fix
+— **49 candidates (7,692 B) are refused solely by a callee that already
+carries an identical, committed name in the target's own `symbols.txt`**
+(e.g. `OS_DisableIrq`/`OS_RestoreIrq`), which `resolve_symbol` never checks
+before falling back to structural fingerprinting; 38 more (6,156 B) would
+be partially helped. Three smaller classes found: a `placeholder-twin`
+recurrence (5 sole candidates, same mechanism `q-port-residual-fix` #1462
+already fixed once), a NEW comment-parsing false-positive bug (3 sole
+candidates, same bug class as `q-invariants-green`'s
+`check_match_invariants.py` fix, just never applied to
+`parse_symbols_in_source`), and a real `find_region_siblings.load_region()`
+coverage gap — it never loads the `itcm` module at all (2 sole candidates).
+JPN cross-checked (provisional, mid-drain):
+266 distinct blockers, all 264 of USA's present, top-15 identical, and the
+exact-name-lookup impact reproduces almost exactly (50/8,120 B). Did not
+port anything or recommend a direction, per the item's own instruction.
+Full table and every reproducing command:
+[`docs/research/campaign-analytics/port-refusal-taxonomy.md`](../research/campaign-analytics/port-refusal-taxonomy.md).
+
+**Original brief text below, preserved for context:**
 
 **This item is BUILD-FREE. Do not compile, do not run `ninja`, do not run
 `gate3.py` against a region.** The other lane owns the compiler toolchain for
