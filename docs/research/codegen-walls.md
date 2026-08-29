@@ -12617,20 +12617,24 @@ narrower effort gap than `cm-513-1023-census` disclosed (there, only 2
 of 15 candidates got any iteration at all) — this round's larger
 candidates that showed promise all received genuine follow-up.
 
-**The code frontier is now fully characterised. Full map:**
+**The code frontier is now fully characterised.** *(Correction, BR-7:*
+*this was wrong — the table below skipped straight from 321-376 B to*
+*513-1023 B and never actually sampled the seam between them. See BR-7*
+*for the 377-512 B measurement this claim was missing.)* **Full map:**
 
 | Band | Result | Status |
 |---|---|---|
 | `<=192 B` | drained to 0 candidates | exhausted |
 | `193-256 B` | 0/60 | CLOSED (BR-1) |
 | `257-320 B` | 4/20 = 20.0% | MARGINAL (BR-4) |
-| `321-376 B` | 1/15 = 6.7% | CLOSED (BR-6, this round) |
+| `321-376 B` | 1/15 = 6.7% | CLOSED (BR-6) |
+| `377-512 B` | 1/20 = 5.0% | CLOSED (BR-7) |
 | `513-1023 B` | 0/15 | effectively closed (BR-5) |
 | `>1024 B` | zero functions ever matched | hard ceiling |
 
 Every band this method can reach has now been measured at least once
 under the matched-effort, wall-screened, ledgered protocol this campaign
-converged on across BR-1 through BR-6. The only pocket that is not
+converged on across BR-1 through BR-7. The only pocket that is not
 closed is 257-320 B's marginal 20.0% — a real, defensible signal, not a
 gap in coverage. Nobody has to re-open "did we actually check this band"
 again; the recurring cost this queue item named is retired.
@@ -12646,6 +12650,73 @@ can reach, now exists in one place.
 
 **Provenance:** `cm-321-376-probe` (this PR), `attempts.tsv` rows tagged
 `cm-321-376-probe`, `band-rate-vintage.md`, BR-1 through BR-5.
+
+### BR-7. The 377-512 B `.text` band: the seam BR-6 missed, CLOSED at 1/20 = 5.0%
+
+`cm-377-512-probe` measured the one band-map gap BR-6's "fully
+characterised" claim didn't actually cover: BR-6's own map table jumped
+directly from `321-376 B` to `513-1023 B`, and nothing in this campaign's
+history had ever sampled the 377-512 B seam between those two probes'
+boundaries.
+
+**Sample:** n=20, capped-proportional stratified (largest-remainder
+method, cap 3/module) against a 349-candidate / 154,308 B pool spread
+across 22 modules (`overlay002` 176, `main` 104, 20 others with 1-11
+each). Seed `20260829`. Screened clean against every documented wall
+before dispatch.
+
+**Tooling finding:** all 20 candidates hit `m2c_feed.py`'s
+`find_object()` glob-blindness (it matches only `_dsd_gap@*.o`, missing
+94.6% of this project's current delink objects — the same gap
+`large-band-unsampled.md` documented for the `>=1024 B` ceiling sample).
+Every candidate fed cleanly via the existing `--obj
+build/eur/delinks/src/<module>/<func>.o` override. Recorded as a
+tooling-discoverability gap with a working bypass, kept out of the
+ship-rate denominator.
+
+**Result: 1/20 = 5.0% shipped.** `func_ov020_021aa4a0` (100%, 2
+attempts) — a string-escape-code parser. The ship reused BR-6's
+byte-width shift-pair lever in a new form: a `(field & 7) == 0` 3-bit
+mask simplification compiled shorter than the target, and reverting it
+to the literal shift-pair `(u32)(field << 0x1D) >> 0x1D` (rather than
+`field & 7`) closed a 6.7% first attempt to 100% in one change. Three
+candidates broke 80% on genuine multi-attempt work and were independently
+diagnosed as compiler-internal residuals, not under-effort: `overlay003`
+(91.5%, 5 attempts — a missing call argument found by hand-tracing raw
+disassembly was the biggest single fix of the round; final gap is
+call-argument-scheduling), `overlay006` (82.0%, 2 attempts — a
+pointer-splitting rewrite produced byte-identical output to the baseline
+both times), `overlay016` (81.1%, 4 attempts — `volatile` on an MMIO
+register forced the target's two-load read-modify-write pattern instead
+of a CSE'd single load, closing 20.8% to 81.1% in one change; a further
+attempt using explicit temp variables made it *worse*, 81.1% -> 57.5%,
+and was reverted rather than kept). Median `match_pct` across the 19
+parked: 5.2%.
+
+**New lever confirmed:** `volatile` on a raw hardware-register pointer is
+not cosmetic here — it changes codegen. Without it, mwcc CSEs a
+repeated `*(int*)ADDR` read within one expression to a single load; the
+shipped-elsewhere-in-this-project MMIO read-modify-write idiom
+(`hw1`/`hw2` locals in `func_ov004_021d8648.c`) already used `volatile`
+for this reason, and this round confirms the mechanism: adding it to a
+non-volatile equivalent moved one candidate from 20.8% to 81.1% in a
+single change.
+
+**Threshold applied, unchanged:** `<=10%` (this round: 1/20 = 5.0%) is
+**CLOSED.**
+
+**Effort note:** 7 of 20 candidates received exactly 1 attempt, 7
+received 2, 2 received 3, 3 received 4, 1 received 5 (44 attempts total,
+summed programmatically from the ledger, not estimated) — the same
+effort-follows-signal pattern BR-6 established: candidates with a large
+word-count or register-set mismatch on the first compile were parked
+early, candidates with a close word count or partial match received
+genuine follow-up up to the full budget.
+
+**Provenance:** `cm-377-512-probe` (this PR),
+`docs/research/cm-377-512-probe-2026-08-29.md`, `attempts.tsv` rows
+tagged `cm-377-512-probe`, BR-5, BR-6, `band-rate-vintage.md`,
+`large-band-unsampled.md`.
 
 ## Open questions (not levers, not walls — genuinely unresolved)
 

@@ -1784,3 +1784,23 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b3938	ov014	332	default	unknown	parked	8.4	reg-alloc-stack-footprint-mismatch	PROVISIONAL:register-allocation	cm-321-376-probe	1
 0x021b61dc	ov016	328	default	unknown	parked	23.2	reg-alloc-stack-footprint-mismatch	PROVISIONAL:register-allocation	cm-321-376-probe	1
 0x021b3cf0	ov019	328	default	unknown	parked	3.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	cm-321-376-probe	1
+0x02048314	main	428	default	unknown	parked	9.0	P-20-base-ptr-rescratch-after-calls	P-20	cm-377-512-probe	4
+0x0205142c	main	492	default	unknown	parked	36.6	P-20-r0-vs-r1	P-20	cm-377-512-probe	3
+0x020711b0	main	508	default	unknown	parked	1.6	reg-alloc-push-list-mismatch	PROVISIONAL:reg-alloc-push-list-mismatch	cm-377-512-probe	2
+0x021add44	ov000	468	default	unknown	parked	3.0	switch-plus-struct-reg-alloc	PROVISIONAL:switch-plus-struct-reg-alloc	cm-377-512-probe	2
+0x021d5d58	ov002	468	default	unknown	parked	0.0	P-20-confirmed	P-20	cm-377-512-probe	1
+0x021e16a4	ov002	460	default	unknown	parked	0.8	P-20-confirmed	P-20	cm-377-512-probe	1
+0x022ab0a4	ov002	496	default	unknown	parked	4.5	divmod-runtime-plus-reg-alloc	PROVISIONAL:divmod-runtime-plus-reg-alloc	cm-377-512-probe	1
+0x021cec24	ov003	468	default	unknown	parked	91.5	call-arg-scheduling-residual	PROVISIONAL:call-arg-scheduling-residual	cm-377-512-probe	5
+0x021d0f98	ov004	384	default	unknown	parked	4.7	struct-stride-uncertainty	PROVISIONAL:struct-stride-uncertainty	cm-377-512-probe	1
+0x021ab6ac	ov005	428	default	unknown	parked	2.8	indirect-call-plus-chained-cond	PROVISIONAL:indirect-call-plus-chained-cond	cm-377-512-probe	1
+0x021b5c2c	ov006	392	default	unknown	parked	82.0	shifted-add-fusion-residual	PROVISIONAL:shifted-add-fusion-residual	cm-377-512-probe	2
+0x021b01d8	ov008	480	default	unknown	parked	10.0	mmio-plus-complex-flow	PROVISIONAL:mmio-plus-complex-flow	cm-377-512-probe	1
+0x021aaaec	ov009	472	default	unknown	parked	11.0	register-set-mismatch	PROVISIONAL:register-set-mismatch	cm-377-512-probe	2
+0x021b5168	ov010	484	default	unknown	parked	4.1	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	cm-377-512-probe	2
+0x021ce190	ov011	404	default	unknown	parked	6.9	load-scheduling-residual	PROVISIONAL:load-scheduling-residual	cm-377-512-probe	4
+0x021b5818	ov015	396	default	unknown	parked	2.0	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	cm-377-512-probe	3
+0x021b32f0	ov016	424	default	unknown	parked	81.1	mmio-bitfield-extract-register-shuffle	PROVISIONAL:mmio-bitfield-extract-register-shuffle	cm-377-512-probe	4
+0x021b5f24	ov017	504	default	unknown	parked	5.2	dense-bitfield-scheduling	PROVISIONAL:dense-bitfield-scheduling	cm-377-512-probe	1
+0x021aa5fc	ov018	408	default	unknown	parked	22.6	param-truncation-sequence	PROVISIONAL:param-truncation-sequence	cm-377-512-probe	2
+0x021aa4a0	ov020	476	default	unknown	shipped	100.0	n/a		cm-377-512-probe	2
