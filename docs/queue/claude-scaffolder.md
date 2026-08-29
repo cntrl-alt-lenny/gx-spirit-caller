@@ -2431,7 +2431,7 @@ ONE PR; verify every number against `git diff --stat` **including the batch
 count** — last round's body miscounted its own batches; `python
 tools/work_queue.py done claude-scaffolder cm-verified-neighbor-drain`.
 
-### cm-377-512-probe — the first real probe into the band nobody has tried [TODO]
+### cm-377-512-probe — the first real probe into the band nobody has tried [CLAIMED]
 
 **The ports are done.** After `cm-verified-neighbor-drain` (PR #1597) the
 byte-identical pool is **17 USA / 18 JPN rows** — down from 524. USA and JPN
