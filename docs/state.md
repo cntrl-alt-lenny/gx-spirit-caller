@@ -1067,7 +1067,7 @@ not a verdict on difficulty.
 ⚠️ **Control 12 NOT executable, fifth consecutive round** — both lanes run
 outside Claude Code and Codex. Every finding above is git- and tool-derived.
 
-**Last updated:** 2026-08-31 — **(Windows PC, brain=Opus 5; both lanes Claude
+**Round 0831 (2026-08-31, Windows PC, brain=Opus 5; both lanes Claude
 Sonnet 5 at `max` effort.) Round 0831: both results came back NEGATIVE and both
 were reported honestly. 377-512 B is CLOSED at 5.0%, and the brain's own
 tooling-blindness hypothesis is DEAD. The band map is now complete and
@@ -1139,7 +1139,66 @@ deterministic path check, not a glob widening) and dates the coverage figure.
 
 ⚠️ **Control 12 NOT executable, sixth consecutive round.**
 
-<!-- main-sha: bfbdc1d27 -->
+**Last updated:** 2026-09-01 — **(Windows PC, brain=Opus 5; both lanes Claude
+Sonnet 5 at `max` effort.) Round 0901: the shift-pair lever is confirmed to
+transfer on a controlled A/B, the `find_object()` tax is gone, and wall
+membership has quietly become the thing that decides which candidates get
+attempted at all.**
+
+Merged **PR #1602** and **PR #1603**. `main` at `87b18e48f`. EUR **17.29% ->
+17.32%**; USA/JPN unchanged at 15.85%.
+
+**PR #1603 — 3/17 = 17.6% at 257-320 B**, inside the noise of BR-4's
+pre-registered 20.0% at n=17. The lane **declined to declare a divergence it
+could not support**, which is the correct call. Recorded as BR-8; **259
+candidates remain unattempted** in the band.
+
+**Lever 2 (shift-pair over mask) CONFIRMED TRANSFERRING, on a direct A/B.** On
+`func_ov002_021fa968` the literal `(u32)(x << 0x1F) >> 0x1F` scored **71.2%**;
+simplifying the identical logic to `x & 1` dropped it to **7.7%**. **Lever 1
+(`volatile` on MMIO) was reported as "not exercised"** — no candidate in the
+pool had the read-modify-write shape — rather than falsely confirmed. Two
+restructuring attempts that made a match *worse* were disclosed
+(78.8%->47.0%, 62.1%->57.6%). Three new unconfirmed failure signatures recorded
+as leads: push-vs-`sub sp,#N` alignment padding, `str`/`stmib` fusion, and
+independent-computation interleaving.
+
+⚠️ **THE DENOMINATOR ISSUE, AND IT IS NOW STRUCTURAL.** PR #1603 screened **6 of
+23** candidates out **on sight** as confirmed P-20 wall members and excluded
+them: 3/17 = **17.6% attempted-rate** vs 3/23 = **13.0% pool-rate**. The
+exclusion was defensible (11+ independently falsified prior attempts) and
+clearly disclosed. But **wall membership is now gating which candidates get
+attempted at all**, in the only band above the 10% closed line — and **a
+screened-out candidate produces no attempt row, so it is invisible to every
+ship-rate the campaign computes**. `q-wall-overblock-audit` is seeded to test
+whether any wall is broader than its evidence; `cm-257-320-drain-2` now requires
+**both** rate figures.
+
+**PR #1602 — the `find_object()` tax is removed and the coverage figure is
+dated.** The per-source fallback **disasm-verifies the header** at the
+predictable path rather than trusting existence, so a stale object is never
+silently returned; gap objects are still checked first. Its canary **confirmed
+the brain's build-state finding directly**: the lane's tree (2,083 gap objects /
+2,881 distinct functions) shows 45-68%, the brain's integration tree (754 / 55)
+shows ~0% — **same code, two trees, two answers**. `m2c_gap_coverage.py` now
+prints its own build state, turning a silent dependency into a visible one.
+
+⚠️ **BRAIN MISS, caught by the lane.** `docs/dashboard.md` was stale on
+`origin/main` — brain confirmed with `stale (line count differs)`. Cause: the
+**round-0831 brain PR added a whole new trend row**, and PR #1593's tolerance
+covers only a **rewritten SHA on the trailing row**, not a **new row appearing**.
+Same self-reference, second form. **The brain's own loop is the trigger** — it
+regenerates on the integration branch, but the round PR lands afterwards and can
+invalidate it again. Folded into `q-wall-overblock-audit` as a second task.
+
+**Process note:** the scaffolder worktree showed one dirty file
+(`config/eur/arm9/delinks.txt`) whose diff was **empty** — a CRLF line-ending
+artifact, not lost work. Check the diff before treating a dirty tree as a
+finding.
+
+⚠️ **Control 12 NOT executable, seventh consecutive round.**
+
+<!-- main-sha: 87b18e48f -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
