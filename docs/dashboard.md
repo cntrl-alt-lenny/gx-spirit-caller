@@ -15,7 +15,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 412,578 | **17.29%** | 4,420 | 17.48% |
+| eur | 413,358 | **17.32%** | 4,420 | 17.51% |
 | usa | 377,920 | **15.85%** | 2,924 | 15.97% |
 | jpn | 377,920 | **15.85%** | 2,932 | 15.97% |
 
@@ -80,8 +80,10 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `1afa974be` | 2026-08-28 | 412,102 | 17.27% | +0 |
 | `edaf46ae0` | 2026-08-28 | 412,102 | 17.27% | +0 |
 | `81c879c13` | 2026-08-28 | 412,102 | 17.27% | +0 |
+| `bfbdc1d27` | 2026-08-30 | 412,578 | 17.29% | +476 |
+| `89fc077bc` | 2026-08-30 | 413,358 | 17.32% | +780 |
 
-55 points, one per commit that changed `docs/state-table.md` (oldest first).
+57 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 
@@ -93,7 +95,7 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | --- | ---: | ---: |
 | <=192 B | 1,160 | 135,268 |
 | 193-256 B | 460 | 102,472 |
-| 257-320 B | 411 | 118,200 |
+| 257-320 B | 394 | 113,760 |
 | 321-384 B | 261 | 91,724 |
 | 385+ B | 1,310 | 1,309,080 |
 
@@ -106,10 +108,10 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | module | permanent count | permanent bytes | unassessed count | unassessed bytes |
 | --- | ---: | ---: | ---: | ---: |
 | itcm | 0 | 0 | 12 | 2,020 |
-| main | 36 | 3,096 | 1,407 | 510,976 |
+| main | 36 | 3,096 | 1,397 | 508,356 |
 | overlay000 | 0 | 0 | 45 | 14,628 |
 | overlay001 | 0 | 0 | 0 | 0 |
-| overlay002 | 44 | 6,636 | 1,652 | 889,404 |
+| overlay002 | 44 | 6,636 | 1,646 | 887,844 |
 | overlay003 | 0 | 0 | 12 | 17,400 |
 | overlay004 | 7 | 1,472 | 73 | 49,752 |
 | overlay005 | 0 | 0 | 26 | 24,816 |
@@ -117,7 +119,7 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | overlay007 | 0 | 0 | 7 | 1,572 |
 | overlay008 | 0 | 0 | 43 | 24,936 |
 | overlay009 | 0 | 0 | 11 | 10,648 |
-| overlay010 | 0 | 0 | 35 | 19,448 |
+| overlay010 | 0 | 0 | 34 | 19,188 |
 | overlay011 | 0 | 0 | 45 | 23,660 |
 | overlay012 | 0 | 0 | 12 | 7,112 |
 | overlay013 | 0 | 0 | 6 | 5,296 |
