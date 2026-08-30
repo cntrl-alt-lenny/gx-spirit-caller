@@ -12467,6 +12467,10 @@ exactly what the thresholds were pre-registered against. Report it and
 let it be weighed against the data lane's known 66,096 B (verifier
 `cm-restock-carve-12`) + 128,875 B (non-string shapes) pool.
 
+*(Update, BR-8: once the rest of the band map closed at or below 10%, this
+band became the only pocket above the "drain it" line by elimination — see
+BR-8 for the drain this recommendation eventually led to.)*
+
 **Provenance:** `cm-main-band-followthrough` (#1563), `cm-main-band-finish`
 (this PR), `attempts.tsv` rows tagged with either brief.
 
@@ -12717,6 +12721,52 @@ genuine follow-up up to the full budget.
 `docs/research/cm-377-512-probe-2026-08-29.md`, `attempts.tsv` rows
 tagged `cm-377-512-probe`, BR-5, BR-6, `band-rate-vintage.md`,
 `large-band-unsampled.md`.
+
+### BR-8. Draining the 257-320 B `.text` band: 3/17 = 17.6%, both new levers tested, no divergence from BR-4's 20.0%
+
+`cm-257-320-drain` worked BR-4's MARGINAL band — the only pocket left
+above the campaign's 10% closed line once BR-6/BR-7 closed the two bands
+on either side of it — applying the two levers `cm-377-512-probe` found
+one band up. Single-threaded, smallest-first through the unattempted
+population, canary-then-continue.
+
+**Result: 3/17 ledgered = 17.6%** (38 total attempts). 6 further candidates
+were screened out on sight as confirmed P-20 cohort members
+(`(x & 1) * 0x868`) before any C was written — not counted in the
+denominator. 17.6% sits inside the statistical noise of BR-4's
+pre-registered 20.0% baseline for a 17-trial sample; **no divergence to
+report**, exactly the outcome the pre-registered protocol is built to
+detect if it existed.
+
+**Both levers, explicitly (the round's secondary finding, as requested):**
+
+- **Lever 2 (shift-pair over mask) transfers cleanly.** Directly A/B-tested
+  on `func_ov002_021fa968`: the literal `(u32)(x << 0x1F) >> 0x1F` form
+  scored 71.2%; simplifying to `x & 1` dropped it to 7.7% with a
+  3-word-shorter object — a clean, reproducible confirmation. Both ships
+  that used this idiom kept the literal shift-pair as drafted and shipped
+  on the first attempt.
+- **Lever 1 (`volatile` on MMIO pointers) did not get a genuine test case.**
+  No candidate in the worked portion of the pool contained an MMIO
+  read-modify-write shape. One candidate wrote to two `0x0400xxxx`
+  addresses as plain single writes (no repeated read of the same address),
+  so `volatile` — applied defensively — could not have changed anything.
+  Reported as "not exercised," not as a false confirmation.
+
+**Three new residual signatures observed** (each on only 1-2 candidates,
+short of this campaign's confirmation bar — recorded as leads, not walls):
+push-count-vs-`sub sp,#N` alignment padding, `str`/`stmib` (or `ldr`/`ldm`)
+instruction-fusion choices, and independent-computation interleaving
+across unrelated sub-expressions. Full detail, the per-candidate table,
+and both reverted-when-worse restructuring attempts (disclosed, not
+hidden) are in `cm-257-320-drain-2026-09-01.md`.
+
+**259 candidates remain unattempted** in this band's pool for a future
+round to continue the drain.
+
+**Provenance:** `cm-257-320-drain` (this PR),
+`docs/research/cm-257-320-drain-2026-09-01.md`, `attempts.tsv` rows
+tagged `cm-257-320-drain`, BR-4, BR-7.
 
 ## Open questions (not levers, not walls — genuinely unresolved)
 
