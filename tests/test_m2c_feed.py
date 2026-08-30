@@ -31,8 +31,11 @@ from m2c_feed import (  # noqa: E402
     FeedResult,
     FewshotExample,
     M2CMissing,
+    _module_to_src_dir,
+    _persource_object_path,
     build_context,
     find_core_header,
+    find_object,
     format_fewshot_block,
     main,
     render,
@@ -180,6 +183,156 @@ class TestFindCoreHeader(unittest.TestCase):
 
     def test_nonexistent_overlay_returns_none(self):
         self.assertIsNone(find_core_header("eur", "ov999"))
+
+
+class TestPersourceObjectPath(unittest.TestCase):
+    """Pure helpers behind find_object()'s per-source fallback
+    (q-find-object-persource): q-large-band-reachability (PR #1599)
+    found all 774 project-wide gap-object misses resolve at this one
+    predictable path."""
+
+    def test_main_module_maps_to_main_dir(self):
+        self.assertEqual(_module_to_src_dir("main"), "main")
+
+    def test_overlay_module_maps_to_zero_padded_overlay_dir(self):
+        self.assertEqual(_module_to_src_dir("ov2"), "overlay002")
+        self.assertEqual(_module_to_src_dir("ov002"), "overlay002")
+
+    def test_unrecognized_module_passed_through(self):
+        self.assertEqual(_module_to_src_dir("itcm"), "itcm")
+
+    def test_path_shape_for_main(self):
+        p = _persource_object_path("eur", "main", "func_020037d0")
+        self.assertEqual(
+            p.as_posix().split("build/", 1)[1],
+            "eur/delinks/src/main/func_020037d0.o",
+        )
+
+    def test_path_shape_for_overlay(self):
+        p = _persource_object_path("usa", "ov002", "func_ov002_02246a50")
+        self.assertEqual(
+            p.as_posix().split("build/", 1)[1],
+            "usa/delinks/src/overlay002/func_ov002_02246a50.o",
+        )
+
+    def test_routing_suffix_moves_from_stem_to_object_suffix(self):
+        # A bare func_ name never actually carries a routing suffix in
+        # practice (verified against 1,875 real not-in-gap candidates,
+        # 0 exceptions -- see docs/research/campaign-analytics/
+        # large-band-reachability.md) since routing suffixes mark a
+        # *source file's* compiler tier, not a symbol name. This only
+        # exercises split_routing_suffix's own contract for symmetry
+        # with a function that has since been partially routed.
+        p = _persource_object_path("eur", "main", "func_x.thumb")
+        self.assertEqual(p.name, "func_x.thumb.o")
+
+
+class TestFindObject(unittest.TestCase):
+    """find_object()'s gap-object search + per-source fallback
+    (q-find-object-persource). `--obj`/output-format callers are
+    untouched -- feed() only reaches find_object() when --obj is
+    omitted (see tools/m2c_feed.py's feed())."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.delinks = self.root / "build" / "eur" / "delinks"
+        self.delinks.mkdir(parents=True)
+
+    def _gap_obj(self, module, n=1):
+        p = self.delinks / f"_dsd_gap@{module}_{n}.o"
+        p.write_bytes(b"")  # subprocess.run is mocked below; content unused
+        return p
+
+    def _persource_obj(self, module_dir, func):
+        p = self.delinks / "src" / module_dir / f"{func}.o"
+        p.parent.mkdir(parents=True, exist_ok=True)
+        p.write_bytes(b"")
+        return p
+
+    @staticmethod
+    def _hdr(func):
+        return f"00000000 <{func}>:\n   0:\te1a00000 \tnop\n"
+
+    def test_finds_function_in_gap_object_unchanged_behaviour(self):
+        gap = self._gap_obj("main")
+        with mock.patch("m2c_feed.subprocess.run") as run:
+            run.return_value = mock.Mock(stdout=self._hdr("func_020037d0"))
+            with mock.patch("m2c_feed.ROOT", self.root):
+                obj = find_object("eur", "func_020037d0", "objdump", "main")
+        self.assertEqual(Path(obj), gap)
+
+    def test_falls_back_to_persource_object_when_gap_glob_misses(self):
+        gap = self._gap_obj("main")
+        persource = self._persource_obj("main", "func_020037d0")
+
+        def fake_run(args, **kwargs):
+            target = Path(args[-1])
+            if target == persource:
+                return mock.Mock(stdout=self._hdr("func_020037d0"))
+            return mock.Mock(stdout=self._hdr("func_SOMETHING_ELSE"))
+
+        with mock.patch("m2c_feed.subprocess.run", side_effect=fake_run):
+            with mock.patch("m2c_feed.ROOT", self.root):
+                obj = find_object("eur", "func_020037d0", "objdump", "main")
+        self.assertEqual(Path(obj), persource)
+        self.assertNotEqual(Path(obj), gap)
+
+    def test_raises_when_persource_object_missing_entirely(self):
+        self._gap_obj("main")  # exists, but never contains the target
+        with mock.patch("m2c_feed.subprocess.run") as run:
+            run.return_value = mock.Mock(stdout=self._hdr("func_SOMETHING_ELSE"))
+            with mock.patch("m2c_feed.ROOT", self.root):
+                with self.assertRaises(FeedError):
+                    find_object("eur", "func_020037d0", "objdump", "main")
+
+    def test_raises_when_persource_object_exists_but_lacks_the_symbol(self):
+        # A predictable-path .o existing is necessary but not sufficient:
+        # find_object still disasm-verifies the header there, exactly as
+        # it already does for gap objects, so a stale/wrong object at
+        # that path is never silently returned.
+        self._gap_obj("main")
+        self._persource_obj("main", "func_020037d0")
+
+        with mock.patch("m2c_feed.subprocess.run") as run:
+            run.return_value = mock.Mock(stdout=self._hdr("func_SOMETHING_ELSE"))
+            with mock.patch("m2c_feed.ROOT", self.root):
+                with self.assertRaises(FeedError):
+                    find_object("eur", "func_020037d0", "objdump", "main")
+
+    def test_gap_object_wins_when_function_is_in_both(self):
+        # Existing behaviour must be unchanged where the gap glob already
+        # succeeds -- the fallback must never even be consulted.
+        gap = self._gap_obj("main")
+        persource = self._persource_obj("main", "func_020037d0")
+        calls = []
+
+        def fake_run(args, **kwargs):
+            calls.append(Path(args[-1]))
+            return mock.Mock(stdout=self._hdr("func_020037d0"))
+
+        with mock.patch("m2c_feed.subprocess.run", side_effect=fake_run):
+            with mock.patch("m2c_feed.ROOT", self.root):
+                obj = find_object("eur", "func_020037d0", "objdump", "main")
+        self.assertEqual(Path(obj), gap)
+        self.assertNotIn(persource, calls)
+
+    def test_overlay_module_persource_fallback_uses_zero_padded_dir(self):
+        self._gap_obj("ov002")
+        persource = self._persource_obj("overlay002", "func_ov002_02246a50")
+
+        def fake_run(args, **kwargs):
+            target = Path(args[-1])
+            if target == persource:
+                return mock.Mock(stdout=self._hdr("func_ov002_02246a50"))
+            return mock.Mock(stdout=self._hdr("func_SOMETHING_ELSE"))
+
+        with mock.patch("m2c_feed.subprocess.run", side_effect=fake_run):
+            with mock.patch("m2c_feed.ROOT", self.root):
+                # module inferred from the func_ovNNN_ prefix, not passed
+                obj = find_object("eur", "func_ov002_02246a50", "objdump")
+        self.assertEqual(Path(obj), persource)
 
 
 class TestBuildContext(unittest.TestCase):

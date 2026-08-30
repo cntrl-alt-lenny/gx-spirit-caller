@@ -1,10 +1,13 @@
-"""Regression tests for tools/m2c_gap_coverage.py (q-large-band-reachability)."""
+"""Regression tests for tools/m2c_gap_coverage.py (q-large-band-reachability,
+q-find-object-persource)."""
 
 from __future__ import annotations
 
 import sys
+import tempfile
 import unittest
 from pathlib import Path
+from unittest import mock
 
 _TOOLS = Path(__file__).resolve().parent.parent / "tools"
 sys.path.insert(0, str(_TOOLS))
@@ -12,6 +15,7 @@ sys.path.insert(0, str(_TOOLS))
 from m2c_gap_coverage import (  # noqa: E402
     BANDS,
     band_for,
+    build_state,
     coverage_by_band,
     module_to_src_dir,
     parse_func_headers,
@@ -152,6 +156,58 @@ class TestCoverageByBand(unittest.TestCase):
     def test_every_band_from_module_constant_present(self):
         out = coverage_by_band([])
         self.assertEqual([r["band"] for r in out], [b[0] for b in BANDS])
+
+
+class TestBuildState(unittest.TestCase):
+    """build_state() reports the counts a coverage run actually depends
+    on (q-find-object-persource, brain round 0901) -- a tree whose gap
+    objects are mostly-empty stubs reports ~0% coverage everywhere with
+    the SAME code that reports 45-68% against a fully-populated tree;
+    these two counts turn that silent dependency into a visible one."""
+
+    def setUp(self):
+        self.tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self.tmp.cleanup)
+        self.root = Path(self.tmp.name)
+        self.delinks = self.root / "build" / "eur" / "delinks"
+        self.delinks.mkdir(parents=True)
+
+    def test_counts_gap_objects_and_uses_passed_in_functions(self):
+        (self.delinks / "_dsd_gap@main_1.o").write_bytes(b"")
+        (self.delinks / "_dsd_gap@main_2.o").write_bytes(b"")
+        with mock.patch("m2c_gap_coverage.ROOT", self.root):
+            state = build_state("eur", gap_funcs={"func_a", "func_b", "func_c"})
+        self.assertEqual(state["gap_object_count"], 2)
+        self.assertEqual(state["gap_distinct_function_count"], 3)
+        self.assertEqual(state["region"], "eur")
+
+    def test_scans_functions_itself_when_not_passed(self):
+        (self.delinks / "_dsd_gap@main_1.o").write_bytes(b"")
+        with mock.patch("m2c_gap_coverage.subprocess.run") as run:
+            run.return_value = mock.Mock(
+                stdout="a.o:     file format elf32-littlearm\n\n00000000 <func_x>:\n"
+            )
+            with mock.patch("m2c_gap_coverage.ROOT", self.root):
+                state = build_state("eur")
+        self.assertEqual(state["gap_object_count"], 1)
+        self.assertEqual(state["gap_distinct_function_count"], 1)
+
+    def test_mostly_empty_gap_objects_report_low_function_count_not_error(self):
+        # The exact shape that motivated this item: many objects, few
+        # distinct functions -- 754 objects / 55 functions on the
+        # integration tree that reproduced ~0% coverage everywhere.
+        for n in range(5):
+            (self.delinks / f"_dsd_gap@main_{n}.o").write_bytes(b"")
+        with mock.patch("m2c_gap_coverage.ROOT", self.root):
+            state = build_state("eur", gap_funcs={"func_only_one"})
+        self.assertEqual(state["gap_object_count"], 5)
+        self.assertEqual(state["gap_distinct_function_count"], 1)
+
+    def test_zero_gap_objects_reports_zero_not_error(self):
+        with mock.patch("m2c_gap_coverage.ROOT", self.root):
+            state = build_state("eur", gap_funcs=set())
+        self.assertEqual(state["gap_object_count"], 0)
+        self.assertEqual(state["gap_distinct_function_count"], 0)
 
 
 if __name__ == "__main__":
