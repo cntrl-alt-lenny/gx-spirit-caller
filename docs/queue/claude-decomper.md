@@ -2597,3 +2597,74 @@ annotated with its reproducing command and derivation date. Build-free.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-large-band-reachability`; then report
 QUEUE-EMPTY honestly if you reach it.
+
+### q-find-object-persource — close the gap you scoped, and date the figure that moved [TODO]
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+`q-large-band-reachability` (PR #1599) killed the size-dependence hypothesis
+cleanly — coverage **rises** with size (48.4% small/mid vs 62.1% large), and the
+ledger cross-check settled it: **zero of the 83 large-band attempts used gap
+objects at all**, so the low attempt count is a methodology choice, not a
+tooling wall. That was the right answer and it is now closed.
+
+**But the gap is real and it costs every round.** PR #1600 hit
+`find_object()`'s glob-blindness on **all 20** of its candidates. The `--obj`
+override bypassed it every time, so it is a **discoverability tax, not a
+blocker** — but it is a tax every future band round pays.
+
+**PR #1599 already scoped the fix precisely, which is why this is a small
+item:** all **774/774** project-wide "not in gap object" candidates — including
+**450/450** in the three large bands — resolve to a real per-source object at a
+**single predictable path**, zero misses. So this is a **deterministic path
+check**, not a glob widening.
+
+**Task one: implement it.** Extend `find_object()` to fall back to that
+per-source path when the gap glob misses. Keep the gap glob first so existing
+behaviour is unchanged where it already works. **Each change needs a test you
+have seen fail before it passes.** Do not change `m2c_feed.py`'s output format
+or its `--obj` override — both are in active use.
+
+⚠️ **`m2c_feed.py` is not dead code.** PR #1599 established it is
+`ACTIVE-CAMPAIGN` elsewhere (briefs 604-619, the `cmatch_loop.py` retriever
+pipeline). A regression here breaks work outside this lane, so hold the bar
+accordingly.
+
+**Task two: date the coverage figure, because the brain could not reproduce
+it.** Running `tools/m2c_gap_coverage.py` on the integration tree returned
+**~0.0% coverage in every band**, against your reported 45-68%. That is not an
+error in your work — the brain's `build/eur/delinks/` held 754 gap objects
+containing only **55 distinct functions between them**, so the gap objects there
+were essentially empty. **The consequence is that the coverage percentage is a
+property of whichever build tree it is run against, not of the project.**
+
+Your conclusion is unaffected — it rests on the ledger cross-check and the
+canary, both build-independent — but the number needs the caveat.
+**Add to `docs/research/campaign-analytics/`'s reachability doc: the build state
+the figure was derived from, the date, and an explicit note that the figure is
+build-state-dependent and must be re-derived rather than cited.** If you can
+cheaply make the tool *report* the build state it measured (object count,
+distinct-function count), do that too — it turns a silent dependency into a
+visible one.
+
+⚠️ **Do not restate the coverage number as a project constant anywhere**, and do
+not delete it — it is real for the tree it was measured on. Label it.
+
+**CANARY.** Before implementing, reproduce the brain's observation: run
+`m2c_gap_coverage.py` on your own tree and report both the coverage figures AND
+the gap-object/distinct-function counts behind them. If your tree still shows
+45-68%, that confirms build-state dependence directly (two trees, two answers,
+same code). If your tree now also shows ~0%, say so — that would mean something
+changed in the shared build and is worth knowing before you touch anything.
+
+**SUB-AGENTS PERMITTED, TWO HARD RULES.** READ-ONLY only — they share this
+worktree, so you do all writing, committing and git operations. No sub-agent
+runs a build, `ninja`, or a region gate. Single-threaded is fine.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean. Build-free.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-find-object-persource`; then report
+QUEUE-EMPTY honestly if you reach it.
