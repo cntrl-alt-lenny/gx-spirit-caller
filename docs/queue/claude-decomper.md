@@ -2817,7 +2817,7 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-wall-overblock-audit`; then report
 QUEUE-EMPTY honestly if you reach it.
 
-### q-wall-catalog-repair — fix the two defects your own audit found [TODO]
+### q-wall-catalog-repair — fix the two defects your own audit found [DONE]
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.
