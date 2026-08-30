@@ -93,6 +93,72 @@ Derived 2026-08-29T17:59:15Z. Every "not in gap object" candidate in
 every band (774/774, project-wide) resolves to a real object file at a
 predictable path — see Deliverable 3.
 
+### ⚠️ This coverage table is build-state-dependent — re-derive, do not cite
+
+**The percentages above describe the specific `build/eur/delinks/`
+tree they were measured against, not a project constant.** Added
+2026-09-01 (`q-find-object-persource`), after the brain tried to
+reproduce this table on the integration tree and got **~0.0% coverage
+in every band** — the identical code, a different tree.
+
+**Build state this table was derived from** (now machine-reported —
+`tools/m2c_gap_coverage.py` prints a `build state:` line and, with
+`--json`, a `build_state` object, before every run):
+
+```bash
+$ python tools/m2c_gap_coverage.py --region eur
+build state: 2083 gap objects / 2881 distinct functions in
+build/eur/delinks -- coverage below is a property of THIS tree, not
+the project (see q-find-object-persource).
+```
+
+**2,083 gap objects holding 2,881 distinct functions**, re-confirmed
+2026-08-30T11:40:01Z (unchanged from the original 2026-08-29 derivation
+above within measurement noise). Against this, the table's 45-68%
+coverage figures reproduce exactly.
+
+**The brain's integration tree, same code, same day:** `build/eur/
+delinks/` held **754 gap objects containing only 55 distinct functions
+between them** — a tree whose gap objects are mostly-empty stubs — and
+every band reported ~0% coverage. Nothing in `tools/m2c_gap_coverage.py`
+changed between the two runs; only the build tree did.
+
+**What this does and does not undermine:**
+
+- **Untouched:** Deliverable 2's verdict (coverage rises with size, the
+  size-dependent hypothesis is dead) and Deliverable 4's ledger
+  cross-check (zero of 83 large-band attempts used gap objects). Both
+  rest on the ledger and the canary, which are build-independent — a
+  ledger row's provenance doesn't change with whichever tree happens to
+  be checked out.
+- **Build-state-dependent:** every literal coverage percentage in the
+  table above (45.10%, 57.02%, 67.75%, etc.) and the persource/gap
+  object counts behind them. Re-run
+  `python tools/m2c_gap_coverage.py --region <region>` against the
+  CURRENT tree before citing a coverage number anywhere, and quote the
+  `build state:` line alongside it.
+
+**Do not restate any coverage percentage from this document as a
+project constant.** It is a real, reproducible number for the tree
+named above — not deleted, not corrected — but it is a property of
+that tree, the same way a `.text`-only ratio is a property of which
+metric function computed it (see `q-eur-next-frontier`'s own opening
+finding). A future round citing "coverage is ~57%" without re-running
+the tool and reporting its own `build state:` line is citing a number
+that may no longer describe the tree it is being applied to.
+
+**The discoverability tax this document describes is now closed**,
+independently of the build-state caveat above: `tools/m2c_feed.py`'s
+`find_object()` (`q-find-object-persource`, same PR as this update)
+now falls back to the predictable per-source object path from
+Deliverable 3 whenever the gap-object glob misses, so the ~43-55%
+coverage gap measured here no longer costs a `FeedError` — it costs
+nothing, because `find_object()` finds the function either way. The
+coverage table above still describes gap-object-only reachability
+(unchanged, since that's what it was built to measure); it no longer
+describes `find_object()`'s actual reachability, which is the whole
+point of the fix.
+
 ## Deliverable 2 — is the pattern size-dependent?
 
 **No. The three large bands (377-512 / 513-1023 / ≥1024 B) have
@@ -129,6 +195,15 @@ what is holding back the large bands specifically.**
 ## Deliverable 3 — scoping what closing the gap would take
 
 **Not implemented, per the item's explicit prohibition.** Scoped only.
+
+> **Update, 2026-09-01 (`q-find-object-persource`):** the fix scoped
+> below has since shipped, in the same PR as this update. `find_object()`
+> now checks exactly the predictable path described here as its
+> fallback when the gap glob misses, with the same disasm-header
+> verification the gap-object path already used (not a bare
+> file-existence check) — see `tools/m2c_feed.py`. The scoping below is
+> kept as-written, as the record of what was verified before the fix
+> existed.
 
 Every one of the 774 project-wide "not in gap object" dispatch-ready
 candidates — all 450 of them across the three large bands specifically
@@ -255,7 +330,7 @@ comparison — that reconciliation is out of scope here.
 | Is there a real coverage gap at all? | Yes — 43-55% uncovered in every band, small and large alike | High |
 | Did the 83 large-band attempts hit this gap? | No — none confirmed to have used `find_object()`/gap objects at all | High for 17/83 (fully confirmed), inferred for 66/83 (49 confirmed + 17 same-series) |
 | Is the 83-attempt count a tooling artefact? | No — it reflects a consistent choice of manual/agent-disassembly methodology across the campaign, not a wall hit by `m2c_feed.py` | High |
-| Would closing the gap be cheap? | Scoped only: a deterministic predictable-path check, 774/774 candidates resolve, zero misses found | High for the scoping census; the fix itself is unverified since it was not implemented |
+| Would closing the gap be cheap? | Yes — shipped 2026-09-01 (`q-find-object-persource`) as the scoped deterministic predictable-path check, 774/774 candidates resolve, zero misses found | High for the scoping census; the fix itself now shipped and unit-tested (`tests/test_m2c_feed.py::TestFindObject`) |
 
 ## Critic pass — is coverage-by-`find_object()` the right metric?
 
