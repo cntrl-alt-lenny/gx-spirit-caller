@@ -2565,3 +2565,69 @@ landed. Add any new `PROVISIONAL:` `park_class` values to
 
 ONE PR; verify every number against `git diff --stat` including the arithmetic;
 `python tools/work_queue.py done claude-scaffolder cm-257-320-drain`.
+
+### cm-257-320-drain-2 — continue the only live pocket, with the tax removed [TODO]
+
+`cm-257-320-drain` (PR #1603) worked 17 candidates and shipped **3 = 17.6%**,
+inside the noise of BR-4's pre-registered 20.0% at n=17. It correctly declined
+to declare a divergence it could not support. **259 candidates remain
+unattempted in this band** — still the only pocket above the campaign's 10%
+closed line, and still the best remaining code work.
+
+**Two things changed in your favour since that round.**
+
+1. **The `find_object()` tax is gone.** PR #1602 added the per-source fallback,
+   disasm-verifying the header at the predictable path rather than trusting
+   existence. You should no longer need `--obj` for most candidates. **If you
+   still do, say so** — that would mean the fallback misses a case PR #1599's
+   774/774 measurement did not.
+2. **The shift-pair lever is confirmed to transfer**, on a direct A/B test:
+   `(u32)(x << 0x1F) >> 0x1F` scored **71.2%** where `x & 1` scored **7.7%** on
+   the same candidate. Use the literal form by default in this band.
+
+**Scope: continue the drain.** Work candidates until they stop shipping or you
+have exhausted a reasonable batch. Populate `attempts`, ledger both results.
+
+**Three new failure signatures came out of PR #1603 as unconfirmed 1-2-hit
+leads. Test them as levers where the shape fits, and report which (if any)
+became one:**
+
+- push-vs-`sub sp,#N` alignment padding
+- `str`/`stmib` instruction-fusion choices
+- independent-computation interleaving
+
+Read `docs/research/cm-257-320-drain-2026-09-01.md` before starting — the
+per-candidate table and both levers are there in full, and BR-8 in
+`codegen-walls.md` has the band context.
+
+⚠️ **The denominator question from last round, stated so you can improve on
+it.** PR #1603 screened 6 candidates out on sight as confirmed P-20 wall
+members and excluded them from its denominator, giving 3/17 = 17.6%; including
+them it is 3/23 = 13.0%. That exclusion was defensible and clearly disclosed.
+**This round, report BOTH numbers explicitly** — attempted-rate and
+pool-rate — so the band's real yield is not flattered by screening. The other
+lane is auditing whether the wall classifications that justify such screening
+are themselves over-applied.
+
+⚠️ **Do not re-characterise the band.** 20.0% is the measured baseline and
+17.6% is consistent with it. If your rate diverges sharply, **report the
+divergence** rather than adjusting anything — `band-rate-vintage.md` exists
+because a same-band resample once collapsed 27.6% to 0/60.
+
+**Disclose attempts that made a match worse**, the way PR #1603 disclosed its
+two regressions (78.8%->47.0% and 62.1%->57.6%). Those are data about the
+compiler, not embarrassments.
+
+**DO NOT USE SUB-AGENTS.** Shared worktree, machine-wide-serialising compiler.
+Single-threaded.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, `gate3.py --scope tests`. Use `tee`, never `tail`, and
+**read the log rather than the exit code**. `git restore assets/` after each
+clean run. Regenerate `docs/state-table.md` first, `docs/dashboard.md` second.
+Add any new `PROVISIONAL:`/`P-NN` `park_class` values to
+`tools/park_class_map.tsv` — PR #1603 had to fix 12.
+
+ONE PR; verify every number against `git diff --stat` including both rate
+figures; `python tools/work_queue.py done claude-scaffolder cm-257-320-drain-2`.

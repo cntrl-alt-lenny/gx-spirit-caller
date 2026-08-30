@@ -2700,3 +2700,81 @@ tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean. Build-free.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-find-object-persource`; then report
 QUEUE-EMPTY honestly if you reach it.
+
+### q-wall-overblock-audit — are the walls blocking candidates they should not? [TODO]
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+**Why this matters now.** `cm-257-320-drain` (PR #1603) screened **6 of 23**
+candidates out **on sight** as confirmed P-20 wall members and excluded them
+from its denominator — 3/17 = 17.6% attempted-rate versus 3/23 = 13.0%
+pool-rate. That exclusion was defensible and clearly disclosed. But it means
+**wall membership is now directly gating which candidates get attempted at all**,
+in the only band the campaign still has above its 10% closed line.
+
+**If a wall is over-applied, candidates are being written off unattempted, and
+nobody would notice** — a screened-out candidate produces no attempt row, so it
+is invisible to every ship-rate the campaign computes. That is the failure mode
+to test.
+
+⚠️ **This is not a request to weaken the walls.** They encode real, repeatedly
+falsified failures — P-20 alone has 11+ independently falsified prior attempts.
+The default expectation is that they are correct. **A clean "all walls are
+correctly scoped" is a perfectly good result** and would let future rounds screen
+with confidence instead of suspicion.
+
+**Deliverable:**
+
+1. **Per P-NN wall: how many currently-unattempted candidates does it block?**
+   Counts and bytes, per band. Rank by blocked bytes. Nobody has this number.
+2. **Evidence strength per wall.** How many independent falsified attempts back
+   each one, and from which rounds? A wall with 11 falsifications is a different
+   object from one asserted once and never retested. Say which are which.
+3. **Flag any wall whose membership test is broader than its evidence.** The
+   known precedent is real: `wall_aware_headroom.py` has a documented
+   classification gap where an already-diagnosed permanent wall surfaced as an
+   unassessed candidate — the same machinery can err in the other direction.
+   **Do not re-classify anything; report the mismatch and its size.**
+4. **A bottom line:** how many unattempted candidates, and how many bytes, sit
+   behind walls whose evidence is thin enough to be worth one re-test round.
+
+⚠️ **Watch the vintage rule.** A wall established against a specific pool at a
+specific date describes that pool. Re-derive membership counts against the
+current tree and stamp every figure with its date and reproducing command.
+
+⚠️ **Blank is not zero, and do not recommend a direction.** If a wall's evidence
+cannot be reconstructed from committed sources, say so — an unreconstructable
+wall is itself a finding.
+
+**SECOND, SMALLER TASK.** PR #1593's dashboard tolerance covers a **rewritten
+SHA on the trailing trend row**, but not a **new row appearing** — and the brain
+confirmed `docs/dashboard.md` was stale on `origin/main` this round with
+`stale (line count differs)`, caused by the round-0831 brain PR adding a trend
+row. Same self-reference, second form. Extend the tolerance to cover a
+trailing-row *addition* whose values are otherwise consistent with a fresh
+render, **or** state clearly why that cannot be done safely. The existing
+constraint stands: **do not weaken the freshness check into uselessness** — say
+what it still guarantees, and demonstrate the fix by constructing the failure
+and showing it pass.
+
+**CANARY.** Before the full survey, take **P-20** specifically — the wall that
+did the screening in PR #1603 — and reconstruct its evidence: how many
+falsified attempts, from which rounds, and how many unattempted candidates it
+currently blocks. If you cannot reconstruct P-20's evidence from committed
+sources, STOP and report that, because it is the best-evidenced wall in the
+catalog and every weaker one would then be unreconstructable too.
+
+**SUB-AGENTS PERMITTED, TWO HARD RULES.** One worker per wall class, then a
+synthesis pass on common units, then a critic pass asking which wall's evidence
+is weakest. **READ-ONLY only** — shared worktree; you do all writing, committing
+and git operations. **No sub-agent runs a build, `ninja`, or a region gate.**
+Verify your workers rather than relaying them.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
+annotated with its reproducing command and date. Build-free.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-wall-overblock-audit`; then report
+QUEUE-EMPTY honestly if you reach it.
