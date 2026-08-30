@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**151 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**152 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (74)
+- [Uncategorised](#uncategorised) (75)
 
 ## Analysis / worklist
 
@@ -722,6 +722,12 @@ The 3-region `gate3.py` is our *merge* gate — the strongest possible arbiter o
 **vendor m2c (the asm->C decompiler) at a pinned commit,**
 
 mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
+
+### `tools/m2c_gap_coverage.py`
+
+**READ-ONLY: what fraction of EUR code-frontier candidates can**
+
+`tools/m2c_feed.py`'s `find_object()` actually resolve, per size band? (q-large-band-reachability)
 
 ### `tools/main_shape_reclassify.py`
 

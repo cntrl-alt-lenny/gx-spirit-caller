@@ -2491,7 +2491,38 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-eur-next-frontier`; then report
 QUEUE-EMPTY honestly if you reach it.
 
-### q-large-band-reachability — can the toolchain even feed a large function? [TODO]
+### q-large-band-reachability — can the toolchain even feed a large function? [DONE]
+
+**Result (this PR):** canary determined the one `>=1024 B` ledger row's
+provenance (`func_ov002_02246a50`, brief-650) was manual disassembly
+reading, not `m2c_feed.py` — it provides no direct evidence about
+`find_object()`. **Coverage census** (new `tools/m2c_gap_coverage.py`,
+reads already-built `build/eur/delinks/` objects, verified 8/8 against
+the real `find_object()`): gap-object coverage is **45-68% per band**,
+and **rises with size** (48.4% weighted across the small/mid bands vs.
+62.1% across the three large bands) — the opposite of the hypothesis's
+predicted direction. **The size-dependent hypothesis is dead.** A real,
+size-UNIFORM ~43-55% coverage gap exists in every band regardless —
+774/774 project-wide "not in gap object" candidates (450/450 in the
+three large bands) resolve to a real per-source object at a single
+predictable path (`build/<region>/delinks/src/<module>/<name>.o`),
+zero misses, scoping the fix as a deterministic path check rather than
+a glob-widening or pipeline redesign — **not implemented**, per the
+item's own prohibition. **Ledger cross-check:** of the 83 large-band
+attempts, 66 (79.5%) directly confirmed by commit subject and 17
+(20.5%) inferred by identical PR-series membership — **zero** used
+`find_object()`/gap objects; every checked attempt used the campaign's
+standard manual/agent disassembly-reading workflow instead, so the
+83-attempt count reflects a methodology choice, not a tooling wall.
+Caveat: `m2c_feed.py` is `ACTIVE-CAMPAIGN` elsewhere (briefs 604-619,
+the untracked `cmatch_loop.py`/retriever pipeline) — this finding is
+narrow to `attempts.tsv`'s own rows, not a claim the tool is unused
+project-wide. Regression discipline: a real `re.MULTILINE`-omission
+bug in the coverage tool itself silently zeroed every band's count
+during development; caught, fixed, and demonstrated fail→pass via a
+reverted-then-restored test run. Full costed doc, every figure dated
+and reproducible:
+[`docs/research/campaign-analytics/large-band-reachability.md`](../research/campaign-analytics/large-band-reachability.md).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.
