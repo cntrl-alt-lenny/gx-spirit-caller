@@ -994,7 +994,7 @@ EUR moves.** `q-eur-next-frontier` is seeded to cost every remaining EUR avenue
 ⚠️ **Control 12 NOT executable, fourth consecutive round** — both lanes run
 outside Claude Code and Codex. Every finding above is git- and tool-derived.
 
-**Last updated:** 2026-08-30 — **(Windows PC, brain=Opus 5; both lanes Claude
+**Round 0830 (2026-08-30, Windows PC, brain=Opus 5; both lanes Claude
 Sonnet 5 at `max` effort, swarm on the build-free lane only.) Round 0830: the
 port campaign is DONE — 489 final ports take USA and JPN to 15.85% and leave 17
 and 18 rows. And the code frontier was never closed: it was under-sampled. 87%
@@ -1067,7 +1067,79 @@ not a verdict on difficulty.
 ⚠️ **Control 12 NOT executable, fifth consecutive round** — both lanes run
 outside Claude Code and Codex. Every finding above is git- and tool-derived.
 
-<!-- main-sha: 81c879c13 -->
+**Last updated:** 2026-08-31 — **(Windows PC, brain=Opus 5; both lanes Claude
+Sonnet 5 at `max` effort.) Round 0831: both results came back NEGATIVE and both
+were reported honestly. 377-512 B is CLOSED at 5.0%, and the brain's own
+tooling-blindness hypothesis is DEAD. The band map is now complete and
+monotone.**
+
+Merged **PR #1599** and **PR #1600**. `main` at `bfbdc1d27`. EUR **17.27% ->
+17.29%** — small, but the first EUR movement in six rounds. USA and JPN
+unchanged at 15.85%.
+
+**PR #1600 — the band is closed, on a threshold nobody moved.** n=20 at
+377-512 B returned **1/20 = 5.0%**, inside the pre-registered `<=10%` zone. The
+frontier is now fully mapped and **monotonically harder with size**:
+
+| band | rate | status |
+|---|---|---|
+| 193-256 B | 0/60 | closed (204 fresh candidates remain) |
+| **257-320 B** | **4/20 = 20.0%** | **the only pocket above 10%** |
+| 321-376 B | 1/15 = 6.7% | closed |
+| 377-512 B | **1/20 = 5.0%** | **closed — BR-7** |
+| 513-1023 B | 0/15 | effectively closed |
+| >=1024 B | 1 attempt ever | unmeasured |
+
+Three near-misses broke **80%+** (91.5%, 82.0%, 81.1%) on genuine multi-attempt
+work and were each diagnosed as **compiler-internal register-allocation
+residuals, not under-effort** — the method has a ceiling and we have found it.
+It also corrects BR-6's "fully characterised" claim, which had skipped this band
+entirely.
+
+**Two new levers, both worth carrying forward.** `volatile` on a raw MMIO
+register pointer forces mwcc's own two-load read-modify-write instead of a CSE'd
+single load — **20.8% -> 81.1% in one change**. And **shift-pair over mask
+simplification**: reverting `(field & 7) == 0` to the literal
+`(u32)(field << 0x1D) >> 0x1D` closed a 6.7% attempt to **100%**; it extends to
+3-bit fields.
+
+**PR #1599 — the brain's hypothesis is dead, and the ledger settled it.**
+Coverage **rises** with size (48.4% small/mid vs 62.1% large), the opposite of
+predicted. The load-bearing finding is build-independent: **zero of the 83
+large-band attempts used gap objects at all** — every one used manual
+disassembly reading. **The low attempt count is a methodology choice, not a
+tooling wall.** Brain verified the canary directly: exactly one ledger row
+>=1024 B, `0x02246a50` / ov002 / 1036 B / parked / `brief-650`, produced by hand.
+
+⚠️ **BRAIN FINDING: PR #1599's coverage figure is BUILD-STATE-DEPENDENT.**
+Running `tools/m2c_gap_coverage.py` on the integration tree returned **~0.0%
+coverage in every band** against the reported 45-68%. Not a lane error — the
+brain's `build/eur/delinks/` held **754 gap objects containing only 55 distinct
+functions between them**, so the gap objects there were essentially empty. **The
+percentage is a property of whichever build tree it is run against, not of the
+project.** The conclusion survives untouched because it rests on the ledger
+cross-check and the canary. `q-find-object-persource` requires the figure be
+dated and labelled rather than cited as a constant.
+
+⚠️ **Gate caught real drift at integration.** The first `--scope all --clean`
+run passed all three SHA1 checks but **failed 2 tests** — both dashboard
+freshness, including PR #1593's own regression test. Cause: merging the two
+branches produced genuine content drift, which is more than the trailing-SHA
+tolerance covers. Regenerated state-table then dashboard; `--scope tests` then
+returned **3,540 passed**. **The `tee` wrapper reported exit 0 while the gate
+had FAILED** — reading the log is what caught it.
+
+**Next round.** `cm-257-320-drain`: 257-320 B is the only pocket above 10%, with
+**263 unattempted candidates / 75,980 B** behind it — roughly 50 functions and
+~15,000 B at its measured rate, and the two new levers have never been applied
+there. Probing 513-1023 B was rejected: the gradient is monotone and it would
+buy a predictable null. `q-find-object-persource` implements the fix PR #1599
+scoped (**774/774** candidates resolve at a single predictable path — a
+deterministic path check, not a glob widening) and dates the coverage figure.
+
+⚠️ **Control 12 NOT executable, sixth consecutive round.**
+
+<!-- main-sha: bfbdc1d27 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

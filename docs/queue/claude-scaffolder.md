@@ -2498,3 +2498,70 @@ vacuous pass. `git restore assets/` after each clean run.
 ONE PR; verify every number against `git diff --stat` including the arithmetic
 and the attempt count; `python tools/work_queue.py done claude-scaffolder
 cm-377-512-probe`.
+
+### cm-257-320-drain — the only live code pocket left, with two new levers [TODO]
+
+**The band map is now complete and monotone.** `cm-377-512-probe` (PR #1600)
+closed 377-512 B at **1/20 = 5.0%** on a pre-registered threshold, and the
+gradient across the whole frontier is unambiguous:
+
+| band | rate | status |
+|---|---|---|
+| 193-256 B | 0/60 | closed (204 fresh candidates remain) |
+| **257-320 B** | **4/20 = 20.0%** | **MARGINAL — the only pocket above 10%** |
+| 321-376 B | 1/15 = 6.7% | closed (161 fresh remain) |
+| 377-512 B | 1/20 = 5.0% | **closed (BR-7)** |
+| 513-1023 B | 0/15 | effectively closed |
+| >=1024 B | 1 attempt ever | unmeasured |
+
+**Larger is monotonically harder.** Probing 513-1023 B would almost certainly
+return another null, and PR #1600's three 80%+ near-misses were each diagnosed as
+**compiler-internal register-allocation residuals, not under-effort** — the
+method has a ceiling and we have found it.
+
+**So: drain the one pocket the data says is live.** 257-320 B holds **263
+unattempted candidates / 75,980 B**. At its measured 20.0% that is roughly 50
+functions and ~15,000 B — the best remaining code EV by a wide margin.
+
+**Two new levers landed in PR #1600. Try both here; they were discovered one
+band up and have never been applied at 257-320 B.**
+
+1. **`volatile` on a raw MMIO register pointer** forces mwcc's own two-load
+   read-modify-write instead of a CSE'd single load. Took one candidate from
+   **20.8% to 81.1% in a single change** (`func_ov016_021b32f0`).
+2. **Shift-pair over mask simplification** — reverting `(field & 7) == 0` to the
+   literal `(u32)(field << 0x1D) >> 0x1D` closed a 6.7% first attempt to
+   **100%**. PR #1600 notes this extends to 3-bit fields.
+
+Read `docs/research/cm-377-512-probe-2026-08-29.md` for both levers in full
+before starting, and `codegen-walls.md`'s BR-7 entry for the band context.
+
+**Scope: a drain, not a probe** — this band is already characterised, so work
+candidates until they stop shipping or you have exhausted a reasonable batch.
+Populate `attempts`, ledger both results, and **record explicitly whether either
+new lever changed an outcome** — that is the secondary finding and it matters
+for every future round.
+
+⚠️ **Do not re-probe or re-characterise the band.** The 20.0% is measured. If
+your observed rate diverges sharply from it, **report the divergence** rather
+than adjusting anything — `band-rate-vintage.md` exists because a same-band
+resample once collapsed 27.6% to 0/60, and a real shift is a finding.
+
+⚠️ **`m2c_feed.py`'s `find_object()` will fail on most candidates.** PR #1600
+hit it on **all 20**; the existing **`--obj` override bypasses it cleanly every
+time**. Use the override, do not fight the glob, and do not count a feed failure
+as a match failure. The other lane is fixing this properly in parallel.
+
+**DO NOT USE SUB-AGENTS.** Shared worktree, machine-wide-serialising compiler.
+Single-threaded.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, `gate3.py --scope tests`. Use `tee`, never `tail`.
+`git restore assets/` after each clean run. **Regenerate `docs/state-table.md`
+first and `docs/dashboard.md` second**, each after the commit it describes has
+landed. Add any new `PROVISIONAL:` `park_class` values to
+`tools/park_class_map.tsv` — PR #1600 had to fix 15 of them.
+
+ONE PR; verify every number against `git diff --stat` including the arithmetic;
+`python tools/work_queue.py done claude-scaffolder cm-257-320-drain`.
