@@ -2499,7 +2499,7 @@ ONE PR; verify every number against `git diff --stat` including the arithmetic
 and the attempt count; `python tools/work_queue.py done claude-scaffolder
 cm-377-512-probe`.
 
-### cm-257-320-drain — the only live code pocket left, with two new levers [TODO]
+### cm-257-320-drain — the only live code pocket left, with two new levers [DONE]
 
 **The band map is now complete and monotone.** `cm-377-512-probe` (PR #1600)
 closed 377-512 B at **1/20 = 5.0%** on a pre-registered threshold, and the

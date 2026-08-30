@@ -49,6 +49,7 @@ P-20-r8-vs-r9-const-vs-masked-swap	P-20	r8-vs-r9-const-vs-masked-swap	1
 P-20-redundant-const-preserve	P-20	redundant-const-preserve	1
 P-20-reg-alloc	P-20	reg-alloc	1
 P-20-regalloc-plus-imm-fold	P-20	regalloc-plus-imm-fold	1
+P-20-register-letter	P-20	register-letter	1
 P-20-register-permutation	P-20	register-permutation	1
 P-20-register-swap-plus-scheduling	P-20	register-swap-plus-scheduling	1
 P-20-row-offset	P-20	row-offset	15
@@ -180,6 +181,7 @@ dead-value-register-reuse-changed-bool-P36-adjacent	PROVISIONAL:register-choice	
 dense-bitfield-scheduling	PROVISIONAL:dense-bitfield-scheduling	dense-bitfield-scheduling	1
 divmod-runtime-plus-reg-alloc	PROVISIONAL:divmod-runtime-plus-reg-alloc	divmod-runtime-plus-reg-alloc	1
 epilogue-shape	PROVISIONAL:frame/epilogue	epilogue-shape	4
+epilogue-tail-merge-residual	PROVISIONAL:epilogue-tail-merge-residual	epilogue-tail-merge-residual	1
 extra-2-register-cascade	PROVISIONAL:register-pressure/cascade	extra-2-register-cascade	1
 field-pool-base212-known-wall	PROVISIONAL:pool/address-cse	field-pool-base212-known-wall	1
 fixed-point-blend-structural-mismatch	PROVISIONAL:fixed-point-blend-structural-mismatch	fixed-point-blend-structural-mismatch	1
@@ -187,6 +189,7 @@ fn-ptr-field-pool-b6c-dispatch	PROVISIONAL:pool/address-cse	fn-ptr-field-pool-b6
 fold-predication-alloc	PROVISIONAL:predication/branch	fold-predication-alloc	1
 frame-shape	PROVISIONAL:frame/epilogue	frame-shape	2
 guard-chain-double-deref-p1reg	PROVISIONAL:guard-chain-double-deref-p1reg	guard-chain-double-deref-p1reg	4
+independent-computation-interleave-scheduling	PROVISIONAL:independent-computation-interleave-scheduling	independent-computation-interleave-scheduling	1
 indirect-call-plus-chained-cond	PROVISIONAL:indirect-call-plus-chained-cond	indirect-call-plus-chained-cond	1
 induction-strength-reduction	C-65	induction-strength-reduction	2
 instr-selection	PROVISIONAL:instruction-selection	instr-selection	1
@@ -195,6 +198,8 @@ instruction-selection	PROVISIONAL:instruction-selection	instruction-selection	8
 large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	large-diff-materialized-bool-mismatch	1
 large-diff-register-realloc	PROVISIONAL:register-pressure/cascade	large-diff-register-realloc	6
 large-diff-scheduling-mismatch	P-36	large-diff-scheduling-mismatch	1
+large-word-count-gap-field-width-uncertainty	PROVISIONAL:large-word-count-gap-field-width-uncertainty	large-word-count-gap-field-width-uncertainty	1
+ldm-fusion-residual	PROVISIONAL:ldm-fusion-residual	ldm-fusion-residual	1
 legacy-prologue-r3-pad-vs-subsp4-register-pressure	PROVISIONAL:register-pressure/cascade	legacy-prologue-r3-pad-vs-subsp4-register-pressure	1
 lo-hi-register-swap	PROVISIONAL:register-choice	lo-hi-register-swap	2
 load-fusion	PROVISIONAL:memory-order/fusion	load-fusion	1
@@ -203,11 +208,13 @@ load-scheduling-interleave	P-36	load-scheduling-interleave	1
 load-scheduling-residual	PROVISIONAL:load-scheduling-residual	load-scheduling-residual	1
 loop-index-count-register-role-swap-plus-stack-spill-risk	PROVISIONAL:register-choice	loop-index-count-register-role-swap-plus-stack-spill-risk	1
 loop-invariant-hoist-register-cascade-P36-adjacent	PROVISIONAL:register-pressure/cascade	loop-invariant-hoist-register-cascade-P36-adjacent	1
+loop-rotation-scheduling-residual	PROVISIONAL:loop-rotation-scheduling-residual	loop-rotation-scheduling-residual	1
 loop-strength-reduction-plus-uncertain-div256-idiom	C-65	loop-strength-reduction-plus-uncertain-div256-idiom	1
 loop-strength-reduction-register-role-cascade-P36-adjacent	PROVISIONAL:register-choice	loop-strength-reduction-register-role-cascade-P36-adjacent	1
 materialized-bool-global	PROVISIONAL:constant-materialization	materialized-bool-global	1
 memory-width	PROVISIONAL:memory-width	memory-width	1
 missing-char-reload-spill	PROVISIONAL:missing-char-reload-spill	missing-char-reload-spill	1
+missing-top-guard-branch	PROVISIONAL:missing-top-guard-branch	missing-top-guard-branch	1
 mistagged-brief294	PROVISIONAL:ledger-mistag	mistagged-brief294	3
 mistagged-c34	PROVISIONAL:ledger-mistag	mistagged-c34	4
 mla-operand-order-register-numbering-P17-adjacent	PROVISIONAL:mla-operand-order-register-numbering-p17-adjacent	mla-operand-order-register-numbering-P17-adjacent	1
@@ -239,6 +246,7 @@ predicated-pointer-vs-value-choice-on-final-compare	PROVISIONAL:predication/bran
 predication	PROVISIONAL:predication/branch	predication	13
 predication-resistance-new	PROVISIONAL:predication/branch	predication-resistance-new	2
 predication-vs-branch-dual-assignment	PROVISIONAL:predication/branch	predication-vs-branch-dual-assignment	1
+push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	push-vs-subsp-alignment-padding	2
 reciprocal-division-register-numbering-cascade	PROVISIONAL:reciprocal-division-register-numbering-cascade	reciprocal-division-register-numbering-cascade	1
 reg-alloc	PROVISIONAL:register-allocation	reg-alloc	144
 reg-alloc-2nd-loop-addressing	PROVISIONAL:register-allocation	reg-alloc-2nd-loop-addressing	1
@@ -285,6 +293,7 @@ shifted-add-fusion-residual	PROVISIONAL:shifted-add-fusion-residual	shifted-add-
 sibling-constant-arithmetic-reuse	PROVISIONAL:sibling-constant-arithmetic-reuse	sibling-constant-arithmetic-reuse	1
 smulbb-instruction-selection-and-r5-reuse-residual	PROVISIONAL:instruction-selection	smulbb-instruction-selection-and-r5-reuse-residual	1
 sp3-dead-store-stack-pad-reg-pressure	PROVISIONAL:frame/epilogue	sp3-dead-store-stack-pad-reg-pressure	2
+spill-vs-extra-register-mismatch	PROVISIONAL:spill-vs-extra-register-mismatch	spill-vs-extra-register-mismatch	1
 stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	stack-slot-assignment-mismatch	1
 statement-order	P-36	statement-order	1
 stm-burst-needs-asm	PROVISIONAL:inline-asm	stm-burst-needs-asm	1
@@ -292,15 +301,18 @@ stmib-grouping-scheduling	P-36	stmib-grouping-scheduling	1
 stmib-grouping-scheduling-p7-split	P-36	stmib-grouping-scheduling-p7-split	1
 store-coalescing	PROVISIONAL:memory-order/fusion	store-coalescing	1
 store-order	PROVISIONAL:memory-order/fusion	store-order	1
+str-stmib-fusion-residual	PROVISIONAL:str-stmib-fusion-residual	str-stmib-fusion-residual	2
 strength-reduction	C-65	strength-reduction	1
 struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	struct-by-value-return-abi	1
 struct-stride-uncertainty	PROVISIONAL:struct-stride-uncertainty	struct-stride-uncertainty	1
 structural	PROVISIONAL:structural	structural	9
 switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	PROVISIONAL:switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	1
 switch-plus-struct-reg-alloc	PROVISIONAL:switch-plus-struct-reg-alloc	switch-plus-struct-reg-alloc	1
+switch-value-register-letter-reuse	PROVISIONAL:switch-value-register-letter-reuse	switch-value-register-letter-reuse	1
 tier-verification-inferior	PROVISIONAL:tier-verification-inferior	tier-verification-inferior	1
 tool-anomaly	UNCLASSIFIED:tool-anomaly	fastmatch/sha1 disagreement; tool follow-up	1
 unclear	PROVISIONAL:unclear	unclear	1
 unknown	UNCLASSIFIED:unknown	raw value is unknown	259
 unsigned-cast	PROVISIONAL:unsigned-cast	unsigned-cast	1
 xor-order	PROVISIONAL:xor-order	xor-order	2
+zero-const-register-reuse	PROVISIONAL:zero-const-register-reuse	zero-const-register-reuse	1

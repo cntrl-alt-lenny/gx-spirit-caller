@@ -1804,3 +1804,20 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b5f24	ov017	504	default	unknown	parked	5.2	dense-bitfield-scheduling	PROVISIONAL:dense-bitfield-scheduling	cm-377-512-probe	1
 0x021aa5fc	ov018	408	default	unknown	parked	22.6	param-truncation-sequence	PROVISIONAL:param-truncation-sequence	cm-377-512-probe	2
 0x021aa4a0	ov020	476	default	unknown	shipped	100.0	n/a		cm-377-512-probe	2
+0x0203f094	main	260	default	unknown	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	cm-257-320-drain	2
+0x02057d5c	main	260	default	unknown	parked	43.1	str-stmib-fusion-residual	PROVISIONAL:str-stmib-fusion-residual	cm-257-320-drain	3
+0x0205febc	main	260	default	unknown	parked	30.9	spill-vs-extra-register-mismatch	PROVISIONAL:spill-vs-extra-register-mismatch	cm-257-320-drain	3
+0x0207fda4	main	260	default	unknown	parked	0.0	large-word-count-gap-field-width-uncertainty	PROVISIONAL:large-word-count-gap-field-width-uncertainty	cm-257-320-drain	2
+0x0209fae4	main	260	default	unknown	parked	1.5	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	cm-257-320-drain	1
+0x021fa968	ov002	260	default	unknown	parked	71.2	switch-value-register-letter-reuse	PROVISIONAL:switch-value-register-letter-reuse	cm-257-320-drain	4
+0x02206780	ov002	260	default	unknown	shipped	100.0	n/a		cm-257-320-drain	1
+0x02206eb0	ov002	260	default	unknown	shipped	100.0	n/a		cm-257-320-drain	1
+0x0222fcb0	ov002	260	default	unknown	parked	93.8	P-20-register-letter	P-20	cm-257-320-drain	3
+0x0223bcb4	ov002	260	default	unknown	shipped	100.0	n/a		cm-257-320-drain	2
+0x022932c0	ov002	260	default	unknown	parked	85.3	epilogue-tail-merge-residual	PROVISIONAL:epilogue-tail-merge-residual	cm-257-320-drain	3
+0x021b421c	ov010	260	default	unknown	parked	48.5	ldm-fusion-residual	PROVISIONAL:ldm-fusion-residual	cm-257-320-drain	2
+0x0200ce5c	main	264	default	unknown	parked	57.6	independent-computation-interleave-scheduling	PROVISIONAL:independent-computation-interleave-scheduling	cm-257-320-drain	4
+0x02021934	main	264	default	unknown	parked	9.1	missing-top-guard-branch	PROVISIONAL:missing-top-guard-branch	cm-257-320-drain	2
+0x020580a0	main	264	default	unknown	parked	37.9	str-stmib-fusion-residual	PROVISIONAL:str-stmib-fusion-residual	cm-257-320-drain	2
+0x020602c4	main	264	default	unknown	parked	78.8	loop-rotation-scheduling-residual	PROVISIONAL:loop-rotation-scheduling-residual	cm-257-320-drain	2
+0x02091d24	main	264	default	unknown	parked	24.2	zero-const-register-reuse	PROVISIONAL:zero-const-register-reuse	cm-257-320-drain	1
