@@ -23,6 +23,7 @@ P-20-cmp-operand-r0-r1-swap	P-20	cmp-operand-r0-r1-swap	1
 P-20-confirmed	P-20	confirmed	1
 P-20-dead-stackword-register	P-20	dead-stackword-register	1
 P-20-dual-register-swap	P-20	dual-register-swap	1
+P-20-family	P-20	P-20-family	2
 P-20-final-add-register-choice	P-20	final-add-register-choice	1
 P-20-guard-merge-residual	P-20	guard-merge-residual	1
 P-20-leaf-r0r1-choice	P-20	leaf-r0r1-choice	1
@@ -124,6 +125,7 @@ RSB-immediate-constant-fusion-resists-source	PROVISIONAL:rsb-immediate-constant-
 T-1-r1-vs-r2-scratch-register-renaming	PROVISIONAL:T-1	T-1-r1-vs-r2-scratch-register-renaming	1
 T-1-r2-vs-r3-scratch-register-renaming	PROVISIONAL:T-1	T-1-r2-vs-r3-scratch-register-renaming	1
 T-1-r4-vs-r5-first-call-result-register-choice	PROVISIONAL:T-1	T-1-r4-vs-r5-first-call-result-register-choice	1
+address-fold	PROVISIONAL:address-fold	address-fold	1
 and-shift-pair-collapse	PROVISIONAL:and-shift-pair-collapse	and-shift-pair-collapse	1
 asm-int	PROVISIONAL:inline-asm	asm-int	2
 bitfield	PROVISIONAL:bitfield/bit-pack	bitfield	2
@@ -144,6 +146,7 @@ c-60	C-60	formal anchor	2
 c-61	C-61	formal anchor	4
 c-63	C-63	formal anchor	1
 c-64	C-64	formal anchor	2
+call-arg-scheduling-residual	PROVISIONAL:call-arg-scheduling-residual	call-arg-scheduling-residual	1
 canary-lever-residual	PROVISIONAL:canary-residual	canary-lever-residual	4
 canary-lever-residual-2nd-access	PROVISIONAL:canary-residual	canary-lever-residual-2nd-access	1
 canary-lever-residual-iplr	PROVISIONAL:canary-residual	canary-lever-residual-iplr	1
@@ -174,6 +177,8 @@ dead-call-result-register-reuse	PROVISIONAL:register-choice	dead-call-result-reg
 dead-param-preservation-move-not-elided	PROVISIONAL:dead-param-preservation-move-not-elided	dead-param-preservation-move-not-elided	1
 dead-until-later-param-register-choice-plus-bitpack	PROVISIONAL:register-choice	dead-until-later-param-register-choice-plus-bitpack	1
 dead-value-register-reuse-changed-bool-P36-adjacent	PROVISIONAL:register-choice	dead-value-register-reuse-changed-bool-P36-adjacent	2
+dense-bitfield-scheduling	PROVISIONAL:dense-bitfield-scheduling	dense-bitfield-scheduling	1
+divmod-runtime-plus-reg-alloc	PROVISIONAL:divmod-runtime-plus-reg-alloc	divmod-runtime-plus-reg-alloc	1
 epilogue-shape	PROVISIONAL:frame/epilogue	epilogue-shape	4
 extra-2-register-cascade	PROVISIONAL:register-pressure/cascade	extra-2-register-cascade	1
 field-pool-base212-known-wall	PROVISIONAL:pool/address-cse	field-pool-base212-known-wall	1
@@ -182,6 +187,7 @@ fn-ptr-field-pool-b6c-dispatch	PROVISIONAL:pool/address-cse	fn-ptr-field-pool-b6
 fold-predication-alloc	PROVISIONAL:predication/branch	fold-predication-alloc	1
 frame-shape	PROVISIONAL:frame/epilogue	frame-shape	2
 guard-chain-double-deref-p1reg	PROVISIONAL:guard-chain-double-deref-p1reg	guard-chain-double-deref-p1reg	4
+indirect-call-plus-chained-cond	PROVISIONAL:indirect-call-plus-chained-cond	indirect-call-plus-chained-cond	1
 induction-strength-reduction	C-65	induction-strength-reduction	2
 instr-selection	PROVISIONAL:instruction-selection	instr-selection	1
 instr-selection-const-materialize	PROVISIONAL:instruction-selection	instr-selection-const-materialize	1
@@ -194,6 +200,7 @@ lo-hi-register-swap	PROVISIONAL:register-choice	lo-hi-register-swap	2
 load-fusion	PROVISIONAL:memory-order/fusion	load-fusion	1
 load-order	P-36	load-order	1
 load-scheduling-interleave	P-36	load-scheduling-interleave	1
+load-scheduling-residual	PROVISIONAL:load-scheduling-residual	load-scheduling-residual	1
 loop-index-count-register-role-swap-plus-stack-spill-risk	PROVISIONAL:register-choice	loop-index-count-register-role-swap-plus-stack-spill-risk	1
 loop-invariant-hoist-register-cascade-P36-adjacent	PROVISIONAL:register-pressure/cascade	loop-invariant-hoist-register-cascade-P36-adjacent	1
 loop-strength-reduction-plus-uncertain-div256-idiom	C-65	loop-strength-reduction-plus-uncertain-div256-idiom	1
@@ -204,6 +211,9 @@ missing-char-reload-spill	PROVISIONAL:missing-char-reload-spill	missing-char-rel
 mistagged-brief294	PROVISIONAL:ledger-mistag	mistagged-brief294	3
 mistagged-c34	PROVISIONAL:ledger-mistag	mistagged-c34	4
 mla-operand-order-register-numbering-P17-adjacent	PROVISIONAL:mla-operand-order-register-numbering-p17-adjacent	mla-operand-order-register-numbering-P17-adjacent	1
+mmio-bitfield-extract-register-shuffle	PROVISIONAL:mmio-bitfield-extract-register-shuffle	mmio-bitfield-extract-register-shuffle	1
+mmio-const-materialization	PROVISIONAL:mmio-const-materialization	mmio-const-materialization	1
+mmio-plus-complex-flow	PROVISIONAL:mmio-plus-complex-flow	mmio-plus-complex-flow	1
 multi-table-reg-numbering	P-30	multi-table-reg-numbering	1
 neg1-materialization-reg-swap	PROVISIONAL:constant-materialization	neg1-materialization-reg-swap	1
 new-bitswap-scratch-register-pressure	PROVISIONAL:register-pressure/cascade	new-bitswap-scratch-register-pressure	1
@@ -217,6 +227,7 @@ ov011-core-documented-1reg-wall	PROVISIONAL:ov011-core-documented-1reg-wall	ov01
 ov011-core-documented-multifield-rmw-wall	PROVISIONAL:ov011-core-documented-multifield-rmw-wall	ov011-core-documented-multifield-rmw-wall	1
 ov011-core-multifield-rmw-wall-stack-variant	PROVISIONAL:frame/epilogue	ov011-core-multifield-rmw-wall-stack-variant	1
 p-17	P-17	formal anchor	2
+param-truncation-sequence	PROVISIONAL:param-truncation-sequence	param-truncation-sequence	1
 permanent-header	PROVISIONAL:permanent-header	permanent-header	1
 permuter-class-register-mirror	PROVISIONAL:register-choice	permuter-class-register-mirror	1
 pool-const-materialize	PROVISIONAL:constant-materialization	pool-const-materialize	3
@@ -242,6 +253,7 @@ reg-alloc-mul-dest-swap-plus-LS-vs-EQ-condcode-persistent	PROVISIONAL:register-a
 reg-alloc-preamble-mismatch	PROVISIONAL:register-allocation	reg-alloc-preamble-mismatch	1
 reg-alloc-predication	PROVISIONAL:register-allocation	reg-alloc-predication	1
 reg-alloc-preexisting-global-asm-wall	PROVISIONAL:register-allocation	reg-alloc-preexisting-global-asm-wall	1
+reg-alloc-push-list-mismatch	PROVISIONAL:reg-alloc-push-list-mismatch	reg-alloc-push-list-mismatch	1
 reg-alloc-scratch-register-choice-ip-vs-r0-persistent	PROVISIONAL:register-allocation	reg-alloc-scratch-register-choice-ip-vs-r0-persistent	1
 reg-alloc-single-load-dest-choice-persistent	PROVISIONAL:register-allocation	reg-alloc-single-load-dest-choice-persistent	1
 reg-alloc-stack-footprint-mismatch	PROVISIONAL:register-allocation	reg-alloc-stack-footprint-mismatch	2
@@ -260,32 +272,35 @@ register-role-rotation-field2-holder	PROVISIONAL:register-choice	register-role-r
 register-role-rotation-plus-LS-vs-EQ-mnemonic	PROVISIONAL:register-choice	register-role-rotation-plus-LS-vs-EQ-mnemonic	5
 register-role-rotation-side-count-array-idx	PROVISIONAL:register-choice	register-role-rotation-side-count-array-idx	1
 register-role-rotation-side-rec-cat-idx	PROVISIONAL:register-choice	register-role-rotation-side-rec-cat-idx	1
+register-set-mismatch	PROVISIONAL:register-set-mismatch	register-set-mismatch	1
 register-spill-pressure-8-live-values	PROVISIONAL:register-spill-pressure-8-live-values	register-spill-pressure-8-live-values	1
 row-address-mla-add-operand-register-order-not-source-forceable	PROVISIONAL:pool/address-cse	row-address-mla-add-operand-register-order-not-source-forceable	1
 scheduler-interleave-reg-swap	P-36	scheduler-interleave-reg-swap	1
 scheduling-cmp-reuse	P-36	scheduling-cmp-reuse	1
+scheduling-diff	P-36	scheduling-diff	1
 scheduling-order	P-36	scheduling-order	1
 scheduling-wall	P-36	scheduling-wall	2
 self-vs-scratch-register-swap	PROVISIONAL:register-choice	self-vs-scratch-register-swap	1
+shifted-add-fusion-residual	PROVISIONAL:shifted-add-fusion-residual	shifted-add-fusion-residual	1
 sibling-constant-arithmetic-reuse	PROVISIONAL:sibling-constant-arithmetic-reuse	sibling-constant-arithmetic-reuse	1
 smulbb-instruction-selection-and-r5-reuse-residual	PROVISIONAL:instruction-selection	smulbb-instruction-selection-and-r5-reuse-residual	1
 sp3-dead-store-stack-pad-reg-pressure	PROVISIONAL:frame/epilogue	sp3-dead-store-stack-pad-reg-pressure	2
+stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	stack-slot-assignment-mismatch	1
 statement-order	P-36	statement-order	1
 stm-burst-needs-asm	PROVISIONAL:inline-asm	stm-burst-needs-asm	1
 stmib-grouping-scheduling	P-36	stmib-grouping-scheduling	1
 stmib-grouping-scheduling-p7-split	P-36	stmib-grouping-scheduling-p7-split	1
 store-coalescing	PROVISIONAL:memory-order/fusion	store-coalescing	1
 store-order	PROVISIONAL:memory-order/fusion	store-order	1
-struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	struct-by-value-return-abi	1
-structural	PROVISIONAL:structural	structural	9
 strength-reduction	C-65	strength-reduction	1
+struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	struct-by-value-return-abi	1
+struct-stride-uncertainty	PROVISIONAL:struct-stride-uncertainty	struct-stride-uncertainty	1
+structural	PROVISIONAL:structural	structural	9
 switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	PROVISIONAL:switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	1
+switch-plus-struct-reg-alloc	PROVISIONAL:switch-plus-struct-reg-alloc	switch-plus-struct-reg-alloc	1
 tier-verification-inferior	PROVISIONAL:tier-verification-inferior	tier-verification-inferior	1
 tool-anomaly	UNCLASSIFIED:tool-anomaly	fastmatch/sha1 disagreement; tool follow-up	1
 unclear	PROVISIONAL:unclear	unclear	1
 unknown	UNCLASSIFIED:unknown	raw value is unknown	259
 unsigned-cast	PROVISIONAL:unsigned-cast	unsigned-cast	1
 xor-order	PROVISIONAL:xor-order	xor-order	2
-P-20-family	P-20	P-20-family	2
-address-fold	PROVISIONAL:address-fold	address-fold	1
-scheduling-diff	P-36	scheduling-diff	1
