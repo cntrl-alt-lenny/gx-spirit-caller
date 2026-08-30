@@ -176,6 +176,7 @@ cross-call-self-and-result-persistence-reg-alloc-mismatch	PROVISIONAL:cross-call
 cross-overlay-bl-module-none	PROVISIONAL:cross-overlay	cross-overlay-bl-module-none	1
 dead-call-result-register-reuse	PROVISIONAL:register-choice	dead-call-result-register-reuse	1
 dead-param-preservation-move-not-elided	PROVISIONAL:dead-param-preservation-move-not-elided	dead-param-preservation-move-not-elided	1
+dead-result-compare-after-call	PROVISIONAL:dead-result-compare-after-call	dead-result-compare-after-call	1
 dead-until-later-param-register-choice-plus-bitpack	PROVISIONAL:register-choice	dead-until-later-param-register-choice-plus-bitpack	1
 dead-value-register-reuse-changed-bool-P36-adjacent	PROVISIONAL:register-choice	dead-value-register-reuse-changed-bool-P36-adjacent	2
 dense-bitfield-scheduling	PROVISIONAL:dense-bitfield-scheduling	dense-bitfield-scheduling	1
@@ -183,13 +184,14 @@ divmod-runtime-plus-reg-alloc	PROVISIONAL:divmod-runtime-plus-reg-alloc	divmod-r
 epilogue-shape	PROVISIONAL:frame/epilogue	epilogue-shape	4
 epilogue-tail-merge-residual	PROVISIONAL:epilogue-tail-merge-residual	epilogue-tail-merge-residual	1
 extra-2-register-cascade	PROVISIONAL:register-pressure/cascade	extra-2-register-cascade	1
+extraction-scratch-register-swap	PROVISIONAL:extraction-scratch-register-swap	extraction-scratch-register-swap	1
 field-pool-base212-known-wall	PROVISIONAL:pool/address-cse	field-pool-base212-known-wall	1
 fixed-point-blend-structural-mismatch	PROVISIONAL:fixed-point-blend-structural-mismatch	fixed-point-blend-structural-mismatch	1
 fn-ptr-field-pool-b6c-dispatch	PROVISIONAL:pool/address-cse	fn-ptr-field-pool-b6c-dispatch	1
 fold-predication-alloc	PROVISIONAL:predication/branch	fold-predication-alloc	1
 frame-shape	PROVISIONAL:frame/epilogue	frame-shape	2
 guard-chain-double-deref-p1reg	PROVISIONAL:guard-chain-double-deref-p1reg	guard-chain-double-deref-p1reg	4
-independent-computation-interleave-scheduling	PROVISIONAL:independent-computation-interleave-scheduling	independent-computation-interleave-scheduling	1
+independent-computation-interleave-scheduling	PROVISIONAL:independent-computation-interleave-scheduling	independent-computation-interleave-scheduling	2
 indirect-call-plus-chained-cond	PROVISIONAL:indirect-call-plus-chained-cond	indirect-call-plus-chained-cond	1
 induction-strength-reduction	C-65	induction-strength-reduction	2
 instr-selection	PROVISIONAL:instruction-selection	instr-selection	1
@@ -207,16 +209,19 @@ load-order	P-36	load-order	1
 load-scheduling-interleave	P-36	load-scheduling-interleave	1
 load-scheduling-residual	PROVISIONAL:load-scheduling-residual	load-scheduling-residual	1
 loop-index-count-register-role-swap-plus-stack-spill-risk	PROVISIONAL:register-choice	loop-index-count-register-role-swap-plus-stack-spill-risk	1
+loop-invariant-const-register-order	PROVISIONAL:loop-invariant-const-register-order	loop-invariant-const-register-order	1
 loop-invariant-hoist-register-cascade-P36-adjacent	PROVISIONAL:register-pressure/cascade	loop-invariant-hoist-register-cascade-P36-adjacent	1
 loop-rotation-scheduling-residual	PROVISIONAL:loop-rotation-scheduling-residual	loop-rotation-scheduling-residual	1
 loop-strength-reduction-plus-uncertain-div256-idiom	C-65	loop-strength-reduction-plus-uncertain-div256-idiom	1
 loop-strength-reduction-register-role-cascade-P36-adjacent	PROVISIONAL:register-choice	loop-strength-reduction-register-role-cascade-P36-adjacent	1
+m2c-dropped-trailing-args	PROVISIONAL:m2c-dropped-trailing-args	m2c-dropped-trailing-args	1
 materialized-bool-global	PROVISIONAL:constant-materialization	materialized-bool-global	1
 memory-width	PROVISIONAL:memory-width	memory-width	1
 missing-char-reload-spill	PROVISIONAL:missing-char-reload-spill	missing-char-reload-spill	1
 missing-top-guard-branch	PROVISIONAL:missing-top-guard-branch	missing-top-guard-branch	1
 mistagged-brief294	PROVISIONAL:ledger-mistag	mistagged-brief294	3
 mistagged-c34	PROVISIONAL:ledger-mistag	mistagged-c34	4
+mixed-cache-vs-reread-register-pressure	PROVISIONAL:mixed-cache-vs-reread-register-pressure	mixed-cache-vs-reread-register-pressure	1
 mla-operand-order-register-numbering-P17-adjacent	PROVISIONAL:mla-operand-order-register-numbering-p17-adjacent	mla-operand-order-register-numbering-P17-adjacent	1
 mmio-bitfield-extract-register-shuffle	PROVISIONAL:mmio-bitfield-extract-register-shuffle	mmio-bitfield-extract-register-shuffle	1
 mmio-const-materialization	PROVISIONAL:mmio-const-materialization	mmio-const-materialization	1
@@ -239,6 +244,7 @@ permanent-header	PROVISIONAL:permanent-header	permanent-header	1
 permuter-class-register-mirror	PROVISIONAL:register-choice	permuter-class-register-mirror	1
 pool-const-materialize	PROVISIONAL:constant-materialization	pool-const-materialize	3
 pool-constant-caching-resistance	PROVISIONAL:constant-materialization	pool-constant-caching-resistance	1
+pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	pop-lr-bx-vs-pop-pc-epilogue	2
 post-call-scratch-scheduling-cascade	P-36	post-call-scratch-scheduling-cascade	1
 preamble-sink-scheduling	P-36	preamble-sink-scheduling	1
 predicated-flag-scheduling-interleave	PROVISIONAL:predication/branch	predicated-flag-scheduling-interleave	1
@@ -246,7 +252,7 @@ predicated-pointer-vs-value-choice-on-final-compare	PROVISIONAL:predication/bran
 predication	PROVISIONAL:predication/branch	predication	13
 predication-resistance-new	PROVISIONAL:predication/branch	predication-resistance-new	2
 predication-vs-branch-dual-assignment	PROVISIONAL:predication/branch	predication-vs-branch-dual-assignment	1
-push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	push-vs-subsp-alignment-padding	2
+push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	push-vs-subsp-alignment-padding	4
 reciprocal-division-register-numbering-cascade	PROVISIONAL:reciprocal-division-register-numbering-cascade	reciprocal-division-register-numbering-cascade	1
 reg-alloc	PROVISIONAL:register-allocation	reg-alloc	144
 reg-alloc-2nd-loop-addressing	PROVISIONAL:register-allocation	reg-alloc-2nd-loop-addressing	1
@@ -308,10 +314,11 @@ struct-stride-uncertainty	PROVISIONAL:struct-stride-uncertainty	struct-stride-un
 structural	PROVISIONAL:structural	structural	9
 switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	PROVISIONAL:switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	switch-jumptable-inline-bxlr-vs-shared-branch-consolidation	1
 switch-plus-struct-reg-alloc	PROVISIONAL:switch-plus-struct-reg-alloc	switch-plus-struct-reg-alloc	1
-switch-value-register-letter-reuse	PROVISIONAL:switch-value-register-letter-reuse	switch-value-register-letter-reuse	1
+switch-value-register-letter-reuse	PROVISIONAL:switch-value-register-letter-reuse	switch-value-register-letter-reuse	3
 tier-verification-inferior	PROVISIONAL:tier-verification-inferior	tier-verification-inferior	1
 tool-anomaly	UNCLASSIFIED:tool-anomaly	fastmatch/sha1 disagreement; tool follow-up	1
 unclear	PROVISIONAL:unclear	unclear	1
+unconditional-arg-spill-to-stack	PROVISIONAL:unconditional-arg-spill-to-stack	unconditional-arg-spill-to-stack	1
 unknown	UNCLASSIFIED:unknown	raw value is unknown	259
 unsigned-cast	PROVISIONAL:unsigned-cast	unsigned-cast	1
 xor-order	PROVISIONAL:xor-order	xor-order	2

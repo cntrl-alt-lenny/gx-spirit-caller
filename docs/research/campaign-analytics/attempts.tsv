@@ -1821,3 +1821,17 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020580a0	main	264	default	unknown	parked	37.9	str-stmib-fusion-residual	PROVISIONAL:str-stmib-fusion-residual	cm-257-320-drain	2
 0x020602c4	main	264	default	unknown	parked	78.8	loop-rotation-scheduling-residual	PROVISIONAL:loop-rotation-scheduling-residual	cm-257-320-drain	2
 0x02091d24	main	264	default	unknown	parked	24.2	zero-const-register-reuse	PROVISIONAL:zero-const-register-reuse	cm-257-320-drain	1
+0x0204bf44	main	264	default	unknown	parked	77.3	dead-result-compare-after-call	PROVISIONAL:dead-result-compare-after-call	cm-257-320-drain-2	2
+0x0209e91c	main	264	default	unknown	parked	25.8	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	cm-257-320-drain-2	1
+0x021ded8c	ov002	264	default	unknown	parked	0.0	unconditional-arg-spill-to-stack	PROVISIONAL:unconditional-arg-spill-to-stack	cm-257-320-drain-2	1
+0x021f6814	ov002	264	default	unknown	parked	71.6	switch-value-register-letter-reuse	PROVISIONAL:switch-value-register-letter-reuse	cm-257-320-drain-2	1
+0x021f9dac	ov002	264	default	unknown	parked	24.6	extraction-scratch-register-swap	PROVISIONAL:extraction-scratch-register-swap	cm-257-320-drain-2	2
+0x0221c6e8	ov002	264	default	unknown	shipped	100.0	n/a		cm-257-320-drain-2	2
+0x0221e548	ov002	264	default	unknown	parked	24.2	switch-value-register-letter-reuse	PROVISIONAL:switch-value-register-letter-reuse	cm-257-320-drain-2	2
+0x022930ec	ov002	264	default	unknown	parked	92.4	loop-invariant-const-register-order	PROVISIONAL:loop-invariant-const-register-order	cm-257-320-drain-2	3
+0x02297050	ov002	264	default	unknown	parked	27.1	mixed-cache-vs-reread-register-pressure	PROVISIONAL:mixed-cache-vs-reread-register-pressure	cm-257-320-drain-2	2
+0x021caf80	ov012	264	default	unknown	parked	0.0	m2c-dropped-trailing-args	PROVISIONAL:m2c-dropped-trailing-args	cm-257-320-drain-2	2
+0x0201ac84	main	268	default	unknown	parked	43.3	independent-computation-interleave-scheduling	PROVISIONAL:independent-computation-interleave-scheduling	cm-257-320-drain-2	2
+0x0206c61c	main	268	default	unknown	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	cm-257-320-drain-2	1
+0x020964a0	main	268	default	unknown	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	cm-257-320-drain-2	1
+0x0207bec8	main	268	default	unknown	parked	10.4	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	cm-257-320-drain-2	1

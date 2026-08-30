@@ -12762,11 +12762,72 @@ and both reverted-when-worse restructuring attempts (disclosed, not
 hidden) are in `cm-257-320-drain-2026-09-01.md`.
 
 **259 candidates remain unattempted** in this band's pool for a future
-round to continue the drain.
+round to continue the drain. *(Correction, BR-9: this figure does not
+reconcile against the ledger — direct re-measurement gives 246
+`= 263 - 17` ledgered rows. The source of "259" was never identified. See
+BR-9 for the re-derivation and the round that continued from the corrected
+number.)*
 
 **Provenance:** `cm-257-320-drain` (this PR),
 `docs/research/cm-257-320-drain-2026-09-01.md`, `attempts.tsv` rows
 tagged `cm-257-320-drain`, BR-4, BR-7.
+
+### BR-9. Draining the 257-320 B band, round 2: 1/14 attempted (7.1%), 1/27 pool (3.7%) — both denominators, as requested
+
+`cm-257-320-drain-2` continued the drain with PR #1602's `find_object()`
+fix in place (confirmed: **zero of 27 candidates needed `--obj`**, down
+from all 20 the round before) and both denominators reported explicitly,
+because BR-8's 3/17 vs 3/23 split showed wall-screening was quietly
+shaping the headline rate.
+
+**Premise correction:** the kickoff's stated 259 remaining candidates did
+not reconcile; direct measurement gave **246** (`263 - 17` ledgered rows
+from BR-8). A 5% bookkeeping gap, not an order-of-magnitude one — reported
+plainly, then the round continued rather than stopping over it.
+
+**Result: 1/14 attempted = 7.1%, 1/27 pool = 3.7%.** 27 candidates
+examined; 13 screened before writing C — 12 on the confirmed P-20 wall
+(one via a partial match: the idiom in only one switch case still blocks
+the whole function from 100%) and 1 on effort-triage grounds (a
+`ROTATE_RIGHT`-based bit-index reconstruction, genuinely complex and not a
+documented wall — disclosed, not silently dropped). Both rates sit below
+BR-4's 20.0% baseline and BR-8's own 17.6%/13.0%, but at n=14-27 this is
+plausible noise, not a confirmed divergence. **Cumulative across BR-8 +
+BR-9: 4/31 attempted = 12.9%, 4/50 pool = 8.0%.**
+
+**The three BR-8 leads:**
+
+- **Push-vs-`sub sp,#N` alignment padding** — hit twice more (4th+
+  occurrence overall), zero source-level response across every attempt
+  made against it. Effectively confirmed as compiler-internal.
+- **`str`/`stmib` fusion** — no clean re-hit this round; a superficially
+  similar candidate turned out to be a different mechanism (see below).
+  Status unchanged.
+- **Independent-computation interleaving** — hit once more (2 hits total),
+  still unresponsive. Leaning "does not generalise" but short of the
+  3-hit bar.
+
+**Two new candidate signatures, not yet confirmed:** a `pop {regs,lr}; bx
+lr` epilogue convention used instead of direct `pop {regs,pc}` (2 hits,
+plausibly tied to whether a function's address is taken elsewhere in the
+codebase); and an unconditional spill of all incoming argument registers
+to the stack for a function whose true parameter count m2c under-detected
+(1 hit, possibly the same underlying cause). A `--obj`-workaround-adjacent
+tooling finding: m2c's draft silently dropped 2 trailing constant
+arguments from a 6-argument call, rendering it 4-argument — found only by
+reading the raw disassembly directly.
+
+**Lever 1 (`volatile`) status:** one genuine MMIO read-modify-write test
+case this round, result **inconclusive** — blocked by the push-vs-`sub sp`
+structural mismatch, not by anything related to the MMIO handling.
+
+**232 candidates remain unattempted.** Full per-candidate table, effort
+disclosure (including the one reverted-when-worse attempt), and complete
+detail: `cm-257-320-drain-2-2026-09-02.md`.
+
+**Provenance:** `cm-257-320-drain-2` (this PR),
+`docs/research/cm-257-320-drain-2-2026-09-02.md`, `attempts.tsv` rows
+tagged `cm-257-320-drain-2`, BR-4, BR-8.
 
 ## Open questions (not levers, not walls — genuinely unresolved)
 
