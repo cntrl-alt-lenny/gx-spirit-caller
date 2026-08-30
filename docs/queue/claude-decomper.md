@@ -2701,7 +2701,45 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-find-object-persource`; then report
 QUEUE-EMPTY honestly if you reach it.
 
-### q-wall-overblock-audit — are the walls blocking candidates they should not? [TODO]
+### q-wall-overblock-audit — are the walls blocking candidates they should not? [DONE]
+
+**Result (this PR):** the headline finding is that nobody can answer
+Deliverable 1's literal question, and now we know precisely why:
+across the whole 1,822-row `attempts.tsv`, **zero** rows are
+`result=not-attempted` tagged to any formal P-NN wall — every P-NN
+row is an individually-drafted-then-parked candidate, not an
+on-sight screening. PR #1603's 6 screened P-20 candidates left
+**zero** ledger trace (confirmed: exactly 17 rows cite
+`cm-257-320-drain`, matching 3 shipped + 14 parked). **Canary (P-20):**
+55 confirmed members (a 56th genuinely confirmed but misplaced after
+an unrelated sub-heading), 6 independently-convergent falsification
+rounds 2026-07-27 to 2026-08-22 — the best-evidenced wall in the
+catalog, and a direct signature re-scan of the current 1,777-candidate
+pool found **zero** further size-appropriate matches. **Evidence
+strength (45 live walls, 6 parallel read-only workers):** P-20 is the
+**only** wall with genuinely independent 3+-round confirmation; every
+other wall tops out at 2 rounds, several thinner than their member
+counts suggest (P-11: 16 members/5 rounds but accretive not
+independent; P-28: 16 members/1 round, self-admitted possible
+grab-bag). **Membership-broader-than-evidence, concrete and
+address-level:** a `generate_walls_index.py` heading-boundary bug
+inflates apparent evidence for at least 2 walls (P-20 shows 30 vs
+real 55; P-49 shows 9 vs real 1, from ~1,700 unrelated lines bleeding
+in); 8 walls have catalog-documented stale members still listed as
+blocking (P-11 worst: **10 of 16 (62.5%) already shipped** per the
+project's own re-audit); P-50 is under-counted the opposite way (a
+later round found 17 pairs/34 symbols vs. the catalog's 4, never
+folded back). **Bottom line:** the literal unattempted-candidate
+figure is blank (ledger-blind, full pool re-match out of scope); the
+answerable proxy is 7,924 B already-parked behind THIN-verdict walls,
+worth a re-test. No wall re-classified. Second task: extended
+PR #1593's dashboard tolerance to a clean trailing-row addition (the
+form round 0831's own PR triggered), demonstrated fail-then-pass on
+both the pure logic and a real subprocess mutation of the committed
+file, with a companion negative test proving two simultaneous
+additions still fail. Full findings, every figure dated and
+reproducible:
+[`docs/research/campaign-analytics/wall-overblock-audit.md`](../research/campaign-analytics/wall-overblock-audit.md).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.

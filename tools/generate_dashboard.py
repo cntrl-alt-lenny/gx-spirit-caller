@@ -137,6 +137,15 @@ _TREND_ROW_RE = re.compile(
     re.MULTILINE,
 )
 
+# The trend table's own point-count summary line -- the one other line that
+# a trailing-row ADDITION (see _dashboard_is_current's second tolerance
+# branch below) legitimately changes, since it's a bare `len(trend)`.
+_POINTS_LINE_RE = re.compile(
+    rf"^(\d+) points, one per commit that changed "
+    rf"`{re.escape(STATE_TABLE_REL)}` \(oldest first\)\.$",
+    re.MULTILINE,
+)
+
 
 def _run_git(*args: str) -> str:
     r = subprocess.run(["git", *args], cwd=ROOT, capture_output=True, text=True)
@@ -170,10 +179,17 @@ def _dashboard_is_current(committed: str, fresh: str) -> tuple[bool, str]:
     """Compare a committed dashboard against a freshly-rendered one.
 
     Returns (is_current, detail) -- `detail` is a human-readable reason
-    either way. Tolerates AT MOST one differing line, and only if that
-    line is the trend table's trailing row differing solely in its SHA
-    column (see module note above). Any other difference -- more than one
-    line, a non-trailing row, a non-SHA field of the trailing row -- is
+    either way. Tolerates exactly two narrow, documented self-reference
+    patterns, both scoped to the trend table specifically (see module note
+    above and _check_trailing_row_addition's own note below):
+      1. Same line count: the trailing trend row's SHA column differs and
+         nothing else does (a squash-merge rewrite).
+      2. Fresh has exactly one more line: one new trend row was appended
+         at the end, and the point-count summary line bumped to match --
+         nothing else differs.
+    Any other difference -- more than one line changed (case 1), more or
+    fewer than one line added (case 2), a non-trailing row, a non-SHA
+    field of the trailing row, a moved/changed row anywhere else -- is
     real staleness and returns `is_current=False`.
     """
     if committed == fresh:
@@ -181,9 +197,19 @@ def _dashboard_is_current(committed: str, fresh: str) -> tuple[bool, str]:
 
     committed_lines = committed.splitlines(keepends=True)
     fresh_lines = fresh.splitlines(keepends=True)
-    if len(committed_lines) != len(fresh_lines):
-        return False, "stale (line count differs)"
 
+    if len(committed_lines) == len(fresh_lines):
+        return _check_trailing_sha_rewrite(committed_lines, fresh_lines, fresh)
+    if len(fresh_lines) == len(committed_lines) + 1:
+        return _check_trailing_row_addition(committed_lines, fresh_lines)
+    return False, "stale (line count differs)"
+
+
+def _check_trailing_sha_rewrite(
+    committed_lines: list[str], fresh_lines: list[str], fresh: str,
+) -> tuple[bool, str]:
+    """Case 1: tolerates AT MOST one differing line, and only if that line
+    is the trend table's trailing row differing solely in its SHA column."""
     diffs = [i for i, (c, f) in enumerate(zip(committed_lines, fresh_lines, strict=True))
              if c != f]
     if len(diffs) != 1:
@@ -213,6 +239,83 @@ def _dashboard_is_current(committed: str, fresh: str) -> tuple[bool, str]:
         f"docs/state-table.md after this file was generated; not staleness. "
         f"Re-run `python tools/generate_dashboard.py` on the next regeneration "
         f"to pick up the settled SHA."
+    )
+
+
+# --------------------------------------------------------------------------- #
+# Trailing-row ADDITION tolerance (q-wall-overblock-audit) -- the SAME
+# self-reference as above, in its OTHER form. PR #1593's tolerance only
+# covered a squash-merge REWRITING the trailing row's SHA; it did not cover
+# a genuinely NEW commit landing on docs/state-table.md between generation
+# and `--check` (e.g. a separate PR merging first), which appends a whole
+# new trailing row rather than just changing one cell -- a real, additional
+# line the same self-reference problem produces, first hit when the round
+# 0831 brain PR added a trend row after this file had already been
+# generated. Tolerates EXACTLY one new trend-table row, appended at the
+# table's end, plus the one point-count summary line it must legitimately
+# also change -- nothing else may differ, so a moved/edited historical row,
+# more than one new row, or any other section changing still fails closed.
+# --------------------------------------------------------------------------- #
+
+
+def _check_trailing_row_addition(
+    committed_lines: list[str], fresh_lines: list[str],
+) -> tuple[bool, str]:
+    """Case 2: `fresh_lines` has exactly one more line than
+    `committed_lines` (caller-checked). Walk both line lists in lockstep;
+    at each divergence, accept ONLY a new trend-table row in `fresh` (skip
+    it, advance fresh alone) or the point-count summary line bumping by
+    exactly the number of new rows seen so far (advance both) -- any other
+    divergence fails closed."""
+    i = j = 0
+    new_rows: list[str] = []
+    points_bumped = False
+    while i < len(committed_lines) and j < len(fresh_lines):
+        c_line, f_line = committed_lines[i], fresh_lines[j]
+        if c_line == f_line:
+            i += 1
+            j += 1
+            continue
+        if not new_rows and _TREND_ROW_RE.match(f_line.rstrip("\n")):
+            new_rows.append(f_line)
+            j += 1
+            continue
+        c_m = _POINTS_LINE_RE.match(c_line.rstrip("\n"))
+        f_m = _POINTS_LINE_RE.match(f_line.rstrip("\n"))
+        if (not points_bumped and c_m and f_m
+                and int(f_m.group(1)) == int(c_m.group(1)) + len(new_rows)):
+            points_bumped = True
+            i += 1
+            j += 1
+            continue
+        return False, (
+            f"stale (unexpected difference at committed line {i + 1}, "
+            f"beyond a trailing trend-row addition)"
+        )
+
+    if i != len(committed_lines) or j != len(fresh_lines):
+        return False, "stale (content after the expected insertion still differs)"
+    if len(new_rows) != 1:
+        return False, f"stale ({len(new_rows)} new trend row(s) found, expected exactly 1)"
+    if not points_bumped:
+        return False, (
+            "stale (a new trend row was added but the point-count summary "
+            "line was not bumped to match)"
+        )
+
+    new_row_groups = _TREND_ROW_RE.match(new_rows[0].rstrip("\n")).groups()
+    fresh_trend_rows = _TREND_ROW_RE.findall("".join(fresh_lines))
+    if not fresh_trend_rows or fresh_trend_rows[-1] != new_row_groups:
+        return False, "stale (the new row is not the trend table's trailing row)"
+
+    return True, (
+        f"current except one new trailing trend-table row (commit "
+        f"`{new_row_groups[0]}`, {new_row_groups[1]}) and its matching "
+        f"point-count bump -- a genuine new commit touched "
+        f"docs/state-table.md since this file was last generated, not "
+        f"staleness in the rendering itself. Re-run "
+        f"`python tools/generate_dashboard.py` to pick up the row as a "
+        f"real regeneration."
     )
 
 
