@@ -15,6 +15,22 @@ OUT = ROOT / "docs/research/codegen-walls-index.md"
 HEADING_RE = re.compile(
     r"^### (?P<key>[PC]-\d+)\.\s+(?P<title>.+?)\s*$", re.MULTILINE,
 )
+# A wall's own section ends at the next level-3 heading of ANY shape, not just
+# the next formal `### P-N.`/`### C-N.` one. The catalog has plenty of other
+# `###` headings between two formal wall entries (compound sub-entries like
+# `### P-20-mode-switch-selector.`, unrelated appendix sections like `### BR-1.`
+# or `### T-3.`) -- HEADING_RE alone is blind to all of them, so a section's
+# `end` used to fall through to the NEXT formal heading, silently sweeping
+# every intervening heading's own content (including its own "Affected
+# picks/drops" bracket) into the prior wall's count. Confirmed real: P-49's
+# true section ends 26 lines after its own heading, but the next `[PC]-\d+`
+# heading HEADING_RE recognises is ~1,800 lines later, past an entire
+# unrelated "Band ship-rate closures" appendix (BR-1..BR-9, OQ-1, E-1..E-3,
+# T-1..T-4, S-1, S-2). Deliberately excludes `####`+ headings (the required
+# `[ \t]` right after the third `#` fails to match a fourth `#`), and content
+# inside fenced code blocks never starts a line with `### ` in this document
+# (verified against the current catalog) so this doesn't need fence-tracking.
+ANY_HEADING_RE = re.compile(r"^###[ \t]+\S.*$", re.MULTILINE)
 STATUS_RE = re.compile(r"^\| (?P<key>[PC]-\d+) \| (?P<status>[^|]+) \|", re.MULTILINE)
 
 
@@ -67,10 +83,11 @@ def parse_catalog(text: str) -> list[WallEntry]:
         for match in STATUS_RE.finditer(text)
     }
     headings = list(HEADING_RE.finditer(text))
+    boundary_starts = [match.start() for match in ANY_HEADING_RE.finditer(text)]
     entries: list[WallEntry] = []
-    for index, heading in enumerate(headings):
+    for heading in headings:
         start = heading.start()
-        end = headings[index + 1].start() if index + 1 < len(headings) else len(text)
+        end = next((pos for pos in boundary_starts if pos > start), len(text))
         section = text[start:end]
         key = heading.group("key")
         entries.append(WallEntry(
