@@ -70,6 +70,7 @@ from typing import NamedTuple
 
 from export_matched_pairs import mnemonics_from_objdump
 from retrieval_eval import BM25, load_jsonl
+from routing_suffixes import split_routing_suffix
 
 ROOT = Path(__file__).resolve().parent.parent
 VALID_REGIONS = ("eur", "usa", "jpn")
@@ -360,8 +361,40 @@ def run_m2c(func: str, s_text: str, context: Path | None) -> str:
     return result.stdout
 
 
+def _module_to_src_dir(module: str) -> str:
+    """main -> main, ov005 -> overlay005 -- the same convention
+    m2c_gap_coverage.py and port_to_region.py's own module_to_src_dir()
+    use; duplicated here as a tiny pure function rather than importing
+    a census/porting tool into the production feed path."""
+    if module == "main":
+        return "main"
+    if module.startswith("ov") and module[2:].isdigit():
+        return "overlay" + module[2:].zfill(3)
+    return module
+
+
+def _persource_object_path(region: str, module: str, func: str) -> Path:
+    """The predictable per-source delink object path for `func`,
+    mirroring `src/`'s own layout (`q-find-object-persource`).
+    `q-large-band-reachability` (PR #1599) found ALL 774 project-wide
+    dispatch-ready candidates missing from every gap object resolve
+    here, with zero exceptions. `split_routing_suffix` strips a
+    `.legacy`/`.legacy_sp3`/`.thumb` routing tier if the source has
+    since been partially routed to a suffixed `.c` -- a still-unmatched
+    cold-RE `.s` candidate (the common case `find_object` serves) never
+    carries one, so this is a no-op fallback in that case, not the
+    primary path."""
+    stem, suffix = split_routing_suffix(func)
+    mod_dir = _module_to_src_dir(module)
+    return ROOT / "build" / region / "delinks" / "src" / mod_dir / f"{stem}{suffix}.o"
+
+
 def find_object(region: str, func: str, objdump: str, module: str | None = None) -> str:
-    """Find the gap `.o` that DEFINES `func` (by disasm header)."""
+    """Find the `.o` that DEFINES `func` (by disasm header) -- first
+    among dsd's gap-filler objects, falling back to the predictable
+    per-source object path (`q-find-object-persource`) when the gap
+    glob misses, since `_dsd_gap@*.o` never covers the project's
+    ~10,000 per-source delink objects."""
     delinks = ROOT / f"build/{region}/delinks"
     if not delinks.is_dir():
         raise FeedError(
@@ -380,8 +413,17 @@ def find_object(region: str, func: str, objdump: str, module: str | None = None)
         ).stdout
         if hdr.search(out):
             return str(obj)
+    persource = _persource_object_path(region, module, func)
+    if persource.is_file():
+        out = subprocess.run(
+            [objdump, "-d", "--architecture=armv5te", str(persource)],
+            capture_output=True, text=True,
+        ).stdout
+        if hdr.search(out):
+            return str(persource)
     raise FeedError(
         f"{func} is not defined in any build/{region}/delinks/_dsd_gap@*.o "
+        f"or its predictable per-source object ({persource}) "
         f"(matched functions are not in gap objects)"
     )
 

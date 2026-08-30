@@ -2598,7 +2598,39 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-large-band-reachability`; then report
 QUEUE-EMPTY honestly if you reach it.
 
-### q-find-object-persource — close the gap you scoped, and date the figure that moved [TODO]
+### q-find-object-persource — close the gap you scoped, and date the figure that moved [DONE]
+
+**Result (this PR):** canary reproduced the brain's observation directly —
+same code, two build trees, two answers. My tree (2,083 gap objects / 2,881
+distinct functions) still shows 45-68% coverage, matching PR #1599 almost
+exactly; the brain's tree (754 gap objects / 55 distinct functions) explains
+its ~0% independently, confirming build-state dependence rather than a
+regression. **Task one:** extended `find_object()` in `tools/m2c_feed.py`
+with a per-source fallback — when the gap-object glob misses, it now checks
+the exact predictable path PR #1599 scoped
+(`build/<region>/delinks/src/<module>/<name>.o`), disasm-verifying the
+header there exactly as it already did for gap objects (existence alone is
+not proof of content), so a stale object can never be silently returned.
+Gap objects are still checked first and win when a function is in both —
+existing behaviour is unchanged everywhere it already worked. `--obj` and
+the `.s`/`--m2c` output format are untouched; `feed()` only reaches
+`find_object()` when `--obj` is omitted. 6 new tests in
+`tests/test_m2c_feed.py::TestFindObject` (+6 pure-helper tests in
+`TestPersourceObjectPath`) — the two fallback-exercising tests were
+reverted and confirmed to fail (`FeedError` instead of resolving) before
+being restored. **Task two:** `tools/m2c_gap_coverage.py` now prints a
+`build state:` line (and a JSON `build_state` object) reporting the exact
+gap-object/distinct-function counts behind every coverage run — 4 new
+tests in `TestBuildState`, same revert-verify discipline. The reachability
+doc gained an explicit build-state-dependence section: the build state and
+date the 45-68% table was derived from, a note that it must be re-derived
+rather than cited, and an update marking Deliverable 3's scoped fix as now
+shipped. No coverage number restated as a project constant anywhere.
+Incidental: `docs/dashboard.md` was stale on `origin/main` independent of
+this change (a trend-table row from round 0831's PR #1601 was never
+regenerated) — regenerated as part of reaching a green gate, one row added,
+nothing else touched. Full update:
+[`docs/research/campaign-analytics/large-band-reachability.md`](../research/campaign-analytics/large-band-reachability.md).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.

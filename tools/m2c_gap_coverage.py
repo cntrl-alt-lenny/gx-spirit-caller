@@ -146,15 +146,38 @@ def _batched(items, n):
         yield items[i:i + n]
 
 
-def scan_gap_functions(region: str, batch_size: int = 150) -> set[str]:
+def gap_object_paths(region: str) -> list[Path]:
     delinks = ROOT / "build" / region / "delinks"
-    gap_objs = sorted(delinks.glob("_dsd_gap@*.o"))
+    return sorted(delinks.glob("_dsd_gap@*.o"))
+
+
+def scan_gap_functions(region: str, batch_size: int = 150) -> set[str]:
     names: set[str] = set()
-    for chunk in _batched(gap_objs, batch_size):
+    for chunk in _batched(gap_object_paths(region), batch_size):
         args = [OBJDUMP, "-d", "--architecture=armv5te"] + [str(p) for p in chunk]
         r = subprocess.run(args, capture_output=True, text=True)
         names |= parse_func_headers(r.stdout)
     return names
+
+
+def build_state(region: str, gap_funcs: set[str] | None = None) -> dict:
+    """The build-tree facts a coverage run depends on -- `q-find-object-
+    persource` (brain round 0901): coverage is a property of WHICH
+    `build/<region>/delinks/` tree it is run against, not of the
+    project. A tree whose gap objects are mostly-empty stubs (e.g. 754
+    objects holding only 55 distinct functions, seen on one integration
+    tree) reports ~0% coverage everywhere with the identical code that
+    reports 45-68% against a fully-populated tree (2,083 objects /
+    2,881 functions). Reporting these two counts turns that silent
+    dependency into a visible one."""
+    gap_objs = gap_object_paths(region)
+    if gap_funcs is None:
+        gap_funcs = scan_gap_functions(region)
+    return {
+        "region": region,
+        "gap_object_count": len(gap_objs),
+        "gap_distinct_function_count": len(gap_funcs),
+    }
 
 
 def symbol_name_index(region: str) -> dict[tuple[str, str], str]:
@@ -174,7 +197,10 @@ def symbol_name_index(region: str) -> dict[tuple[str, str], str]:
     return out
 
 
-def build_rows(region: str) -> list[dict]:
+def build_rows(region: str) -> tuple[list[dict], set[str]]:
+    """Returns `(rows, gap_funcs)` -- callers needing the build state
+    behind the coverage numbers (`build_state()`) reuse `gap_funcs`
+    rather than re-scanning every gap object a second time."""
     delinks = ROOT / "build" / region / "delinks"
     if not delinks.is_dir():
         raise SystemExit(
@@ -213,7 +239,7 @@ def build_rows(region: str) -> list[dict]:
             obj = predictable_persource_object(region, mod, path)
             row["has_persource_obj"] = obj.is_file()
         rows.append(row)
-    return rows
+    return rows, gap_funcs
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -222,13 +248,18 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--json", action="store_true")
     args = ap.parse_args(argv)
 
-    rows = build_rows(args.region)
+    rows, gap_funcs = build_rows(args.region)
     summary = coverage_by_band(rows)
+    state = build_state(args.region, gap_funcs=gap_funcs)
 
     if args.json:
-        print(json.dumps({"rows": rows, "summary": summary}, indent=1))
+        print(json.dumps({"build_state": state, "rows": rows, "summary": summary}, indent=1))
         return 0
 
+    print(f"build state: {state['gap_object_count']} gap objects / "
+          f"{state['gap_distinct_function_count']} distinct functions "
+          f"in build/{args.region}/delinks -- coverage below is a property "
+          f"of THIS tree, not the project (see q-find-object-persource).")
     print(f"{'band':<12} {'dispatch N':>10} {'in-gap N':>9} {'cov N':>7} "
           f"{'dispatch B':>11} {'in-gap B':>10} {'cov B':>7} {'persource N':>11}")
     for row in summary:
