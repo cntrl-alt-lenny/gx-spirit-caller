@@ -2816,3 +2816,72 @@ annotated with its reproducing command and date. Build-free.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-wall-overblock-audit`; then report
 QUEUE-EMPTY honestly if you reach it.
+
+### q-wall-catalog-repair — fix the two defects your own audit found [TODO]
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+`q-wall-overblock-audit` (PR #1605) found two concrete defects and correctly did
+not act on either. Both are now worth fixing, and both are build-free. **This
+item implements what that audit scoped — it does not re-open the audit.**
+
+**Defect 1 — `generate_walls_index.py`'s heading-boundary regex.** It only
+recognises an exact `### P-N.` / `### C-N.` heading, so any other heading in
+between silently bleeds its own bracket into the prior wall's count. Brain
+confirmed the symptom directly in `docs/research/codegen-walls-index.md`:
+
+```text
+| P-20 | LIVE | 30  | ...   (audit's re-count: 55)
+| P-49 | LIVE |  9  | ...   (audit's re-count: 1, from ~1,700 unrelated lines bleeding in)
+```
+
+**Fix the boundary detection and regenerate the index.** Add a test that fails
+on the current regex and passes after — construct the exact heading arrangement
+that causes the bleed. **Then diff the whole regenerated index against the
+committed one and report every wall whose count changes**, not just the two
+already known. That diff is the real deliverable: nobody knows how many other
+walls are misreported.
+
+**Defect 2 — stale members still counted as blocking.** Your audit found **8
+walls** carrying members the project's own re-audits have since shipped. The
+worst is **P-11: 10 of 16 (62.5%) already shipped**, never looped back. P-50 is
+wrong the other way — a later round found 17 pairs / 34 symbols against the
+catalog's documented 4.
+
+**Reconcile all 8 against committed evidence** — for each stale member, cite
+where it shipped. Update the catalog entries to reflect reality. **Do not
+retire a wall** because its members shipped: a wall with 6 of 16 members still
+blocking is still a wall, just a smaller one. Say what each corrected count is
+and what it was.
+
+⚠️ **Do not weaken or retire any wall on your own judgement.** P-20 is the only
+wall with genuinely independent 3+-round confirmation; every other tops out at
+2, and several are thinner than their member counts suggest (P-11 accretive not
+independent; P-28 a self-admitted possible grab-bag). **That thinness is a
+finding you already reported — it is not licence to act.** Correcting a count
+against committed evidence is bookkeeping; retiring a wall is a research
+decision and belongs to a future round with cntrl_alt_lenny's call.
+
+⚠️ **The other lane is now writing `not-attempted` ledger rows tagged to the
+wall they screened on**, closing the blind spot you found. Their rows will land
+while you work — **do not treat a changing `attempts.tsv` as drift**, and
+timestamp any count you derive from it.
+
+**CANARY.** Before touching the generator, reproduce the P-49 bleed and state
+exactly which heading arrangement causes it, with the line numbers. If you
+cannot reproduce a bleed that your own audit measured at ~1,700 lines, STOP and
+report the discrepancy — it would mean the generator behaves differently than
+the audit assumed and the fix would be aimed at the wrong thing.
+
+**SUB-AGENTS PERMITTED, TWO HARD RULES.** READ-ONLY only — shared worktree; you
+do all writing, committing and git operations. No sub-agent runs a build,
+`ninja`, or a region gate. Verify your workers rather than relaying them.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + the full
+index-diff reported. Build-free.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-wall-catalog-repair`; then report
+QUEUE-EMPTY honestly if you reach it.

@@ -2631,3 +2631,70 @@ Add any new `PROVISIONAL:`/`P-NN` `park_class` values to
 
 ONE PR; verify every number against `git diff --stat` including both rate
 figures; `python tools/work_queue.py done claude-scaffolder cm-257-320-drain-2`.
+
+### cm-257-320-drain-3 — continue, and make screening visible in the ledger [TODO]
+
+`cm-257-320-drain-2` (PR #1606) reported both denominators as asked — **1/14 =
+7.1% attempted, 1/27 = 3.7% pool** — corrected the brain's stale "259 remaining"
+to **246**, and confirmed PR #1602's fix in the field: **zero of 27 candidates
+needed `--obj`**, down from all 20 the round before. **232 candidates remain.**
+
+**Read the rate honestly before deciding this is a collapsing band.** All-time
+attempted-rate across BR-4, BR-8 and BR-9 is **8/51 = 15.7%** — still marginal
+territory, not closed. The *pool*-rate is lower only because roughly half of
+examined candidates are being screened out on the P-20 wall, and
+`q-wall-overblock-audit` (PR #1605) confirmed **P-20 is the best-evidenced wall
+in the catalog** — 55 confirmed members, 6 independently convergent
+falsification rounds, and a fresh signature re-scan of the 1,777-candidate pool
+found **zero further matches**. So the pool-rate is measuring "a bounded share
+of this band is P-20", not "this band is hard". **Do not conflate the two.**
+
+**PRIMARY CHANGE THIS ROUND — write a ledger row when you screen.** PR #1605's
+headline: across all **1,822** rows, **zero** are `result=not-attempted` tagged
+to any formal P-NN wall. Brain verified it directly — the 31 `not-attempted`
+rows carry `unknown`, `C-31`, `permanent-header`, `C-23-C-36`, `complexity`, and
+nothing else. **Screening currently leaves no trace at all**, which is why
+nobody could answer how many candidates the walls block.
+
+So: when you screen a candidate on sight, **write an `attempts.tsv` row** with
+`result=not-attempted` and the `park_class` set to the wall you screened on
+(`P-20`, etc.). That single change makes screening measurable for every future
+round, and it is worth more than a marginal ship. Say in your PR how many rows
+you added.
+
+**Scope: continue the drain** on the remaining 232. Populate `attempts`, ledger
+every outcome including screens, and **report both rate figures again** plus a
+third: how many of your screens were P-20 versus other grounds.
+
+**Since P-20 membership is bounded at 55 confirmed and 18 have now been
+encountered across two rounds, track your cumulative P-20 encounters** — if the
+screened share falls as you go, the band's effective yield improves and that is
+worth knowing.
+
+**Three signature leads, updated by PR #1606:** push-vs-`sub sp,#N` alignment
+padding is now **effectively confirmed compiler-internal** (4th+ occurrence,
+zero source-level response) — treat it as a wall, not a lever.
+Independent-computation interleaving has 2 hits and is still unresponsive.
+`str`/`stmib` fusion had no clean re-hit. Two new leads appeared: a
+`pop {regs,lr}; bx lr` epilogue convention (2 hits, possibly tied to whether a
+function's address is taken elsewhere), and an unconditional spill of all
+incoming argument registers where m2c under-detected the true parameter count.
+
+⚠️ **The `volatile` lever is still untested.** PR #1606 found one genuine MMIO
+read-modify-write case and it came back **inconclusive**, blocked by an
+unrelated structural mismatch. If you meet another, that is worth the attempt.
+
+**Disclose attempts that make a match worse and revert them**, as PR #1606 did
+(24.2%->12.1%).
+
+**DO NOT USE SUB-AGENTS.** Shared worktree, machine-wide-serialising compiler.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, `gate3.py --scope tests`. Use `tee`, never `tail`, and
+read the log not the exit code. `git restore assets/` after each clean run.
+Regenerate `docs/state-table.md` first, `docs/dashboard.md` second. Add new
+`PROVISIONAL:`/`P-NN` values to `tools/park_class_map.tsv`.
+
+ONE PR; verify every number against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-257-320-drain-3`.

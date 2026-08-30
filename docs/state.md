@@ -1139,7 +1139,7 @@ deterministic path check, not a glob widening) and dates the coverage figure.
 
 ⚠️ **Control 12 NOT executable, sixth consecutive round.**
 
-**Last updated:** 2026-09-01 — **(Windows PC, brain=Opus 5; both lanes Claude
+**Round 0901 (2026-09-01, Windows PC, brain=Opus 5; both lanes Claude
 Sonnet 5 at `max` effort.) Round 0901: the shift-pair lever is confirmed to
 transfer on a controlled A/B, the `find_object()` tax is gone, and wall
 membership has quietly become the thing that decides which candidates get
@@ -1198,7 +1198,73 @@ finding.
 
 ⚠️ **Control 12 NOT executable, seventh consecutive round.**
 
-<!-- main-sha: 87b18e48f -->
+**Last updated:** 2026-09-02 — **(Windows PC, brain=Opus 5; both lanes Claude
+Sonnet 5 at `max` effort.) Round 0902: the wall audit found that on-sight
+screening leaves NO ledger trace for any wall, and that only P-20 is strongly
+evidenced. The drain reported both denominators and corrected the brain's own
+stale candidate count.**
+
+Merged **PR #1605** and **PR #1606**. `main` at `676fed454`. EUR **17.32% ->
+17.34%**; USA/JPN unchanged at 15.85%.
+
+**PR #1605 — the ledger blind spot is TOTAL, and brain verified it exactly.**
+Across all **1,822** rows, **zero** are `result=not-attempted` tagged to any
+formal P-NN wall. The 31 `not-attempted` rows carry `unknown` (27), `C-31`,
+`permanent-header`, `C-23-C-36`, `complexity` — nothing else. **Screening leaves
+no trace for ANY wall**, so Deliverable 1's literal question was unanswerable
+from the ledger and required re-matching each wall's idiom against the live
+pool. PR #1603's own screening left zero rows (exactly 17 cite it = 3 shipped +
+14 parked).
+
+**P-20 is the only wall with genuinely independent 3+-round confirmation** — 55
+confirmed members, 6 convergent falsification rounds (2026-07-27 to 2026-08-22),
+and a fresh signature re-scan of the 1,777-candidate pool found **zero further
+matches**. Every other wall tops out at 2 rounds; P-11 is accretive rather than
+independent, P-28 self-admittedly a possible grab-bag. **So the screening in
+PR #1603/PR #1606 was justified — it used the one strong wall.**
+
+⚠️ **Two concrete defects, neither acted on (correctly).**
+`generate_walls_index.py`'s heading-boundary regex only recognises an exact
+`### P-N.`/`### C-N.` heading, so any other heading bleeds its bracket into the
+prior wall's count. Brain confirmed the symptom in
+`docs/research/codegen-walls-index.md`: **P-20 reports 30** (re-count 55) and
+**P-49 reports 9** (re-count 1, from ~1,700 unrelated lines). And **8 walls
+carry stale members still counted as blocking — worst P-11, 10 of 16 (62.5%)
+already shipped**, never looped back; P-50 is under-counted the other way (17
+pairs/34 symbols vs a documented 4). Both seeded as `q-wall-catalog-repair`.
+
+**PR #1606 — 1/14 = 7.1% attempted, 1/27 = 3.7% pool**, both reported as asked.
+**Zero of 27 candidates needed `--obj`** (down from all 20), independently
+confirming PR #1602's fallback in the field. It **corrected the brain's stale
+"259 remaining" to 246** and continued on the corrected number. **232 remain.**
+
+⚠️ **Read the rate correctly — the brain nearly did not.** All-time
+attempted-rate across BR-4/BR-8/BR-9 is **8/51 = 15.7%**, still marginal, not
+closed. The pool-rate is lower **only because roughly half of examined
+candidates are screened on P-20**, whose membership is **bounded at 55
+confirmed**. The pool-rate measures "a bounded share of this band is P-20", not
+"this band is hard". **Do not conflate them.**
+
+**Honesty pattern held again:** the `volatile` lever finally met a genuine MMIO
+read-modify-write case and came back **inconclusive** (blocked by an unrelated
+structural mismatch), reported as such rather than claimed. A restructuring that
+made a match worse (24.2%->12.1%) was disclosed **and reverted**.
+Push-vs-`sub sp,#N` alignment padding is now **effectively confirmed
+compiler-internal** (4th+ occurrence, zero source-level response) — a wall, not
+a lever.
+
+**The primary change seeded for next round:** the drain lane now **writes an
+`attempts.tsv` row with `result=not-attempted` and the wall's `park_class` when
+it screens**. That closes the blind spot permanently and makes every future
+screening measurable.
+
+**Process note:** the scaffolder worktree again showed dirty `delinks.txt` files
+with **empty diffs** — CRLF artifacts. The kickoff's "check the diff before
+reporting" instruction worked.
+
+⚠️ **Control 12 NOT executable, eighth consecutive round.**
+
+<!-- main-sha: 676fed454 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
