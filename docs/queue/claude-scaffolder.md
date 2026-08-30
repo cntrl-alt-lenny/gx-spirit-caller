@@ -2566,7 +2566,7 @@ landed. Add any new `PROVISIONAL:` `park_class` values to
 ONE PR; verify every number against `git diff --stat` including the arithmetic;
 `python tools/work_queue.py done claude-scaffolder cm-257-320-drain`.
 
-### cm-257-320-drain-2 — continue the only live pocket, with the tax removed [TODO]
+### cm-257-320-drain-2 — continue the only live pocket, with the tax removed [DONE]
 
 `cm-257-320-drain` (PR #1603) worked 17 candidates and shipped **3 = 17.6%**,
 inside the noise of BR-4's pre-registered 20.0% at n=17. It correctly declined
