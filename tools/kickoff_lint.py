@@ -55,12 +55,20 @@ def _has(text: str, *pats: str) -> bool:
 def check_preflight(text: str) -> tuple[bool, str]:
     # A guard that STOPS on a false premise (missing tool/base/dir) rather than
     # producing void work: a PREFLIGHT marker plus a hard stop (exit 1 / || {).
-    marker = _has(text, r"\bpreflight\b")
+    # An affirmative mention only — "No preflight this round" plus any
+    # unrelated `exit 1` used to pass. See _has_affirmative.
+    marker = _has_affirmative(text, r"\bpreflight\b")
+    declined = (not marker) and _has(text, r"\bpreflight\b")
     stop = _has(text, r"exit\s+1", r"\|\|\s*\{", r"&&\s*echo\s+preflight-ok")
     if marker and stop:
         return True, "PREFLIGHT guard with a hard stop present"
     if marker:
         return False, "PREFLIGHT mentioned but no hard stop (exit 1 / || {…}) — a false premise won't halt"
+    if declined:
+        return False, (
+            "preflight is mentioned only to DECLINE it — a stated refusal "
+            "is not a guard"
+        )
     return False, "no PREFLIGHT guard — a missing tool/base/dir would run as void work"
 
 
@@ -182,14 +190,14 @@ _CANARY_NEGATION_RE = re.compile(
 _CANARY_NEGATION_WINDOW = 45
 
 
-def _has_affirmative_canary(text: str) -> bool:
-    """True when at least one `canary` mention is not a refusal of one.
+def _has_affirmative(text: str, pattern: str) -> bool:
+    """True when at least one `pattern` mention is not a refusal of one.
 
     Round 0828's scaffolder kickoff shipped the literal sentence "No canary
     this round." and linted clean, because this check only looked for the
     word. A stated refusal is the opposite of a guard.
     """
-    for m in re.finditer(r"\bcanary\b", text, re.IGNORECASE):
+    for m in re.finditer(pattern, text, re.IGNORECASE):
         # Scope the search to the canary's OWN sentence. A window alone
         # misfires on unrelated negations ("No sub-agents. CANARY: ...").
         head = text[max(0, m.start() - _CANARY_NEGATION_WINDOW):m.start()]
@@ -205,7 +213,7 @@ def check_canary(text: str) -> tuple[bool, str]:
     # A first-batch check that fails loud before bulk work (dsd check / self-
     # retrieval / sha1 on one item). The word CANARY is our convention; accept
     # an explicit equivalent first-item verification.
-    if _has_affirmative_canary(text):
+    if _has_affirmative(text, r"\bcanary\b"):
         return True, "CANARY present"
     if re.search(r"\bcanary\b", text, re.IGNORECASE):
         return False, (

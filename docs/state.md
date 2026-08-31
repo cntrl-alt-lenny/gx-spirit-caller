@@ -414,29 +414,35 @@ they stay here:
    dispatch); the log is the structural fix. A kickoff is written for the
    host in that row, never forwarded across machines.
 
-## In flight (post this brain-PR)
+## In flight
 
-**Active PRs: 0** once `brain/integ-0824b` lands. **#1020** (decomp.dev CI)
-remains the one genuinely parked draft and is declared in the `parked-prs`
-anchor above. **#1534 is CLOSED**, superseded by #1542's rescope.
+**Roster (as of 2026-09-02): TWO lanes, not four.** `decomper` and
+`scaffolder`, both on the Windows PC. The Codex lanes (`kb-map`, `kb-types`)
+and their queues are **dormant** — `docs/queue/codex-*.md` are retained as
+history, not dispatched. Owner is trialling external models (GPT 5.6 Luna,
+Gemini) in the two live lanes, which is why control 12's transcript audit has
+been unexecutable since round 0827 — see that control's external-harness
+clause for the compensating checks that replace it.
 
-**All four queues re-seeded.** Dispatch host: the Windows PC (recorded in
-[`docs/dispatch-log.md`](dispatch-log.md), row 0824). Every seeded item was
-verified to resolve via `work_queue.py next` on the integration tree.
+**Standing scheduling rule:** at most **one toolchain-bound lane per machine
+per round**; the second lane gets **build-free** work. The compiler serialises
+machine-wide and ignoring this cost a full lane-round on 2026-08-27.
 
-⚠️ **The Codex Scaffolder's next kickoff must NOT open with `git reset --hard`.**
-Its `q-make-kickoff-generator` work is written, gate-passing and **uncommitted**
-in `kb-types` (199 lines of `tools/make_kickoff.py` + 60 of tests). It paused
-before committing because the item's own spec forbade building against an
-unmerged interface — correct behaviour that the standard preflight would then
-have destroyed. Brain holds a backup; the kickoff commits it as step one.
+**Current lane items** (re-seeded round 0902, live on `main`):
 
-| Lane | Next item | Why |
+| Lane | Item | Kind |
 |---|---|---|
-| CC Decomper | `cm-main-band-followthrough` | The re-run answered: 0/20 at matched effort. Its Outcome-B branch fires — record the closure in the catalog, then the bounded 257-512 B pilot with the <15% kill criterion stated in advance. |
-| CC Scaffolder | `cm-restock-carve-12` (rewritten) | Wave 11 sized the lever precisely: 576 windows / 3,069 symbols / 66,096 B are geometrically composable but blocked behind a per-group `.o` inspection nobody will do 576 times by hand. Build the verifier, drain what passes. |
-| Codex Decomper | `q-ledger-chronology`, then `q-remaining-opportunity-census` | The first fixes a false-positive class in its own just-merged audit. The second writes down what is actually left now that the small-code frontier has closed. |
-| Codex Scaffolder | `q-make-kickoff-generator` | Commit the paused work first, then finish it against the now-merged #1542 interface. Three more items behind it. |
+| scaffolder | `cm-257-320-drain-3` | toolchain-bound |
+| decomper | `q-wall-catalog-repair` | build-free |
+
+**#1020 (decomp.dev CI) is parked on an OWNER action, not on engineering.**
+It is complete as written (+579/-0: a Dockerfile, a workflow, and setup docs).
+decomp.dev ingests only CI build artifacts, the build needs the ROM, and the
+ROM is correctly never committed — so the design bakes it into a **private**
+GHCR image that CI pulls. **Nothing in this repo can unblock it**: it needs
+cntrl_alt_lenny to build and push that private image and grant the workflow
+access. Declared in the `parked-prs` anchor above so `queue_state_drift.py`
+excludes it. Leave it open; it is not stale work.
 
 ## Active clusters (post-pivot reality)
 
@@ -471,39 +477,36 @@ followup; do NOT pre-emptively grind it.
   reverted, deferred indefinitely. 34 of 35 odd-aligned ov004 data
   symbols remain unclaimed — DEFERRED.
 
-## Code-decomp resumption (post-pivot active work)
+## Metrics — what the headline is, and what it cannot measure
 
-**Canonical metric** (changed 2026-05-23 evening per brief 203
-investigation): `complete_units` from `build/eur/report.json`.
-Brief 199 / 202 / 203 investigation found that
-`matched_code_percent` + `matched_functions` systematically
-under-count `.legacy.c` + `.s` ships because objdiff requires
-unrelocated-`.o` byte-identity, while our ship paths have
-different reloc records than dsd's delink (post-link bytes match
-— SHA1 PASS verifies). `complete_units` IS the SHA1-aligned
-indicator. Full diagnosis:
-[`docs/research/objdiff-fuzzy-vs-complete-metric.md`](../docs/research/objdiff-fuzzy-vs-complete-metric.md).
+**Acceptance gate (unchanged, the only thing that decides correctness):**
+the 3-region byte-identical `ninja sha1`, driven by
+`python tools/gate3.py --scope all`. Nothing below outranks it.
 
-**Current (post #671 + #672 merge):**
+**Headline progress metric:** **natural-C percentage per region**, from
+`tools/progress.py` — the same function `docs/state-table.md` and
+`docs/dashboard.md` both render. Do not hand-compute it; run the tool.
 
-| Metric | Value | Notes |
-|---|---|---|
-| **complete_units** | **1,749 / 2,660** | SHA1-aligned headline. 65.75 %. +46 over post-#668/#669 (1,703 baseline at last round). |
-| matched_code_percent | **5.0263 %** | +0.046 pp this round — mostly `.s` ships which are headline-light but complete-units-heavy. |
-| matched_functions | **1,786 / 9,801** (18.22 %) | +46 over post-#668/#669 baseline of 1,740. The brief 210 `$d → $a` chain credits `.s` ships cleanly now. |
-| fuzzy_match_percent | **5.7246 %** | +0.047 pp this round |
-| complete_code_percent | (per-unit) | for individual ships, 100 % means byte-identical at the linker level |
-| **easy-tier matched ratio** | **92.9 %** | up from 88.7 %. 79 unmatched easy-tier picks remain, of which 39 are Wall-2-blocked (leaf-no-pool reg-alloc divergence). |
+⚠️ **The headline is `.text`-ONLY, and this is load-bearing.** `progress.py`
+defines `CODE_SECTIONS = {".text", ".init"}` and never scans `.data`,
+`.rodata` or `.bss`. So **no amount of data/carve work can move the headline
+number** — the ~407,506 B reachable data pool moves a *separate, non-combined*
+metric. Established by PR #1596 (round 0830) after the brain had spent two
+rounds treating "EUR is flat" as a strategic signal without that
+qualification. Any claim of the form "EUR is stuck" must say *at which
+metric*.
 
-**Resumption queue:** [docs/research/code-decomp-resumption-queue.md](../docs/research/code-decomp-resumption-queue.md)
-— 52 picks across trivial (12) / easy (25) / medium-easy (15).
-Brief 188 is grinding the trivial bucket; brief 190+ picks up
-easy + medium-easy once brief 189's wall pre-emption lands.
-
-**Resumption playbook:** [docs/decomp-workflow.md](../docs/decomp-workflow.md)
-§ "Code-decomp resumption — the post-scaffold playbook" (NEW in
-brief 187). Routing decision tree, scratch flow, permuter staging,
-3-region SHA1 PASS as headline gate.
+**Historical metrics, retained for provenance only — NOT the headline.**
+`complete_units`, `matched_code_percent`, `matched_functions` and
+`fuzzy_match_percent` from `build/<ver>/report.json` were the canonical
+indicators in the 2026-05 scaffold era. The brief 199/202/203 diagnosis of why
+objdiff's fuzzy metrics under-count `.legacy.c` and `.s` ships is still correct
+and worth reading —
+[`objdiff-fuzzy-vs-complete-metric.md`](research/objdiff-fuzzy-vs-complete-metric.md)
+— but the figures that used to sit here were from the brief-671 era and are
+about a thousand PRs out of date. They were removed rather than refreshed:
+a stale number in the file the next brain reads cold is worse than no number,
+and the live ones are one command away.
 
 ## Worktree convention — isolation per agent, two equivalent mechanisms
 
@@ -544,24 +547,12 @@ sufficient.
 
 ## Next-brain TODO
 
-**0a. SEEDED-NOT-DISPATCHED (Mac brain, 2026-08-17) — three CI/tooling items
-from an external read-only audit.** They sit **second** in their lanes' queues,
-behind round 0817's four items, so `work_queue.py next` is unaffected until
-those clear. Every premise was verified live on `main` twice (`b1015c872` and
-`fcb39a4c2`); re-verify before dispatch anyway.
-
-- `q-cascade-ci-quadratic` (codex-decomper) — `find_mega_cascades.py`,
-  `find_cascades.py` and `propagate_template.py` rebuild per-target what they
-  should index once; ~78 s of CI wall per triggering PR, and all three tools run
-  in PR CI on essentially every conversion PR. Brain re-measured
-  `find_cascades.py` at 10.36 s for a zero-result run.
-- `q-ci-timeout-cache` (codex-scaffolder) — 12 of 12 workflows lack
-  `timeout-minutes`; `compile-check.yml` re-downloads the ~87 MB toolchain on
-  every run of a 3-region matrix.
-- `q-toolchain-repin-eval` (claude-scaffolder) — `dsd` / `m2c` / permuter pins
-  have drifted 2-4 months. **Evaluation only, adoption is a separate item.**
-  Carries a layer correction: upstream m2c cannot subsume our `.legacy` /
-  `.legacy_sp3` routing (compile-tier vs draft-generation).
+**0a. ✅ RESOLVED — the three 2026-08-17 CI/tooling items all shipped.**
+`q-cascade-ci-quadratic`, `q-ci-timeout-cache` and `q-toolchain-repin-eval`
+are all marked DONE in their queues (verified 2026-09-02). The fourth item
+referenced here, `q-readable-c-done-definition`, is not in any queue — its
+decision is recorded at item 0 below. **Nothing in this block is
+outstanding; it is kept only so the audit trail is not silently dropped.**
 
 **Rejected in the same pass, with reasons — do not re-litigate without new
 information.** A `git filter-repo` scrub of the `.wine-lane` blobs in history

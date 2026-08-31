@@ -18,6 +18,7 @@ sys.path.insert(0, str(_TOOLS))
 
 from kickoff_lint import (  # noqa: E402
     check_platform_coherence,
+    check_preflight,
     check_referenced_commits,
     check_referenced_paths,
     lint,
@@ -218,6 +219,29 @@ class TestMissingGuards(unittest.TestCase):
             "dsd check — it MUST stay green.",
         )
         self.assertNotIn("canary", self._fail_keys(text))
+
+    def test_negated_preflight_does_not_satisfy_the_check(self):
+        """A kickoff that DECLINES a preflight must not pass the preflight check.
+
+        `check_preflight` required a PREFLIGHT mention plus any hard stop, and
+        every kickoff contains an `exit 1` somewhere — so "No preflight this
+        round" passed on an unrelated stop. The preflight guard is what
+        prevents the wrong-worktree class that cost round 0822 two lanes.
+        """
+        for phrasing in (
+            "No preflight this round -- the worktree is known good.",
+            "We are skipping the preflight.",
+            "There is no PREFLIGHT needed here.",
+        ):
+            with self.subTest(phrasing=phrasing):
+                text = phrasing + chr(10) + "    [ -d x ] || { echo NOPE; exit 1; }"
+                self.assertFalse(check_preflight(text)[0])
+
+    def test_unrelated_negation_does_not_void_a_real_preflight(self):
+        text = ("DO NOT USE SUB-AGENTS." + chr(10) + chr(10)
+                + "PREFLIGHT -- STOP on any failure." + chr(10)
+                + "    [ -d x ] || { echo NOPE; exit 1; }")
+        self.assertTrue(check_preflight(text)[0])
 
     def test_missing_location_guard(self):
         self.assertIn("location-guard", self._fail_keys(GOOD.replace(
