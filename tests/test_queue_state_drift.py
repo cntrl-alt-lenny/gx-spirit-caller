@@ -31,7 +31,7 @@ Resolved and merged in `tools/port_to_region.py`.
         text = """### q-future — future [TODO]
 
 Earlier waves shipped related work.
-The queue remains live; see `docs/queue/codex-scaffolder.md`.
+The queue remains live; see `docs/queue/scaffolder.md`.
 """
         self.assertEqual(queue_findings(text, "queue.md", lambda _value: True), [])
 

@@ -1,8 +1,15 @@
 [//]: # (markdownlint-disable MD013 MD041)
 
-# Claude Code Scaffolder — autonomous C-match queue (WALL-AWARE)
+# Scaffolder — autonomous C-match queue (WALL-AWARE)
 
-**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next claude-scaffolder --claim` (⚠️ Windows: plain `python`, NOT `python3.13`). Candidate list via `python tools/wall_aware_headroom.py --json`. Hand C-match a batch, byte-verify, gate `python tools/gate3.py --scope all` (including pytest), ONE PR **per item**, `work_queue.py done`, commit, then immediately take the next item. Effort MAX.
+> **Lane identity is the ROLE `scaffolder`, not a provider.** This file was
+> `docs/queue/claude-scaffolder.md` until 2026-09-04; it was renamed because the
+> standing lanes are roles and any capable agentic coding tool may occupy one.
+> Git history follows the rename. Retired provider-named queues are read-only
+> under `docs/queue/archive/`. Historical item text below may still name a
+> provider — that is a record of what happened, not a lane definition.
+
+**Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next scaffolder --claim` (⚠️ Windows: plain `python`, NOT `python3.13`). Candidate list via `python tools/wall_aware_headroom.py --json`. Hand C-match a batch, byte-verify, gate `python tools/gate3.py --scope all` (including pytest), ONE PR **per item**, `work_queue.py done`, commit, then immediately take the next item. Effort MAX.
 
 **Pool status (2026-07-23 — supersedes the old "~245 convertible" line, which came from the broken pre-b651 classifier):** the honest pool is **6,093 candidates** (116 coercible + 5,945 never-assessed + 32 no-marker); only **32 files project-wide are confirmed-permanent**. Brief 661 established that `main`'s never-assessed tranche is **real runway, not disguised walls** — the generic "reg-alloc-walled, no C match (brief 294 endgame)" header is NOT evidence and was wrong more often than right on a true random sample.
 
@@ -672,7 +679,7 @@ The census regex used every wave (`src/main/*.c src/overlay*/*.c`) is a **flat, 
 
 Waves 2 through 12 have worked through every opaque `unsigned char[N]` blob the original mechanical carve produced across `main` and all 24 overlays, plus the one cross-region lead that surfaced along the way. No `cm-data-inference-13` filed — there is no known fresh lead left for this specific discovery method (a live census re-run at the start of wave 12 confirmed zero remaining untouched candidates).
 
-If a future session wants to continue this line of work, it needs a **different discovery angle**, not a re-run of the same census — for example: scanning for opaque data that was never part of the original "Cluster C/D" mechanical carve batch at all (a different category, likely needing its own identification method), auditing already-shipped retypes for correctness now that the method has matured (several early-wave ships used older/weaker evidence standards than waves 8-12), or picking a completely different queue item. `python tools/work_queue.py next claude-scaffolder --claim` will fall through to whatever else is queued, if anything.
+If a future session wants to continue this line of work, it needs a **different discovery angle**, not a re-run of the same census — for example: scanning for opaque data that was never part of the original "Cluster C/D" mechanical carve batch at all (a different category, likely needing its own identification method), auditing already-shipped retypes for correctness now that the method has matured (several early-wave ships used older/weaker evidence standards than waves 8-12), or picking a completely different queue item. `python tools/work_queue.py next scaffolder --claim` will fall through to whatever else is queued, if anything.
 
 ### cm-data-inference-13 — the untagged Cluster-C pool in src/overlay004/data/ (priority S) [DONE]
 
@@ -846,7 +853,7 @@ Continuation of `cm-bss-convert-1`: re-derive the fresh candidate pool (excludin
 
 Continuation: keep the exact per-symbol reconciliation rule and keep declining — do not let the ratio drift upward under volume. Prefer struct-typed conversions where evidence genuinely supports one (`Named-struct` 1.09% is furthest behind `Typed-array` 3.31%), but never force a struct onto array-shaped evidence. File the wave-2 `progress.py` brace-nesting finding on the `codex-scaffolder` queue rather than fixing it in this lane. `ov000`/`ov002` remain out of scope.
 
-**Result: 23 fresh symbols reconciled (16 CONVERT, 7 DECLINE), 3,460 B shipped.** Filed [`q-typed-array-brace-nesting-fix`](codex-scaffolder.md) separately (PR #1406) before starting the carve batch. Full per-symbol table and process notes: `docs/research/data/cm-bss-convert-3-2026-07-31.md`.
+**Result: 23 fresh symbols reconciled (16 CONVERT, 7 DECLINE), 3,460 B shipped.** Filed [`q-typed-array-brace-nesting-fix`](archive/codex-scaffolder.md) separately (PR #1406) before starting the carve batch. Full per-symbol table and process notes: `docs/research/data/cm-bss-convert-3-2026-07-31.md`.
 `Typed-array`: 158,304 → 161,736 (**+3,432 B**, 3.31% → 3.39%). `Named-struct`: 52,040 → 52,068 (**+28 B**, 1.09% → 1.09%). Both deltas match the per-symbol hand-predicted totals exactly — no struct-internal-field leakage this wave, since none of this wave's Named-struct typedefs contain an internal array field (the specific shape that caused wave 2's classifier discrepancy).
 **Two new DispatchState-pattern members investigated, one converted, one genuinely declined** — found directly from the commit that shipped the first four, not a prescan. `data_ov016_021b9740` converted cleanly (6th confirmed instance of the pattern). `data_ov014_021b5040` declined despite matching the pattern on its surface: unlike its 5 already-shipped siblings, 3 *real* consumers (not draft speculation) dereference an offset landing inside the neighboring symbol. First case in the campaign where a symbol matching an already-proven pattern was independently investigated and declined — the reconciliation discipline isn't rubber-stamping pattern matches.
 Two shipped `char[]` conversions (`data_0218fd10`, `data_021a071c`) have unusually strong flagged struct-shape alternates (one backed by 5 independent ground-truth `.s` files) that were deliberately not shipped as structs — stride is solidly evidenced, exact field types are not, and unlike every Named-struct conversion shipped so far, neither struct name exists in already-matched code. Kept as documented leads rather than inventing a new type from partial evidence.
@@ -866,7 +873,7 @@ Focused sub-item: resolve `data_0218fd10`/`data_021a071c`'s flagged struct alter
 
 Continue, keep weighting toward struct-typed candidates (`Named-struct` 1.11% still trails `Typed-array` 3.34%). New sub-item: apply the wave-4 lower-bound rule retroactively to the 5 DispatchState members shipped before that rule existed — a second independent consumer or ground-truth `.s` write for every field; fix any found short. Keep the transitive-callee tracing technique for any partial-stride lead. Note the wave-4 build-tooling wall (`data_ov001_021ca420_alias`) as a queue item for whichever lane owns the tool, rather than carrying the workaround forward silently.
 
-**Result: all 5 pre-wave-4 DispatchState members (`data_ov023_021b23a0`, `data_ov009_*`, `data_ov016_021bab44`, `data_ov017_*`, `data_ov019_*`) CONFIRMED CORRECT against the lower-bound standard — zero fixes needed.** Filed [`q-zero-width-bss-tu-fix`](codex-scaffolder.md) separately (PR #1415, not yet merged) for the wave-4 build wall before starting the carve batch. Two dedicated leads resolved: `data_ov019_021b6848` → `Ov019SceneBState` (204 B, a straight `Typed-array`→`Named-struct` swap, not a free addition, since the struct is genuinely heterogeneous and can't keep an array bracket); `data_0219b490`/`data_021a5340` → real vendored-SDK `OSThread` (a first for this project — mechanism confirmed safe by reading `configure.py`'s include-path logic directly, not assumed). **Fresh batch: 15 symbols investigated (9 CONVERT, 6 DECLINE), all 9 shipped**, plus 1 bonus alignment-pairing symbol (`data_ov004_0229164c`) found and shipped mid-carve, for 10 symbols across 9 files. Full per-symbol table and process notes: `docs/research/data/cm-bss-convert-5-2026-08-01.md`.
+**Result: all 5 pre-wave-4 DispatchState members (`data_ov023_021b23a0`, `data_ov009_*`, `data_ov016_021bab44`, `data_ov017_*`, `data_ov019_*`) CONFIRMED CORRECT against the lower-bound standard — zero fixes needed.** Filed [`q-zero-width-bss-tu-fix`](archive/codex-scaffolder.md) separately (PR #1415, not yet merged) for the wave-4 build wall before starting the carve batch. Two dedicated leads resolved: `data_ov019_021b6848` → `Ov019SceneBState` (204 B, a straight `Typed-array`→`Named-struct` swap, not a free addition, since the struct is genuinely heterogeneous and can't keep an array bracket); `data_0219b490`/`data_021a5340` → real vendored-SDK `OSThread` (a first for this project — mechanism confirmed safe by reading `configure.py`'s include-path logic directly, not assumed). **Fresh batch: 15 symbols investigated (9 CONVERT, 6 DECLINE), all 9 shipped**, plus 1 bonus alignment-pairing symbol (`data_ov004_0229164c`) found and shipped mid-carve, for 10 symbols across 9 files. Full per-symbol table and process notes: `docs/research/data/cm-bss-convert-5-2026-08-01.md`.
 `Typed-array`: 159,508 → 160,072 (**+564 B**, 3.34% → 3.35%). `Named-struct`: 52,836 → 53,352 (**+516 B**, 1.11% → 1.12%). Both deltas match the per-symbol hand-predicted totals exactly, measured against a fresh `git stash` baseline on this exact branch point (matches wave 4's own reported ending values exactly, confirming a clean anchor).
 **Headline finding: the retroactive audit closes a real risk with a real (negative) result.** The `relocs.txt` structural-proof technique (counting every `kind:load ... to:<addr>` relocation in the shipped ROM's own relocation table) definitively ruled out hidden consumers for 2 of the 5 audited members — a stronger guarantee than grep-based reference counting. The DispatchState family (7 shipped members) is now fully verified end-to-end with zero known undersizing risk; no future wave needs to re-run this check.
 **One genuine metric-classification nuance surfaced**: `data_ov019_021b6848`'s retype is a straight bucket *swap* (-204 `Typed-array` / +204 `Named-struct`), unlike wave 4's two RETYPE precedents which were free additions (outer array bracket kept, so `Typed-array` was untouched). The difference is structural — this struct is genuinely heterogeneous (a 2-element record array plus 5 scalar tail fields) and can't honestly keep a top-level array bracket, landing in the bracket-less-singleton case `tools/progress.py` already special-cases.
@@ -1617,7 +1624,7 @@ this PR**. This item is evaluation only; adoption is its own follow-up item with
 its own gate.
 
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder q-toolchain-repin-eval`; commit;
+tools/work_queue.py done scaffolder q-toolchain-repin-eval`; commit;
 report the PR number with the pasted artifacts.
 
 ### cm-toolchain-adopt-1 — execute the m2c ADOPT verdict, then finish the dsd leg you were blocked on [DONE]
@@ -1672,7 +1679,7 @@ is not `gate3.py`'s), plus the delink-ref audit result stated either way.
 `python3.13 -m pytest -q tests` green. Regenerate `docs/research/README.md` LAST.
 
 ONE PR; verify every claim against `git diff --stat`; `python3.13
-tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-1`; commit; report.
+tools/work_queue.py done scaffolder cm-toolchain-adopt-1`; commit; report.
 
 ### cm-toolchain-adopt-2 — the dsd leg, third attempt, and this time you get the machine first [DONE]
 
@@ -1730,7 +1737,7 @@ show `DSD_VERSION` as the only toolchain change if you adopt. Regenerate
 `docs/research/README.md` LAST.
 
 ONE PR; verify every claim against `git diff --stat`; `python3.13
-tools/work_queue.py done claude-scaffolder cm-toolchain-adopt-2`; commit; report.
+tools/work_queue.py done scaffolder cm-toolchain-adopt-2`; commit; report.
 
 ### cm-restock-carve-10 — teach the call graph to see data->data edges, then drain what appears [DONE]
 
@@ -1811,7 +1818,7 @@ reconcile against the files you shipped, item by item, the way wave 9's
 `11,716 = 11,588 + 32 + 96` did.
 
 ONE PR; verify every PR-body claim against `git diff --stat` before writing it;
-`python tools/work_queue.py done claude-scaffolder cm-restock-carve-10`.
+`python tools/work_queue.py done scaffolder cm-restock-carve-10`.
 
 ### cm-restock-carve-11 — the two tranches your own census sized [DONE]
 
@@ -1866,7 +1873,7 @@ push -u`/`pop`, and the delta reconciled item by item against the files shipped.
 LAST.
 
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-restock-carve-11`.
+tools/work_queue.py done scaffolder cm-restock-carve-11`.
 
 ### cm-progress-dashboard — one page where every number is tool-derived [DONE]
 
@@ -1916,7 +1923,7 @@ every dashboard number annotated with its reproducing command. This item needs
 no ROM build — if you find yourself running `ninja`, you have left scope.
 
 ONE PR; verify every PR-body claim against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-progress-dashboard`; commit;
+tools/work_queue.py done scaffolder cm-progress-dashboard`; commit;
 report.
 
 ### cm-restock-carve-12 — build the group verifier, then drain the 66,096 B it unlocks [DONE]
@@ -1993,7 +2000,7 @@ before -> after via `summarize_data_readability`, BEFORE isolated with a real
 LAST.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-restock-carve-12`; next item.
+tools/work_queue.py done scaffolder cm-restock-carve-12`; next item.
 
 ### cm-restock-carve-13 — the non-string shapes, one recipe at a time [DONE]
 
@@ -2026,7 +2033,7 @@ honest "this shape needs X, which we do not have" is a result — it is how
 BEFORE stashed, reconciliation item by item, README regenerated last.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-restock-carve-13`; then take the
+tools/work_queue.py done scaffolder cm-restock-carve-13`; then take the
 next item — report QUEUE-EMPTY honestly if you genuinely reach it.
 
 ### cm-restock-carve-14 — carve the pointer tables themselves, the thing every other route keeps hitting [DONE]
@@ -2086,7 +2093,7 @@ artifact your content invalidates — dashboard, state-table and walls-index all
 carry freshness guards now.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-restock-carve-14`.
+tools/work_queue.py done scaffolder cm-restock-carve-14`.
 
 ### cm-restock-carve-15 — the high-reader unknown-shape symbols [DONE]
 
@@ -2141,7 +2148,7 @@ files shipped. `git restore assets/` after the clean run. Regenerate every deriv
 artifact your content invalidates.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-restock-carve-15`.
+tools/work_queue.py done scaffolder cm-restock-carve-15`.
 
 ### cm-port-drain-jpn — the same drain, JPN side, with the machine to yourself [DONE]
 
@@ -2211,7 +2218,7 @@ brain did that this round and clipped its own evidence; use `tee` if you need a
 log. `git restore assets/` if a `--clean` run deletes the heatmap SVGs.
 
 ONE PR; verify every number against `git diff --stat` before writing the body;
-`python tools/work_queue.py done claude-scaffolder cm-port-drain-jpn`.
+`python tools/work_queue.py done scaffolder cm-port-drain-jpn`.
 
 ### cm-port-exact-name-unlock — the 49-candidate blocker #1586 found, fixed and banked [DONE]
 
@@ -2279,7 +2286,7 @@ through `tail`; use `tee`. `git restore assets/` if a `--clean` run removes the
 heatmap SVGs. Regenerate `docs/dashboard.md` if it goes stale.
 
 ONE PR; verify every number against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-port-exact-name-unlock`.
+tools/work_queue.py done scaffolder cm-port-exact-name-unlock`.
 
 ### cm-verified-neighbor-tranche — the 95.3% wall, tested against the ROM gate [DONE]
 
@@ -2359,7 +2366,7 @@ emitted before the four-minute pytest block. `git restore assets/` after a
 second, each after the commit it describes has landed.
 
 ONE PR; verify every number against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-verified-neighbor-tranche`.
+tools/work_queue.py done scaffolder cm-verified-neighbor-tranche`.
 
 ### cm-verified-neighbor-drain — the ceiling comes off [DONE]
 
@@ -2429,7 +2436,7 @@ after a `--clean` run.
 
 ONE PR; verify every number against `git diff --stat` **including the batch
 count** — last round's body miscounted its own batches; `python
-tools/work_queue.py done claude-scaffolder cm-verified-neighbor-drain`.
+tools/work_queue.py done scaffolder cm-verified-neighbor-drain`.
 
 ### cm-377-512-probe — the first real probe into the band nobody has tried [DONE]
 
@@ -2496,7 +2503,7 @@ three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
 vacuous pass. `git restore assets/` after each clean run.
 
 ONE PR; verify every number against `git diff --stat` including the arithmetic
-and the attempt count; `python tools/work_queue.py done claude-scaffolder
+and the attempt count; `python tools/work_queue.py done scaffolder
 cm-377-512-probe`.
 
 ### cm-257-320-drain — the only live code pocket left, with two new levers [DONE]
@@ -2564,7 +2571,7 @@ landed. Add any new `PROVISIONAL:` `park_class` values to
 `tools/park_class_map.tsv` — PR #1600 had to fix 15 of them.
 
 ONE PR; verify every number against `git diff --stat` including the arithmetic;
-`python tools/work_queue.py done claude-scaffolder cm-257-320-drain`.
+`python tools/work_queue.py done scaffolder cm-257-320-drain`.
 
 ### cm-257-320-drain-2 — continue the only live pocket, with the tax removed [DONE]
 
@@ -2630,7 +2637,7 @@ Add any new `PROVISIONAL:`/`P-NN` `park_class` values to
 `tools/park_class_map.tsv` — PR #1603 had to fix 12.
 
 ONE PR; verify every number against `git diff --stat` including both rate
-figures; `python tools/work_queue.py done claude-scaffolder cm-257-320-drain-2`.
+figures; `python tools/work_queue.py done scaffolder cm-257-320-drain-2`.
 
 ### cm-257-320-drain-3 — continue, and make screening visible in the ledger [DONE]
 
@@ -2697,7 +2704,7 @@ Regenerate `docs/state-table.md` first, `docs/dashboard.md` second. Add new
 `PROVISIONAL:`/`P-NN` values to `tools/park_class_map.tsv`.
 
 ONE PR; verify every number against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-257-320-drain-3`.
+tools/work_queue.py done scaffolder cm-257-320-drain-3`.
 
 ### cm-257-320-drain-4 — the screening pressure just dropped to zero [DONE]
 
@@ -2757,7 +2764,7 @@ landed — the integration merge failed the dashboard tolerance tests twice this
 round for exactly that reason.
 
 ONE PR; verify every number against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-257-320-drain-4`.
+tools/work_queue.py done scaffolder cm-257-320-drain-4`.
 
 ### cm-257-320-drain-5 — the band is two pools and the last round drained the wrong one [TODO]
 
@@ -2850,4 +2857,4 @@ that omission was the only red in drain-4's integration gate. Regenerate
 commit it describes has landed.
 
 ONE PR; verify every number against `git diff --stat`; `python
-tools/work_queue.py done claude-scaffolder cm-257-320-drain-5`.
+tools/work_queue.py done scaffolder cm-257-320-drain-5`.

@@ -2,6 +2,12 @@
 
 # Codex Decomper — autonomous naming queue
 
+> **ARCHIVED / READ-ONLY (2026-09-04).** This was a provider-named standing
+> lane. Standing lanes are now roles: the live queue for this work is
+> [`docs/queue/decomper.md`](../decomper.md). Kept verbatim for its completed-item
+> history; do NOT claim, add or transition items here, and do not dispatch
+> against it. `work_queue.py` will still read it if pointed at it — don't.
+
 **Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next codex-decomper --claim` (⚠️ Windows: plain `python`). Every rename via `rename_symbol.py --cascade`, each naming batch gated `scope_gate.py --kind naming` (b610/b612 safety); paste real `dsd check` + `scope_gate` output. Open ONE PR **per item**, `work_queue.py done codex-decomper <id>`, commit, then immediately take the next item. Effort HIGH.
 
 **This lane is now naming + ANALYSIS.** Naming alone is candidate-scarce (honest low counts / QUEUE-EMPTY are a SUCCESS — never invent names), so the queue below mixes renaming with research/census work that feeds the CC C-match lanes.

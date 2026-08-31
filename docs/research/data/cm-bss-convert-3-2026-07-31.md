@@ -149,7 +149,7 @@ tells you which one you have.
   (46: 17 modified, 29 new, once this doc and the regenerated research
   index are folded in) checked and reconciled against `git diff --stat`
   before every claim in this doc and the queue result block.
-- Filed [`q-typed-array-brace-nesting-fix`](../../queue/codex-scaffolder.md)
+- Filed [`q-typed-array-brace-nesting-fix`](../../queue/archive/codex-scaffolder.md)
   on the `codex-scaffolder` queue (PR #1406) for wave 2's struct-internal-field
   classifier finding, rather than fixing `progress.py` in this lane.
 

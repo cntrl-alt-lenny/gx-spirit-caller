@@ -42,7 +42,8 @@ Usage:
     python3.13 tools/work_queue.py list   <lane>                 # ids + status + titles
 
 Exit codes: 0 ok · 3 queue EMPTY (no TODO) on `next` · 2 usage/IO error.
-Lanes are free-form (e.g. codex-decomper, codex-scaffolder). File must exist.
+Lanes are free-form, but the STANDING lanes are the roles `decomper` and
+`scaffolder` -- never a provider name. File must exist.
 """
 from __future__ import annotations
 
@@ -59,6 +60,16 @@ STATUSES = ("TODO", "CLAIMED", "DONE", "PARKED")
 # MD022 markdownlint failure (a required check). Lookahead => byte-perfect tail.
 _HDR = re.compile(r"^###\s+(?P<id>\S+)\s+—\s+(?P<title>.*?)\s+\[(?P<status>\w+)\](?=[ \t]*(?:\r?\n|$))",
                   re.M)
+
+
+# THE canonical worker roles. This tuple is the single source of truth for
+# lane identity: a lane IS a role. The tool occupying a role is chosen
+# externally and never appears in a lane name, a queue name or a branch name
+# -- see AGENTS.md "Slugs are roles, not LLM providers". Adding a provider
+# does NOT add a lane; only a project-motivated concurrency lane does, and
+# that lane is still named for what it does, never for who runs it.
+# tests/test_role_lane_neutrality.py enforces this against docs/queue/.
+ROLES: tuple[str, ...] = ("decomper", "scaffolder")
 
 
 def _qfile(lane: str) -> Path:
