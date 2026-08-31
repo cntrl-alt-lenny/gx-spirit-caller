@@ -37,6 +37,11 @@ jobs:
     timeout-minutes: 15
     steps:
       - uses: actions/checkout@v4
+        with:
+          # test_ship_coverage_history_is_not_vacuous derives rounds from
+          # round-labelled commits, so this job needs the history it asserts
+          # over — same reason drift-check pins it.
+          fetch-depth: 0
 
       - uses: actions/setup-python@v5
         with:
