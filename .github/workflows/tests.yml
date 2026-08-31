@@ -44,7 +44,7 @@ jobs:
           cache: 'pip'
           cache-dependency-path: tools/requirements.txt
 
-      - name: Check unittest import parity
+      - name: Check unittest import + collection parity
         run: python tools/check_test_imports.py
 
       - name: Install Python deps

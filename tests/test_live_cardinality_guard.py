@@ -4,6 +4,7 @@ from __future__ import annotations
 
 import ast
 import re
+import unittest
 from dataclasses import dataclass
 from pathlib import Path
 
@@ -227,18 +228,17 @@ def find_repo_test_brittleness_assertions(root: Path) -> list[Finding]:
     return findings
 
 
-def test_live_cardinality_guard_is_clean_on_current_tests():
-    root = Path(__file__).resolve().parents[1]
-    assert find_repo_live_cardinality_assertions(root) == []
+class TestLiveCardinalityGuard(unittest.TestCase):
+    def test_live_cardinality_guard_is_clean_on_current_tests(self):
+        root = Path(__file__).resolve().parents[1]
+        assert find_repo_live_cardinality_assertions(root) == []
 
+    def test_general_brittleness_guard_is_clean_on_current_tests(self):
+        root = Path(__file__).resolve().parents[1]
+        assert find_repo_test_brittleness_assertions(root) == []
 
-def test_general_brittleness_guard_is_clean_on_current_tests():
-    root = Path(__file__).resolve().parents[1]
-    assert find_repo_test_brittleness_assertions(root) == []
-
-
-def test_live_cardinality_guard_flags_live_hardcoded_counts_only():
-    source = """
+    def test_live_cardinality_guard_flags_live_hardcoded_counts_only(self):
+        source = """
 def test_fixture_local():
     rows = [1, 2, 3]
     assert len(rows) == 3
@@ -248,13 +248,12 @@ class Live:
         rows = load_ledger()
         self.assertEqual(len(rows), 12)
 """
-    findings = find_live_cardinality_assertions(source)
-    assert len(findings) == 1
-    assert findings[0].line == 9
+        findings = find_live_cardinality_assertions(source)
+        assert len(findings) == 1
+        assert findings[0].line == 9
 
-
-def test_live_cardinality_guard_accepts_three_fixture_counts():
-    source = """
+    def test_live_cardinality_guard_accepts_three_fixture_counts(self):
+        source = """
 def test_one():
     assert len([1]) == 1
 
@@ -265,25 +264,22 @@ def test_three():
     values = [1, 2, 3]
     assert 3 == len(values)
 """
-    assert find_live_cardinality_assertions(source) == []
+        assert find_live_cardinality_assertions(source) == []
 
+    def test_general_brittleness_guard_flags_hardcoded_sha_assertion(self):
+        hardcoded_sha = "deadbeef" * 5
+        source = f'''\ndef test_bad():\n    result = "ok"\n    assert result == "{hardcoded_sha}"\n'''
+        findings = find_test_brittleness_assertions(source)
+        assert len(findings) == 1
+        assert findings[0].line == 4
 
-def test_general_brittleness_guard_flags_hardcoded_sha_assertion():
-    hardcoded_sha = "deadbeef" * 5
-    source = f'''\ndef test_bad():\n    result = "ok"\n    assert result == "{hardcoded_sha}"\n'''
-    findings = find_test_brittleness_assertions(source)
-    assert len(findings) == 1
-    assert findings[0].line == 4
+    def test_general_brittleness_guard_allows_historical_sha_as_input(self):
+        historical_sha = "deadbeef" * 5
+        source = f'''\ndef test_history_input():\n    kickoff = "git show {historical_sha}^:src/main/func.s"\n    assert "git show" in kickoff\n'''
+        assert find_test_brittleness_assertions(source) == []
 
-
-def test_general_brittleness_guard_allows_historical_sha_as_input():
-    historical_sha = "deadbeef" * 5
-    source = f'''\ndef test_history_input():\n    kickoff = "git show {historical_sha}^:src/main/func.s"\n    assert "git show" in kickoff\n'''
-    assert find_test_brittleness_assertions(source) == []
-
-
-def test_general_brittleness_guard_flags_live_scalar_and_allows_fixture_shape():
-    source = """
+    def test_general_brittleness_guard_flags_live_scalar_and_allows_fixture_shape(self):
+        source = """
 def test_live():
     rows = load_ledger()
     assert rows.count("x") == 3
@@ -292,6 +288,10 @@ def test_shape():
     names = {"x"}
     assert names == set()
 """
-    findings = find_test_brittleness_assertions(source)
-    assert len(findings) == 1
-    assert findings[0].line == 4
+        findings = find_test_brittleness_assertions(source)
+        assert len(findings) == 1
+        assert findings[0].line == 4
+
+
+if __name__ == "__main__":
+    unittest.main()
