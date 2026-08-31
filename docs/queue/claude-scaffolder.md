@@ -2758,3 +2758,96 @@ round for exactly that reason.
 
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-257-320-drain-4`.
+
+### cm-257-320-drain-5 — the band is two pools and the last round drained the wrong one [TODO]
+
+`cm-257-320-drain-4` (PR #1616) shipped **1 of 17 attempted (5.9%)**, **1 of 17
+pool (5.9%)**, **zero screens** — and reported that as a divergence rather than
+adjusting it. That was the right call on the evidence you had. The brain then
+quantified the explanation you gave in prose, and it changes the dispatch.
+
+**THE BAND IS TWO POOLS.** Split every 257-320 B attempt in the ledger by
+module, across all six briefs that have worked this band:
+
+```text
+  ov002              6/30 = 20.0%     132 candidates remaining
+  main               1/34 =  2.9%      56 candidates remaining
+  everything else    4/20 = 20.0%      10 candidates remaining
+```
+
+The per-round rate tracks the module mix almost exactly: drain-1 (10 main /
+6 ov002) 17.6%, drain-2 (6/7) 7.1%, drain-3 (0 main / 12 ov002) 12.5%, drain-4
+(16 main / 1 ov002) **5.9%**. **Your tranche drew 16 of 17 from the 2.9%
+sub-pool while 132 candidates sat in the 20.0% one.** Remaining pool, measured
+on `main` with the project's own tool:
+`python tools/pool_freshness.py --pool wall-bl4-small --min-size 257
+--max-size 320 --exclude-attempted --all-modules` -> **198 candidates /
+57,976 B**, which reconciles exactly with your 215 minus your 17.
+
+**Scope, in this order.**
+
+1. **Fix the auto-scaffold padding bug you found — first, before any
+   candidate.** `prepare_compile_source` declares every referenced `unkNN`
+   field as a sequentially-packed `int` with no padding for the real byte gap,
+   so a compile succeeds at the wrong offsets. Derive the gap from the numeric
+   suffixes already in the field names. Your own evidence: one `char _pad[N]`
+   took the shipped function **95.89% -> 100.0%** and moved `func_0201cab4`
+   **10.96% -> 83.6%**. **CANARY (control 7): construct a case with a known
+   gap, confirm the generator emits the wrong struct BEFORE the fix and the
+   right one after.** If it is already right on the current tree, your reading
+   of the bug is wrong — STOP and report that.
+2. **Drain ov002-first.** Take the 132 `ov002` candidates in pool order. Do not
+   take `main` candidates this round; if you exhaust ov002, stop and report
+   rather than filling the tranche from the 2.9% pool. Target n≈20.
+3. **Backfill the wall catalogue.** `codegen-walls.md`'s BR ledger **stops at
+   BR-9** — drain-3 and drain-4 never added entries. Add **BR-10** (drain-3,
+   2/16 attempted / 2/17 pool) and **BR-11** (drain-4, 1/17 / 1/17) from the
+   ledger, then add your own as **BR-12**. A catalogue that stops being updated
+   is the same narrative-only divergence your C-63 recovery just found in the
+   other direction.
+
+⚠️ **ONE DENOMINATOR, PINNED.** Three competing cumulative figures are in
+circulation for this band: BR-9's 4/31 = 12.9% (BR-8+BR-9 only), the kickoffs'
+8/51 = 15.7% (BR-4+drains), and **11/84 = 13.1% (all six briefs)** — which you
+derived and the brain reproduced exactly. **11/84 is the one. Quote it, and say
+its scope every time.**
+
+⚠️ **`m2ctx.py` hardcodes `gcc` and this machine has none — and it bites
+exactly the pool you are about to drain.** Brain reproduced it:
+`m2c_feed.build_context('eur','ov002')` raises `FileNotFoundError [WinError 2]`.
+PR #1616 correctly stopped that from destroying the whole skeleton, but
+`context_error` is written at `cmatch_loop.py:361` and **read nowhere**, so the
+degradation is now silent. `main` has no `*_core.h` and legitimately returns
+`None`, which is why drain-4 was unaffected — **`ov002` has one, so every
+candidate this round is affected.** Two things: **(a)** surface `context_error`
+wherever the dossier is rendered, so a context-less run announces itself;
+**(b)** report whether a working context changes m2c's output on ov002 — if any
+`cpp`/`clang`/`gcc` is reachable, test one candidate both ways and say what
+differed. **Do not install anything system-wide**; report what is missing.
+
+**Report all of:** attempted-rate, pool-rate, screens split by grounds,
+cumulative P-20 encounters (18 at the start of this round), module mix of your
+tranche, and how many m2c compile-context failures you hit. Keep writing
+`result=not-attempted` rows for screens — standing practice now.
+
+**Signature leads, current state:** push-vs-`sub sp,#N` alignment padding is
+**confirmed compiler-internal** — a wall, spend no attempts on it.
+Independent-computation interleaving: 2 hits, unresponsive. `str`/`stmib`
+fusion: no clean re-hit. The `volatile` MMIO lever is **still untested** — one
+genuine case appeared and was inconclusive for unrelated reasons.
+
+**DO NOT USE SUB-AGENTS.** Shared worktree, machine-wide-serialising compiler.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, `validate_attempts.py`, `gate3.py --scope tests`. Use
+`tee`, never `tail`, and **read the log, not the exit code** — the wrapper
+printed `[exited with code 0]` directly under `GATE FAIL` twice this round.
+`git restore assets/` after each clean run. **Run
+`python tools/generate_research_index.py` after adding your research doc** —
+that omission was the only red in drain-4's integration gate. Regenerate
+`docs/state-table.md` first and `docs/dashboard.md` second, each after the
+commit it describes has landed.
+
+ONE PR; verify every number against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-257-320-drain-5`.
