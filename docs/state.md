@@ -381,6 +381,22 @@ back, so the "run conservatively" fallback also never fired) and CR-stripping
 on the ref manifest. `tests/test_pre_push_hook.py` now runs the real script;
 mutating the fix back to the original pattern turns 3 of its 4 tests red.
 
+⚠️ **39 tests never run in CI** (found 2026-09-03 while verifying PR #1608's
+one red test). `pytest --collect-only` sees **3,594**; CI's
+`unittest discover` runs **3,555**. Eight files use module-level `def test_*`
+functions that `unittest` cannot collect — including
+`test_validate_attempts.py` (12 tests, guards the ledger every ship-rate is
+computed from) and `test_port_to_region.py` (the port resolver).
+`tools/check_test_imports.py` sounds like it would catch this and does not: it
+checks only third-party imports. Seeded as `q-ci-test-visibility`.
+
+⚠️ **A lane is running on the Mac, not the Windows PC.** PR #1608's red test
+resolved `python3.13` only. `tools/make_kickoff.py` stamps
+`"python" if host == "windows" else "python3.13"` and the test hard-codes the
+Windows form, so it can only pass on Windows. The `python3.13` **hard version
+pin** is a separate latent defect — it breaks on any Python upgrade — and is
+deliberately NOT being changed blind from a machine that cannot verify the Mac.
+
 <!-- main-sha: 676fed454 -->
 <!-- parked-prs: 1020 -->
 

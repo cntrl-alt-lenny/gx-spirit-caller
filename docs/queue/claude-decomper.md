@@ -2885,3 +2885,85 @@ index-diff reported. Build-free.
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-wall-catalog-repair`; then report
 QUEUE-EMPTY honestly if you reach it.
+
+### q-ci-test-visibility — 39 tests never run in CI [TODO]
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+**Found while verifying PR #1608's one red test.** That failure was real but
+narrow; chasing it surfaced something wider. The two runners disagree:
+
+```text
+python -m pytest -q tests --collect-only   ->  3,594 tests collected
+python -m unittest discover -s tests       ->  3,555 tests ran
+```
+
+**CI runs only `unittest discover`.** So **39 tests never execute in CI.** They
+live in 8 files that use module-level `def test_*` functions, which
+`unittest` cannot collect:
+
+```text
+test_validate_attempts.py   12   <- guards the campaign ledger
+test_live_cardinality_guard.py 7
+test_pool_freshness.py       6
+test_asm_void_counter.py     4
+test_make_kickoff.py         4
+test_fix_delink_suffixes.py  3
+test_port_to_region.py       2   <- the port resolver
+test_touch_stamp.py          1
+```
+
+`tools/check_test_imports.py` exists and sounds like it would catch this — it
+does not. It checks only for **third-party imports** that would break the
+stdlib-only unittest job. Collection parity is unguarded.
+
+**This is the same defect class the campaign keeps finding:** a safety
+mechanism that is documented, installed, and inert. `test_validate_attempts.py`
+guards the ledger every ship-rate is computed from, and CI has never run it.
+
+**Deliverable, in order:**
+
+1. **A parity guard that fails loudly.** Extend `check_test_imports.py` (or add
+   a sibling, your call — say which and why) to compare what `unittest
+   discover` collects against what is actually defined, and fail when a
+   `test_*.py` contributes tests that unittest cannot see. Add it to the CI
+   job. **A test you have seen fail first**, constructed from a file with a
+   module-level test function.
+2. **Bring the 39 into CI.** Convert them to `unittest.TestCase` (the CI job is
+   deliberately stdlib-only — do **not** add pytest to CI to solve this). If
+   any test genuinely cannot be expressed without pytest, say so and leave it,
+   with the guard explicitly allow-listing it and a reason.
+3. **Fix the host-dependent test found in PR #1608.** `tools/make_kickoff.py`
+   line ~65 stamps `interpreter="python" if host == "windows" else
+   "python3.13"`, and `test_make_kickoff.py` hard-codes the Windows form, so it
+   can only pass on Windows. Make the test assert against the same host
+   conditional the tool uses rather than a literal.
+
+⚠️ **Do not change the interpreter SELECTION while fixing the test.** The
+`python3.13` pin is a separate question — it is a hard version pin that would
+break on a Python upgrade, but changing it needs verification on the Mac, which
+this lane cannot do. **Fix the test; report the pin as a finding.**
+
+⚠️ **Do not weaken any test to make it collectable.** If converting a test to
+`TestCase` changes what it asserts, that is a rewrite, not a conversion — flag
+it instead.
+
+⚠️ **Blank is not zero.** State the before/after counts from both runners, so
+the parity is demonstrated rather than asserted.
+
+**CANARY.** Before converting anything, add the guard and confirm it **fails on
+the current tree** with all 8 files named. If it passes on the current tree,
+the guard is not measuring what you think and everything downstream is built on
+it — STOP and report that.
+
+**SUB-AGENTS PERMITTED, TWO HARD RULES.** READ-ONLY only — shared worktree; you
+do all writing, committing and git operations. No sub-agent runs a build,
+`ninja`, or a region gate.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + both collection
+counts pasted before and after. Build-free.
+
+ONE PR; verify every claim against `git diff --stat`; `python
+tools/work_queue.py done claude-decomper q-ci-test-visibility`.
