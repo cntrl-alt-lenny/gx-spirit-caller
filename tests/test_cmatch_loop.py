@@ -367,7 +367,7 @@ class TestWrongSourceIteratesThenParks(unittest.TestCase):
                          "}\n")
         delinks_path = cl.delinks_path_for_module(region, module)
         c_path = cl.src_path(region, module, func)
-        rel = str(c_path.relative_to(cl.ROOT))
+        rel = c_path.relative_to(cl.ROOT).as_posix()
         original = c_path.read_text()
 
         with tempfile.TemporaryDirectory() as tmp:
@@ -462,7 +462,7 @@ class TestBuildDossierRegression(unittest.TestCase):
         func, region, module = "func_ov002_0220448c", "eur", "ov002"
         delinks_path = cl.delinks_path_for_module(region, module)
         c_path = cl.src_path(region, module, func)
-        rel = str(c_path.relative_to(cl.ROOT))
+        rel = c_path.relative_to(cl.ROOT).as_posix()
 
         with cl.TemporaryGap({delinks_path: [rel]}):
             dossier = cl.build_dossier(region, func, module)
