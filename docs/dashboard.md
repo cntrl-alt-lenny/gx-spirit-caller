@@ -15,7 +15,7 @@ Reproduce: `python -c "import sys; sys.path.insert(0,'tools'); import progress; 
 
 | region | natural-C | natural-C % | asm-C | C-decompiled % |
 | --- | ---: | ---: | ---: | ---: |
-| eur | 414,174 | **17.36%** | 4,420 | 17.54% |
+| eur | 414,466 | **17.37%** | 4,420 | 17.56% |
 | usa | 377,920 | **15.85%** | 2,924 | 15.97% |
 | jpn | 377,920 | **15.85%** | 2,932 | 15.97% |
 
@@ -83,8 +83,10 @@ Reproduce: `git log --follow --format=%H -- docs/state-table.md` then `git show 
 | `bfbdc1d27` | 2026-08-30 | 412,578 | 17.29% | +476 |
 | `87b18e48f` | 2026-08-30 | 413,358 | 17.32% | +780 |
 | `676fed454` | 2026-08-30 | 413,622 | 17.34% | +264 |
+| `15a8e9579` | 2026-08-31 | 414,174 | 17.36% | +552 |
+| `a2b0f9976` | 2026-08-31 | 414,466 | 17.37% | +292 |
 
-58 points, one per commit that changed `docs/state-table.md` (oldest first).
+60 points, one per commit that changed `docs/state-table.md` (oldest first).
 
 ## Remaining candidate pools by size band (EUR, `.text`)
 
@@ -96,7 +98,7 @@ Reproduce per row: `python tools/wall_aware_headroom.py --exclude-attempted --mi
 | --- | ---: | ---: |
 | <=192 B | 1,160 | 135,268 |
 | 193-256 B | 460 | 102,472 |
-| 257-320 B | 363 | 105,176 |
+| 257-320 B | 346 | 100,196 |
 | 321-384 B | 261 | 91,724 |
 | 385+ B | 1,310 | 1,309,080 |
 
@@ -109,10 +111,10 @@ Reproduce: `python tools/wall_aware_headroom.py --json --exclude-attempted`; eac
 | module | permanent count | permanent bytes | unassessed count | unassessed bytes |
 | --- | ---: | ---: | ---: | ---: |
 | itcm | 0 | 0 | 12 | 2,020 |
-| main | 36 | 3,096 | 1,391 | 506,756 |
+| main | 36 | 3,096 | 1,375 | 502,040 |
 | overlay000 | 0 | 0 | 45 | 14,628 |
 | overlay001 | 0 | 0 | 0 | 0 |
-| overlay002 | 44 | 6,636 | 1,626 | 882,292 |
+| overlay002 | 44 | 6,636 | 1,625 | 882,028 |
 | overlay003 | 0 | 0 | 12 | 17,400 |
 | overlay004 | 7 | 1,472 | 73 | 49,752 |
 | overlay005 | 0 | 0 | 26 | 24,816 |
