@@ -302,7 +302,7 @@ finding.
 
 ⚠️ **Control 12 NOT executable, seventh consecutive round.**
 
-**Last updated:** 2026-09-02 — **(Windows PC, brain=Opus 5; both lanes Claude
+**Round 0902 (2026-09-02, Windows PC, brain=Opus 5; both lanes Claude
 Sonnet 5 at `max` effort.) Round 0902: the wall audit found that on-sight
 screening leaves NO ledger trace for any wall, and that only P-20 is strongly
 evidenced. The drain reported both denominators and corrected the brain's own
@@ -397,7 +397,192 @@ Windows form, so it can only pass on Windows. The `python3.13` **hard version
 pin** is a separate latent defect — it breaks on any Python upgrade — and is
 deliberately NOT being changed blind from a machine that cannot verify the Mac.
 
-<!-- main-sha: 676fed454 -->
+**Round 0903 (2026-09-03, Windows PC, brain=Opus 5; both lanes Claude
+Sonnet 5 at `max` effort.) Round 0903: the ledger screen-row change landed and
+worked, P-20 screens fell 12 -> 0, and the wall-index fix corrected seven stale
+counts. Written up retroactively during round 0904 — see the process defect
+below.**
+
+Merged **PR #1608** and **PR #1609**, plus brain PRs **#1610**, **#1611**,
+**#1612**, **#1613**, **#1614**. `main` at `050f06c0f`. EUR **17.34% ->
+17.36%** (413,622 -> 414,174 B); USA/JPN unchanged at 15.85%.
+
+**PR #1609 — 2/16 attempted (12.5%), 2/17 pool (11.8%)**, shipping
+`func_ov002_021c9c94` and `func_ov002_021c9fc4`. It delivered the ledger change
+round 0902 seeded: `attempts.tsv` now carries a formal `result=not-attempted`
+row when a candidate is screened, and `validate_attempts.py` reported 1,853
+rows / 0 errors. **P-20 screens went 12 -> 0**, so this was the first tranche
+where attempted-rate and pool-rate nearly converged.
+
+**PR #1608 — the wall-index heading regex is fixed and seven counts
+reconciled.** It found a wall nobody had asked about (C-39) and corrected
+**P-11 to 13/16 shipped, not the audit's own 10/16**; P-50 went 4 -> 21.
+
+⚠️ **PROCESS DEFECT — this round's own bookkeeping never happened, and both
+guards that exist to catch it are inert.** PR #1614 appended two warning
+paragraphs into the round-0902 section: it opened no Round 0903 heading, left
+the `main-sha` anchor at `676fed454` (eight PR-merges behind by the time round
+0904 began), and added no `0903` dispatch-log row. Control 5's checklist went
+unticked. Two guards should have fired and could not:
+
+1. `tools/queue_state_drift.py` measures anchor staleness with
+   `git rev-list --count --merges <anchor>..<ref>`. **The repo has squash-merged
+   exclusively since 2026-08-25** (`efb512d32`, PR #1581, the last real merge
+   commit), so `merges_since` is **always 0** and the `_STALE_MERGE_TOLERANCE`
+   branch is unreachable. Demonstrated in round 0904: `main_anchor_checker`
+   returns `(True, 0)` for anchors roughly 30 PRs back.
+2. `tools/check_dispatch_log.py` requires a dispatch row only when the
+   `**Last updated:**` *block* changes — that line through the next blank line.
+   A round appending its narrative anywhere else skips the requirement
+   silently, which is exactly what happened.
+
+**Neither guard is wired into any CI workflow.** This is the third instance of
+the "documented, installed, inert" class in three rounds, after the pre-push
+invariants hook and the unittest collection gap. `docs/guard-coverage-review.md`
+is not evidence against it: that table lists `test_install_git_hooks.py` as
+FIRES-CORRECTLY while the hook it installs was inert for its entire life — it
+audited the installer, not the behaviour. Seeded as `q-handoff-guard-repair`.
+
+**Last updated:** 2026-09-04 — **(Windows PC, brain=Opus 5; both lanes Claude
+Sonnet 5 at `max` effort.) Round 0904: the 257-320 B band is not one pool but
+two, and the round spent 16 of 17 attempts on the wrong one. Both lanes
+reported their own limits accurately; the brain's contribution was to put
+numbers on what the drain lane had already described in prose.**
+
+Merged **PR #1616**. **PR #1615 is HELD open on a red required check** — see
+below. EUR **17.36% -> 17.37%** (414,174 -> 414,466 B); USA/JPN unchanged at
+15.85%.
+
+⚠️ **THE BAND IS TWO POOLS. This is the round's finding and it decides the next
+dispatch.** PR #1616 returned 1/17 = 5.9% and reported it as a genuine
+divergence from the all-time figure, explaining in prose that the batch "drew
+heavily from `main`-tier candidates rather than the `ov002` near-miss shapes
+that dominate the campaign's ship history". The brain quantified that
+explanation from the ledger, across all six 257-320 B briefs:
+
+| sub-pool | shipped / attempted | remaining candidates |
+| --- | ---: | ---: |
+| **ov002** | **6/30 = 20.0%** | **132** |
+| `main` | 1/34 = 2.9% | 56 |
+| everything else | 4/20 = 20.0% | 10 |
+
+The per-round rate tracks the module mix almost exactly: drain-1 (10 main /
+6 ov002) 17.6%, drain-2 (6/7) 7.1%, drain-3 (0 main / 12 ov002) 12.5%, drain-4
+(16 main / 1 ov002) **5.9%**. **The divergence is a selection artefact, not
+band exhaustion** — drain-4 spent 16 of 17 attempts on the 2.9% sub-pool while
+132 candidates sat in the 20.0% one. Remaining pool measured with the project's
+own `pool_freshness.py`: **198 candidates / 57,976 B**, reconciling exactly
+with the lane's 215 minus its own 17.
+
+⚠️ **Three different cumulative rates for this band are in circulation, and the
+wall catalogue is two rounds stale.** `codegen-walls.md`'s BR ledger stops at
+**BR-9**; drain-3 and drain-4 never added BR-10/BR-11. The figures are:
+
+| source | figure | scope |
+| --- | ---: | --- |
+| `codegen-walls.md` BR-9 | 4/31 = 12.9% | BR-8 + BR-9 only |
+| `state.md` + the last two kickoffs | 8/51 = 15.7% | BR-4 + drains |
+| drain-4's writeup, brain-recomputed | **11/84 = 13.1%** | all six briefs |
+
+**11/84 = 13.1% is the correct one** — the lane derived it independently and
+the brain's recomputation matched exactly. One denominator, pinned, from now
+on. A wall catalogue that stops being updated is the same narrative-vs-ledger
+divergence the C-63 recovery just found in the other direction.
+
+**PR #1616 — verified, and honest about its own limits.** Brain re-derived the
+17 ledger rows from the diff: 1 shipped / 16 parked, **zero screens**, so
+attempted-rate and pool-rate are genuinely identical at 5.9% rather than
+converged by argument. The C-63 recovery (`func_ov002_02236bbc`) was a
+**narrative-only decline** — documented as parked in `codegen-walls.md` but
+never ledgered; the lane applied the lever for real, got 8.96%, and recorded
+it. It did not ship, and the lane did not claim it did. Control 10 dup-scan
+clean; `.s` deleted, `.c` added, `delinks.txt` flipped.
+
+**Its systemic finding is real and is the highest-value tooling item on the
+board.** `prepare_compile_source`'s auto-scaffold declares every referenced
+`unkNN` field as a sequentially-packed `int` with **no padding for the real
+byte gap**, so a compile succeeds at the wrong field offsets. One `char _pad[N]`
+insertion took the shipped function from **95.89% to 100.0%**, and the same fix
+moved `func_0201cab4` from 10.96% to **83.6%**. The gap is derivable from the
+numeric suffixes already present in the field names.
+
+⚠️ **BRAIN FINDING: `m2ctx.py` hardcodes `gcc`, and this machine has none.**
+Reproduced directly — `m2c_feed.build_context('eur','ov002')` raises
+`FileNotFoundError [WinError 2]`. PR #1616 fixed the *consequence* (the raise
+escaped and dropped the whole skeleton) by catching it and recording
+`context_error`, which is correct. But **`context_error` is written at
+`cmatch_loop.py:361` and read nowhere**, so the degradation is now silent
+rather than loud. The modules this hits are exactly those with a `*_core.h` —
+**`ov002`**, the 20.0% sub-pool the next round targets. `main` has no core
+header and legitimately returns `None`, which is why drain-4 was unaffected and
+why the lane's attribution of its own near-misses to the scaffold, not to the
+context, was correct.
+
+**PR #1615 — the parity guard is real, brain-verified red.** Control 7: pointed
+`scan_collection` at a temp tree containing a module-level `def test_*` and a
+non-`TestCase` class; **both go red**, and the guard catches the class form the
+brief never asked for. Green on the converted tree with an **empty allow-list**
+— all 39 were converted, none excused. Brain re-derived the population by
+running the new guard against `origin/main`: **exactly 39 violations across
+exactly the 8 named files, per-file counts matching.**
+
+⚠️ **PR #1615 IS HELD: its required `unittest` check is red in CI, and both
+failures are real.** `Ran 3593 tests ... FAILED (errors=2, skipped=27)`:
+
+1. `test_ship_coverage_history_is_not_vacuous` — `KeyError:
+   'cm-main-tier-sweep-7'`. It derives rounds from round-labelled commits, but
+   the `unittest` job uses a default shallow `actions/checkout` with no
+   `fetch-depth: 0`. The `drift-check` job sets it explicitly and documents why;
+   this one never did.
+2. `test_pool_item_stamps_live_figure_and_reproducer` — `FileNotFoundError:
+   'python3.13'`. `make_kickoff._run_pool` **executes** the pinned interpreter,
+   and `_lane_spec` models only `windows`/`mac`, so the Linux runner resolves
+   `python3.13`, which is absent (CI is 3.11).
+
+**Both are pre-existing defects that were invisible precisely because these
+tests never ran in CI** — the new guard working as designed on its first
+outing. The brain did **not** fix (2) here: round 0903 reserved the
+`python3.13` pin as unverifiable from a machine without the Mac, and that
+reservation is not overruled silently. The branch stays open and the item
+returns to the decomper lane.
+
+The lane's headline "gap closed from 46 to 0" mixes the real 39 with a 7-test
+discrepancy it separately investigated and concluded was an artefact of its own
+diagnostic script, not of the repo. It disclosed that openly and did not report
+the 7 as a repo defect — but the two halves have different provenance and
+should not be quoted as one figure.
+
+⚠️ **The gate FAILED on the first integration run, and the wrapper exited 0.**
+All three SHA1 PASS, then `test_generate_research_index.py::
+TestCommittedIndexIsCurrent` went red: PR #1616 added its research writeup
+without re-running `tools/generate_research_index.py`. One generated line.
+**`[exited with code 0]` sat directly beneath
+`==================== GATE FAIL ====================`** — reading the log is
+what caught it, for the second round running. Fixed on the lane's branch
+(`8cc6301bd`, fast-forward push, not a force) per the round-0824c precedent,
+then re-gated to `GATE PASS` (3,584 passed / 16 skipped).
+
+**Round 0902's two dashboard failures are gone**, confirming the diagnosis:
+they were caused by round 0903's missing regeneration, and PR #1616's
+regeneration cleared them.
+
+**Gate provenance, stated exactly:** the three SHA1 PASS lines were produced on
+the integration tree *before* the one-line research-index commit; the only
+delta between that tree and the `GATE PASS` tree is `docs/research/README.md`,
+verified by `git diff --stat` and confirmed absent from `build.ninja`.
+
+✅ **Control 12 EXECUTABLE — first time in nine rounds.** Both lanes ran in
+Claude Code and both transcripts were read.
+
+| lane | session located | final report read | caveats / parked work | matched branch, PR, files |
+| --- | --- | --- | --- | --- |
+| Claude Code Decomper | yes (`local_8ae4709a`) | yes | disclosed a 7-test discrepancy as its own instrumentation artefact rather than a repo defect; left the `python3.13` pin untouched as instructed and reported it as a finding | yes — 13 files, +571/-355 |
+| Claude Code Scaffolder | yes (`local_32bdcd11`) | yes | disclosed a self-inflicted pytest race (regenerated `dashboard.md` while pytest exercised its own staleness fixtures) and re-ran clean; declined to adjust the 5.9% figure | yes — 10 files, +228/-107 |
+
+Neither lane's report contradicted the artefacts, and neither overstated a
+result. Both surfaced their own limits before the brain asked.
+
+<!-- main-sha: 0b2f8c630 -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

@@ -2967,3 +2967,90 @@ counts pasted before and after. Build-free.
 
 ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done claude-decomper q-ci-test-visibility`.
+
+**ROUND 2 (added 2026-09-04 by the brain — this item is NOT done).**
+
+Your PR [#1615] is **open and HELD**, not merged. The work is good: the brain
+mutation-tested your guard (control 7) by pointing `scan_collection` at a temp
+tree with a module-level `def test_*` and a non-`TestCase` class — **both go
+red**, and it catches the class form this brief never asked for. Green on your
+converted tree with an **empty allow-list**. The brain also re-derived the
+population by running your guard against `origin/main`: **exactly 39 violations
+across exactly the 8 named files, per-file counts matching.** That all holds.
+
+**What blocks the merge: your required `unittest` check is RED in CI.**
+`Ran 3593 tests ... FAILED (errors=2, skipped=27)`. Both failures are real, and
+both are **pre-existing defects that were invisible precisely because these
+tests never ran in CI** — your guard working as designed on its first outing.
+Continue on the SAME branch and PR.
+
+1. **`test_ship_coverage_history_is_not_vacuous` — `KeyError:
+   'cm-main-tier-sweep-7'`.** It derives rounds from round-labelled commits, but
+   the `unittest` job in `.github/workflows/tests.yml` uses a bare
+   `actions/checkout@v4` with the default shallow depth. `generated-files-drift.yml`
+   sets `fetch-depth: 0` and documents exactly why ("Ship-coverage validation
+   derives round flips from round-labelled commits"). Give the `unittest` job the
+   same, or make the test skip explicitly when history is unavailable — **your
+   call, say which and why.** A silent skip is worse than a loud one.
+
+2. **`test_pool_item_stamps_live_figure_and_reproducer` —
+   `FileNotFoundError: 'python3.13'`.** `make_kickoff._run_pool` **executes**
+   the pinned interpreter, and `_lane_spec` models only `windows`/`mac`
+   (`raise ValueError("host must be windows or mac")`), so the Linux runner
+   resolves `python3.13`, which is absent — CI is 3.11. Your host-conditional
+   fix was right in principle; it just moved the failure to a host the tool's
+   own model does not have.
+
+   ⚠️ **The interpreter SELECTION is still reserved** — changing the
+   `python3.13` pin needs verification on the Mac, which this lane cannot do,
+   and that reservation stands. Fix this **at the boundary**: either the tool
+   resolves an interpreter that exists (falling back to `sys.executable` when
+   the pin is unresolvable) or the test stops invoking a live subprocess. State
+   which you chose and what it does NOT fix.
+
+**Then, second item this round — `q-handoff-guard-repair`.** Round 0903's
+bookkeeping silently never happened, and **both guards that exist to catch it
+are inert**. Brain-verified on `main`:
+
+- `tools/queue_state_drift.py` measures anchor staleness with
+  `git rev-list --count --merges <anchor>..<ref>`. **The repo has squash-merged
+  exclusively since 2026-08-25** (`efb512d32`, PR #1581, the last real merge
+  commit), so `merges_since` is **always 0**. Demonstrated:
+  `main_anchor_checker(Path('.'),'HEAD')` returns `(True, 0)` for anchors ~30
+  PRs back. The `_STALE_MERGE_TOLERANCE` branch is unreachable.
+- `tools/check_dispatch_log.py` requires a dispatch row only when the
+  `**Last updated:**` *block* changes — that line through the next blank line.
+  A round appending its narrative anywhere else skips the requirement silently.
+- **Neither is wired into any CI workflow.** `generated-files-drift.yml` runs
+  the three index `--check`s plus `validate_attempts.py`, and nothing else.
+
+Fix both so they measure the thing they claim, and wire them into CI. Count
+squash-merge commits (or PR-numbered subjects), not `--merges`.
+
+**CANARY, control 7, non-negotiable:** for EACH guard, show it **RED on a
+reconstruction of the round-0903 tree** (anchor `676fed454`, `main` at
+`050f06c0f`, no `0903` dispatch row) before your fix and GREEN after. If either
+passes on that input before your fix, your model of the bug is wrong — STOP and
+report it.
+
+⚠️ **`docs/guard-coverage-review.md` is not evidence.** It lists
+`test_install_git_hooks.py` as FIRES-CORRECTLY while the pre-push hook it
+installs was inert for its entire life — it audited the installer, not the
+behaviour. **Do not cite that table as proof any guard works, and add a line to
+it saying so.** This is the third "documented, installed, inert" finding in
+three rounds.
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+**SUB-AGENTS PERMITTED, READ-ONLY ONLY** — shared worktree; you do all writing,
+committing and git operations.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean. **The real gate
+for item 1 is the `unittest` check going green on PR #1615 in CI** — paste
+`gh pr checks 1615`. Local green is not sufficient; that is the whole lesson of
+this item.
+
+Verify every claim against `git diff --stat`. When #1615 is green, mark it:
+`python tools/work_queue.py done claude-decomper q-ci-test-visibility`.
