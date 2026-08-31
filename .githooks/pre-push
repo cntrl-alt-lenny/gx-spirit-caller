@@ -28,17 +28,25 @@ set -euo pipefail
 
 touched_interesting=0
 while read -r local_ref local_sha remote_ref remote_sha; do
+    # Strip any trailing CR. Git writes this manifest with LF, but this
+    # repo is Windows-primary and CRLF has leaked into hook stdin before;
+    # a stray  makes the all-zeros comparisons below silently fail.
+    local_sha="${local_sha%%}"
+    remote_sha="${remote_sha%%}"
     # Deletion (local_sha is all zeroes) — nothing to check.
     if [[ "${local_sha}" == "0000000000000000000000000000000000000000" ]]; then
         continue
     fi
 
     # New branch (remote_sha is zeros): diff against merge base
+    # NOTE: rev-parse needs --verify, or an unresolvable SHA is echoed
+    # straight back and `base` looks resolved when it is not, silently
+    # skipping the check instead of running it conservatively.
     # with origin/main, falling back to the parent commit if no
     # origin/main.
     if [[ "${remote_sha}" == "0000000000000000000000000000000000000000" ]]; then
         base=$(git merge-base "${local_sha}" origin/main 2>/dev/null \
-               || git rev-parse "${local_sha}^" 2>/dev/null \
+               || git rev-parse --verify --quiet "${local_sha}^" 2>/dev/null \
                || echo "")
     else
         base="${remote_sha}"
@@ -75,9 +83,18 @@ fi
 
 # Run the check. --version eur is hardcoded (project baseline);
 # multi-version support would extend this to a loop.
-if ! "${PYTHON}" tools/check_match_invariants.py --version eur \
-        >/tmp/invariants.out 2>&1; then
-    rc=$?
+# Capture the status with `|| rc=$?`, NOT `if ! cmd; then rc=$?`. `!` inverts
+# the pipeline status, so inside such a then-block `$?` is 0 -- which made the
+# `-eq 2` branch below unreachable and left this guard inert for its whole
+# life. Covered by tests/test_pre_push_hook.py, which executes this script for
+# real rather than testing helper logic around it.
+out_file="$(mktemp -t invariants.XXXXXX 2>/dev/null || echo "/tmp/invariants.$$.out")"
+trap 'rm -f "${out_file}"' EXIT
+
+rc=0
+"${PYTHON}" tools/check_match_invariants.py --version eur \n    >"${out_file}" 2>&1 || rc=$?
+
+if [[ "${rc}" -ne 0 ]]; then
     if [[ "${rc}" -eq 2 ]]; then
         echo >&2
         echo "❌ pre-push: match-invariants reports ERRORS." >&2
@@ -89,7 +106,7 @@ if ! "${PYTHON}" tools/check_match_invariants.py --version eur \
             /^== [a-z_]+ \([0-9]+\) ==$/ { section=$0; hide=0 }
             /^== complete_tu_rename / { hide=1 }
             hide==0 { print }
-        ' /tmp/invariants.out >&2
+        ' "${out_file}" >&2
         echo >&2
         echo "Bypass once: git push --no-verify" >&2
         exit 1

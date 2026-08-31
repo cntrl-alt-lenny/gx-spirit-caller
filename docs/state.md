@@ -368,6 +368,19 @@ reporting" instruction worked.
 
 ⚠️ **Control 12 NOT executable, eighth consecutive round.**
 
+⚠️ **The `pre-push` invariants guard was INERT for its entire life** (found
+2026-09-02 by an external review of the agentic workflow, verified here). It
+captured the checker's status as `if ! cmd; then rc=$?` — `!` inverts the
+pipeline status, so `$?` inside that block is **0** and the `-eq 2` "errors,
+block the push" branch was unreachable. Every push since the hook landed went
+unguarded. `tests/test_install_git_hooks.py` pinned the installer, the file
+mode and `core.hooksPath`, but **never executed the hook**, which is exactly
+the "documented but untested safety mechanism" failure class. Fixed with
+`|| rc=$?`, plus `rev-parse --verify` (an unresolvable SHA was being echoed
+back, so the "run conservatively" fallback also never fired) and CR-stripping
+on the ref manifest. `tests/test_pre_push_hook.py` now runs the real script;
+mutating the fix back to the original pattern turns 3 of its 4 tests red.
+
 <!-- main-sha: 676fed454 -->
 <!-- parked-prs: 1020 -->
 

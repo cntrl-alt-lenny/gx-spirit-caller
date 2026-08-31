@@ -8,6 +8,7 @@ must fail the corresponding required check.
 
 from __future__ import annotations
 
+import shutil
 import subprocess
 import sys
 import unittest
@@ -384,6 +385,55 @@ class TestAdvisory(unittest.TestCase):
         # still no *required* failure
         self.assertEqual([c.key for c in checks if c.required and not c.ok], [])
 
+
+
+class TestCommitMustBeReachableFromARemote(unittest.TestCase):
+    """A SHA that exists only locally must fail — the PR #1520 class.
+
+    `git cat-file -e` proves the object is in THIS clone. #1520 hardcoded a
+    commit that resolved on the machine that wrote it and was a bad object in
+    the shared repo: green locally, broken for every lane. The check now also
+    requires the commit to be reachable from a remote-tracking branch.
+    """
+
+    def _repo_with_local_only_commit(self):
+        import subprocess
+        import tempfile
+        from pathlib import Path
+        tmp = Path(tempfile.mkdtemp(prefix="sha-reach-"))
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        run = lambda *a: subprocess.run(a, cwd=tmp, capture_output=True, text=True)
+        run("git", "init", "-q")
+        run("git", "config", "user.email", "t@example.invalid")
+        run("git", "config", "user.name", "t")
+        (tmp / "f.txt").write_text("x", encoding="utf-8")
+        run("git", "add", "f.txt")
+        run("git", "commit", "-q", "-m", "local only")
+        sha = run("git", "rev-parse", "HEAD").stdout.strip()
+        return tmp, sha
+
+    def test_local_only_commit_is_rejected(self):
+        tmp, sha = self._repo_with_local_only_commit()
+        ok, detail = check_referenced_commits(
+            f"    git show {sha} --stat" + chr(10), root=tmp
+        )
+        self.assertFalse(ok, f"local-only SHA accepted: {detail}")
+        self.assertIn("only locally", detail)
+
+    def test_commit_on_a_remote_branch_is_accepted(self):
+        import subprocess
+        from pathlib import Path
+        root = Path(__file__).resolve().parent.parent
+        sha = subprocess.run(
+            ["git", "rev-parse", "origin/main"],
+            cwd=root, capture_output=True, text=True,
+        ).stdout.strip()
+        if not sha:
+            self.skipTest("no origin/main in this clone")
+        ok, detail = check_referenced_commits(
+            f"    git show {sha} --stat" + chr(10), root=root
+        )
+        self.assertTrue(ok, detail)
 
 if __name__ == "__main__":
     unittest.main()
