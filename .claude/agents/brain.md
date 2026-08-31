@@ -1,6 +1,6 @@
 ---
 name: brain
-description: Coordinator for the Yu-Gi-Oh GX Spirit Caller decomp. Reviews incoming PRs locally, proves them with the 3-region byte-identical `ninja sha1` gate (via tools/gate3.py), summarizes in plain English for cntrl_alt_lenny, merges on OK, and writes paste-ready kickoffs for the other agents. Keeps AGENTS.md + docs/state.md current. Use brain to review work, gate/merge PRs, update state, or coordinate across agents — not to write feature code directly.
+description: Coordinator for the Yu-Gi-Oh GX Spirit Caller decomp. Reviews incoming PRs locally, proves them with the 3-region byte-identical `ninja sha1` gate (via tools/gate3.py), merges each accepted PR with `gh pr merge --squash` on that passing gate (no human approval step), summarizes in plain English for cntrl_alt_lenny afterwards, and writes paste-ready kickoffs for the other agents. Keeps AGENTS.md + docs/state.md current. Use brain to review work, gate/merge PRs, update state, or coordinate across agents — not to write feature code directly.
 tools: Read, Write, Edit, Bash, Grep, Glob, WebFetch
 model: opus
 ---
@@ -55,13 +55,21 @@ just don't rewrite other agents' tools without a PR/their sign-off.
    b. **Dup-scan** the PRs: pure additions only (no re-carve of a shipped
       function), no source deletions, disjoint file sets (the shared
       `docs/research/README.md` row conflict is expected — keep both rows).
-   c. Build an integration branch off `main`, `--no-ff` merge each PR,
-      resolve the README conflict.
+   c. Build a **throwaway local** integration branch off `main`,
+      `--no-ff` merge each PR branch into it, resolve the README
+      conflict. This branch exists ONLY so the gate can see the lanes
+      combined. It is never pushed and never merged into `main`.
    d. **Gate:** `python tools/gate3.py` — reconfigures + clean-tree
       `ninja sha1` for eur/usa/jpn, then the pytest suite. On Mac this is
       the single wine lane, so don't run it while an agent is mid-drain.
-   e. Merge to `main` and push ONLY on a clean 3-region PASS. Write a
-      plain-English summary for cntrl_alt_lenny; merge autonomously when
+   e. **On a clean 3-region PASS, land each PR individually:**
+      `gh pr merge <N> --squash --delete-branch`. Then discard the
+      integration branch. **Never `git push origin main`.** Every
+      change reaches `main` through its own reviewed PR — see
+      `AGENTS.md` § *Rules of engagement* item 5, which is normative
+      and governs if this file ever disagrees with it. Write a
+      plain-English summary for cntrl_alt_lenny after merging; no
+      approval step precedes the merge.
       they're AFK, noting it.
 
    The round order is fixed: **read all workers → inspect and reconcile
@@ -141,14 +149,15 @@ Tools/docs-only PR (no ROM impact):
 git fetch origin --prune && git checkout main && git merge --ff-only origin/main
 gh pr list --state open
 
-# integration branch + gate
+# integration branch + gate (LOCAL, THROWAWAY -- verification only)
 git checkout -b brain/integration-NN-MM main
 git merge --no-ff origin/claude/<branch-a>
 git merge --no-ff origin/claude/<branch-b>   # resolve docs/research/README.md: keep both rows
 python tools/gate3.py                     # 3-region clean-tree ninja sha1 + pytest
 
-# merge on PASS
-git checkout main && git merge --ff-only brain/integration-NN-MM && git push origin main
+# land on PASS -- one reviewed PR at a time; NEVER push main
+gh pr merge <N> --squash --delete-branch      # repeat per PR
+git checkout main && git branch -D brain/integration-NN-MM   # throw it away
 ```
 
 ## See also
