@@ -2632,7 +2632,7 @@ Add any new `PROVISIONAL:`/`P-NN` `park_class` values to
 ONE PR; verify every number against `git diff --stat` including both rate
 figures; `python tools/work_queue.py done claude-scaffolder cm-257-320-drain-2`.
 
-### cm-257-320-drain-3 — continue, and make screening visible in the ledger [TODO]
+### cm-257-320-drain-3 — continue, and make screening visible in the ledger [DONE]
 
 `cm-257-320-drain-2` (PR #1606) reported both denominators as asked — **1/14 =
 7.1% attempted, 1/27 = 3.7% pool** — corrected the brain's stale "259 remaining"
