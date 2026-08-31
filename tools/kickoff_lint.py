@@ -298,6 +298,7 @@ def check_referenced_commits(
 ) -> tuple[bool, str]:
     """Require command-line abbreviated/full revisions to resolve in this repo."""
     missing: list[str] = []
+    local_only: list[str] = []
     checked: set[str] = set()
     for line_number, segment in _command_segments(text):
         for token in re.split(r"\s+", segment):
@@ -317,9 +318,29 @@ def check_referenced_commits(
             )
             if result.returncode:
                 missing.append(f"line {line_number}: {commit_revision}")
+                continue
+            # Local existence is not enough. PR #1520 hardcoded a SHA that
+            # resolved on the machine that wrote it and was a bad object in
+            # the shared repo — green here, broken for the lane. Require the
+            # commit to be reachable from some remote-tracking branch, which
+            # is what "the lane can fetch this" actually means.
+            reachable = subprocess.run(
+                ["git", "branch", "-r", "--contains", commit_revision],
+                cwd=root,
+                capture_output=True,
+                text=True,
+            )
+            if reachable.returncode or not reachable.stdout.strip():
+                local_only.append(f"line {line_number}: {commit_revision}")
     if missing:
         return False, "referenced commit(s) do not resolve — " + ", ".join(missing)
-    return True, "all command-line commit references resolve"
+    if local_only:
+        return False, (
+            "referenced commit(s) exist only locally, on no remote branch — "
+            "a lane on another machine cannot fetch them: "
+            + ", ".join(local_only)
+        )
+    return True, "all command-line commit references resolve and are on a remote"
 
 
 def check_platform_coherence(text: str) -> tuple[bool, str]:

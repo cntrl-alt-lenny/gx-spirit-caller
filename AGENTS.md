@@ -14,7 +14,7 @@ in plain English — see *Adding or retiring agents* near the bottom.
 | Slug              | Where it runs                                                                             | Role                                                                                                                                                                                   | Owns these paths                                               | Hands-off paths                                                                 |
 |-------------------|-------------------------------------------------------------------------------------------|----------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------|----------------------------------------------------------------|---------------------------------------------------------------------------------|
 | **cntrl_alt_lenny** | meatspace                                                                                 | Human project owner. Sets priorities, picks direction, merges PRs, adds/retires agents, final authority.                                                                              | —                                                              | —                                                                               |
-| **brain**         | Any LLM session (Claude Code, Codex CLI, …) on cntrl_alt_lenny's PC or Mac, with toolchain + baserom | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file + `docs/state.md`, writes task briefs, reviews incoming PRs, decides the next task. **Default on every PR: review locally → summarize in plain English to cntrl_alt_lenny → offer to merge → execute on OK.** Self-merges autonomously when cntrl_alt_lenny is AFK, flagging in the PR body. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`, `docs/state.md`      | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
+| **brain**         | Any LLM session (Claude Code, Codex CLI, …) on cntrl_alt_lenny's PC or Mac, with toolchain + baserom | The **brain**. Coordinator. Runs `ninja` / `dsd` to verify PRs locally, maintains this file + `docs/state.md`, writes task briefs, reviews incoming PRs, decides the next task. **Default on every PR: review locally → reproduce the gate → merge → summarize in plain English to cntrl_alt_lenny.** Self-merge on a passing gate is the locked pattern (see *Rules of engagement* item 5); cntrl_alt_lenny retains veto and does not sign off on each merge. | `AGENTS.md`, `CLAUDE.md`, `docs/briefs/`, `docs/state.md`      | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`                  |
 | **scaffolder**    | Any LLM session in a sibling worktree with mwccarm but without the full build pipeline (baserom / `dsd` / `objdiff`) | **Scaffolder, source-recipe researcher & reviewer.** Writes tools, library headers, surveys, research; reviews PRs via GitHub MCP integrations. Runs **direct `mwccarm.exe` variant matrices** for source-codegen wall research (briefs 214, 216 pattern — compile snippet, parse ELF, diff bytes against orig delinks). Cannot run `ninja rom` / `dsd check modules` / `ninja objdiff`, so delegates **final ROM** verification to brain.                                                                                                                                | `tools/`, `libs/`, `include/`                                  | `src/`, `config/**/symbols.txt`, `AGENTS.md` (proposes via PR; brain merges)    |
 | **decomper**      | Any LLM session on cntrl_alt_lenny's PC or Mac, with toolchain + baserom (separate session from brain) | Primary decomper. Matches individual functions against the baserom, writes C source, renames symbols as functions match.                                                              | `src/`, `config/<ver>/**/symbols.txt` (renames), `assets/`     | `tools/`, `libs/`, `include/`, `AGENTS.md`                                      |
 
@@ -114,10 +114,12 @@ brain reads it cold to catch up in under a minute.
 1. **Before starting any task**, run `git fetch origin` and read this
    file (top to bottom). State on disk may be behind what's on GitHub.
 2. **Never push to `main` directly.** Every change is a pull request.
-   The brain reviews locally, summarizes to cntrl_alt_lenny in plain
-   English, and merges on OK. cntrl_alt_lenny retains veto — the brain's
-   job is to make the review/merge decision easy to approve, not to
-   outsource the click.
+   The brain reviews locally, reproduces the gate, merges, and then
+   summarizes to cntrl_alt_lenny in plain English. "On OK" means **on a
+   passing gate**, not on a per-PR approval — see item 5, which is the
+   normative statement of this policy. cntrl_alt_lenny retains veto; the
+   brain's job is to make the decision easy to review after the fact, not
+   to outsource the click.
 3. **One branch per task.** Branch name = `<agent-slug>/<kebab-scope>`,
    e.g. `decomper/ov011-tail-wrappers`, `scaffolder/tier-delta`,
    `brain/agents-rename`. One branch, one PR, one concern.
@@ -184,7 +186,9 @@ No-one else touches it without coordination.
    summarizes for cntrl_alt_lenny in plain English: what changed, why
    it's safe, what's next — cntrl_alt_lenny doesn't need to read the
    diff, the summary is the interface.
-5. **Brain merges.** Self-merge by default once the gate passes (the
+5. **Brain merges. THIS ITEM IS THE NORMATIVE MERGE POLICY** — if any
+   other section appears to say otherwise, this one governs and the other
+   is drift to be fixed. Self-merge by default once the gate passes (the
    brain-pattern is locked): `gh pr merge <N> --squash --delete-branch`
    (squash matches the existing commit history). cntrl_alt_lenny
    retains veto and can gate any specific merge, but does not sign off
