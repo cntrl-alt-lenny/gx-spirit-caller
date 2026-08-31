@@ -86,7 +86,7 @@ Metrics: `progress.py --by-module` (honest tractable-ceiling columns),
 
 ## PR discipline
 
-- Branch `codex/<kebab-scope>` (or `scaffolder/<scope>`), one concern per PR.
+- Branch `scaffolder/<kebab-scope>`, one concern per PR.
 - PR body: Summary · What changed · Test plan (paste the real gate output:
   `gate3 --scope all` PASS if you touched build inputs, else `pytest`) · Scope.
 - Never push to `main`. Never `--no-verify` / `push --force` /

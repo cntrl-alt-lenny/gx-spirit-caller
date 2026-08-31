@@ -69,7 +69,7 @@ Step-by-step:
 8. **Gate**. The real gate is `python3.13 tools/gate3.py --scope all`
    (3-region byte-identical `ninja sha1`) — run it before your PR; a green
    per-function objdiff is NOT sufficient (objdiff ≠ link; b453/b597 trap).
-9. **Commit + PR** on branch `codex/<kebab-scope>` (or `decomper/<scope>`).
+9. **Commit + PR** on branch `decomper/<kebab-scope>`.
 
 ## Useful tools (scaffolder-built, consume freely)
 

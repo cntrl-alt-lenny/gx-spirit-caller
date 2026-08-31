@@ -75,16 +75,16 @@ preferences. Every one has cost a round, a merge, or nearly cost real work.
   history; "replace the third block with…" is not actionable to it, and forces
   cntrl_alt_lenny to reconcile two replies by hand. Fragments have been pasted
   to agents verbatim, arriving as a bare data block with no task attached.
-- **CANONICAL DISPATCH RULE.** One response, one fenced block per worker,
-  all lanes together — **one complete paste-ready message per active
-  standing lane that needs dispatch, normally all four** (Claude Code
-  Decomper, Claude Code Scaffolder, Codex Decomper, Codex Scaffolder) —
-  each self-contained (context + task + mechanically checkable gate). Skip
-  a lane only when it is genuinely mid-flight or has nothing to dispatch,
-  and say which and why. Never defer a message to a later turn: the message
-  is the deliverable, not a note that one is ready. `AGENTS.md`
-  § end-of-round checklist and `.claude/agents/brain.md` restate this rule;
-  if any copy disagrees, THIS is the one that governs.
+- **DISPATCH RULE (restated; `AGENTS.md` § end-of-round checklist item 5
+  governs).** One response, one fenced block per worker, all lanes together
+  — **one complete paste-ready message per active standing ROLE lane that
+  needs dispatch, normally both** (Decomper, Scaffolder) — each
+  self-contained (context + task + mechanically checkable gate) and each
+  pasteable into any compatible agentic coding tool. **Lanes are counted by
+  role, never by provider.** Skip a lane only when it is genuinely
+  mid-flight or has nothing to dispatch, and say which and why. Never defer
+  a message to a later turn: the message is the deliverable, not a note that
+  one is ready.
 
 ## Contention: the toolchain serialises MACHINE-WIDE
 
@@ -99,7 +99,7 @@ machine (the Metrowerks license DLL is a machine-wide lock).
   happened twice to one lane; both times the lane was correct and blameless.
 - Sweeps must gate **once, on the consolidated branch** — never N parallel
   3-region gates. Worker batches iterate with `fastmatch.py` (one object, no
-  link, no ROM). This is also stated in `docs/queue/claude-decomper.md`'s own
+  link, no ROM). This is also stated in `docs/queue/decomper.md`'s own
   header; check that file before inventing a new rule.
 
 ## Gating

@@ -1,8 +1,15 @@
 [//]: # (markdownlint-disable MD013 MD041)
 
-# Claude Code Decomper — autonomous C-match queue (WALL-AWARE)
+# Decomper — autonomous C-match queue (WALL-AWARE)
 
-**Protocol:** loop until QUEUE-EMPTY. `python tools/work_queue.py next claude-decomper --claim`. For each item, the candidate list is the module's CANDIDATE (non-permanent) functions — get them with `python tools/wall_aware_headroom.py --json` (that module's `convertible_files`; richer per-file detail in `coercible_files`/`unknown_files`/`no_marker_files`). Do NOT re-attempt confirmed-`permanent` files (P-NN citation or a real unconditional `mcr`/`mrc`/`msr`/`mrs`/`swi` instruction in the body). Hand C-match a batch, byte-verify, gate `gate3.py --scope all`, ONE PR, `work_queue.py done`, commit, next. Park anything that turns out to be a genuine wall (add a `P-NN` marker, or a new codegen-walls.md entry if none fits — do NOT just re-add the old generic "wall" text). Effort MAX.
+> **Lane identity is the ROLE `decomper`, not a provider.** This file was
+> `docs/queue/claude-decomper.md` until 2026-09-04; it was renamed because the
+> standing lanes are roles and any capable agentic coding tool may occupy one.
+> Git history follows the rename. Retired provider-named queues are read-only
+> under `docs/queue/archive/`. Historical item text below may still name a
+> provider — that is a record of what happened, not a lane definition.
+
+**Protocol:** loop until QUEUE-EMPTY. `python tools/work_queue.py next decomper --claim`. For each item, the candidate list is the module's CANDIDATE (non-permanent) functions — get them with `python tools/wall_aware_headroom.py --json` (that module's `convertible_files`; richer per-file detail in `coercible_files`/`unknown_files`/`no_marker_files`). Do NOT re-attempt confirmed-`permanent` files (P-NN citation or a real unconditional `mcr`/`mrc`/`msr`/`mrs`/`swi` instruction in the body). Hand C-match a batch, byte-verify, gate `gate3.py --scope all`, ONE PR, `work_queue.py done`, commit, next. Park anything that turns out to be a genuine wall (add a `P-NN` marker, or a new codegen-walls.md entry if none fits — do NOT just re-add the old generic "wall" text). Effort MAX.
 
 **Brief 651 rework (docs/research/brief-651-wall-tooling.md):** the "~245 convertible" framing below was wrong — brief 640 found the old classifier conflated codegen-walls.md's own "coercible-with-knowledge" (`C-NN`) bucket with "permanent" (`P-NN`), and treated the blanket `GLOBAL_ASM`/brief-294/302 whole-function-ship header (a mechanical-tool bulk stamp, not per-function proof) as a wall too. The real EUR candidate pool is **6,122** (139 `coercible` — cited C-NN code, look up the lever in codegen-walls.md; 5,951 `unknown` — cohort-stamped or prose-only, never individually assessed; 32 `no_marker` — unchanged from before). Only 32 files are confirmed-`permanent` project-wide. **Prioritize `coercible` first** (`wall_aware_headroom.py --coercible` lists every file with its code) — the lever is already documented, so these are the cheapest wins. The `unknown` bucket is real but unverified: most of it (ov002's 2,740) was mechanically `.s`-shipped by size-tier sweeps with zero C-drafting attempts (brief 416) — expect a mix of easy and genuinely-hard, same as any fresh module.
 
@@ -1482,7 +1489,7 @@ split, the pool size at dispatch, and the rate against the 60.8% prior.
 Regenerate `docs/research/README.md` LAST.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper cm-main-exploit-drain-1`; commit; report.
+tools/work_queue.py done decomper cm-main-exploit-drain-1`; commit; report.
 
 ### cm-main-exploit-drain-2 — finish the 192 B pool, then find out where it stops being a 73% pool [DONE]
 
@@ -1606,7 +1613,7 @@ after each `--clean` so the heatmap SVGs stay out of the diff. Dedup touched
 delinks against **current `main`**, not just your branch base.
 
 ONE PR; verify every PR-body claim against `git diff --stat` before writing it;
-`python tools/work_queue.py done claude-decomper cm-main-exploit-drain-2`.
+`python tools/work_queue.py done decomper cm-main-exploit-drain-2`.
 
 ### cm-main-boundary-rerun — settle the 193-256 B question with matched effort [DONE]
 
@@ -1681,7 +1688,7 @@ current `main`.
 
 ONE PR; verify every PR-body claim against `git diff --stat` before writing it —
 including the arithmetic, which is what slipped last round; `python
-tools/work_queue.py done claude-decomper cm-main-boundary-rerun`.
+tools/work_queue.py done decomper cm-main-boundary-rerun`.
 
 ### cm-main-band-followthrough — one bounded pilot at 257-320 B, framed as the test it actually is [DONE]
 
@@ -1770,7 +1777,7 @@ vacuous pass — #1545 handled that exactly right. `git restore assets/` after
 each clean run.
 
 ONE PR; verify every claim against `git diff --stat` including the arithmetic;
-`python tools/work_queue.py done claude-decomper cm-main-band-followthrough`.
+`python tools/work_queue.py done decomper cm-main-band-followthrough`.
 
 ### cm-main-band-finish — process the 11 you deferred, then apply the thresholds to a real n=20 [DONE]
 
@@ -1832,7 +1839,7 @@ after each clean run. Regenerate any derived artifact your content invalidates �
 all carry freshness guards now and the suite will tell you.
 
 ONE PR; verify every claim against `git diff --stat` including the arithmetic;
-`python tools/work_queue.py done claude-decomper cm-main-band-finish`.
+`python tools/work_queue.py done decomper cm-main-band-finish`.
 
 ### cm-513-1023-census — the probe that never got fully specified [DONE]
 
@@ -1873,7 +1880,7 @@ invariant check, delink dupes, tests. If the round ships zero, say so plainly an
 note that `check_activation_invariant.py` correctly refuses a vacuous pass.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper cm-513-1023-census`.
+tools/work_queue.py done decomper cm-513-1023-census`.
 
 ### cm-321-376-probe — the one band left unmeasured, and it is cheap [DONE]
 
@@ -1919,7 +1926,7 @@ and note the invariant correctly refuses a vacuous pass. `git restore assets/`
 after each clean run. Regenerate any derived artifact your content invalidates.
 
 ONE PR; verify every claim against `git diff --stat` including the arithmetic;
-`python tools/work_queue.py done claude-decomper cm-321-376-probe`.
+`python tools/work_queue.py done decomper cm-321-376-probe`.
 
 ### cm-port-drain-usa — the EUR-ship-triggered USA drain that is now due [DONE]
 
@@ -1983,7 +1990,7 @@ the pytest tail) + `python tools/check_activation_invariant.py origin/main..HEAD
 `--clean` run deletes the heatmap SVGs.
 
 ONE PR; verify every claim against `git diff --stat` before writing the body;
-`python tools/work_queue.py done claude-decomper cm-port-drain-usa`.
+`python tools/work_queue.py done decomper cm-port-drain-usa`.
 
 ### q-port-refusal-taxonomy — 365 fresh refusals with reasons, and nobody has read them [DONE]
 
@@ -2082,7 +2089,7 @@ annotated with its reproducing command. **Build-free — no region gate, and
 `gate3.py --scope tests` only if you need it.**
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-port-refusal-taxonomy`; then report
+tools/work_queue.py done decomper q-port-refusal-taxonomy`; then report
 QUEUE-EMPTY honestly if you reach it.
 
 
@@ -2194,7 +2201,7 @@ annotated with its reproducing command. Build-free; `gate3.py --scope tests`
 only if you want the invariants.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-fingerprint-promotion-evidence`;
+tools/work_queue.py done decomper q-fingerprint-promotion-evidence`;
 then report QUEUE-EMPTY honestly if you reach it.
 
 ### q-collision-pair-audit — seven unvalidated pairs sitting inside already-shipped ports [DONE]
@@ -2292,7 +2299,7 @@ tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
 annotated with its reproducing command. Build-free.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-collision-pair-audit`; then report
+tools/work_queue.py done decomper q-collision-pair-audit`; then report
 QUEUE-EMPTY honestly if you reach it.
 
 ### q-derived-artifact-selfreference — the staleness that has cost three rounds running [DONE]
@@ -2488,7 +2495,7 @@ tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
 annotated with its reproducing command **and its derivation date**. Build-free.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-eur-next-frontier`; then report
+tools/work_queue.py done decomper q-eur-next-frontier`; then report
 QUEUE-EMPTY honestly if you reach it.
 
 ### q-large-band-reachability — can the toolchain even feed a large function? [DONE]
@@ -2595,7 +2602,7 @@ tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
 annotated with its reproducing command and derivation date. Build-free.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-large-band-reachability`; then report
+tools/work_queue.py done decomper q-large-band-reachability`; then report
 QUEUE-EMPTY honestly if you reach it.
 
 ### q-find-object-persource — close the gap you scoped, and date the figure that moved [DONE]
@@ -2698,7 +2705,7 @@ runs a build, `ninja`, or a region gate. Single-threaded is fine.
 tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean. Build-free.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-find-object-persource`; then report
+tools/work_queue.py done decomper q-find-object-persource`; then report
 QUEUE-EMPTY honestly if you reach it.
 
 ### q-wall-overblock-audit — are the walls blocking candidates they should not? [DONE]
@@ -2814,7 +2821,7 @@ tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + every figure
 annotated with its reproducing command and date. Build-free.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-wall-overblock-audit`; then report
+tools/work_queue.py done decomper q-wall-overblock-audit`; then report
 QUEUE-EMPTY honestly if you reach it.
 
 ### q-wall-catalog-repair — fix the two defects your own audit found [DONE]
@@ -2883,7 +2890,7 @@ tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + the full
 index-diff reported. Build-free.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-wall-catalog-repair`; then report
+tools/work_queue.py done decomper q-wall-catalog-repair`; then report
 QUEUE-EMPTY honestly if you reach it.
 
 ### q-ci-test-visibility — 39 tests never run in CI [DONE]
@@ -2966,4 +2973,91 @@ tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean + both collection
 counts pasted before and after. Build-free.
 
 ONE PR; verify every claim against `git diff --stat`; `python
-tools/work_queue.py done claude-decomper q-ci-test-visibility`.
+tools/work_queue.py done decomper q-ci-test-visibility`.
+
+**ROUND 2 (added 2026-09-04 by the brain — this item is NOT done).**
+
+Your PR [#1615] is **open and HELD**, not merged. The work is good: the brain
+mutation-tested your guard (control 7) by pointing `scan_collection` at a temp
+tree with a module-level `def test_*` and a non-`TestCase` class — **both go
+red**, and it catches the class form this brief never asked for. Green on your
+converted tree with an **empty allow-list**. The brain also re-derived the
+population by running your guard against `origin/main`: **exactly 39 violations
+across exactly the 8 named files, per-file counts matching.** That all holds.
+
+**What blocks the merge: your required `unittest` check is RED in CI.**
+`Ran 3593 tests ... FAILED (errors=2, skipped=27)`. Both failures are real, and
+both are **pre-existing defects that were invisible precisely because these
+tests never ran in CI** — your guard working as designed on its first outing.
+Continue on the SAME branch and PR.
+
+1. **`test_ship_coverage_history_is_not_vacuous` — `KeyError:
+   'cm-main-tier-sweep-7'`.** It derives rounds from round-labelled commits, but
+   the `unittest` job in `.github/workflows/tests.yml` uses a bare
+   `actions/checkout@v4` with the default shallow depth. `generated-files-drift.yml`
+   sets `fetch-depth: 0` and documents exactly why ("Ship-coverage validation
+   derives round flips from round-labelled commits"). Give the `unittest` job the
+   same, or make the test skip explicitly when history is unavailable — **your
+   call, say which and why.** A silent skip is worse than a loud one.
+
+2. **`test_pool_item_stamps_live_figure_and_reproducer` —
+   `FileNotFoundError: 'python3.13'`.** `make_kickoff._run_pool` **executes**
+   the pinned interpreter, and `_lane_spec` models only `windows`/`mac`
+   (`raise ValueError("host must be windows or mac")`), so the Linux runner
+   resolves `python3.13`, which is absent — CI is 3.11. Your host-conditional
+   fix was right in principle; it just moved the failure to a host the tool's
+   own model does not have.
+
+   ⚠️ **The interpreter SELECTION is still reserved** — changing the
+   `python3.13` pin needs verification on the Mac, which this lane cannot do,
+   and that reservation stands. Fix this **at the boundary**: either the tool
+   resolves an interpreter that exists (falling back to `sys.executable` when
+   the pin is unresolvable) or the test stops invoking a live subprocess. State
+   which you chose and what it does NOT fix.
+
+**Then, second item this round — `q-handoff-guard-repair`.** Round 0903's
+bookkeeping silently never happened, and **both guards that exist to catch it
+are inert**. Brain-verified on `main`:
+
+- `tools/queue_state_drift.py` measures anchor staleness with
+  `git rev-list --count --merges <anchor>..<ref>`. **The repo has squash-merged
+  exclusively since 2026-08-25** (`efb512d32`, PR #1581, the last real merge
+  commit), so `merges_since` is **always 0**. Demonstrated:
+  `main_anchor_checker(Path('.'),'HEAD')` returns `(True, 0)` for anchors ~30
+  PRs back. The `_STALE_MERGE_TOLERANCE` branch is unreachable.
+- `tools/check_dispatch_log.py` requires a dispatch row only when the
+  `**Last updated:**` *block* changes — that line through the next blank line.
+  A round appending its narrative anywhere else skips the requirement silently.
+- **Neither is wired into any CI workflow.** `generated-files-drift.yml` runs
+  the three index `--check`s plus `validate_attempts.py`, and nothing else.
+
+Fix both so they measure the thing they claim, and wire them into CI. Count
+squash-merge commits (or PR-numbered subjects), not `--merges`.
+
+**CANARY, control 7, non-negotiable:** for EACH guard, show it **RED on a
+reconstruction of the round-0903 tree** (anchor `676fed454`, `main` at
+`050f06c0f`, no `0903` dispatch row) before your fix and GREEN after. If either
+passes on that input before your fix, your model of the bug is wrong — STOP and
+report it.
+
+⚠️ **`docs/guard-coverage-review.md` is not evidence.** It lists
+`test_install_git_hooks.py` as FIRES-CORRECTLY while the pre-push hook it
+installs was inert for its entire life — it audited the installer, not the
+behaviour. **Do not cite that table as proof any guard works, and add a line to
+it saying so.** This is the third "documented, installed, inert" finding in
+three rounds.
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+**SUB-AGENTS PERMITTED, READ-ONLY ONLY** — shared worktree; you do all writing,
+committing and git operations.
+
+**Gate:** `python -m pytest -q tests` green AND `python -m unittest discover -s
+tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean. **The real gate
+for item 1 is the `unittest` check going green on PR #1615 in CI** — paste
+`gh pr checks 1615`. Local green is not sufficient; that is the whole lesson of
+this item.
+
+Verify every claim against `git diff --stat`. When #1615 is green, mark it:
+`python tools/work_queue.py done decomper q-ci-test-visibility`.
