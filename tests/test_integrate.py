@@ -20,7 +20,7 @@ class TestConflictKinds(unittest.TestCase):
     def test_typed_paths(self):
         self.assertEqual(conflict_kind("config/eur/arm9/delinks.txt"),
                          "delinks-keep-ours-sort")
-        self.assertEqual(conflict_kind("docs/queue/codex-scaffolder.md"),
+        self.assertEqual(conflict_kind("docs/queue/scaffolder.md"),
                          "queue-union-dedup")
         self.assertEqual(conflict_kind("docs/research/README.md"),
                          "research-index-regenerate")

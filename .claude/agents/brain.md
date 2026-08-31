@@ -37,10 +37,10 @@ just don't rewrite other agents' tools without a PR/their sign-off.
    **After a stint on the other machine, git/PRs/docs are canonical — read
    them, don't trust a possibly-stale local `AGENTS.md`.**
 2. Catch up: `docs/state.md` (live head) + `gh pr list --state open`.
-3. For each round (currently four lanes: 2× Claude Code, 2× Codex):
+3. For each round (two standing role lanes: `decomper`, `scaffolder`;
+   which tool occupies each is chosen per round and never adds a lane):
    a. **Read every dispatched worker's transcript — FIRST, before judging
-      anything.** Enumerate every Claude and Codex session dispatched for
-      this sweep; read each one's final visible message plus enough
+      anything.** Enumerate every dispatched lane, whatever tool it ran on; read each one's final visible message plus enough
       preceding visible transcript and tool output to catch caveats,
       failed attempts, parked work, contradictions, uncommitted changes,
       and completion claims. Reconcile each against the real branch / PR /
@@ -79,8 +79,8 @@ just don't rewrite other agents' tools without a PR/their sign-off.
    per-lane queue files under `docs/queue/`, update `docs/state.md`
    (including its `main-sha:` anchor) and your file-based memory. Then hand
    cntrl_alt_lenny **one complete paste-ready message per active standing
-   lane that needs dispatch — normally all four** (Claude Code Decomper,
-   Claude Code Scaffolder, Codex Decomper, Codex Scaffolder), all in the
+   ROLE lane that needs dispatch — normally both** (Decomper, Scaffolder),
+   each pasteable into any compatible agentic coding tool, all in the
    SAME final response (no nested triple-backticks — they get copied
    verbatim to the agents). Skip a lane only when it is genuinely
    mid-flight or has nothing to dispatch, and say so explicitly. Never
@@ -108,9 +108,9 @@ Scope: production fires only, never feature work.
 
 ## Brief / kickoff writing
 
-The live queues are the four per-lane files under `docs/queue/`
-(`claude-decomper.md`, `claude-scaffolder.md`, `codex-decomper.md`,
-`codex-scaffolder.md`). For each lane's claimed item, hand cntrl_alt_lenny
+The live queues are the role-named files under `docs/queue/`
+(`decomper.md`, `scaffolder.md`). Provider-named queues are retired,
+read-only, under `docs/queue/archive/`. For each lane's claimed item, hand cntrl_alt_lenny
 a self-contained paste-ready kickoff: the assigned worktree path with an
 `EXPECT=` repo-root equality guard, worktree setup where a new one is
 needed (`git worktree add ../<dir> -b <branch> origin/main`, then copy the
@@ -119,16 +119,17 @@ git-ignored tool binaries — `cp -R ../brain/tools/mwccarm tools/ && cp
 + PR instructions, and the branch name. Lint every kickoff before sending:
 `python tools/kickoff_lint.py <file>`. Match each lane's gate to its
 worktree's build capability (`kb-map` = build-free, `kb-types` = EUR only,
-`decomper`/`scaffolder`/`codex-*` = all 3 baseroms). On Mac the wine drain
-is a single lane; on Windows all four lanes can build, but the mwcc
-toolchain still serialises MACHINE-WIDE — never two 3-region gates at once.
+`decomper`/`scaffolder` = all 3 baseroms). On Mac the wine drain is a
+single lane; on Windows every worktree can build, but the mwcc toolchain
+still serialises MACHINE-WIDE — never two 3-region gates at once, and only
+one toolchain-bound lane per machine per round.
 
 ## Verification checklist
 
 Before merging any ROM-affecting PR (drain waves, ports, `.s`→C):
 
-- [ ] **Transcript audit table emitted** — every dispatched Claude and
-      Codex lane read (or explicitly reported unreadable), each report
+- [ ] **Transcript audit table emitted** — every dispatched lane read on
+      whatever tool it ran (or explicitly reported unreadable), each report
       reconciled against its branch/PR/files. This is done BEFORE the
       gate, not after.
 - [ ] `python tools/gate3.py` → **GATE PASS** (eur/usa/jpn all
@@ -151,8 +152,8 @@ gh pr list --state open
 
 # integration branch + gate (LOCAL, THROWAWAY -- verification only)
 git checkout -b brain/integration-NN-MM main
-git merge --no-ff origin/claude/<branch-a>
-git merge --no-ff origin/claude/<branch-b>   # resolve docs/research/README.md: keep both rows
+git merge --no-ff origin/decomper/<scope-a>
+git merge --no-ff origin/scaffolder/<scope-b>   # resolve docs/research/README.md: keep both rows
 python tools/gate3.py                     # 3-region clean-tree ninja sha1 + pytest
 
 # land on PASS -- one reviewed PR at a time; NEVER push main

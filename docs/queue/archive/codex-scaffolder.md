@@ -2,6 +2,12 @@
 
 # Codex Scaffolder — autonomous tooling queue
 
+> **ARCHIVED / READ-ONLY (2026-09-04).** This was a provider-named standing
+> lane. Standing lanes are now roles: the live queue for this work is
+> [`docs/queue/scaffolder.md`](../scaffolder.md). Kept verbatim for its completed-item
+> history; do NOT claim, add or transition items here, and do not dispatch
+> against it. `work_queue.py` will still read it if pointed at it — don't.
+
 **Protocol:** loop until QUEUE-EMPTY — do NOT stop after one item. `python tools/work_queue.py next codex-scaffolder --claim` (⚠️ Windows: plain `python`, NOT `python3.13`). Gate each item's stated Gate (paste real output); the normal build gate includes the full pytest suite. Open ONE PR **per item**, `work_queue.py done codex-scaffolder <id>`, commit, then immediately take the next item. Effort HIGH.
 
 **Worktree capability (match your gate to it — briefing bug b642):** `kb-map` = build-FREE (no baserom, no `dsd`) · `kb-types` = EUR baserom only · `scaffolder`/`decomper` = all 3 baseroms. If an item's gate needs a build you cannot run, say so and skip rather than forcing.

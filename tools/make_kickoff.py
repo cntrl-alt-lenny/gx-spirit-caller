@@ -153,9 +153,9 @@ def render(
     branch: str | None = None,
 ) -> str:
     spec = lane_spec(lane, host)
-    branch = branch or f"codex/{lane}-kickoff"
+    branch = branch or f"{lane}/kickoff"
     lines = [
-        f"Codex Scaffolder kickoff — lane {lane}, host {host}.",
+        f"{lane.capitalize()} kickoff — lane {lane}, host {host}.",
         "SET YOUR REASONING EFFORT TO HIGH.",
     ]
     if spec.powershell:
