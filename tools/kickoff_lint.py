@@ -173,12 +173,45 @@ def check_location_guard(text: str) -> tuple[bool, str]:
     return True, "repo-root equality assertion matches the assigned worktree path"
 
 
+_CANARY_NEGATION_RE = re.compile(
+    r"(?:\bno\b|\bnot\b|\bwithout\b|\bskip(?:ping|ped)?\b"
+    r"|\bomit(?:ting)?\b|\bforgo\b|\bbother\b|\bunnecessary\b"
+    r"|\bneedless\b|\bdon'?t\b)",
+    re.IGNORECASE,
+)
+_CANARY_NEGATION_WINDOW = 45
+
+
+def _has_affirmative_canary(text: str) -> bool:
+    """True when at least one `canary` mention is not a refusal of one.
+
+    Round 0828's scaffolder kickoff shipped the literal sentence "No canary
+    this round." and linted clean, because this check only looked for the
+    word. A stated refusal is the opposite of a guard.
+    """
+    for m in re.finditer(r"\bcanary\b", text, re.IGNORECASE):
+        # Scope the search to the canary's OWN sentence. A window alone
+        # misfires on unrelated negations ("No sub-agents. CANARY: ...").
+        head = text[max(0, m.start() - _CANARY_NEGATION_WINDOW):m.start()]
+        cut = max(head.rfind("."), head.rfind("!"), head.rfind("?"),
+                  head.rfind(chr(10)))
+        clause = head[cut + 1:]
+        if not _CANARY_NEGATION_RE.search(clause):
+            return True
+    return False
+
+
 def check_canary(text: str) -> tuple[bool, str]:
     # A first-batch check that fails loud before bulk work (dsd check / self-
     # retrieval / sha1 on one item). The word CANARY is our convention; accept
     # an explicit equivalent first-item verification.
-    if _has(text, r"\bcanary\b"):
+    if _has_affirmative_canary(text):
         return True, "CANARY present"
+    if re.search(r"\bcanary\b", text, re.IGNORECASE):
+        return False, (
+            "canary is mentioned only to DECLINE it — a stated refusal "
+            "is not a guard"
+        )
     if _has(text, r"first\s+(batch|item|rename|carve).{0,40}(check|verify|sha1|dsd check)"):
         return True, "first-item verification present (canary-equivalent)"
     return False, "no CANARY — the wrong-base/wrong-tool class won't be caught before bulk work"
