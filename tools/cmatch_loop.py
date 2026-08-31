@@ -978,7 +978,11 @@ def run_canary(func_names: list[str], region: str, *, state_path: Path) -> dict:
     for func in func_names:
         module = m2c_feed.resolve_symbol(region, func)["module"]
         c_path = src_path(region, module, func)
-        rel = str(c_path.relative_to(ROOT))
+        # delinks.txt uses repository-relative POSIX paths on every host
+        # (see s_routed_complete_tu's identical normalization above); a bare
+        # str(Path.relative_to(ROOT)) emits backslashes on Windows and the
+        # header lookup below silently never matches.
+        rel = c_path.relative_to(ROOT).as_posix()
         delinks_path = delinks_path_for_module(region, module)
         if not delinks_path.is_file():
             raise ValueError(f"{func}: no delinks.txt at {delinks_path}")
