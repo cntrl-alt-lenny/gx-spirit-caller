@@ -2699,7 +2699,7 @@ Regenerate `docs/state-table.md` first, `docs/dashboard.md` second. Add new
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-257-320-drain-3`.
 
-### cm-257-320-drain-4 — the screening pressure just dropped to zero [CLAIMED]
+### cm-257-320-drain-4 — the screening pressure just dropped to zero [DONE]
 
 `cm-257-320-drain-3` (PR #1609) shipped **2 of 16 attempted (12.5%)**, **2 of
 17 pool (11.8%)**, and delivered the ledger change: `attempts.tsv` now carries
