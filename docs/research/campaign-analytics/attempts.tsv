@@ -1852,3 +1852,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b0df8	ov002	300	default	unknown	not-attempted	unknown	complexity	PROVISIONAL:complexity	cm-257-320-drain-3	
 0x021c9c94	ov002	280	default	guard-chain	shipped	100	n/a		cm-257-320-drain-3	2
 0x021c9fc4	ov002	272	default	guard-chain	shipped	100	n/a		cm-257-320-drain-3	1
+0x02236bbc	ov002	264	default	C-63 addressing lever applied (int*-then-separate-offset row ptr, computed-goto 5-case switch on CE288->f_5a8 selector) -- a narrative-only decline never ledgered despite codegen-walls.md C-63 documenting it as parked; hand draft compiled but landed well short of match, root cause not isolated this round	parked	8.96	structural	PROVISIONAL:structural	cm-257-320-drain-4	3
