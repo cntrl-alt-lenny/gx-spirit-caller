@@ -39,6 +39,7 @@ from port_to_region import (  # noqa: E402
     find_rename_collisions,
     function_symbol_for,
     infer_module_from_path,
+    is_placeholder_function_name,
     load_verified_neighbor_index,
     module_to_src_dir,
     normalize_module_name,
@@ -1975,10 +1976,6 @@ class TestCollectNewSymbolsTxtLines(unittest.TestCase):
         self.assertEqual(collect_new_symbols_txt_lines(resolutions), {})
 
 
-if __name__ == "__main__":
-    unittest.main()
-
-
 # ---------------------------------------------------------------------------
 # Cross-region named-callee refusal (PR #1388). These two tests arrived in a
 # commit that OVERWROTE this entire file, deleting the 97 tests above. All 97
@@ -1986,23 +1983,22 @@ if __name__ == "__main__":
 # deletion was gratuitous rather than a response to failures. Restored and
 # merged by the brain at integration time.
 # ---------------------------------------------------------------------------
-from port_to_region import (  # noqa: E402
-    is_placeholder_function_name,
-)
+class TestNamedExternAndPlaceholderClassification(unittest.TestCase):
+    def test_named_extern_is_added_to_source_symbol_refs(self):
+        source = 'extern void Task_Invoke(int h);\nTask_Invoke(h);\n'
+        refs = parse_symbols_in_source(
+            source,
+            default_module="ov002",
+            named_functions={"Task_Invoke": ("main", 0x02006E1C)},
+        )
+        ref = refs[("func", "main", 0x02006E1C)]
+        assert ref.text == "Task_Invoke"
+
+    def test_placeholder_name_classifier_matches_region_placeholders_only(self):
+        assert is_placeholder_function_name("func_02006bf0")
+        assert is_placeholder_function_name("func_ov002_022afea8")
+        assert not is_placeholder_function_name("Task_Invoke")
 
 
-def test_named_extern_is_added_to_source_symbol_refs():
-    source = 'extern void Task_Invoke(int h);\nTask_Invoke(h);\n'
-    refs = parse_symbols_in_source(
-        source,
-        default_module="ov002",
-        named_functions={"Task_Invoke": ("main", 0x02006E1C)},
-    )
-    ref = refs[("func", "main", 0x02006E1C)]
-    assert ref.text == "Task_Invoke"
-
-
-def test_placeholder_name_classifier_matches_region_placeholders_only():
-    assert is_placeholder_function_name("func_02006bf0")
-    assert is_placeholder_function_name("func_ov002_022afea8")
-    assert not is_placeholder_function_name("Task_Invoke")
+if __name__ == "__main__":
+    unittest.main()

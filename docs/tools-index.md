@@ -339,7 +339,9 @@ against the matched C bodies it claims to be derived from.
 
 ### `tools/check_test_imports.py`
 
-**Check that the unittest suite has no undeclared third-party imports.**
+**Guard the assumptions CI's stdlib-only `unittest discover` job relies on.**
+
+Two independent checks:
 
 ## CI formatters
 

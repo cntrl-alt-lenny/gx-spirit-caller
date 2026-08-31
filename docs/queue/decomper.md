@@ -2893,7 +2893,7 @@ ONE PR; verify every claim against `git diff --stat`; `python
 tools/work_queue.py done decomper q-wall-catalog-repair`; then report
 QUEUE-EMPTY honestly if you reach it.
 
-### q-ci-test-visibility — 39 tests never run in CI [TODO]
+### q-ci-test-visibility — 39 tests never run in CI [DONE]
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.
