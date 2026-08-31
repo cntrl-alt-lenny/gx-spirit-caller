@@ -44,7 +44,7 @@ Generated from [`codegen-walls.md`](codegen-walls.md). Run `python tools/generat
 | [C-36](codegen-walls.md#c-36) | LIVE | n/a | Literal-tail trim trap — delinks-aware patcher guard | 4842 |
 | [C-37](codegen-walls.md#c-37) | LIVE | n/a | Bit-test / byte-zero check normalised to 0/1 via redundant-tail idiom | 4906 |
 | [C-38](codegen-walls.md#c-38) | LIVE | n/a | Leaf-no-pool reg-alloc + CSE divergence | 5022 |
-| [C-39](codegen-walls.md#c-39) | LIVE | 3 | Non-leaf C-37 — bit-0 extract wrapped in helper call | 5103 |
+| [C-39](codegen-walls.md#c-39) | LIVE | n/a | Non-leaf C-37 — bit-0 extract wrapped in helper call | 5103 |
 | [C-40](codegen-walls.md#c-40) | LIVE | n/a | MMIO bit-extract -> VRAM/base address | 5843 |
 | [C-41](codegen-walls.md#c-41) | LIVE | n/a | MMIO bit-clear + tail-call | 5922 |
 | [C-42](codegen-walls.md#c-42) | LIVE | n/a | Multi-call thunk (no special idiom; natural recipe) | 6014 |
@@ -89,64 +89,64 @@ Generated from [`codegen-walls.md`](codegen-walls.md). Run `python tools/generat
 | [C-81](codegen-walls.md#c-81) | LIVE | 1 | For `pointer + int` addition, mwcc always assigns the POINTER operand to the ADD's Rn (base) field regardless of the C source's left/right operand order — cast both operands to a plain integer type to regain operand-order control | 8233 |
 | [C-82](codegen-walls.md#c-82) | LIVE | 1 | A `switch` case whose body is textually identical to `default`'s must stay a SEPARATE case label — a shared `case N: default:` label lets mwcc merge their jump-table targets | 8257 |
 | [P-1](codegen-walls.md#p-1) | LIVE | 14 | Shift-pair vs mask collapse | 8391 |
-| [P-2](codegen-walls.md#p-2) | LIVE | 2 | ldmia / ldmib / stmia fusion (bidirectional) | 8500 |
-| [P-3](codegen-walls.md#p-3) | LIVE | 2 | Constant materialisation: pool-load vs add-imm vs orr chain | 8544 |
-| [P-4](codegen-walls.md#p-4) | LIVE | 7 | Tiny-thunk reg-allocator divergence (formerly "swap-shape") | 8567 |
-| [P-5](codegen-walls.md#p-5) | LIVE | n/a | Halfword offset >0xff split via add | 8877 |
-| [P-6](codegen-walls.md#p-6) | RETIRED | 3 | Predication threshold (≥4-op if-body) — RETIRED, was a routing-tier gap | 8898 |
-| [P-7](codegen-walls.md#p-7) | RETIRED | 1 | Pool literal not deduplicated across uses — SUPERSEDED BY C-27 (dual-extern alias/pointer-dance recipe) | 8936 |
-| [P-8](codegen-walls.md#p-8) | RETIRED | 1 | Bit-chain reg-alloc: r0-only vs r0→r1→r0 — SUPERSEDED BY C-25 (split-chain source form) | 9010 |
-| [P-9](codegen-walls.md#p-9) | LIVE | n/a | Conditional mvn-write `-1`: `mvnNE rN, #0` peephole absent | 9089 |
-| [P-10](codegen-walls.md#p-10) | RETIRED | 1 | Over-predication of short tail vs early-return — SUPERSEDED BY C-29 (`if (!p)` early-return polarity) | 9241 |
-| [P-11](codegen-walls.md#p-11) | LIVE | n/a | mwcc 2.0 reg-allocator plateau on mid-size helper-call functions | 9379 |
-| [P-12](codegen-walls.md#p-12) | LIVE | 2 | Non-leaf chained-cast reg-alloc divergence | 9594 |
-| [P-13](codegen-walls.md#p-13) | LIVE | n/a | C-39c bitfield-packing cross-tier irreducible | 9678 |
-| [P-14](codegen-walls.md#p-14) | LIVE | 1 | Sub-struct base-offset fold (in-range) | 9739 |
-| [P-15](codegen-walls.md#p-15) | LIVE | 4 | Legacy-tier (1.2/sp2p3) reg-alloc + const-CSE plateau | 9860 |
-| [P-16](codegen-walls.md#p-16) | LIVE | 1 | Repeated-address rematerialization after a call | 9949 |
-| [P-17](codegen-walls.md#p-17) | UNDER RECONSIDERATION | n/a | Briefs 288/290 commutative-add CSE/reg-alloc wall | 10145 |
-| [P-18](codegen-walls.md#p-18) | LIVE | 1 | Task-config field-write store-reordering | 10265 |
-| [P-19](codegen-walls.md#p-19) | LIVE | 1 | Bit-pack intermediate register-choice CSE divergence (r0 vs r2) | 10316 |
-| [P-20](codegen-walls.md#p-20) | LIVE | 30 | Per-player row-offset multiply register-letter swap (`(player&1)*0x868` idiom) | 10357 |
-| [P-21](codegen-walls.md#p-21) | LIVE | 6 | Loop/field-extraction-variable register permutation | 10526 |
-| [P-22](codegen-walls.md#p-22) | LIVE | 3 | Slot bit-manipulation register-pressure wall (the `&1` remask lever backfires here) | 10578 |
-| [P-23](codegen-walls.md#p-23) | LIVE (tentative) | 2 | Pool-constant register-pairing wall (`mla`'s two constant operands) (tentative — see 2026-08-18 correction) | 10617 |
-| [P-24](codegen-walls.md#p-24) | LIVE (tentative) | 5 | Per-player row + idx\*0x14-stride loop register-swap (tentative, P-20-sibling) | 10685 |
-| [P-25](codegen-walls.md#p-25) | LIVE | 4 | Legacy_sp3-tier dead-value-in-callee-saved-register wall | 10712 |
-| [P-26](codegen-walls.md#p-26) | LIVE | 9 | Precheck-array-lookup P-20 variant (EQ-vs-LS component) | 10738 |
-| [P-27](codegen-walls.md#p-27) | LIVE | 4 | Post-call scheduling/materialization resists source-level restructuring (family, not one mechanism) | 10792 |
-| [P-28](codegen-walls.md#p-28) | LIVE (tentative) | 16 | Single-scratch-value register-mirror, broader than P-20/P-23's literal `mla`-operand shape (tentative) | 10871 |
-| [P-29](codegen-walls.md#p-29) | LIVE (tentative) | 7 | Single-symbol guard + row-loop eager-`mla` fusion (tentative, single-batch) | 10940 |
-| [P-30](codegen-walls.md#p-30) | LIVE (tentative) | 5 | Canary-lever residual — the shared large-offset base reproduces structure but not its physical register (tentative, main module) | 10985 |
-| [P-31](codegen-walls.md#p-31) | LIVE | 8 | Predication-resistance — mwcc fully if-converts a guard that no source restructuring can force into a real branch (mirror image of C-55) | 11037 |
-| [P-32](codegen-walls.md#p-32) | LIVE | 2 | OR-of-non-adjacent-equality-values resists suppression into two genuine branches — a sticky CMP/CMPNE predicated membership test | 11125 |
-| [P-33](codegen-walls.md#p-33) | LIVE | 3 | Same-register repeated-equality compound-compare-merge — a C-55 boundary case with no working recipe | 11172 |
-| [P-34](codegen-walls.md#p-34) | LIVE (tentative) | 2 | Prologue pad-register-fold resistance — a stack-alignment pad word folds into the `lr` push in the target but never in source-driven recompiles | 11219 |
-| [P-35](codegen-walls.md#p-35) | LIVE (tentative) | 1 | SUBS-flag-fusion resistance — a variable-assigned shift/subtract amount won't fuse its flags into the following branch when the amount is stored to a local first | 11251 |
-| [P-36](codegen-walls.md#p-36) | LIVE | 17 | Instruction-scheduling order is frequently not source-controllable at all — a family of walls where every diff is a pure reordering of otherwise-correct instructions | 11279 |
-| [P-37](codegen-walls.md#p-37) | LIVE (tentative) | 1 | Register reuse via free-`lr`-after-`pop{pc}` — a hand-optimized-looking allocation trick a C compiler won't reproduce from ordinary source (tentative, single instance) | 11421 |
-| [P-40](codegen-walls.md#p-40) | LIVE | 3 | Immediate/constant materialization strategy resists source-level control — mwcc's own optimizer prefers folding a small-enough constant into an ADD's immediate field, but the original binary sometimes doesn't | 11463 |
-| [P-41](codegen-walls.md#p-41) | LIVE | 1 | mwcc 2.0 silently truncates a folded constant offset that exceeds the 12-bit STR immediate range instead of splitting it into a register ADD plus an in-range offset — a genuine compiler correctness defect, not a source-shape wall | 11499 |
-| [P-42](codegen-walls.md#p-42) | LIVE | 1 | A `void` function whose body is a single backward-branching loop with only internal `return;` exits still gets one extra unreachable trailing `bx lr` appended (tentative, single instance) | 11534 |
-| [P-43](codegen-walls.md#p-43) | LIVE | 1 | mwcc downgrades a dead-result XOR to a flags-only TEQ — an EOR/TEQ cousin of P-35's SUBS-flag-fusion (tentative, single instance) | 11553 |
-| [P-44](codegen-walls.md#p-44) | LIVE | 1 | Sibling-constant arithmetic reuse between two different sequentially-assigned local variables (tentative, single instance) | 11571 |
-| [P-45](codegen-walls.md#p-45) | LIVE | 1 | A mask-AND needed for two different downstream uses collapses to a shift-pair, resisting every caching hint (tentative, single instance) | 11592 |
-| [C-83](codegen-walls.md#c-83) | LIVE | 1 | Cross-call pointer-CSE defeat via integer round-trip — the mirror image of C-73 | 11613 |
-| [C-84](codegen-walls.md#c-84) | LIVE | 1 | A named stack buffer's declared size must exclude mwcc's own outgoing-vararg argument-build area | 11634 |
-| [C-85](codegen-walls.md#c-85) | LIVE | 2 | Taking the address of a function's own 2nd/3rd parameter for a specific two-out-param helper call forces a full 4-register incoming-argument spill block | 11661 |
-| [C-86](codegen-walls.md#c-86) | LIVE | 1 | A hand-written zero-trip guard placed immediately before a `for` loop over the same bound duplicates the loop's own auto-generated check | 11697 |
-| [C-87](codegen-walls.md#c-87) | LIVE | 1 | Dense fall-through case labels can force `switch` lowering into a real jump table instead of a compare-chain | 11715 |
-| [C-88](codegen-walls.md#c-88) | LIVE | 1 | A loop with multiple break-conditions needs ONE combined `while` condition, not separate `for(;;)`-with-internal-breaks, to get mwcc's jump-to-test-first rotation | 11735 |
-| [P-46](codegen-walls.md#p-46) | LIVE | 2 | Repeated pure-address computation gets cached into an extra callee-saved register, where the target recomputes it fresh at every use — no load involved | 11787 |
-| [P-47](codegen-walls.md#p-47) | LIVE | 1 | `ip`/`lr` used as extra scratch registers beyond r0-r3 during a no-call computation window (tentative, single instance) | 11814 |
-| [P-50](codegen-walls.md#p-50) | LIVE | 4 | Composed-TU declaration order collapses to ascending byte size whenever two top-level data globals differ in size — a data-layout wall, not a codegen one (permanent, evidence chain below) | 11847 |
-| [C-89](codegen-walls.md#c-89) | LIVE | 1 | Guard-clause polarity inversion can be the difference between predication and a real branch | 12081 |
-| [C-90](codegen-walls.md#c-90) | LIVE | 1 | A zero-initialized array's ELEMENT TYPE controls stmia-pair lowering vs. a byte-store loop | 12098 |
-| [C-91](codegen-walls.md#c-91) | LIVE | 1 | An extern global passed by address needs array-decay typing, not a pointer-variable declaration | 12115 |
-| [C-92](codegen-walls.md#c-92) | LIVE | 1 | A boolean assigned only on the true branch, relying on a pre-zeroed default, must be written as a bare `if`, not a full assignment expression | 12134 |
-| [C-93](codegen-walls.md#c-93) | LIVE | 1 | When a structurally-correct routing tier's assembler doesn't support a needed mnemonic, ship as inline `asm` under a DIFFERENT tier instead of fighting the structural router | 12148 |
-| [C-94](codegen-walls.md#c-94) | LIVE | 2 | An unnecessary cached local — even one that's re-read fresh elsewhere and never needs to survive a call — can force mwcc to allocate a genuinely extra callee-saved register | 12168 |
-| [C-95](codegen-walls.md#c-95) | LIVE | n/a | Declare a bit-packed field as a real C bitfield, not a manual mask/shift — mwcc only emits the target's double-shift pair from an actual `: N` member | 12191 |
-| [P-48](codegen-walls.md#p-48) | LIVE | 1 | Register pressure can evict a passthrough parameter from r0-r3 into a callee-saved register even with no intervening calls, if the function also does non-trivial bit arithmetic (tentative, single instance) | 12250 |
-| [P-49](codegen-walls.md#p-49) | LIVE | 9 | mwcc always folds `-(x) + CONST` into a single `rsb`-immediate, even where the target keeps two separate instructions (tentative, single instance) | 12266 |
-| [P-51](codegen-walls.md#p-51) | LIVE | 18 | `int c=0; if(rec.field){rec.field=0;c=1;}` reuses the just-emptied field's dead register for `c`; mwcc always allocates a fresh one (permanent, ov004, 18 confirmed members) | 14085 |
+| [P-2](codegen-walls.md#p-2) | LIVE | 0 | ldmia / ldmib / stmia fusion (bidirectional) | 8500 |
+| [P-3](codegen-walls.md#p-3) | LIVE | 2 | Constant materialisation: pool-load vs add-imm vs orr chain | 8568 |
+| [P-4](codegen-walls.md#p-4) | LIVE | 6 | Tiny-thunk reg-allocator divergence (formerly "swap-shape") | 8591 |
+| [P-5](codegen-walls.md#p-5) | LIVE | n/a | Halfword offset >0xff split via add | 8912 |
+| [P-6](codegen-walls.md#p-6) | RETIRED | 3 | Predication threshold (≥4-op if-body) — RETIRED, was a routing-tier gap | 8933 |
+| [P-7](codegen-walls.md#p-7) | RETIRED | 1 | Pool literal not deduplicated across uses — SUPERSEDED BY C-27 (dual-extern alias/pointer-dance recipe) | 8971 |
+| [P-8](codegen-walls.md#p-8) | RETIRED | 1 | Bit-chain reg-alloc: r0-only vs r0→r1→r0 — SUPERSEDED BY C-25 (split-chain source form) | 9045 |
+| [P-9](codegen-walls.md#p-9) | LIVE | n/a | Conditional mvn-write `-1`: `mvnNE rN, #0` peephole absent | 9124 |
+| [P-10](codegen-walls.md#p-10) | RETIRED | 1 | Over-predication of short tail vs early-return — SUPERSEDED BY C-29 (`if (!p)` early-return polarity) | 9293 |
+| [P-11](codegen-walls.md#p-11) | LIVE | n/a | mwcc 2.0 reg-allocator plateau on mid-size helper-call functions | 9431 |
+| [P-12](codegen-walls.md#p-12) | LIVE | 2 | Non-leaf chained-cast reg-alloc divergence | 9660 |
+| [P-13](codegen-walls.md#p-13) | LIVE | n/a | C-39c bitfield-packing cross-tier irreducible | 9744 |
+| [P-14](codegen-walls.md#p-14) | LIVE | 1 | Sub-struct base-offset fold (in-range) | 9805 |
+| [P-15](codegen-walls.md#p-15) | LIVE | 4 | Legacy-tier (1.2/sp2p3) reg-alloc + const-CSE plateau | 9926 |
+| [P-16](codegen-walls.md#p-16) | LIVE | 2 | Repeated-address rematerialization after a call | 10015 |
+| [P-17](codegen-walls.md#p-17) | UNDER RECONSIDERATION | n/a | Briefs 288/290 commutative-add CSE/reg-alloc wall | 10218 |
+| [P-18](codegen-walls.md#p-18) | LIVE | 1 | Task-config field-write store-reordering | 10346 |
+| [P-19](codegen-walls.md#p-19) | LIVE | 1 | Bit-pack intermediate register-choice CSE divergence (r0 vs r2) | 10397 |
+| [P-20](codegen-walls.md#p-20) | LIVE | 28 | Per-player row-offset multiply register-letter swap (`(player&1)*0x868` idiom) | 10438 |
+| [P-21](codegen-walls.md#p-21) | LIVE | 6 | Loop/field-extraction-variable register permutation | 10607 |
+| [P-22](codegen-walls.md#p-22) | LIVE | 3 | Slot bit-manipulation register-pressure wall (the `&1` remask lever backfires here) | 10659 |
+| [P-23](codegen-walls.md#p-23) | LIVE (tentative) | 2 | Pool-constant register-pairing wall (`mla`'s two constant operands) (tentative — see 2026-08-18 correction) | 10698 |
+| [P-24](codegen-walls.md#p-24) | LIVE (tentative) | 5 | Per-player row + idx\*0x14-stride loop register-swap (tentative, P-20-sibling) | 10766 |
+| [P-25](codegen-walls.md#p-25) | LIVE | 4 | Legacy_sp3-tier dead-value-in-callee-saved-register wall | 10793 |
+| [P-26](codegen-walls.md#p-26) | LIVE | 9 | Precheck-array-lookup P-20 variant (EQ-vs-LS component) | 10819 |
+| [P-27](codegen-walls.md#p-27) | LIVE | 4 | Post-call scheduling/materialization resists source-level restructuring (family, not one mechanism) | 10873 |
+| [P-28](codegen-walls.md#p-28) | LIVE (tentative) | 16 | Single-scratch-value register-mirror, broader than P-20/P-23's literal `mla`-operand shape (tentative) | 10952 |
+| [P-29](codegen-walls.md#p-29) | LIVE (tentative) | 7 | Single-symbol guard + row-loop eager-`mla` fusion (tentative, single-batch) | 11021 |
+| [P-30](codegen-walls.md#p-30) | LIVE (tentative) | 5 | Canary-lever residual — the shared large-offset base reproduces structure but not its physical register (tentative, main module) | 11066 |
+| [P-31](codegen-walls.md#p-31) | LIVE | 8 | Predication-resistance — mwcc fully if-converts a guard that no source restructuring can force into a real branch (mirror image of C-55) | 11118 |
+| [P-32](codegen-walls.md#p-32) | LIVE | 2 | OR-of-non-adjacent-equality-values resists suppression into two genuine branches — a sticky CMP/CMPNE predicated membership test | 11206 |
+| [P-33](codegen-walls.md#p-33) | LIVE | 3 | Same-register repeated-equality compound-compare-merge — a C-55 boundary case with no working recipe | 11253 |
+| [P-34](codegen-walls.md#p-34) | LIVE (tentative) | 2 | Prologue pad-register-fold resistance — a stack-alignment pad word folds into the `lr` push in the target but never in source-driven recompiles | 11300 |
+| [P-35](codegen-walls.md#p-35) | LIVE (tentative) | 1 | SUBS-flag-fusion resistance — a variable-assigned shift/subtract amount won't fuse its flags into the following branch when the amount is stored to a local first | 11332 |
+| [P-36](codegen-walls.md#p-36) | LIVE | 17 | Instruction-scheduling order is frequently not source-controllable at all — a family of walls where every diff is a pure reordering of otherwise-correct instructions | 11360 |
+| [P-37](codegen-walls.md#p-37) | LIVE (tentative) | 1 | Register reuse via free-`lr`-after-`pop{pc}` — a hand-optimized-looking allocation trick a C compiler won't reproduce from ordinary source (tentative, single instance) | 11502 |
+| [P-40](codegen-walls.md#p-40) | LIVE | 3 | Immediate/constant materialization strategy resists source-level control — mwcc's own optimizer prefers folding a small-enough constant into an ADD's immediate field, but the original binary sometimes doesn't | 11544 |
+| [P-41](codegen-walls.md#p-41) | LIVE | 1 | mwcc 2.0 silently truncates a folded constant offset that exceeds the 12-bit STR immediate range instead of splitting it into a register ADD plus an in-range offset — a genuine compiler correctness defect, not a source-shape wall | 11580 |
+| [P-42](codegen-walls.md#p-42) | LIVE | 1 | A `void` function whose body is a single backward-branching loop with only internal `return;` exits still gets one extra unreachable trailing `bx lr` appended (tentative, single instance) | 11615 |
+| [P-43](codegen-walls.md#p-43) | LIVE | 1 | mwcc downgrades a dead-result XOR to a flags-only TEQ — an EOR/TEQ cousin of P-35's SUBS-flag-fusion (tentative, single instance) | 11634 |
+| [P-44](codegen-walls.md#p-44) | LIVE | 1 | Sibling-constant arithmetic reuse between two different sequentially-assigned local variables (tentative, single instance) | 11652 |
+| [P-45](codegen-walls.md#p-45) | LIVE | 1 | A mask-AND needed for two different downstream uses collapses to a shift-pair, resisting every caching hint (tentative, single instance) | 11673 |
+| [C-83](codegen-walls.md#c-83) | LIVE | 1 | Cross-call pointer-CSE defeat via integer round-trip — the mirror image of C-73 | 11694 |
+| [C-84](codegen-walls.md#c-84) | LIVE | 1 | A named stack buffer's declared size must exclude mwcc's own outgoing-vararg argument-build area | 11715 |
+| [C-85](codegen-walls.md#c-85) | LIVE | 2 | Taking the address of a function's own 2nd/3rd parameter for a specific two-out-param helper call forces a full 4-register incoming-argument spill block | 11742 |
+| [C-86](codegen-walls.md#c-86) | LIVE | 1 | A hand-written zero-trip guard placed immediately before a `for` loop over the same bound duplicates the loop's own auto-generated check | 11778 |
+| [C-87](codegen-walls.md#c-87) | LIVE | 1 | Dense fall-through case labels can force `switch` lowering into a real jump table instead of a compare-chain | 11796 |
+| [C-88](codegen-walls.md#c-88) | LIVE | 1 | A loop with multiple break-conditions needs ONE combined `while` condition, not separate `for(;;)`-with-internal-breaks, to get mwcc's jump-to-test-first rotation | 11816 |
+| [P-46](codegen-walls.md#p-46) | LIVE | 2 | Repeated pure-address computation gets cached into an extra callee-saved register, where the target recomputes it fresh at every use — no load involved | 11868 |
+| [P-47](codegen-walls.md#p-47) | LIVE | 1 | `ip`/`lr` used as extra scratch registers beyond r0-r3 during a no-call computation window (tentative, single instance) | 11895 |
+| [P-50](codegen-walls.md#p-50) | LIVE | 21 | Composed-TU declaration order collapses to ascending byte size whenever two top-level data globals differ in size — a data-layout wall, not a codegen one (permanent, evidence chain below) | 11928 |
+| [C-89](codegen-walls.md#c-89) | LIVE | 1 | Guard-clause polarity inversion can be the difference between predication and a real branch | 12182 |
+| [C-90](codegen-walls.md#c-90) | LIVE | 1 | A zero-initialized array's ELEMENT TYPE controls stmia-pair lowering vs. a byte-store loop | 12199 |
+| [C-91](codegen-walls.md#c-91) | LIVE | 1 | An extern global passed by address needs array-decay typing, not a pointer-variable declaration | 12216 |
+| [C-92](codegen-walls.md#c-92) | LIVE | 1 | A boolean assigned only on the true branch, relying on a pre-zeroed default, must be written as a bare `if`, not a full assignment expression | 12235 |
+| [C-93](codegen-walls.md#c-93) | LIVE | 1 | When a structurally-correct routing tier's assembler doesn't support a needed mnemonic, ship as inline `asm` under a DIFFERENT tier instead of fighting the structural router | 12249 |
+| [C-94](codegen-walls.md#c-94) | LIVE | 2 | An unnecessary cached local — even one that's re-read fresh elsewhere and never needs to survive a call — can force mwcc to allocate a genuinely extra callee-saved register | 12269 |
+| [C-95](codegen-walls.md#c-95) | LIVE | n/a | Declare a bit-packed field as a real C bitfield, not a manual mask/shift — mwcc only emits the target's double-shift pair from an actual `: N` member | 12292 |
+| [P-48](codegen-walls.md#p-48) | LIVE | 1 | Register pressure can evict a passthrough parameter from r0-r3 into a callee-saved register even with no intervening calls, if the function also does non-trivial bit arithmetic (tentative, single instance) | 12351 |
+| [P-49](codegen-walls.md#p-49) | LIVE | 1 | mwcc always folds `-(x) + CONST` into a single `rsb`-immediate, even where the target keeps two separate instructions (tentative, single instance) | 12367 |
+| [P-51](codegen-walls.md#p-51) | LIVE | 18 | `int c=0; if(rec.field){rec.field=0;c=1;}` reuses the just-emptied field's dead register for `c`; mwcc always allocates a fresh one (permanent, ov004, 18 confirmed members) | 14186 |

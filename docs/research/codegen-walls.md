@@ -8536,10 +8536,34 @@ may have been compiled at a slightly different optimisation level /
 SP version where the heuristic threshold differed. C source can't
 sit on either side of the threshold reliably on that one tier.
 
-**Affected drops:** brief 028 `func_0209bf18`, brief 031
-`func_0207dee0`. **2 of 47 drops (4%)** — but bidirectional
-appearance means it surfaces in many partial-match shapes that
-got dropped for other surface reasons.
+> **Catalog correction (q-wall-catalog-repair, 2026-08-30).** Both of
+> this entry's 2 named drops have since shipped, dropping the count to
+> **0 of 47 (0%)**:
+>
+> - `func_0209bf18` — already documented above (tier-routing, UPDATE
+>   2026-07-25).
+> - `func_0207dee0` — shipped 2026-07-20 (commit `72ce7403f`), earlier
+>   than `func_0209bf18` but never folded into this entry. Ships as
+>   `asm void ... nofralloc` (a hand-transcribed-assembly coercion, not
+>   a genuine C-source fix) — the fusion mismatch itself remains real
+>   and unsolved by any C form for this function; it is counted
+>   resolved here per this catalog's own established convention
+>   (its historical brief-log table labels asm-void ships "coercible
+>   (asm-void, resolved)", removing them from a wall's counted
+>   population) — see `src/main/func_0207dee0.c`.
+>
+> Neither drop is currently blocking; this wall has no remaining
+> catalogued instances on the default tier, but the underlying
+> mechanism (mwcc's load/store-multiple coalescer threshold) is not
+> retired — the next syntactically-matching candidate is still a P-2
+> risk.
+
+**Affected drops (0):** both prior members shipped — brief 028's
+`func_0209bf18` (see UPDATE above) and brief 031's `func_0207dee0`
+(see correction above). 0 of 47 (0%); do not re-add without new
+evidence. The underlying mechanism is not retired — bidirectional
+appearance means a fresh candidate can still surface this pattern in a
+partial-match shape.
 
 ### P-3. Constant materialisation: pool-load vs add-imm vs orr chain
 
@@ -8760,16 +8784,27 @@ form variants exercised across all 5 mwccarm tiers (1.2/base,
 1.2/sp2p3, 1.2/sp3, 2.0/sp1p5, 2.0/sp2p4) — none reach the
 orig register choice while preserving the 5-insn function shape.
 
-**Affected drops:** brief 031 `func_02052ddc`, `_0207842c`,
+> **Catalog correction (q-wall-catalog-repair, 2026-08-30).**
+> `func_02084ac4` shipped as plain matched C, no register-allocator
+> coercion needed (git commit `adf23a9f0`; confirmed live in
+> `src/main/func_02084ac4.c`) — removed from the bracket below,
+> **7 → 6 of 80+**. It is the same address the "Re-test (brief 671...)"
+> blockquote above already narrates going from "RE-CONFIRMED PERMANENT"
+> to shipped; that blockquote's own citation of "brief 677" for the
+> final ship is a miscitation (brief 677 is an unrelated cross-region
+> port-harvest doc) — the ship itself is independently confirmed via
+> the commit and the current source tree regardless.
+
+**Affected drops (6):** brief 031 `func_02052ddc`, `_0207842c`,
 `_02078444`, `_ov002_0229cd70` (all 66% partial; identical-asm
 group of 3 cross-overlay siblings + 1 main); brief 053
-self-extend 2 / wave 17 (PR #380) added `func_02084a9c` +
-`_02084ac4` (r0-vs-r1 ldr-dest on fnptr-cache shape — a
-different reg-allocator-pick variant in the same single-byte-
-divergence family); brief 217 added `func_ov002_021b4254`
-(broader pool-load + tail-call shape — r1 vs r2). **7 of 80+
-(~9%)** across the canonical swap-thunk, fnptr-cache, and
-pool-load tail-call shapes.
+self-extend 2 / wave 17 (PR #380) added `func_02084a9c`
+(r0-vs-r1 ldr-dest on fnptr-cache shape — a different
+reg-allocator-pick variant in the same single-byte-divergence
+family; sibling `_02084ac4` SHIPPED, see correction above);
+brief 217 added `func_ov002_021b4254` (broader pool-load +
+tail-call shape — r1 vs r2). 6 of 80+ (~8%) across the
+canonical swap-thunk, fnptr-cache, and pool-load tail-call shapes.
 
 **Coercion fallback (brief 054 sweep on wave-17 targets):** the
 `asm void` + `nofralloc` recipe from C-12 / C-16 also works
@@ -9160,11 +9195,28 @@ contain a predicated `mvn rN, #0` instruction. These are the
 P-9 candidate population. Worked example: `func_020534b4`
 (0x20). Other notable candidates from the residue:
 
-- `func_02037b34` (0x24)
-- `func_02033488` (0x2c)
-- `func_02054c0c` (0x24)
-- `func_02000d4c` (0x50)
-- `func_02022540` (0x40)
+- `func_02037b34` (0x24) — RECLASSIFIED, see "Key finding" below;
+  not a P-9 member.
+- `func_02033488` (0x2c) — RECLASSIFIED, see "Key finding" below;
+  not a P-9 member.
+- `func_02054c0c` (0x24) — RECLASSIFIED, see "Key finding" below;
+  not a P-9 member.
+- `func_02000d4c` (0x50) — genuine, untested by brief 105's sweep,
+  still `.s` in all three regions.
+- `func_02022540` (0x40) — genuine, brief 105 sweep plateaued at
+  "partial" (best score 565, never 0), still `.s`.
+
+> **Catalog correction (q-wall-catalog-repair, 2026-08-30).** Of the 6
+> individually-named candidates in this entry (`func_020534b4` above +
+> these 5), 3 are the early-return shape this entry's own "Key finding"
+> below reclassifies away from P-9 — they were never genuine mask-form
+> members. **3 of 6 remain genuine** (`func_020534b4`, shipped only via
+> an `asm void`/`nofralloc` coercion, not a natural-C fix, so it still
+> counts as blocked absent the workaround; `func_02022540`; and
+> `func_02000d4c`, untested). This entry has no single numeric bracket
+> to correct — the correction is to this roster, since the reclassified
+> 3 were previously listed here with no annotation distinguishing them
+> from the genuine 3.
 
 **NEGATIVE finding (worth flagging for future-wave selection):**
 brief 097 classified ~6 of 31 medium-tier residue candidates as
@@ -9397,6 +9449,20 @@ for this pattern — see C-29 for the codified recipe.
 > choice. Re-confirmed standing, not re-tested exhaustively from zero:
 > `func_02024574`, `func_020270d0`, `func_02028790`, `func_ov011_021d2ca8`,
 > `func_ov002_02200084`, `func_ov002_022319f4`.
+
+> **Catalog correction (q-wall-catalog-repair, 2026-08-30) — the same
+> failure mode recurred on top of the correction above.** 3 of the 6
+> "genuinely remain unmatched" members re-confirmed above were
+> themselves shipped as matched C the SAME DAY as that re-audit, by two
+> other, unrelated briefs that never looped back to this entry:
+> `func_020270d0` and `func_02028790` (commits `879210a49` /
+> `5b5d1547f`, "cm-parked-reaudit-2 batch B", ~1h44m-2h after the
+> re-audit landed) and `func_ov011_021d2ca8` (commit `e8d2969ea`,
+> "cm-sm64ds-lever-apply", via an unrelated dead-store-elimination lever,
+> not a P-11 fix). Confirmed by file presence: all three are `.c` in the
+> current tree, no `.s` counterpart. **The real current count is 13 of
+> 16 shipped — only 3 genuinely remain: `func_02024574`,
+> `func_ov002_02200084`, `func_ov002_022319f4`.**
 
 > **Wall family note — see also P-4, P-8, brief 198.** P-11 is
 > the umbrella for mwcc 2.0/sp1p5 register-allocator
@@ -10091,8 +10157,15 @@ calls; none of this brief's picks happened to have that exact shape
 (see the per-target notes in `brief-586-ceiling-r2.md` for what shapes
 they did have).
 
-**Affected picks:** `func_ov002_02269534` (parked, not shipped —
-this is the sole reason it doesn't reach 100%).
+**Affected picks (2):** `func_ov002_02269534` (parked, not shipped —
+this is the sole reason it doesn't reach 100%); `func_ov002_02269ab8`
+(SHIPPED — the SECOND independent confirmation below; kept listed
+here per this catalog's convention of naming every confirmed instance
+of the mechanism, shipped or not). *(Catalog correction,
+q-wall-catalog-repair, 2026-08-30: this line previously named only
+`02269534`, even though the "SECOND independent confirmation" prose
+below has documented `02269ab8` since 2026-07-30 — a bookkeeping gap,
+not a membership dispute.)*
 
 **UPDATE (cm-parked-reaudit-1, 2026-07-25): the pool-fold mechanism
 itself IS a confirmed-fixable counter-lever, softening this entry from
@@ -10156,11 +10229,19 @@ brief-288/290 diagnosis. A fresh accumulated-lever re-test of
 `func_ov002_021ebf40` reproduced the `DIFF_ARG_MISMATCH` register divergence,
 so the cohort remains parked pending a dedicated counter-lever study.
 
-**Affected cohort:** `021e8b34`, `021e97bc`, `021eb128`, `021eb300`,
-`021eb630`, `021ebf40`, `021ebfd0`, `021ee23c`, `021ef5a0`, `021efe44`,
-`021f0028`, `021f020c`, `021f1458`, `021f1504`, `021f208c`, `021f2138`,
-`021f2ac8` (all ov002). The complete cohort census and method are in the
+**Affected cohort (14, down from 17 — see corrections below):**
+`021e8b34`, `021e97bc`, `021eb128`, `021eb300`, ~~`021eb630`~~
+RECLASSIFIED, `021ebf40`, `021ebfd0`, `021ee23c`, `021ef5a0`, `021efe44`,
+`021f0028`, ~~`021f020c`~~ RECLASSIFIED, `021f1458`, ~~`021f1504`~~
+RECLASSIFIED, `021f208c`, `021f2138`, `021f2ac8` (all ov002). The
+complete cohort census and method are in the
 [verified ov002 wall cohort](campaign-analytics/ov002-wall-cohort.md).
+*(Catalog correction, q-wall-catalog-repair, 2026-08-30: this list
+previously showed all 17 raw addresses unedited, even though the
+trailing narrative below already computed 17→15→14 as
+`021f020c`/`021f1504`/`021eb630` shipped — a bookkeeping gap between
+this header list and the entry's own later prose, not a membership
+dispute.)*
 
 **Status:** permanent-for-now / not a C-match queue target. Re-open only
 with a fresh source-form hypothesis and byte evidence; do not infer that the
@@ -12032,15 +12113,35 @@ there, symbol size here); see
 `alignment-wall-tu-composition-recipe.md`'s standing rule, which covers
 both.
 
-**Affected picks (4):** `data_ov011_021d3034` (43 B), `_021d32ba`
-(30 B), the `_021d3583`/`_358b` pair, and the
-`_021d32d8`/`_32d9`/`_334a` cell — all `ov011`.
+**Affected picks (21 across two pools — see correction below):**
+`data_ov011_021d3034` (43 B), `_021d32ba` (30 B), the
+`_021d3583`/`_358b` pair, and the `_021d32d8`/`_32d9`/`_334a` cell —
+all `ov011` (4 picks, the original ov011 misaligned-struct-arc census).
+
+> **Catalog correction (q-wall-catalog-repair, 2026-08-30) — under-
+> counted, a separate pool never folded in.** `cm-restock-carve-11`
+> (2026-08-24, `docs/research/data/cm-restock-carve-11-2026-08-24.md`,
+> commit `6b45ab651`) found the identical P-50 mechanism walling **17
+> descending-size n=2 pairs / 34 symbols / 668 B** in a completely
+> separate pool (the main-module non-4-aligned string pool — zero
+> address/module overlap with the 4 ov011 picks above). That round's
+> own commit message states it plainly: "34 symbols permanently
+> P-50-walled (descending size)." A same-day follow-up commit
+> (`0cebb8e33`) folded a related `char[N]` scope caveat into the
+> composition-recipe doc but explicitly did not touch this entry
+> (confirmed via `git show 0cebb8e33 --stat`) — the finding was never
+> folded back here, until now. **Corrected total: 4 + 17 = 21 declined
+> picks** (the new 17 are reported only as an aggregate in the source
+> doc — no individual addresses are enumerated in any committed
+> artifact, so they cannot be listed by name here the way the original
+> 4 are).
 
 **Provenance:** `cm-restock-carve-5` (2026-08-09, discovery, PR #1487),
 `cm-restock-carve-6` (2026-08-09, formal characterization + the
 merge-to-one-symbol falsification), `cm-restock-carve-7` (2026-08-14,
 closes the evidence boundary: 3-tier SP sweep + the Leg 3 one-compile
-repair test).
+repair test), `cm-restock-carve-11` (2026-08-24, second pool, 17
+additional picks — see correction above).
 9. **Boolean materialized via `moveq`/`movne` resists instruction-
    order rephrasing — now confirmed, 2 independent instances.**
    `func_020488f4` (cm-main-tier-sweep-4, batch 3, 96.2%, 5 tries) and
