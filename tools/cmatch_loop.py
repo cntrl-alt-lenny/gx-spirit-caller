@@ -215,6 +215,7 @@ class Dossier:
     struct_header_text: str | None = None
     m2c_skeleton: str | None = None
     m2c_error: str | None = None
+    context_error: str | None = None
     coercion_hits: list[dict] | None = None
     coercion_error: str | None = None
     unresolved_types_patched: int = 0
@@ -343,7 +344,21 @@ def build_dossier(region: str, func: str, module: str, *, k: int = 3,
 
     try:
         s_text = _disasm_to_s(region, func, obj_path, objdump)
-        context = m2c_feed.build_context(region, module)
+        # build_context() already returns None gracefully when a module has
+        # no *_core.h; it does NOT do the same when the header exists but
+        # m2ctx.py's `gcc -E` preprocess step fails (e.g. no host gcc on
+        # PATH, hit on a real Windows lane with no MinGW installed) -- that
+        # raises instead. Left uncaught, that exception used to escape this
+        # whole try block and drop the dossier's m2c_skeleton to None
+        # entirely, contradicting this function's own "proceeds context-
+        # less" docstring/comment below: a missing context is advisory (m2c
+        # falls back to `?`/unkNNN placeholders same as the no-header case),
+        # not a reason to lose the skeleton.
+        try:
+            context = m2c_feed.build_context(region, module)
+        except Exception as exc:  # noqa: BLE001
+            context = None
+            dossier.context_error = f"{type(exc).__name__}: {exc}"
         raw_skeleton = m2c_feed.run_m2c(func, s_text, context)
         raw_skeleton, n_patched = patch_unresolved_types(raw_skeleton)
         dossier.unresolved_types_patched = n_patched
