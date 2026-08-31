@@ -2698,3 +2698,63 @@ Regenerate `docs/state-table.md` first, `docs/dashboard.md` second. Add new
 
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done claude-scaffolder cm-257-320-drain-3`.
+
+### cm-257-320-drain-4 — the screening pressure just dropped to zero [TODO]
+
+`cm-257-320-drain-3` (PR #1609) shipped **2 of 16 attempted (12.5%)**, **2 of
+17 pool (11.8%)**, and delivered the ledger change: `attempts.tsv` now carries
+a formal `result=not-attempted` row for a screen, and `validate_attempts.py`
+reports **1,853 rows, 0 errors**. **215 candidates remain.**
+
+**The interesting result is the screening, not the ships.** P-20 screens went
+**12 -> 0** in one round; the single screen was on `complexity` grounds.
+Cumulative P-20 encounters are still **18**, against a wall whose membership
+PR #1608 re-counted at **28** (the index had said 30, inflated by a heading
+bleed). So roughly ten P-20 members remain somewhere in the pool, and this
+tranche met none of them.
+
+**That makes this the first clean read of the band's real yield.** With almost
+nothing screened, attempted-rate and pool-rate converge (12.5% vs 11.8%)
+instead of diverging the way they did at 17.6% vs 13.0%. Both sit just under
+the all-time **8/51 = 15.7%**.
+
+**Scope: continue the drain** on the remaining 215. Keep writing the
+`not-attempted` screen rows — that is now the standing practice, not a one-off.
+Report all three figures again (attempted-rate, pool-rate, screens split by
+grounds) plus cumulative P-20 encounters.
+
+⚠️ **Do not read the converged rate as a decline.** 12.5% attempted against a
+15.7% all-time at n=16 is noise, not a trend. Report divergence if you see it;
+do not manufacture one. `docs/research/band-rate-vintage.md` is why.
+
+**Four m2c compile-context failures were logged last round as tool anomalies
+with no fabricated match percentage** — exactly right. Keep doing that, and say
+how many you hit.
+
+**Signature leads, current state:** push-vs-`sub sp,#N` alignment padding is
+**confirmed compiler-internal** — treat as a wall, spend no attempts on it.
+Independent-computation interleaving: 2 hits, unresponsive. `str`/`stmib`
+fusion: no clean re-hit. Newer leads worth watching: the
+`pop {regs,lr}; bx lr` epilogue convention, and the unconditional
+argument-register spill where m2c under-detected the parameter count. The
+`volatile` MMIO lever is **still untested** — one genuine case appeared and was
+inconclusive for unrelated reasons.
+
+**Wall counts changed under you.** PR #1608 corrected seven walls against
+committed evidence — notably **P-11 is 13/16 shipped, not 10/16**, and P-50
+went 4 -> 21. If you screen on any wall other than P-20, check its corrected
+count in `codegen-walls.md` first rather than the number you remember.
+
+**DO NOT USE SUB-AGENTS.** Shared worktree, machine-wide-serialising compiler.
+
+**Gate:** three `python tools/gate3.py --scope <eur|usa|jpn> --clean` runs, all
+three SHA1 PASS lines verbatim, plus `check_activation_invariant.py`,
+`check_delink_dupes.py`, `validate_attempts.py`, `gate3.py --scope tests`. Use
+`tee`, never `tail`, and read the log rather than the exit code.
+`git restore assets/` after each clean run. Regenerate `docs/state-table.md`
+first and `docs/dashboard.md` second, each after the commit it describes has
+landed — the integration merge failed the dashboard tolerance tests twice this
+round for exactly that reason.
+
+ONE PR; verify every number against `git diff --stat`; `python
+tools/work_queue.py done claude-scaffolder cm-257-320-drain-4`.
