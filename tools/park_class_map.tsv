@@ -215,6 +215,7 @@ loop-rotation-scheduling-residual	PROVISIONAL:loop-rotation-scheduling-residual	
 loop-strength-reduction-plus-uncertain-div256-idiom	C-65	loop-strength-reduction-plus-uncertain-div256-idiom	1
 loop-strength-reduction-register-role-cascade-P36-adjacent	PROVISIONAL:register-choice	loop-strength-reduction-register-role-cascade-P36-adjacent	1
 m2c-dropped-trailing-args	PROVISIONAL:m2c-dropped-trailing-args	m2c-dropped-trailing-args	1
+m2c-draft-near-miss	PROVISIONAL:m2c-draft-near-miss	m2c-draft-near-miss	1
 materialized-bool-global	PROVISIONAL:constant-materialization	materialized-bool-global	1
 memory-width	PROVISIONAL:memory-width	memory-width	1
 missing-char-reload-spill	PROVISIONAL:missing-char-reload-spill	missing-char-reload-spill	1
