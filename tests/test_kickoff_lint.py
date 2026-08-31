@@ -186,6 +186,39 @@ class TestMissingGuards(unittest.TestCase):
     def test_missing_canary(self):
         self.assertIn("canary", self._fail_keys(GOOD.replace("CANARY", "note")))
 
+    def test_negated_canary_does_not_satisfy_the_check(self):
+        """A kickoff that DECLINES a canary must not pass the canary check.
+
+        Round 0828's scaffolder kickoff shipped with the literal sentence
+        "No canary this round." and linted clean, because the check only
+        looked for the word. A stated refusal is the opposite of a guard.
+        """
+        for phrasing in (
+            "No canary this round -- just start batching.",
+            "We will skip the canary entirely.",
+            "There is no CANARY needed here.",
+            "Do not bother with a canary.",
+        ):
+            with self.subTest(phrasing=phrasing):
+                text = GOOD.replace(
+                    "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+                    phrasing,
+                )
+                self.assertIn("canary", self._fail_keys(text))
+
+    def test_unrelated_negation_does_not_void_a_real_canary(self):
+        """A negation about something else must not void the canary.
+
+        Scoping negation to the canary's own sentence keeps
+        "DO NOT USE SUB-AGENTS. CANARY: ..." passing.
+        """
+        text = GOOD.replace(
+            "CANARY: rename ONE function, then run dsd check — it MUST stay green.",
+            "DO NOT USE SUB-AGENTS.\n\nCANARY: rename ONE function, then run "
+            "dsd check — it MUST stay green.",
+        )
+        self.assertNotIn("canary", self._fail_keys(text))
+
     def test_missing_location_guard(self):
         self.assertIn("location-guard", self._fail_keys(GOOD.replace(
             '    EXPECT="$HOME/Dev/spirit-caller/codex-610"\n'

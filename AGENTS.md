@@ -395,6 +395,29 @@ this section says how the brain must *evidence* it.
       workers, do not infer them*.
     - If a session cannot be found or read, **say so explicitly** in the
       review summary. Never silently infer what happened in its place.
+    - **When a lane runs in a harness whose transcript this brain cannot
+      reach at all** (an external CLI or model outside Claude Code and
+      Codex), the audit is not merely incomplete — it is *unavailable*,
+      and saying so once is not sufficient. Declare it every round, and
+      run these compensating controls in its place:
+      1. **Re-derive every numeric claim** in the PR body from the diff
+         and the ledger yourself. Counts, not just totals — a body has
+         miscounted its own batches while every total was right.
+      2. **Mutation-test any new test suite** before trusting it
+         (control 7): change one predicate the suite should catch and
+         confirm it goes red.
+      3. **Verify at least one load-bearing claim against primary
+         sources** — `symbols.txt`, `relocs.txt`, the committed source —
+         not against the lane's own derived artifact.
+      4. **Try to reproduce a headline measurement.** If it does not
+         reproduce, establish why before accepting or rejecting it: a
+         coverage figure that differed by 45 points between two trees
+         turned out to be build-state-dependent, not wrong.
+      State in the review summary which of these were run. This
+      substitutes artifact-level verification for reasoning-level
+      verification; it is weaker against a lane that *misreports* than
+      one that *underdelivers*, and that limitation should be said out
+      loud rather than papered over.
     - Worker messages are **evidence, not ground truth.** Repository
       state and the deterministic gates remain authoritative; this
       control adds context the gates cannot see, it does not outrank
