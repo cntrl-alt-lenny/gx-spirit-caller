@@ -2766,7 +2766,7 @@ round for exactly that reason.
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done scaffolder cm-257-320-drain-4`.
 
-### cm-257-320-drain-5 — the band is two pools and the last round drained the wrong one [TODO]
+### cm-257-320-drain-5 — the band is two pools and the last round drained the wrong one [DONE]
 
 `cm-257-320-drain-4` (PR #1616) shipped **1 of 17 attempted (5.9%)**, **1 of 17
 pool (5.9%)**, **zero screens** — and reported that as a divergence rather than
