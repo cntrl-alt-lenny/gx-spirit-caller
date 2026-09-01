@@ -582,7 +582,7 @@ Claude Code and both transcripts were read.
 Neither lane's report contradicted the artefacts, and neither overstated a
 result. Both surfaced their own limits before the brain asked.
 
-**Last updated:** 2026-09-05 — **(Mac M1, brain=Opus 5; both lanes on the
+**Round 0905 (2026-09-05, Mac M1, brain=Opus 5; both lanes on the
 same Mac — scaffolder toolchain-bound, decomper build-free.) Round 0905: the
 brain moved to the Mac, unblocked and merged the PR round 0904 held, and found
 that the ov002 m2c blocker is a property of the Windows PC rather than of the
@@ -680,7 +680,116 @@ verified by file list: `.github/workflows/`, `docs/`, `tests/`, and two
 the time of writing; the transcript audit belongs to the review that follows
 their PRs.
 
-<!-- main-sha: 5b865162b -->
+**Last updated:** 2026-09-08 — **(Windows PC, brain=Opus 5; both lanes ran
+on the Mac M1 last round — scaffolder toolchain-bound, decomper build-free.)
+Round 0908: the brain moved back to Windows and merged both Mac-round lane
+PRs. Two rounds ran on the Mac and left no record of themselves at all, and
+the drain lane's headline rate is a lower bound it measured with a compiler
+scaffold it was still repairing.**
+
+Merged **PR #1620** and **PR #1622**. `main` at `288253e4b`.
+EUR 17.37% -> **17.38%** (414,738 B natural C). USA and JPN unchanged at
+15.85% — neither merge touches a port.
+
+⚠️ **ROUNDS 0906 AND 0907 ARE UNRECORDED, AND THIS IS THE ROUND-0903 DEFECT
+RECURRING TWICE UNDER ITS OWN REPAIR.** `docs/dispatch-log.md` ends at 0905.
+`docs/state.md`'s newest narrative was 0905. Both rounds demonstrably ran —
+PR #1622's writeup is dated by kickoff round 0907, PR #1620's body describes
+its own 0906 and 0907 iterations — and `grep "0906\|0907"` over `state.md`
+and `dispatch-log.md` on `main` at `b14879e28` returned **nothing**. The only
+surviving trace anywhere is one sentence in `docs/decomp-workflow.md` /
+`docs/tools-index.md`, shipped by PR #1621. Two rounds of dispatch, host,
+model and lane-assignment facts are gone and cannot be recovered from memory
+without violating the log's own premise. Rows are appended below carrying only
+what git can still prove.
+
+**The repair PR #1620 does not close this hole, and the brain verified why.**
+`check_dispatch_log.check_texts` opens with
+
+    if state_base is None or state_head is None or state_base == state_head:
+        return CheckResult(True, detail="state narrative unchanged; ...")
+
+so a round that never touches `docs/state.md` is never asked for a dispatch
+row. 0906 and 0907 touched nothing. Guard 1 is the only backstop and its
+`_STALE_MERGE_TOLERANCE = 2` is exactly the width of a normal two-PR round.
+Seeded as `q-fail-open-audit` with the 0906/0907 window as its canary.
+
+✅ **Both repaired guards were confirmed FIRING live, which is the part that
+was never true before.** On `main` at `b14879e28`, `queue_state_drift.py`
+reported the `5b865162b` anchor as three PR commits behind the ref against
+a tolerance of two.
+Before PR #1620 that branch was unreachable by construction — the tool counted
+`--merges` in a repo that has squash-merged exclusively since 2026-08-25, so it
+returned "fresh, zero behind" for every input. Both guards are now wired into
+`generated-files-drift.yml`, so this round's own PR is checked by them.
+
+**PR #1622 was held on a red required `unittest`, and the brain fixed it on
+the lane's branch** (fast-forward push, not a force — the round-0824c and 0905
+precedent) rather than spending a lane-round on a one-file regeneration.
+Reproduced on Windows at `e6574bbf0`: `TestCheckToleratesSquashMergedTrailingSha`
+and `TestCheckToleratesTrailingRowAddition` both failed. After
+`python tools/generate_dashboard.py` and nothing else, the file went
+**34 passed**. ⚠️ **Those two tests do not use a fixture** — they run the real
+`--check` against the live committed `docs/dashboard.md` and then simulate one
+further trailing-row delta. The tolerance admits exactly one row, so any branch
+that touches `docs/state-table.md` without regenerating puts the committed file
+one row behind and lands the simulation two rows out. **This file has now cost
+four rounds** — 0901, 0904, 0907 and this one — each time diagnosed from
+scratch and each time fixed by "regenerate and commit". Seeded as
+`q-dashboard-check-coupling`.
+
+⚠️ **BRAIN FINDING: `pool_freshness.py --module` fails OPEN.** Verified on
+`40e5d826b`:
+
+| `--module` | count | bytes |
+|---|---|---|
+| `overlay002` | 116 | 33,948 |
+| `ov002` | 0 | 0 |
+| `not_a_real_module` | 0 | 0 |
+
+No error, exit 0. `ov002` is the spelling used in `attempts.tsv`'s own
+`module` column, in `codegen-walls.md` and in every 257-320 B kickoff written
+so far, so a lane typing the name it reads everywhere else is told the pool is
+empty. The brain hit this itself while sizing this round's dispatch. Folded
+into `q-fail-open-audit`.
+
+**THE DRAIN'S 6.25% IS A LOWER BOUND, NOT A MEASUREMENT — and that decides the
+next dispatch.** `cm-257-320-drain-5` shipped 1 of 16 attempted, all 16 from
+`ov002` exactly as scoped, which read at face value kills round 0904's
+two-pool hypothesis. But the same round found and fixed **three** real
+auto-scaffold bugs in `cmatch_loop.py` *while draining*, one of which its own
+writeup calls "a 100% compile blocker for every ov002 candidate", and two of
+the three were found mid-tranche. Brain recomputed the parks from
+`attempts.tsv` (16 rows, 34 compile attempts): of the 15 parks, **11 of the 13
+carrying a numeric match are under 20%**, only two cleared 20% (53.52%,
+25.35%), and **2 never compiled at all**. That is the shape of a scaffold
+mistyping fields, not of a codegen wall. `cm-257-320-drain-6` re-attempts all
+15 parks under the fixed toolchain as a pre-registered A/B before taking any
+fresh candidate — one variable changed, and a 0/15 re-run is a publishable
+result that closes the two-pool question for good.
+
+**Brain finding, not acted on:** PR #1620 changed `make_kickoff.py`'s Mac lane
+paths to `~/Dev/spirit-caller/claude-{decomper,scaffolder}-queue`, which is
+right per round 0905's on-Mac verification — but `AGENTS.md`'s worktree table
+and `docs/dispatch-log.md`'s own header still name
+`~/Dev/spirit-caller/{decomper,scaffolder}`. Two documents now disagree about
+where the Mac lanes live. Windows dispatch is unaffected.
+
+**Directory sync (this host).** All five Windows worktrees were clean — no
+uncommitted lane work was at risk. `brain` fast-forwarded to `main`;
+`decomper`, `kb-map`, `kb-types` and `scaffolder` were detached onto
+`origin/main`; four merged local branches were pruned. Five unregistered
+directories remain beside the worktrees (`mainsweep7-p2batch2`,
+`sweep17-batch1`, `sweep3-4`, `sweep9-batch5`, `scratch_stash`) plus
+`mwccarm.bad.tmp`; they are not registered worktrees and were left alone
+pending an owner call.
+
+⚠️ **Control 12 NOT executable.** Both lanes ran on the Mac; their transcripts
+are not readable from this host. The audit belongs to whichever brain next
+runs on the Mac, and by then rounds 0906/0907 will have been unrecorded for
+three rounds — see the dispatch rows below.
+
+<!-- main-sha: 288253e4b -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
@@ -740,12 +849,12 @@ clause for the compensating checks that replace it.
 per round**; the second lane gets **build-free** work. The compiler serialises
 machine-wide and ignoring this cost a full lane-round on 2026-08-27.
 
-**Current lane items** (re-seeded round 0902, live on `main`):
+**Current lane items** (re-seeded round 0908, live on `main`):
 
 | Lane | Item | Kind |
 |---|---|---|
-| scaffolder | `cm-257-320-drain-3` | toolchain-bound |
-| decomper | `q-wall-catalog-repair` | build-free |
+| scaffolder | `cm-257-320-drain-6` | toolchain-bound |
+| decomper | `q-dashboard-check-coupling`, `q-fail-open-audit`, `q-codegen-walls-br-backfill` | build-free |
 
 **#1020 (decomp.dev CI) is parked on an OWNER action, not on engineering.**
 It is complete as written (+579/-0: a Dockerfile, a workflow, and setup docs).

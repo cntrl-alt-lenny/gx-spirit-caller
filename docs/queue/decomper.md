@@ -3128,3 +3128,62 @@ committing and git operations.
 discover -s tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean, plus
 the pasted before/after canary pair for BOTH guards. Verify every claim against
 `git diff --stat origin/main..HEAD`.
+
+### q-dashboard-check-coupling — two staleness tests read the live repo file, so any un-regenerated round turns them red [TODO]
+
+`tests/test_generate_dashboard.py::TestCheckToleratesSquashMergedTrailingSha::test_check_passes_when_trailing_sha_is_squash_rewritten` and `TestCheckToleratesTrailingRowAddition::test_check_passes_when_committed_is_missing_one_trailing_row` do not use a fixture. They run the real `generate_dashboard.py --check` against the **live committed `docs/dashboard.md`**, then simulate one further trailing-row delta on top of whatever state that file is already in.
+
+The tolerance is exactly one trailing row. So the moment a branch touches `docs/state-table.md` without regenerating `docs/dashboard.md`, the committed file is already one row behind, the simulated delta lands **two** rows out, and both tests go red with
+
+```text
+stale (line count differs)
+stale (unexpected difference at committed line 87, beyond a trailing trend-row addition)
+```
+
+— a message that blames staleness in the *tree* rather than the coupling in the *test*. **Brain-reproduced on Windows** at `e6574bbf0`: both tests failed; after `python tools/generate_dashboard.py` and nothing else, `tests/test_generate_dashboard.py` went **34 passed**. That one missing regeneration is what held PR #1622 on a red required `unittest` check.
+
+**This is the fourth round this file has cost.** Round 0901: `dashboard.md` stale on main with `line count differs`. Round 0904: two dashboard failures during merge. Round 0907/0908: PR #1622 blocked. Each time the fix was "regenerate and commit" and the diagnosis had to be rediscovered from scratch.
+
+**Scope.**
+
+1. **CANARY FIRST (control 7).** Construct the one-row-behind tree in a fixture and show both tests RED before your change, GREEN after — and show that a *genuinely* mis-rendered dashboard still fails. If either test is already green on a one-row-behind fixture, your model of the bug is wrong: STOP and report that.
+2. **Decouple the two tolerance tests from the live repo file.** They are testing the tolerance logic, not the tree; give them a synthetic committed/fresh pair. The real staleness signal is not lost — `generate_dashboard.py --check` already runs in `generated-files-drift.yml`.
+3. **Then ask whether the tolerance itself is right.** It admits exactly one trailing row. A round that lands two commits touching `docs/state-table.md` is a normal event. Decide, with evidence, whether to count real trailing rows instead of hardcoding one — and if you decide not to, say why in the PR.
+4. **Make the failure self-diagnosing.** Whatever survives must, when it fires for this reason, print the actual remedy (`python tools/generate_dashboard.py` and commit) rather than only "is out of date".
+
+### q-fail-open-audit — two more guards return "clean" on the input they exist to catch [TODO]
+
+The campaign's dominant defect class is not "guard missing", it is **guard returns a passing answer on the exact input it was built for**. Round 0903 found two. PR #1620 fixed those two. Here are two more, both brain-verified on `main` at `b14879e28`.
+
+**A — `check_dispatch_log.py` is blind to a round that writes nothing at all.** The repaired guard requires a dispatch row when `docs/state.md` changes:
+
+```python
+if state_base is None or state_head is None or state_base == state_head:
+    return CheckResult(True, detail="state narrative unchanged; dispatch row not required")
+```
+
+A round that never touches `docs/state.md` is therefore never asked for a row. **That is not hypothetical — it just happened twice.** `docs/dispatch-log.md` ends at round **0905**; `docs/state.md`'s newest entry is round **0905**. Rounds **0906 and 0907 both ran** (PR #1622's writeup is dated by kickoff round 0907; PR #1620's body describes its own round-0906 and round-0907 iterations) and left **zero** trace in either file. `grep -n "0906\|0907" docs/state.md docs/dispatch-log.md` returns nothing on `main`; the only mention anywhere is one sentence in `docs/decomp-workflow.md` / `docs/tools-index.md`, added by PR #1621.
+
+Guard 1 (`queue_state_drift.py`) is the only backstop, and its `_STALE_MERGE_TOLERANCE = 2` means a two-PR round slips under it silently — which is exactly the width of a normal round. Work out what a round *cannot* avoid touching and key the requirement on that; explain in the PR why your chosen signal cannot be skipped the way `docs/state.md` was. **Reconstruct the 0906/0907 window as a canary and show the guard green before / red after.**
+
+**C — `queue_state_drift.py`'s anchor regex matches its own output quoted in prose.** `_MAIN_SHA_RE` is `main-sha:\s*`?([0-9a-f]{7,40})`?` and it takes the FIRST match in the current state section. Round 0908's narrative quoted the tool's own message verbatim, so the guard parsed the stale sha out of the sentence describing the stale sha and ignored the real anchor 70 lines below. The brain hit this while writing the round and had to reword the prose. A freshness anchor that can be spoofed by a document describing it is not an anchor; anchor the match to the HTML comment form.
+
+**B — `pool_freshness.py --module` fails OPEN on an unknown module name.** Brain-verified on `40e5d826b`:
+
+```text
+--module overlay002        -> count: 116   bytes: 33948
+--module ov002             -> count: 0     bytes: 0      (no error, exit 0)
+--module not_a_real_module -> count: 0     bytes: 0      (no error, exit 0)
+```
+
+`ov002` is the spelling used in `attempts.tsv`'s own `module` column, in `codegen-walls.md`, and in every 257-320 B kickoff written so far. A lane that types the name it reads everywhere else gets `count: 0` and can reasonably report the pool exhausted. Make an unknown module an error, or resolve the aliases — state which and why. Same canary discipline.
+
+### q-codegen-walls-br-backfill — the band-result ledger stops at BR-9 and three rounds are missing [TODO]
+
+`docs/research/codegen-walls.md`'s BR ledger runs BR-1 … BR-9. Missing: **BR-10** (`cm-257-320-drain-3`, PR #1609), **BR-11** (`cm-257-320-drain-4`, PR #1616), **BR-12** (`cm-257-320-drain-5`, PR #1622). Round 0904 flagged the gap; PR #1622 left it deliberately untouched.
+
+This matters because BR-6 already demonstrated the failure mode: it declared the code frontier "fully characterised" and BR-7 had to correct it. An unbacked ledger is how a stale band claim survives.
+
+**Scope.** Write BR-10/11/12 from the ledger and the three briefs, not from prose. For each: attempted rate, pool rate, module mix, and what the round pre-registered vs. what it got. Then **reconcile the cumulative figure across all seven 257-320 B briefs and pin one number** — drain-5 pins 12/100 = 12.0%; verify it against `attempts.tsv` yourself and say so, or correct it. Where an earlier BR entry is contradicted by a later one, add the correction inline the way BR-9 corrects BR-8 — do not silently overwrite.
+
+⚠️ **Row order in `attempts.tsv` is not chronology** (485 of the rows were batch-backfilled). Order by PR number, and fail toward AMBIGUOUS rather than guessing.
