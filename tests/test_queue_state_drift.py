@@ -2,7 +2,9 @@
 
 from __future__ import annotations
 
+import subprocess
 import sys
+import tempfile
 import unittest
 from pathlib import Path
 
@@ -10,6 +12,7 @@ ROOT = Path(__file__).resolve().parent.parent
 sys.path.insert(0, str(ROOT / "tools"))
 
 from queue_state_drift import (  # noqa: E402
+    main_anchor_checker,
     queue_findings,
     state_findings,
     state_sha_findings,
@@ -152,7 +155,7 @@ class StateShaAnchorTests(unittest.TestCase):
             "<!-- main-sha: 750ad5120 -->\n", lambda _sha: (True, 3),
         )
         self.assertEqual(len(findings), 1)
-        self.assertIn("3 PR-merges behind", findings[0].detail)
+        self.assertIn("3 PR commits behind", findings[0].detail)
 
     def test_stale_anchor_is_flagged(self):
         """The real failure: five PRs landed while state.md sat unchanged."""
@@ -160,7 +163,7 @@ class StateShaAnchorTests(unittest.TestCase):
             "<!-- main-sha: c35d49d8d -->\n", lambda _sha: (True, 5),
         )
         self.assertEqual(len(findings), 1)
-        self.assertIn("5 PR-merges behind", findings[0].detail)
+        self.assertIn("5 PR commits behind", findings[0].detail)
 
     def test_anchor_that_never_landed_is_flagged(self):
         findings = state_sha_findings(
@@ -176,6 +179,60 @@ class StateShaAnchorTests(unittest.TestCase):
 """
         findings = state_sha_findings(state, lambda sha: (True, 0 if sha == "750ad5120" else 9))
         self.assertEqual(findings, [])
+
+
+class RealCommitAnchorCanaryTests(unittest.TestCase):
+    """Pinned to the real handoff-drift failure: round 0903 (PR #1614,
+    commit 050f06c0f) left docs/state.md's `main-sha: 676fed454` anchor
+    unmoved while 8 more PR-numbered commits landed on main. A squash-merge
+    repo has no real merge-commit objects for those PRs, so the pre-repair
+    counter (`git rev-list --merges`) sees 0 and calls the anchor fresh;
+    main_anchor_checker's PR-subject counter correctly sees 8, past the
+    tolerance of 2 -- this is the exact defect guard 1 exists to catch."""
+
+    def test_round_0903_anchor_is_stale_by_eight_pr_commits(self):
+        checker = main_anchor_checker(ROOT, "050f06c0f")
+        is_ancestor, pr_commits_since = checker("676fed454")
+        self.assertTrue(is_ancestor)
+        self.assertEqual(pr_commits_since, 8)
+
+    def test_round_0903_anchor_flags_as_stale_handoff(self):
+        findings = state_sha_findings(
+            "<!-- main-sha: 676fed454 -->\n",
+            main_anchor_checker(ROOT, "050f06c0f"),
+        )
+        self.assertEqual(len(findings), 1)
+        self.assertIn("8 PR commits behind", findings[0].detail)
+
+
+class MainAnchorCheckerTests(unittest.TestCase):
+    def test_counts_pr_numbered_commits_instead_of_merge_commits(self):
+        with tempfile.TemporaryDirectory() as directory:
+            repo = Path(directory)
+            self._git(repo, "init", "-q")
+            self._git(repo, "config", "user.email", "test@example.com")
+            self._git(repo, "config", "user.name", "Test")
+            (repo / "file").write_text("base\n", encoding="utf-8")
+            self._git(repo, "add", "file")
+            self._git(repo, "commit", "-qm", "base")
+            anchor = subprocess.check_output(
+                ["git", "-C", str(repo), "rev-parse", "HEAD"], text=True,
+            ).strip()
+            for subject in (
+                "change one (#101)",
+                "internal maintenance",
+                "Merge pull request #102",
+            ):
+                (repo / "file").write_text(subject + "\n", encoding="utf-8")
+                self._git(repo, "commit", "-qam", subject)
+            checker = main_anchor_checker(repo, "HEAD")
+            self.assertEqual(checker(anchor), (True, 2))
+
+    @staticmethod
+    def _git(repo: Path, *args: str) -> None:
+        subprocess.run(
+            ["git", "-C", str(repo), *args], check=True, capture_output=True,
+        )
 
 
 if __name__ == "__main__":

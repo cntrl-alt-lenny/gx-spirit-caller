@@ -11,6 +11,7 @@ from pathlib import Path
 TOOLS = Path(__file__).resolve().parents[1] / "tools"
 sys.path.insert(0, str(TOOLS))
 
+import pool_freshness  # noqa: E402
 from pool_freshness import (  # noqa: E402
     PoolMeasurement,
     body_call_count,
@@ -21,6 +22,16 @@ from pool_freshness import (  # noqa: E402
 
 
 class TestPoolFreshness(unittest.TestCase):
+    def test_reproducer_uses_target_host_interpreter(self):
+        mac = pool_freshness._reproducer_command(
+            "mac", "--pool", "wall-bl4-small",
+        )
+        windows = pool_freshness._reproducer_command(
+            "windows", "--pool", "wall-bl4-small",
+        )
+        self.assertTrue(mac.startswith("python3.13 tools/pool_freshness.py"))
+        self.assertTrue(windows.startswith("python tools/pool_freshness.py"))
+
     def test_body_call_count_only_counts_exact_bl_and_blx(self):
         with tempfile.TemporaryDirectory() as tmp_dir:
             assembly = Path(tmp_dir) / "func.s"

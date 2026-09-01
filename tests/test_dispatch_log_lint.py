@@ -35,16 +35,54 @@ class DispatchLogTextTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertIn("0901", result.detail)
 
-    def test_incidental_state_edit_does_not_trigger(self):
+    def test_narrative_edit_outside_last_updated_still_triggers(self):
         before = _state("0900") + "incident before\n"
         after = _state("0900") + "incident after\n"
         result = check_dispatch_log.check_texts(before, after, _log(["0900"]), _log(["0900"]))
+        self.assertFalse(result.ok)
+        self.assertIn("docs/state.md narrative changed", result.detail)
+
+    def test_unchanged_state_does_not_trigger(self):
+        state = _state("0900")
+        result = check_dispatch_log.check_texts(state, state, _log(["0900"]), _log(["0900"]))
         self.assertTrue(result.ok)
         self.assertIn("not required", result.detail)
 
     def test_duplicate_round_id_is_not_new_evidence(self):
         result = check_dispatch_log.check_texts(_state("0900"), _state("0901", detail="new"), _log(["0900"]), _log(["0900", "0900"]))
         self.assertFalse(result.ok)
+
+    def test_not_a_round_trailer_opts_out_of_the_row_requirement(self):
+        result = check_dispatch_log.check_texts(
+            _state("0900"), _state("0900", detail="housekeeping"),
+            _log(["0900"]), _log(["0900"]),
+            "housekeeping: archive old sections (#1610)\n\nNot-A-Round: true\n",
+        )
+        self.assertTrue(result.ok)
+        self.assertIn("Not-A-Round: true", result.detail)
+
+    def test_trailer_must_match_exactly_not_settable_by_accident(self):
+        result = check_dispatch_log.check_texts(
+            _state("0900"), _state("0900", detail="housekeeping"),
+            _log(["0900"]), _log(["0900"]),
+            "this round is not a round, true story\n",
+        )
+        self.assertFalse(result.ok)
+
+    def test_trailer_is_honoured_regardless_of_content_shape(self):
+        """The guard trusts the declaration wherever it appears -- it does not
+        try to tell round narrative from housekeeping prose itself (that was
+        tried and failed, see queue_state_drift's heading-only variant).
+        A falsely-declared round is a review-time problem, not this guard's;
+        see test_round_0903_stays_blocked_without_a_declared_trailer below
+        for the real case this guard exists to catch."""
+        result = check_dispatch_log.check_texts(
+            _state("0900"), _state("0901", detail="new"),
+            _log(["0900"]), _log(["0900"]),
+            "round 0901\n\nNot-A-Round: true\n",
+        )
+        self.assertTrue(result.ok)
+        self.assertIn("Not-A-Round: true", result.detail)
 
 
 class DispatchLogRepositoryTests(unittest.TestCase):
@@ -76,6 +114,69 @@ class DispatchLogRepositoryTests(unittest.TestCase):
     @staticmethod
     def _git(repo: Path, *args: str) -> None:
         subprocess.run(["git", "-C", str(repo), *args], check=True, capture_output=True)
+
+
+_REPO_ROOT = _TOOLS.parent
+_HOUSEKEEPING_SHAS = ("19296d3fa", "41930febd", "55cada2d2")
+
+
+def _show_at(ref: str, path: str) -> str | None:
+    result = subprocess.run(
+        ["git", "-C", str(_REPO_ROOT), "show", f"{ref}:{path}"],
+        capture_output=True, text=True, check=False,
+    )
+    return result.stdout if result.returncode == 0 else None
+
+
+def _commit_message(sha: str) -> str:
+    result = subprocess.run(
+        ["git", "-C", str(_REPO_ROOT), "log", "-1", "--format=%B", sha],
+        capture_output=True, text=True, check=False,
+    )
+    return result.stdout if result.returncode == 0 else ""
+
+
+class AcceptanceTableTests(unittest.TestCase):
+    """Pinned to the five real commits round 0907 named. Each housekeeping
+    commit must pass WITH a declared opt-out and FAIL without one; round
+    0903 (PR #1614, the defect this guard exists to catch) must fail no
+    matter what -- no trailer is applied to it, real or synthetic; round
+    0905 (PR #1619) must pass without needing the opt-out at all."""
+
+    def test_housekeeping_commits_pass_with_declared_opt_out_fail_without(self):
+        for sha in _HOUSEKEEPING_SHAS:
+            with self.subTest(sha=sha):
+                state_base = _show_at(f"{sha}^", "docs/state.md")
+                state_head = _show_at(sha, "docs/state.md")
+                log_base = _show_at(f"{sha}^", "docs/dispatch-log.md")
+                log_head = _show_at(sha, "docs/dispatch-log.md")
+                real_message = _commit_message(sha)
+                self.assertTrue(real_message, f"could not read commit message for {sha}")
+
+                without = check_dispatch_log.check_texts(
+                    state_base, state_head, log_base, log_head, real_message,
+                )
+                self.assertFalse(without.ok, f"{sha} unexpectedly passed without opt-out")
+
+                withit = check_dispatch_log.check_texts(
+                    state_base, state_head, log_base, log_head,
+                    real_message + "\n\nNot-A-Round: true\n",
+                )
+                self.assertTrue(withit.ok, f"{sha} unexpectedly failed with opt-out")
+
+    def test_round_0903_stays_blocked_without_a_declared_trailer(self):
+        """Before/after canary: this is the exact tool behaviour from before
+        this round (guard fires) re-run against the unmodified real commit
+        after the opt-out feature was added -- still fires, because #1614's
+        real commit message carries no `Not-A-Round: true` trailer."""
+        result = check_dispatch_log.check_repository(_REPO_ROOT, "050f06c0f^", "050f06c0f")
+        self.assertFalse(result.ok)
+        self.assertIn("no newly-added round id", result.detail)
+
+    def test_round_0905_passes_without_needing_the_opt_out(self):
+        result = check_dispatch_log.check_repository(_REPO_ROOT, "6ab979c3c^", "6ab979c3c")
+        self.assertTrue(result.ok)
+        self.assertIn("0905", result.detail)
 
 
 if __name__ == "__main__":

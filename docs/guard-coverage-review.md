@@ -24,7 +24,7 @@ checkout.
 | `test_audit_callsite_arity.py` committed provenance | Missing provenance artifact | FIRES-CORRECTLY; missing-artifact skip removed |
 | `test_permute_batch.py` committed worklist | Missing real target worklist | FIRES-CORRECTLY; missing-artifact skip removed |
 | `test_scaffold_batch.py` live EUR config | Missing `config/eur/arm9` | FIRES-CORRECTLY; missing-config skip removed |
-| `test_install_git_hooks.py` pre-push mode | Non-executable temp file | Platform-scoped: negative predicate confirmed on Windows; full mode assertion runs on Linux |
+| `test_install_git_hooks.py` pre-push mode | Non-executable temp file | INSTALLER-ONLY |
 
 The six changes that remove skips are deliberate fail-closed fixes: these
 artifacts are committed inputs in this repository, so their absence must not
@@ -33,3 +33,8 @@ remain intentionally skipped because those inputs are untracked environment
 prerequisites rather than committed repository invariants.
 
 After the audit, the clean tree is re-run through the full suite and Ruff.
+
+This table records whether a guard is INSTALLED, not whether it FIRES.
+A row here cannot be cited as evidence that a guard catches anything.
+Only a behavioural canary — the guard shown green on a known-bad input,
+then red on the same input after a fix — is that evidence.

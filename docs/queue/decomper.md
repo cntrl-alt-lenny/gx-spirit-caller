@@ -3062,7 +3062,7 @@ this item.
 Verify every claim against `git diff --stat`. When #1615 is green, mark it:
 `python tools/work_queue.py done decomper q-ci-test-visibility`.
 
-### q-handoff-guard-repair — both handoff guards are inert, and one is unreachable by construction [TODO]
+### q-handoff-guard-repair — both handoff guards are inert, and one is unreachable by construction [DONE]
 
 Round 0903's own bookkeeping silently never happened — no round heading, no
 `main-sha` bump, no dispatch row — and **both guards that exist to catch that

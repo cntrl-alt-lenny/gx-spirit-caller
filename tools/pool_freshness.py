@@ -10,6 +10,7 @@ from __future__ import annotations
 import argparse
 import json
 import re
+import shlex
 import subprocess
 import sys
 from dataclasses import asdict, dataclass, field
@@ -35,6 +36,13 @@ _POOL_FIGURE_RE = re.compile(
 )
 _BARE_POOL_COUNT_RE = re.compile(r"\*\*(?P<count>[0-9][0-9,]*)\*\*")
 _DATE_RE = re.compile(r"(?P<date>20[0-9]{2}-[0-9]{2}-[0-9]{2})")
+_TARGET_INTERPRETERS = {"windows": "python", "mac": "python3.13"}
+
+
+def _reproducer_command(target_host: str | None, *args: str) -> str:
+    """Render a command using an interpreter available to its target host."""
+    interpreter = _TARGET_INTERPRETERS.get(target_host, sys.executable)
+    return shlex.join([interpreter, "tools/pool_freshness.py", *args])
 
 
 @dataclass(frozen=True)
@@ -69,7 +77,7 @@ def _revision(root: Path = ROOT) -> str:
     return result.stdout.strip()
 
 
-def _data_string_pool(version: str) -> PoolMeasurement:
+def _data_string_pool(version: str, target_host: str | None) -> PoolMeasurement:
     config_dir = data_worklist.ROOT / "config" / version
     if not config_dir.is_dir():
         raise ValueError(f"unknown data-worklist version: {version}")
@@ -87,9 +95,8 @@ def _data_string_pool(version: str) -> PoolMeasurement:
         size_table=sizes,
         shape_filter=DATA_STRING_SHAPES,
     )
-    command = (
-        f"python tools/pool_freshness.py --pool data-string-pool "
-        f"--version {version}"
+    command = _reproducer_command(
+        target_host, "--pool", "data-string-pool", "--version", version,
     )
     return PoolMeasurement(
         pool="data-string-pool",
@@ -130,6 +137,7 @@ def _wall_bl4_pool(
     max_size: int = 192,
     exclude_attempted: bool = True,
     module: str | None = None,
+    target_host: str | None = None,
 ) -> PoolMeasurement:
     if min_size < 0 or min_size > max_size:
         raise ValueError("min_size must be non-negative and no greater than max_size")
@@ -150,13 +158,19 @@ def _wall_bl4_pool(
             "text_size": item["text_size"],
             "bl_blx": item["bl_blx"],
         })
-    size_arg = f" --min-size {min_size}" if min_size else ""
-    module_arg = f" --module {module}" if module is not None else " --all-modules"
-    attempted_arg = " --exclude-attempted" if exclude_attempted else " --no-exclude-attempted"
-    command = (
-        "python tools/pool_freshness.py --pool wall-bl4-small"
-        f"{size_arg} --max-size {max_size}{attempted_arg}{module_arg}"
+    command_args = ["--pool", "wall-bl4-small"]
+    if min_size:
+        command_args.extend(["--min-size", str(min_size)])
+    command_args.extend(["--max-size", str(max_size)])
+    command_args.extend(
+        ["--exclude-attempted"] if exclude_attempted
+        else ["--no-exclude-attempted"]
     )
+    if module is not None:
+        command_args.extend(["--module", module])
+    else:
+        command_args.append("--all-modules")
+    command = _reproducer_command(target_host, *command_args)
     return PoolMeasurement(
         pool="wall-bl4-small",
         count=len(selected),
@@ -188,15 +202,17 @@ def measure_pool(
     min_size: int = 0,
     exclude_attempted: bool = True,
     module: str | None = None,
+    target_host: str | None = None,
 ) -> PoolMeasurement:
     if pool == "data-string-pool":
-        return _data_string_pool(version)
+        return _data_string_pool(version, target_host)
     if pool == "wall-bl4-small":
         return _wall_bl4_pool(
             max_size=max_size,
             min_size=min_size,
             exclude_attempted=exclude_attempted,
             module=module,
+            target_host=target_host,
         )
     raise ValueError(f"unknown pool {pool!r}")
 
@@ -314,6 +330,7 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--min-size", type=int, default=0)
     ap.add_argument("--exclude-attempted", action=argparse.BooleanOptionalAction, default=True)
     ap.add_argument("--module")
+    ap.add_argument("--target-host", choices=tuple(_TARGET_INTERPRETERS))
     ap.add_argument("--all-modules", action="store_true")
     ap.add_argument("--json", action="store_true")
     ap.add_argument("--check-queue", type=Path)
@@ -335,6 +352,7 @@ def main(argv: list[str] | None = None) -> int:
         min_size=args.min_size,
         exclude_attempted=args.exclude_attempted,
         module=module,
+        target_host=args.target_host,
     )
     _print_measurement(measurement, as_json=args.json)
     if args.check_queue:
