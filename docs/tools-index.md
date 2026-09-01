@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**152 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**153 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (75)
+- [Uncategorised](#uncategorised) (76)
 
 ## Analysis / worklist
 
@@ -714,6 +714,12 @@ Merge a list of reviewed branches into the current integration branch with the r
 **a pre-send gate on agent kickoff text (R&D r8, §4).**
 
 The 3-region `gate3.py` is our *merge* gate — the strongest possible arbiter of correctness. But it fires only after an agent has already spent its hour. The recurring void-work incidents (b576 transcription-without-invariant, b589 wrong…
+
+### `tools/lane_report.py`
+
+**recover a finished lane's final report without a manual paste.**
+
+The brain needs one thing when a lane finishes: the lane's own final message. Repository state alone cannot supply it. Round 0906 proved that concretely — the Scaffolder produced zero commits, and `git status` could not distinguish "corr…
 
 ### `tools/ledger_analytics.py`
 

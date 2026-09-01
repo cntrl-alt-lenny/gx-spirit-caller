@@ -423,6 +423,71 @@ when Claude Code reads `.claude/settings.json`. Raw `git` from a
 terminal uses `.githooks/pre-push` (the installer above); Claude
 Code uses both paths and checks complementarily.
 
+## Lane report recovery
+
+When a lane finishes, the brain needs one artifact: the lane's own
+final message. Repository state cannot substitute for it. Round 0906
+is the canary — the Scaffolder produced **zero commits**, and nothing
+in `git status` could distinguish *"correctly paused because the brain
+held the compiler lock"* from *"failed to do any work"*. Only its final
+message carried that, and it said the first.
+
+So the brain must never infer "nothing happened" from an empty diff,
+and never default to asking the user to paste. Recovery has three
+layers, in order:
+
+1. **The shared inbox artifact** —
+   `<repo-shared-git-dir>/agent-inbox/<role>-latest.md`. Provider-neutral
+   and canonical. Written today by the Claude Code Stop hook described
+   above; the long-term aim is that every lane writes this itself,
+   whatever harness it runs in, at which case layers 2 and 3 stop mattering.
+2. **Provider transcript recovery** — `tools/lane_report.py`, the
+   fallback that reads the harness's own on-disk session store for
+   whichever provider ran that lane. This is what makes an already-finished
+   report recoverable when layer 1 was never written.
+3. **UNKNOWN** — and a manual paste request. A report that cannot be
+   recovered is UNKNOWN. It is never evidence that the lane did nothing.
+
+```bash
+python3.13 tools/lane_report.py --probe            # what is installed here
+python3.13 tools/lane_report.py --role scaffolder  # walk the layers
+```
+
+Exit codes: `0` recovered, `3` UNKNOWN (paste required), `4` ambiguous,
+`2` usage error.
+
+### Provider capability, by class
+
+Which providers are usable is a property of the harness, not of this
+repository. Machine-specific paths belong in
+`<repo-shared-git-dir>/agent-inbox/providers.local.json`, which lives
+inside `.git/` and is therefore never committed. Do not record them
+here or in `docs/state.md`.
+
+| provider | recovery | mechanism |
+| --- | --- | --- |
+| Claude Code | automatic | Stop hook writes layer 1 directly; per-session transcript also readable as a fallback |
+| Codex | automatic | per-session rollout log; each finished turn records the final agent message as a first-class field |
+| Antigravity | **manual paste** | conversation store exposes no workspace or cwd, so no lane can be proven |
+
+Antigravity is refused rather than guessed. Its store is readable, but
+it carries nothing that ties a conversation to a worktree, so any answer
+would be a guess about *which* lane — the one error this tool must not
+make.
+
+### Matching rules
+
+The tool never takes "the newest chat on the machine", and it does not
+accept a session merely because that session *mentions* a lane — the
+brain and the sibling lane both do that constantly, and an early build
+of this tool duly returned the brain's own session as the Scaffolder
+report. A session qualifies only if it was **addressed as** the lane:
+the kickoff header in a user-authored turn, or a working directory
+inside a worktree named for the role. Branch and worktree mentions are
+corroboration, never qualification. Worktree geometry comes from
+`git worktree list`, so no path is hardcoded. When more than one session
+still qualifies, the tool reports the ambiguity instead of picking.
+
 ## What a PR means in this setup
 
 A pull request is just a git branch with a note attached. The flow is:
