@@ -331,6 +331,28 @@ def scan_codex(roots: list[Path], role: str, scope: list[Path],
 # --- layer 2b: claude code ---------------------------------------------------
 
 
+def _project_slug(path) -> str:
+    """Encode a cwd the way Claude Code names its project directory.
+
+    Round 0908 correction. This used to be str(p).replace("/", "-"),
+    which is a no-op on Windows: str(Path) yields backslash separators
+    and a drive colon, so the computed slug kept its original form while
+    the real store holds "C--Users-...". Verified against the live store
+    on the Windows brain host -- the intersection with the real project
+    directories was EMPTY and scan_claude returned 0 hits for a role
+    whose directory exists. That made lane_report blind on the
+    coordinating machine, the same path-separator class as the
+    load_module_sections bug in PR #1580.
+
+    Each of forward slash, backslash and colon becomes "-", which is why
+    a Windows drive letter renders as a double dash.
+    """
+    text = str(path)
+    for separator in ("/", '\\', ":"):
+        text = text.replace(separator, "-")
+    return text
+
+
 def _slug_to_path(slug: str) -> str:
     # Claude Code names a project directory after the cwd with separators
     # replaced by '-'. The transform is lossy (a literal '-' is indistinguishable
@@ -343,7 +365,7 @@ def scan_claude(roots: list[Path], role: str, scope: list[Path],
                 since: datetime | None) -> list[Report]:
     """Claude Code writes ~/.claude/projects/<cwd-slug>/<session-id>.jsonl."""
     found: list[Report] = []
-    scope_slugs = {str(p).replace("/", "-") for p in scope}
+    scope_slugs = {_project_slug(p) for p in scope}
     for root in roots:
         if not root.is_dir():
             continue
