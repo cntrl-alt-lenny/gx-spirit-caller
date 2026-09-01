@@ -35,10 +35,16 @@ class DispatchLogTextTests(unittest.TestCase):
         self.assertTrue(result.ok)
         self.assertIn("0901", result.detail)
 
-    def test_incidental_state_edit_does_not_trigger(self):
+    def test_narrative_edit_outside_last_updated_still_triggers(self):
         before = _state("0900") + "incident before\n"
         after = _state("0900") + "incident after\n"
         result = check_dispatch_log.check_texts(before, after, _log(["0900"]), _log(["0900"]))
+        self.assertFalse(result.ok)
+        self.assertIn("docs/state.md narrative changed", result.detail)
+
+    def test_unchanged_state_does_not_trigger(self):
+        state = _state("0900")
+        result = check_dispatch_log.check_texts(state, state, _log(["0900"]), _log(["0900"]))
         self.assertTrue(result.ok)
         self.assertIn("not required", result.detail)
 

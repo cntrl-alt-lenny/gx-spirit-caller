@@ -43,6 +43,11 @@ _ACTIVE_RE = re.compile(
 _PARKED_TITLE_RE = re.compile(r"\[parked\]|\bPARKED\b")
 _PARKED_DECL_RE = re.compile(r"parked-prs:\s*([0-9,\s]+)", re.I)
 _MAIN_SHA_RE = re.compile(r"main-sha:\s*`?([0-9a-f]{7,40})`?", re.I)
+# Squash merges land on main as ordinary commits, so `git rev-list --merges`
+# cannot count them. GitHub's squash-merge subject includes the PR number;
+# retain the ordinary merge form for historical ranges that still contain
+# merge commits.
+_PR_SUBJECT_RE = re.compile(r"(?:\(#\d+\)|\bMerge pull request #\d+\b)", re.I)
 # The state doc is written BEFORE its own doc-PR merges, so at write time the
 # anchor names the current tip and main later gains that merge. A round can
 # legitimately need a follow-up bookkeeping PR (round 0808 needed two: the
@@ -141,7 +146,7 @@ def is_parked(pr: dict, declared: set[int] | None = None) -> bool:
 def state_sha_findings(state_text: str, anchor_checker) -> list[Finding]:
     """Verify docs/state.md's `main-sha:` anchor still describes the tip.
 
-    `anchor_checker(sha)` returns (is_ancestor, merges_since) for the ref.
+    `anchor_checker(sha)` returns (is_ancestor, pr_commits_since) for the ref.
     This catches a stale handoff doc even when it makes no PR-count claim —
     the failure mode that let state.md sit five merged PRs behind.
     """
@@ -153,17 +158,17 @@ def state_sha_findings(state_text: str, anchor_checker) -> list[Finding]:
             "a stale handoff cannot be detected without one",
         )]
     sha = match.group(1)
-    is_ancestor, merges_since = anchor_checker(sha)
+    is_ancestor, pr_commits_since = anchor_checker(sha)
     if not is_ancestor:
         return [Finding(
             "state", "docs/state.md",
             f"`main-sha: {sha}` is not an ancestor of the ref — the anchor "
             "names a commit that never landed",
         )]
-    if merges_since > _STALE_MERGE_TOLERANCE:
+    if pr_commits_since > _STALE_MERGE_TOLERANCE:
         return [Finding(
             "state", "docs/state.md",
-            f"`main-sha: {sha}` is {merges_since} PR-merges behind the ref "
+            f"`main-sha: {sha}` is {pr_commits_since} PR commits behind the ref "
             f"(tolerance {_STALE_MERGE_TOLERANCE}) — the handoff doc is stale",
         )]
     return []
@@ -211,15 +216,18 @@ def main_artifact_checker(repo: Path, ref: str):
 
 
 def main_anchor_checker(repo: Path, ref: str):
-    """Return (is_ancestor, merges_since) for a candidate anchor sha."""
+    """Return (is_ancestor, pr_commits_since) for a candidate anchor sha."""
     def check(sha: str) -> tuple[bool, int]:
         if _git(repo, "merge-base", "--is-ancestor", sha, ref).returncode != 0:
             return False, 0
-        merges = _git(repo, "rev-list", "--count", "--merges", f"{sha}..{ref}")
-        try:
-            return True, int(merges.stdout.strip() or 0)
-        except ValueError:
-            return True, 0
+        commits = _git(repo, "log", "--format=%s", f"{sha}..{ref}")
+        if commits.returncode != 0:
+            # A failed history query must not make an old handoff look fresh.
+            return True, _STALE_MERGE_TOLERANCE + 1
+        return True, sum(
+            bool(_PR_SUBJECT_RE.search(subject))
+            for subject in commits.stdout.splitlines()
+        )
 
     return check
 

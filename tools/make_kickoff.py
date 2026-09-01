@@ -19,14 +19,18 @@ POOL_BY_ITEM = {"q-pool-freshness-tool": "wall-bl4-small"}
 # One table is the source of truth for lane-to-worktree routing. Windows was
 # brain-verified on 2026-08-22. Mac follows AGENTS.md, but remains explicitly
 # UNVERIFIED until a Mac brain runs and confirms the generated paths.
+def _mac_worktree(role: str) -> str:
+    return f"~/Dev/spirit-caller/claude-{role}-queue"
+
+
 LANE_WORKTREES = {
     "decomper": {
         "windows": "C:/Users/leona/Dev/gx-spirit-caller/decomper",
-        "mac": "~/Dev/spirit-caller/decomper",
+        "mac": _mac_worktree("decomper"),
     },
     "scaffolder": {
         "windows": "C:/Users/leona/Dev/gx-spirit-caller/scaffolder",
-        "mac": "~/Dev/spirit-caller/scaffolder",
+        "mac": _mac_worktree("scaffolder"),
     },
     "kb-map": {
         "windows": "C:/Users/leona/Dev/gx-spirit-caller/kb-map",
@@ -67,13 +71,16 @@ def lane_spec(lane: str, host: str) -> LaneSpec:
     )
 
 
-def _run_pool(pool: str) -> tuple[int, int, str]:
+def _run_pool(pool: str, target_host: str) -> tuple[int, int, str]:
     # `spec.interpreter` names the interpreter the WORKER will type on the
     # target host; it is not necessarily present on the host GENERATING the
     # kickoff. Measuring the live pool is a local action, so it runs under the
     # generator's own interpreter. The REPRODUCER line printed into the kickoff
     # is unaffected: pool_freshness.py emits its own command string.
-    command = [sys.executable, "tools/pool_freshness.py", "--pool", pool]
+    command = [
+        sys.executable, "tools/pool_freshness.py", "--pool", pool,
+        "--target-host", target_host,
+    ]
     result = subprocess.run(
         command,
         cwd=ROOT,
@@ -173,7 +180,7 @@ def render(
     ])
     if item in POOL_BY_ITEM:
         pool = POOL_BY_ITEM[item]
-        count, byte_count, command = _run_pool(pool)
+        count, byte_count, command = _run_pool(pool, host)
         lines.extend([
             f"LIVE POOL {pool}: {count} candidates / {byte_count} B.",
             f"REPRODUCER: {command}",

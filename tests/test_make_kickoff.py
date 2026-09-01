@@ -42,7 +42,16 @@ class TestMakeKickoff(unittest.TestCase):
             branch="codex/pool-kickoff",
         )
         assert "LIVE POOL wall-bl4-small:" in text
-        assert "REPRODUCER: python tools/pool_freshness.py --pool wall-bl4-small" in text
+        expected_interpreter = "python" if CURRENT_HOST == "windows" else "python3.13"
+        assert f"REPRODUCER: {expected_interpreter} tools/pool_freshness.py --pool wall-bl4-small" in text
+
+    def test_mac_lane_paths_point_to_real_worktrees(self):
+        assert make_kickoff.lane_spec("decomper", "mac").worktree == (
+            "~/Dev/spirit-caller/claude-decomper-queue"
+        )
+        assert make_kickoff.lane_spec("scaffolder", "mac").worktree == (
+            "~/Dev/spirit-caller/claude-scaffolder-queue"
+        )
 
     def test_item_without_named_pool_emits_no_number(self):
         text = make_kickoff.generate("scaffolder", "windows", item="q-make-kickoff-generator")

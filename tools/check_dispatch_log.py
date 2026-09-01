@@ -10,7 +10,6 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 _ROUND_ROW_RE = re.compile(r"^\|\s*([0-9]{4}[a-z]?)\s*\|")
-_LAST_UPDATED_RE = re.compile(r"^\*\*Last updated:\*\*")
 
 
 @dataclass(frozen=True)
@@ -41,20 +40,6 @@ def _show(repo: Path, ref: str, path: str) -> str | None:
     return result.stdout if result.returncode == 0 else None
 
 
-def _last_updated_block(text: str | None) -> tuple[str, ...] | None:
-    if text is None:
-        return None
-    lines = text.splitlines()
-    try:
-        start = next(i for i, line in enumerate(lines) if _LAST_UPDATED_RE.match(line))
-    except StopIteration:
-        return None
-    end = start + 1
-    while end < len(lines) and lines[end].strip():
-        end += 1
-    return tuple(lines[start:end])
-
-
 def dispatch_rounds(text: str | None) -> set[str]:
     if text is None:
         return set()
@@ -72,23 +57,21 @@ def check_texts(
     log_head: str | None,
 ) -> CheckResult:
     """Check two base/head snapshots without consulting the live repository."""
-    before = _last_updated_block(state_base)
-    after = _last_updated_block(state_head)
-    if before is None or after is None or before == after:
-        return CheckResult(True, detail="state Last updated block unchanged; dispatch row not required")
+    if state_base is None or state_head is None or state_base == state_head:
+        return CheckResult(True, detail="state narrative unchanged; dispatch row not required")
     added = dispatch_rounds(log_head) - dispatch_rounds(log_base)
     if not added:
         return CheckResult(
             False,
             detail=(
-                "docs/state.md Last updated block changed, but docs/dispatch-log.md "
+                "docs/state.md narrative changed, but docs/dispatch-log.md "
                 "has no newly-added round id"
             ),
         )
     return CheckResult(
         True,
         detail=(
-            "state Last updated block changed; new dispatch round id(s): "
+            "state narrative changed; new dispatch round id(s): "
             + ", ".join(sorted(added))
         ),
     )
