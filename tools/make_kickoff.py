@@ -17,8 +17,12 @@ import kickoff_lint  # noqa: E402
 
 POOL_BY_ITEM = {"q-pool-freshness-tool": "wall-bl4-small"}
 # One table is the source of truth for lane-to-worktree routing. Windows was
-# brain-verified on 2026-08-22. Mac follows AGENTS.md, but remains explicitly
-# UNVERIFIED until a Mac brain runs and confirms the generated paths.
+# brain-verified on 2026-08-22. Mac decomper/scaffolder were confirmed live
+# by a Mac brain on 2026-09-07 (both are real worktrees under
+# ~/Dev/spirit-caller/). kb-map and kb-types have never been confirmed on
+# either host; their entries below are unverified placeholders, and
+# VERIFIED_WORKTREES below is what actually gates generation -- adding a row
+# here is not enough to make it emittable.
 def _mac_worktree(role: str) -> str:
     return f"~/Dev/spirit-caller/claude-{role}-queue"
 
@@ -43,6 +47,23 @@ LANE_WORKTREES = {
 }
 LANES = tuple(LANE_WORKTREES)
 
+# (lane, host) pairs a brain has actually confirmed resolve to a real
+# worktree. This is the defect class fix: kb-map/kb-types' mac paths were
+# hand-typed guesses that pointed at directories which do not exist, and
+# nothing stopped the generator from sending a worker there. A path
+# existence check on disk cannot do this job -- the generator commonly runs
+# on a different host (or in CI) than the one the emitted path names, so
+# "verified" is a fact a brain records here after actually checking, not
+# something computed at generation time. Any lane/host added to
+# LANE_WORKTREES without a matching entry here stays unverified and
+# generation for it is refused.
+VERIFIED_WORKTREES = {
+    ("decomper", "windows"), ("decomper", "mac"),
+    ("scaffolder", "windows"), ("scaffolder", "mac"),
+    ("kb-map", "windows"),
+    ("kb-types", "windows"),
+}
+
 
 @dataclass(frozen=True)
 class LaneSpec:
@@ -54,7 +75,8 @@ class LaneSpec:
 
 
 class GenerationError(RuntimeError):
-    """The requested skeleton failed its own required lint."""
+    """The generator refused: an unverified worktree, or a skeleton that
+    failed its own required lint."""
 
 
 def lane_spec(lane: str, host: str) -> LaneSpec:
@@ -62,6 +84,12 @@ def lane_spec(lane: str, host: str) -> LaneSpec:
         raise ValueError(f"unknown lane {lane!r}; choose from {', '.join(LANES)}")
     if host not in {"windows", "mac"}:
         raise ValueError("host must be windows or mac")
+    if (lane, host) not in VERIFIED_WORKTREES:
+        raise GenerationError(
+            f"{lane}/{host} worktree path is unverified -- a brain must confirm "
+            f"{LANE_WORKTREES[lane][host]!r} is a real worktree and add "
+            f"({lane!r}, {host!r}) to VERIFIED_WORKTREES before this can be emitted"
+        )
     return LaneSpec(
         lane=lane,
         host=host,

@@ -181,6 +181,30 @@ class StateShaAnchorTests(unittest.TestCase):
         self.assertEqual(findings, [])
 
 
+class RealCommitAnchorCanaryTests(unittest.TestCase):
+    """Pinned to the real handoff-drift failure: round 0903 (PR #1614,
+    commit 050f06c0f) left docs/state.md's `main-sha: 676fed454` anchor
+    unmoved while 8 more PR-numbered commits landed on main. A squash-merge
+    repo has no real merge-commit objects for those PRs, so the pre-repair
+    counter (`git rev-list --merges`) sees 0 and calls the anchor fresh;
+    main_anchor_checker's PR-subject counter correctly sees 8, past the
+    tolerance of 2 -- this is the exact defect guard 1 exists to catch."""
+
+    def test_round_0903_anchor_is_stale_by_eight_pr_commits(self):
+        checker = main_anchor_checker(ROOT, "050f06c0f")
+        is_ancestor, pr_commits_since = checker("676fed454")
+        self.assertTrue(is_ancestor)
+        self.assertEqual(pr_commits_since, 8)
+
+    def test_round_0903_anchor_flags_as_stale_handoff(self):
+        findings = state_sha_findings(
+            "<!-- main-sha: 676fed454 -->\n",
+            main_anchor_checker(ROOT, "050f06c0f"),
+        )
+        self.assertEqual(len(findings), 1)
+        self.assertIn("8 PR commits behind", findings[0].detail)
+
+
 class MainAnchorCheckerTests(unittest.TestCase):
     def test_counts_pr_numbered_commits_instead_of_merge_commits(self):
         with tempfile.TemporaryDirectory() as directory:
