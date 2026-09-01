@@ -3061,3 +3061,70 @@ this item.
 
 Verify every claim against `git diff --stat`. When #1615 is green, mark it:
 `python tools/work_queue.py done decomper q-ci-test-visibility`.
+
+### q-handoff-guard-repair — both handoff guards are inert, and one is unreachable by construction [TODO]
+
+Round 0903's own bookkeeping silently never happened — no round heading, no
+`main-sha` bump, no dispatch row — and **both guards that exist to catch that
+are inert**. PR #1615's `unittest` gap was the same class; this is the third
+"documented, installed, inert" finding in three rounds, so the pattern is the
+target, not just these two instances.
+
+**GUARD 1 — `tools/queue_state_drift.py` is unreachable by construction.** It
+measures anchor staleness with `git rev-list --count --merges <anchor>..<ref>`.
+The repo has squash-merged exclusively since 2026-08-25 (`efb512d32` is the
+last real merge commit), so `merges_since` is **always 0** and the
+`_STALE_MERGE_TOLERANCE` branch can never be taken. Brain-measured on `main`
+at `1592a2568`:
+
+    git rev-list --count --merges efb512d32..HEAD   ->  0
+    git rev-list --count efb512d32..HEAD            ->  36
+
+and `main_anchor_checker(Path('.'), 'HEAD')` returns `(True, 0)` — "fresh, zero
+behind" — for anchors `0b2f8c630` (what `docs/state.md` carries), `676fed454`
+(what round 0903 left stale) and `efb512d32` alike.
+
+**GUARD 2 — `tools/check_dispatch_log.py` keys off one paragraph.** It requires
+a dispatch row only when the `**Last updated:**` *block* changes (that line
+through the next blank line). A round appending its narrative anywhere else in
+`docs/state.md` skips the requirement silently, which is exactly what happened.
+
+**NEITHER IS WIRED INTO CI.** `.github/workflows/generated-files-drift.yml`
+runs the three index `--check`s plus `validate_attempts.py` and nothing else.
+
+Fix both so they measure what they claim — count squash-merge commits (or
+PR-numbered subjects), not `--merges`; key guard 2 on the round narrative
+changing at all — and wire both into CI, naming the workflow and why.
+
+⚠️ **`docs/guard-coverage-review.md` is not evidence.** It lists
+`test_install_git_hooks.py` as FIRES-CORRECTLY while the pre-push hook it
+installs was inert for its entire life — it audited the installer, not the
+behaviour. Add a line saying the table cannot be cited as proof a guard fires.
+
+**CANARY, control 7, non-negotiable, BEFORE the fix.** For EACH guard,
+reconstruct the round-0903 tree (anchor `676fed454`, `main` at `050f06c0f`, no
+`0903` dispatch row) and show the guard GREEN on that input — failing to catch
+a handoff that was genuinely broken — then RED on the same input after the fix.
+If either is already RED before the fix, the model of the bug is wrong: STOP
+and report that.
+
+**Two boundary defects found by the brain in round 0905, take them after the
+guards.** (a) `tools/pool_freshness.py` hardcodes `python tools/pool_freshness.py …`
+as its own REPRODUCER output regardless of host, so a Mac-host kickoff prints a
+reproducer the Mac cannot run. (b) `tools/make_kickoff.py`'s `LANE_WORKTREES`
+mac paths (`~/Dev/spirit-caller/decomper`, `~/Dev/spirit-caller/scaffolder`) do
+not exist on the Mac — the real lane worktrees are `claude-decomper-queue` and
+`claude-scaffolder-queue` — so a generated Mac kickoff would send a lane to a
+nonexistent directory. Fix the paths or make the generator refuse to emit one
+that does not exist; state which.
+
+**BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
+a region.** The other lane owns the compiler this round.
+
+**SUB-AGENTS PERMITTED, READ-ONLY ONLY** — shared worktree; you do all writing,
+committing and git operations.
+
+**Gate:** `python3.13 -m pytest -q tests` green AND `python3.13 -m unittest
+discover -s tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean, plus
+the pasted before/after canary pair for BOTH guards. Verify every claim against
+`git diff --stat origin/main..HEAD`.

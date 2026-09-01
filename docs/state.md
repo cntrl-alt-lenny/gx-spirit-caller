@@ -443,7 +443,7 @@ is not evidence against it: that table lists `test_install_git_hooks.py` as
 FIRES-CORRECTLY while the hook it installs was inert for its entire life — it
 audited the installer, not the behaviour. Seeded as `q-handoff-guard-repair`.
 
-**Last updated:** 2026-09-04 — **(Windows PC, brain=Opus 5; both lanes Claude
+**Round 0904 (2026-09-04, Windows PC, brain=Opus 5; both lanes Claude
 Sonnet 5 at `max` effort.) Round 0904: the 257-320 B band is not one pool but
 two, and the round spent 16 of 17 attempts on the wrong one. Both lanes
 reported their own limits accurately; the brain's contribution was to put
@@ -582,7 +582,105 @@ Claude Code and both transcripts were read.
 Neither lane's report contradicted the artefacts, and neither overstated a
 result. Both surfaced their own limits before the brain asked.
 
-<!-- main-sha: 0b2f8c630 -->
+**Last updated:** 2026-09-05 — **(Mac M1, brain=Opus 5; both lanes on the
+same Mac — scaffolder toolchain-bound, decomper build-free.) Round 0905: the
+brain moved to the Mac, unblocked and merged the PR round 0904 held, and found
+that the ov002 m2c blocker is a property of the Windows PC rather than of the
+tool.**
+
+Merged **PR #1615**. `main` at `5b865162b`. No region percentage moved: the
+merge touches tests, CI and tooling only, and no build input.
+
+✅ **PR #1615 IS UNBLOCKED AND MERGED — both held defects were real, both are
+fixed, and the reserved `python3.13` pin was never implicated.** Round 0904
+held it on a red required `unittest` check and returned the item to the lane.
+The brain fixed it on the lane's branch instead (fast-forward push, not a
+force, per the round-0824c precedent), because both defects were one line each
+and a lane-round is worth more than that:
+
+1. `.github/workflows/tests.yml` — the `unittest` job used a bare
+   `actions/checkout` while eight other workflows pin `fetch-depth: 0`. Added,
+   with the reason inline, mirroring `generated-files-drift.yml`.
+2. `tools/make_kickoff.py` — `_run_pool` executed `spec.interpreter`, which
+   names the interpreter the WORKER will type on the TARGET host, not one that
+   exists on the host generating the kickoff. Now `sys.executable`.
+
+⚠️ **Round 0903's reservation was correct to make and is intact.** Changing the
+`python3.13` pin needed the Mac; the brain had the Mac and verified the pin is
+untouched — `lane_spec('scaffolder','mac').interpreter` is still `python3.13`,
+and the emitted `REPRODUCER` line is unchanged because `pool_freshness.py`
+prints its own hardcoded command string rather than echoing its invoker. The
+interpreter the kickoff NAMES and the interpreter the generator RUNS are
+separate concerns, and conflating them was the whole defect.
+
+⚠️ **The defect is host-independent, not Linux-specific as reported.** It
+reproduces on macOS too, and with the OPPOSITE missing interpreter
+(`FileNotFoundError: 'python'` for `host='windows'`), because the failing test
+pins the target host rather than the running one. CI's `python3.13` report was
+one symptom of a two-sided bug.
+
+⚠️ **BRAIN FINDING: the `m2ctx.py` gcc blocker is a property of the Windows PC,
+not of the tool — and this round's drain target is exactly the pool it hits.**
+Round 0904 recorded that `build_context('eur','ov002')` raises
+`FileNotFoundError [WinError 2]`. On this Mac `/usr/bin/gcc` exists as the
+Apple clang shim, and the call returns a real context file:
+
+| call | result |
+| --- | --- |
+| `build_context('eur','ov002')` | `build/eur/_m2c_ctx/ov002_core.ctx.c`, **5,035 B**, exists |
+| `build_context('eur','main')` | `None` — no core header, correct |
+
+So `cm-257-320-drain-5` is the first ov002 tranche to run WITH an m2c compile
+context, and round 0904's explanation of why drain-4 was unaffected is
+confirmed from the other direction. `context_error` is still written at
+`cmatch_loop.py:361` and read nowhere, so the fix to surface it stands — the
+Windows PC will still trip it.
+
+**The inert drift guard, re-derived independently on current `main`.**
+`git rev-list --count --merges efb512d32..HEAD` is **0** against **36** real
+commits, and `main_anchor_checker` returns `(True, 0)` for anchors `0b2f8c630`,
+`676fed454` and `efb512d32` — 5, ~10 and 36 commits back. The
+`_STALE_MERGE_TOLERANCE` branch is unreachable, exactly as round 0903 said.
+Seeded as a real queue item this round rather than narrative only, which is
+what round 0903's seed was.
+
+⚠️ **UNEXPLAINED: at 22:56 on 2026-08-31 all nine non-brain worktrees were
+hard-reset to `origin/main` by something outside the brain session.** No work
+was lost — every branch involved was already squash-merged, and the pre-reset
+commits remain in reflog — but "this branch is merged" stopped being
+independent evidence for those nine, so the local branch namespace was left
+untouched rather than garbage-collected. Recorded because the next brain will
+see nine branches sitting exactly on `main` and should not read that as proof
+of anything.
+
+**Housekeeping.** The five spent `claude-decomper-batch*` worktrees (round-0822
+sweep dirs, content verified present on `main`, remote branches already deleted
+upstream) were removed, reclaiming ~470 MB. `git worktree remove` left three of
+them half-deleted with ignored build artefacts in place and had to be finished
+by hand — worth knowing before scripting this. The four named lane worktrees
+were deliberately NOT recut to the new `decomper/`/`scaffolder/` naming: the
+rename is cosmetic and the paths are load-bearing in live kickoffs.
+
+⚠️ **`make_kickoff.py`'s Mac lane paths do not exist on this Mac.**
+`LANE_WORKTREES` names `~/Dev/spirit-caller/decomper` and
+`~/Dev/spirit-caller/scaffolder`; the real worktrees are
+`claude-decomper-queue` and `claude-scaffolder-queue`. A generated Mac kickoff
+would send a lane to a nonexistent directory and the location guard would
+correctly STOP it. Both kickoffs this round were hand-written against the real
+paths and pass `kickoff_lint.py` on all eight required checks. Seeded.
+
+**Gate provenance, stated exactly.** The 3-region `gate3.py --scope all` run
+was started against `1592a2568` and PR #1615 merged while it was running. The
+sha1 result carries to `5b865162b` because #1615 touches **no build input** —
+verified by file list: `.github/workflows/`, `docs/`, `tests/`, and two
+`tools/` scripts, with nothing under `src/`, `libs/`, `config/`, `include/` or
+`assets/`. The tree was not re-gated for a change that cannot reach the ROM.
+
+**Control 12 — not yet executable for this round.** The lanes had not run at
+the time of writing; the transcript audit belongs to the review that follows
+their PRs.
+
+<!-- main-sha: 5b865162b -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
