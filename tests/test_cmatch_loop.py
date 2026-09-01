@@ -472,6 +472,26 @@ class TestBuildDossierRegression(unittest.TestCase):
         self.assertIsNotNone(dossier.struct_header_path)
         self.assertIsNotNone(dossier.m2c_skeleton)
 
+    def test_skeleton_does_not_double_declare_u32_for_ov002(self):
+        # Round 0907: ov002_core.h redeclares u8/u16/u32 itself, so
+        # unconditionally also prepending `#include <nitro/types.h>`
+        # produced a guaranteed `identifier 'u32' redeclared` mwcc error
+        # on every single ov002 candidate -- confirmed against a real
+        # compile of func_ov002_022b0198. No shipped .c anywhere in this
+        # tree includes both headers together.
+        func, region, module = "func_ov002_0220448c", "eur", "ov002"
+        delinks_path = cl.delinks_path_for_module(region, module)
+        c_path = cl.src_path(region, module, func)
+        rel = c_path.relative_to(cl.ROOT).as_posix()
+
+        with cl.TemporaryGap({delinks_path: [rel]}):
+            dossier = cl.build_dossier(region, func, module)
+
+        self.assertIsNotNone(dossier.m2c_skeleton)
+        self.assertNotIn("#include <nitro/types.h>", dossier.m2c_skeleton)
+        self.assertIn('#include "ov002_core.h"', dossier.m2c_skeleton)
+        self.assertIn("typedef signed int s32;", dossier.m2c_skeleton)
+
 
 # --------------------------------------------------------------------------- #
 # Brief 620 — scale-validation fixes. Pure logic first.
@@ -541,6 +561,60 @@ void func_x(void *arg0) {\n    ? local;\n    local.unk10 = arg0->unk14;\n    *(&
             "extern ? data_x;\nint f(void) { return data_x.unk0 + data_x.unk0; }\n"
         )
         self.assertEqual(prepared.count("int unk0;"), 1)
+
+    def test_unknown_field_gap_gets_explicit_padding(self):
+        # unk0 and unk10 are 16 bytes apart by name, but two bare `int`
+        # fields only span 8 bytes -- without padding, unk10 (and anything
+        # referencing it) compiles at the wrong struct offset.
+        prepared = cl.prepare_compile_source(
+            "void f(struct M2COuter *arg0) {\n"
+            "    s32 t = arg0->unk0;\n"
+            "    s32 t2 = arg0->unk10;\n"
+            "    arg0->unk0 = t + t2;\n"
+            "}\n"
+        )
+        self.assertIn("char _pad4[12];", prepared)
+        struct_body = prepared.split("struct M2CUnknown {", 1)[1].split(
+            "};", 1
+        )[0]
+        self.assertEqual(
+            [line.strip() for line in struct_body.strip().splitlines()],
+            ["int unk0;", "char _pad4[12];", "int unk10;"],
+        )
+
+    def test_mined_field_access_rewrites_to_byte_offset_cast(self):
+        # Round 0907: m2c's --context feeds it the module core header's
+        # mined per-player field-table structs (Ov002D016c, Ov002Ce288,
+        # etc.), and its draft freely emits NAME.f_XXX / NAME->f_XXX member
+        # access on them -- but those globals are only a real struct under
+        # `#ifdef M2C_CONTEXT_BUILD`; a normal compile sees `extern char
+        # NAME[]` instead (ov002_core.h's own documented reason: ~20
+        # already-shipped TUs cast-offset into the char[] form). Confirmed
+        # against a real mwcc run: "not a struct/union/class". Without a
+        # header, the field width defaults to int; with one, it must use
+        # the field's real declared width so a narrower field doesn't
+        # over-read into its neighbor.
+        draft = "int f(void) { return data_ov002_022ce950.f_0 ^ 1; }\n"
+        no_header = cl.prepare_compile_source(draft)
+        self.assertIn("(*(int *)(data_ov002_022ce950 + 0x0))", no_header)
+        self.assertNotIn(".f_0", no_header)
+
+        header = "struct Ov002022ce950 {\n    u16 f_0;\n    u16 f_2;\n};\n"
+        with_header = cl.prepare_compile_source(draft, header)
+        self.assertIn("(*(u16 *)(data_ov002_022ce950 + 0x0))", with_header)
+        self.assertNotIn(".f_0", with_header)
+
+    def test_already_named_struct_param_retypes_to_scaffold(self):
+        # Round 0907: --context sometimes gives m2c enough to infer a real,
+        # already-named core-header struct (e.g. `struct Ov002Self *arg0`)
+        # for a parameter the body ALSO accesses via `unkNN` fields that
+        # struct doesn't have. Confirmed against a real mwcc run: "'unk2'
+        # is not a member of class 'struct Ov002Self'". The scaffold must
+        # win the same way it already does for the void*/int cases.
+        draft = "void f(struct Ov002Self *arg0) {\n    int x = arg0->unk2;\n}\n"
+        prepared = cl.prepare_compile_source(draft)
+        self.assertIn("struct M2CUnknown *arg0", prepared)
+        self.assertNotIn("Ov002Self", prepared)
 
 
 class TestSRoutedCompleteTu(unittest.TestCase):

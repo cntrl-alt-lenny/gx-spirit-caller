@@ -124,8 +124,36 @@ _ADDRESS_DEREF_RE = re.compile(
     r"\*\(&([A-Za-z_]\w*)\s+\+\s+([^;]+?)\)"
 )
 
+# m2c's --context feeds it every module core-header struct, including the
+# brief-609/613 mined per-player field-table banks (Ov002D016c, Ov002Ce288,
+# etc.) whose fields are named `f_<hex offset>` -- a DIFFERENT convention
+# from the plain `unkNN` scaffold above. Those banks are declared as the
+# real mined struct only under `#ifdef M2C_CONTEXT_BUILD`; a normal (non-
+# context) compile sees the SAME global as `extern char NAME[]` instead
+# (ov002_core.h's own documented reason: the char[] form is what ~20
+# already-shipped TUs cast-offset into, so the struct form can't also be
+# in scope). m2c's context-informed draft still emits `NAME.f_XXX` /
+# `NAME->f_XXX` regardless -- a guaranteed "not a struct/union/class"
+# error confirmed against a real mwcc run (round 0907, 6+ independent
+# ov002 candidates). `TYPE field_name;` in the header names the field's
+# real width; default to `int` (the documented majority case) only when
+# the field can't be found.
+_MINED_FIELD_RE = re.compile(
+    r"\b([A-Za-z_]\w*)\s*(->|\.)\s*f_([0-9A-Fa-f]+)\b"
+)
+_MINED_FIELD_DECL_RE = re.compile(
+    r"^\s*(u8|u16|u32|s8|s16|s32|int|unsigned\s+\w+)\s+f_([0-9A-Fa-f]+)\s*;",
+    re.M,
+)
 
-def prepare_compile_source(source: str) -> str:
+
+def _mined_field_types(header_text: str | None) -> dict[str, str]:
+    if not header_text:
+        return {}
+    return {offset.lower(): ctype for ctype, offset in _MINED_FIELD_DECL_RE.findall(header_text)}
+
+
+def prepare_compile_source(source: str, header_text: str | None = None) -> str:
     """Make an m2c draft syntactically compilable for the first probe.
 
     m2c's `?` and `unkNNN` markers are honest uncertainty markers, not C
@@ -133,6 +161,10 @@ def prepare_compile_source(source: str) -> str:
     distinguish "draft compiled, now iterate on bytes" from "the tool could
     not even create an object". The transformation intentionally preserves
     the function body and does not promise a match.
+
+    `header_text` (the module's own *_core.h, when available) supplies real
+    field widths for the mined `f_<hex>` field-table rewrite above -- pass
+    it whenever the caller has a dossier's struct_header_text on hand.
     """
     field_names = set(_UNKNOWN_FIELD_RE.findall(source))
     field_bases = set(_FIELD_BASE_RE.findall(source))
@@ -141,8 +173,19 @@ def prepare_compile_source(source: str) -> str:
     lines = [
         "struct M2CUnknown {",
     ]
+    # m2c's `unkNN` name IS the field's real byte offset into the struct
+    # (hex). Emitting one sequential `int` per field with no gap makes every
+    # field after the first real gap land 4+ bytes short of its true offset
+    # -- confirmed regression, see the padding-bug canary in this module's
+    # test coverage. Insert explicit padding to close each gap.
+    prev_end = 0
     for field in sorted(field_names, key=lambda item: int(item[3:], 16)):
+        offset = int(field[3:], 16)
+        gap = offset - prev_end
+        if gap > 0:
+            lines.append(f"    char _pad{prev_end:x}[{gap}];")
         lines.append(f"    int {field};")
+        prev_end = offset + 4
     lines.extend(["};", ""])
 
     # Pointer-shaped unknown parameters are more useful as the scaffold type
@@ -157,6 +200,16 @@ def prepare_compile_source(source: str) -> str:
                       f"struct M2CUnknown {name}", text)
         text = re.sub(rf"\bextern int {re.escape(name)}\b",
                       f"extern struct M2CUnknown {name}", text)
+        # --context (build_context()) sometimes gives m2c enough to infer a
+        # real, already-named core-header struct (e.g. `struct Ov002Self
+        # *arg0`) for a parameter the body ALSO accesses via `unkNN` fields
+        # that struct doesn't have -- confirmed against a real mwcc run
+        # ("'unk2' is not a member of class 'struct Ov002Self'", round
+        # 0907). The named type is m2c's inference, not ground truth; the
+        # scaffold wins the same way it already does for the void*/int
+        # cases above.
+        text = re.sub(rf"\bstruct \w+ \*{re.escape(name)}\b",
+                      f"struct M2CUnknown *{name}", text)
 
     # An unknown local passed by address needs the aggregate scaffold too;
     # otherwise a generated `? local` becomes `int local` and cannot satisfy
@@ -176,6 +229,20 @@ def prepare_compile_source(source: str) -> str:
     text = _ADDRESS_DEREF_RE.sub(
         r"*(int *)((char *)&\1 + \2)", text
     )
+
+    # Mined per-player field-table access (see _MINED_FIELD_RE above):
+    # rewrite NAME.f_XXX / NAME->f_XXX into the byte-offset-cast form that
+    # already compiles against the char[]-declared global (matching the
+    # project's own documented convention -- ov002_core.h literally spells
+    # out `CE288->f_5a8 // was *(int*)(data_ov002_022ce288+0x5a8)`).
+    field_types = _mined_field_types(header_text)
+
+    def _mined_field_sub(m: re.Match) -> str:
+        name, offset_hex = m.group(1), m.group(3)
+        ctype = field_types.get(offset_hex.lower(), "int")
+        return f"(*({ctype} *)({name} + 0x{offset_hex}))"
+
+    text = _MINED_FIELD_RE.sub(_mined_field_sub, text)
     return "\n".join(lines) + text
 
 
@@ -240,6 +307,9 @@ class Dossier:
             parts.append("- (module has no consolidated *_core.h)")
         parts.append("")
         parts.append("## m2c draft skeleton")
+        if self.context_error:
+            parts.append(f"_(no --context: {self.context_error} -- drafted "
+                          "context-less, same as a module with no *_core.h)_")
         if self.m2c_skeleton:
             if self.unresolved_types_patched:
                 parts.append(f"_({self.unresolved_types_patched} unresolved-type `?` "
@@ -375,7 +445,30 @@ def build_dossier(region: str, func: str, module: str, *, k: int = 3,
         # matched files do exactly this). Prepending both makes the
         # skeleton what run_m2c's docstring already implies it should
         # be: a drop-in draft, not just decompiler-accurate prose.
-        includes = ["#include <nitro/types.h>"]
+        #
+        # ROUND 0907: unconditionally prepending BOTH is a real, 100%
+        # blocker for any module whose own *_core.h redeclares u8/u16/u32
+        # -- confirmed against a real mwcc run on func_ov002_022b0198 --
+        # `identifier 'u32' redeclared ... was declared as: 'unsigned
+        # long' [nitro/types.h] ... now declared as: 'unsigned int'
+        # [ov002_core.h]`. No shipped .c file in this tree includes both
+        # headers together (checked: 0 of the ~470 files that include
+        # ov002_core.h also include nitro/types.h) -- the two established
+        # patterns are "core header only" or "nitro/types.h only", never
+        # combined. Only add nitro/types.h when the module's own header
+        # does NOT already redeclare these primitives; otherwise fall
+        # back to the project's own third precedent (self-contained local
+        # typedefs, e.g. func_ov002_0220a184.c's `typedef int s32;`) for
+        # just the signed widths the core header omits.
+        header_redeclares_u32 = bool(
+            dossier.struct_header_text
+            and re.search(r"typedef\s+.+\bu32\s*;", dossier.struct_header_text)
+        )
+        if header_redeclares_u32:
+            includes = ["typedef signed char s8;", "typedef signed short s16;",
+                        "typedef signed int s32;", "typedef signed long long s64;"]
+        else:
+            includes = ["#include <nitro/types.h>"]
         if dossier.struct_header_path:
             includes.append(f'#include "{Path(dossier.struct_header_path).name}"')
         dossier.m2c_skeleton = "\n".join(includes) + "\n\n" + raw_skeleton
@@ -701,7 +794,7 @@ def process_candidate(func: str, region: str, state: dict, *,
         # a mechanically scaffolded copy so placeholder types do not abort the
         # first fastmatch probe before it can produce useful feedback.
         if source_override is None:
-            source_text = prepare_compile_source(source_text)
+            source_text = prepare_compile_source(source_text, dossier.struct_header_text)
         c_path, created, previous_content = stage_source(
             region, module, func, source_text, reuse_existing=reuse_existing)
         outcome = compile_and_fastmatch(c_path, region, func)

@@ -1869,3 +1869,19 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203c46c	main	288	default	struct-padding-gap + int*-vs-int retype fixes applied (unk0 as int*, byte-cast +4 pointer arith); compiles at 4.0%, unkB0 needs u16/s16 width (orig uses LDRH) not int -- root cause narrowed but not closed	parked	4.0	structural	PROVISIONAL:structural	cm-257-320-drain-4	2
 0x0203b8fc	main	296	default	7-field struct with scattered offsets (0x4..0xC1, one at an odd non-4-aligned byte offset) needing padding-gap + width derivation, plus an int-to-struct-pointer retype (temp_r4=arg0->unk78 then dereferenced) -- real struct-layout work, not attempted this round beyond the raw skeleton	parked	7.89	structural	PROVISIONAL:structural	cm-257-320-drain-4	1
 0x0203d888	main	316	default	irregular switch + m2c SECOND_REG() 64-bit-return-split pseudo-op + struct-size-scaled pointer offsets (arg0 + 0x470, arg0 + (idx*4)) needing byte-pointer casts -- real struct-layout + intrinsic-expansion work, not attempted this round beyond the raw skeleton	parked	2.15	structural	PROVISIONAL:structural	cm-257-320-drain-4	1
+0x022b0198	ov002	316	default	state-machine-multi-call	parked	3.8	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	1
+0x02214738	ov002	284	default	per-player-row-lookup	parked	25.35	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	3
+0x02252e54	ov002	272	default	per-player-table-scan	parked	2.94	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	3
+0x0221d934	ov002	320	default	per-player-field-switch	parked	2.5	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	2
+0x022b31a4	ov002	292	default	loop-counter-guard	parked	1.37	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	1
+0x02220f48	ov002	264	default	bitfield-extract-branch	parked	14.29	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	1
+0x022214dc	ov002	268	default	per-player-row-lookup	parked	17.91	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	1
+0x0221c5cc	ov002	284	default	per-player-row-lookup	parked	1.41	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	1
+0x02256ac8	ov002	272	default	per-player-row-scan-with-guard	shipped	100			cm-257-320-drain-5	3
+0x02202d5c	ov002	316	default	context-mistyped-self-param	parked	unknown	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	3
+0x021d7ee4	ov002	300	default	per-player-row-lookup	parked	19.74	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	2
+0x0224cac4	ov002	312	default	per-player-dual-loop-scan	parked	unknown	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	3
+0x022674d0	ov002	272	default	per-player-row-lookup	parked	53.52	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	3
+0x0223fa20	ov002	296	default	per-player-row-lookup	parked	3.8	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	2
+0x0221b3d8	ov002	280	default	per-player-row-lookup-switch	parked	17.14	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	3
+0x0222a3e0	ov002	312	default	per-player-row-lookup	parked	17.95	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	2
