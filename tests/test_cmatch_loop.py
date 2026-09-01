@@ -616,6 +616,84 @@ void func_x(void *arg0) {\n    ? local;\n    local.unk10 = arg0->unk14;\n    *(&
         self.assertIn("struct M2CUnknown *arg0", prepared)
         self.assertNotIn("Ov002Self", prepared)
 
+    def test_sub_word_field_spacing_does_not_overlap(self):
+        # Round 0908 correction. The round-0907 padding fix assumed every
+        # field is 4 bytes wide, so a halfword access (`unk2` two bytes
+        # after `unk0`) produced gap = 2 - 4 = -2: no padding, no error,
+        # and unk2 silently declared at byte 4 instead of byte 2 -- the
+        # same silent-wrong-offset class the fix exists to close. Each
+        # field must be sized to the room before the next referenced
+        # offset. 9 files in this tree carry sub-4-byte unkNN spacing.
+        prepared = cl.prepare_compile_source(
+            "void f(struct M2COuter *arg0) {\n"
+            "    arg0->unk0 = 1;\n"
+            "    arg0->unk2 = 2;\n"
+            "    arg0->unk10 = 3;\n"
+            "}\n"
+        )
+        struct_body = prepared.split("struct M2CUnknown {", 1)[1].split(
+            "};", 1
+        )[0]
+        self.assertEqual(
+            [line.strip() for line in struct_body.strip().splitlines()],
+            ["short unk0;", "int unk2;", "char _pad6[10];", "int unk10;"],
+            "a 2-byte-spaced field must not be declared as a 4-byte int",
+        )
+
+    def test_mined_field_width_collision_keeps_the_narrowest(self):
+        # Round 0908 correction. The real ov002_core.h declares 162
+        # f_<hex> fields across several mined banks over 144 distinct
+        # offsets; f_0, f_4 and f_c are each declared BOTH int and u16.
+        # Keying the lookup on the offset alone let the last bank parsed
+        # win, so a u16 field could be read as an int and over-read its
+        # neighbour -- the exact failure the width lookup prevents.
+        header = (
+            "struct BankA {\n"
+            "    int f_4;\n"
+            "};\n"
+            "struct BankB {\n"
+            "    u16 f_4;\n"
+            "};\n"
+        )
+        self.assertEqual(cl._mined_field_types(header), {"4": "u16"})
+        # Both declaration orders must give the same answer: a "last bank
+        # parsed wins" implementation passes one order by luck.
+        reversed_header = (
+            "struct BankB {\n"
+            "    u16 f_4;\n"
+            "};\n"
+            "struct BankA {\n"
+            "    int f_4;\n"
+            "};\n"
+        )
+        self.assertEqual(cl._mined_field_types(reversed_header), {"4": "u16"})
+        draft = "int f(void) { return data_x.f_4; }\n"
+        self.assertIn("(*(u16 *)(data_x + 0x4))",
+                      cl.prepare_compile_source(draft, header))
+
+    def test_skeleton_includes_are_testable_without_a_built_tree(self):
+        # Round 0908 correction. The u32-redeclaration fix -- the change
+        # its own writeup calls a 100% compile blocker for every ov002
+        # candidate -- was covered only by a build_dossier test that SKIPS
+        # without a configured EUR build, vendored m2c and
+        # arm-none-eabi-objdump. It is skipped in CI and on the Windows
+        # brain host, and a mutation reverting the fix left the suite
+        # green. The rule is pure string logic and is now exercised here,
+        # where it runs on every host.
+        header = "typedef unsigned int u32;\ntypedef unsigned short u16;\n"
+        self.assertEqual(
+            cl.skeleton_includes("src/overlay002/ov002_core.h", header),
+            ["typedef signed char s8;", "typedef signed short s16;",
+             "typedef signed int s32;", "typedef signed long long s64;",
+             '#include "ov002_core.h"'],
+        )
+        self.assertEqual(
+            cl.skeleton_includes(None, None), ["#include <nitro/types.h>"])
+        self.assertEqual(
+            cl.skeleton_includes("x/foo_core.h", "struct A { int x; };"),
+            ["#include <nitro/types.h>", '#include "foo_core.h"'],
+        )
+
 
 class TestSRoutedCompleteTu(unittest.TestCase):
     """Detects the c-match scenario (already-matched-but-.s) vs. a

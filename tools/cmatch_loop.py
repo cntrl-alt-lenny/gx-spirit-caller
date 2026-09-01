@@ -147,10 +147,63 @@ _MINED_FIELD_DECL_RE = re.compile(
 )
 
 
+def skeleton_includes(struct_header_path, struct_header_text) -> list[str]:
+    """Choose the m2c skeleton's type-declaration preamble.
+
+    Round 0908 correction: this selection used to be inline in
+    `build_dossier`, whose only regression test needs a configured EUR
+    build, vendored m2c and `arm-none-eabi-objdump` -- so it is SKIPPED
+    both in CI and on the Windows brain host, and a mutation reverting the
+    fix left the suite green. The rule is pure string logic, so it is
+    lifted here where it can be tested on any host.
+
+    Prepending `<nitro/types.h>` unconditionally is a 100% compile blocker
+    for any module whose own `*_core.h` redeclares `u32` (mwcc: "identifier
+    'u32' redeclared"). No shipped .c in this tree includes both. When the
+    module header already supplies the unsigned widths, fall back to the
+    project's own third precedent -- self-contained local typedefs for just
+    the signed widths the core header omits.
+    """
+    header_redeclares_u32 = bool(
+        struct_header_text
+        and re.search(r"typedef\s+.+\bu32\s*;", struct_header_text)
+    )
+    if header_redeclares_u32:
+        includes = ["typedef signed char s8;", "typedef signed short s16;",
+                    "typedef signed int s32;", "typedef signed long long s64;"]
+    else:
+        includes = ["#include <nitro/types.h>"]
+    if struct_header_path:
+        includes.append(f'#include "{Path(struct_header_path).name}"')
+    return includes
+
+
+# Round 0908 correction: the real ov002_core.h declares 162 `f_<hex>` fields
+# across several mined banks over only 144 distinct offsets, and three of them
+# (f_0, f_4, f_c) are declared BOTH `int` and `u16` in different banks. Keying
+# the lookup on the offset alone let whichever bank parsed last win, so a
+# 2-byte field could be read as 4 and over-read its neighbour -- exactly the
+# failure this width lookup exists to prevent. Keep the NARROWEST declared
+# width on a collision: reading a field too narrow shows up as a mismatch on
+# the next iteration, over-reading a neighbour silently corrupts the draft.
+_C_WIDTHS = {
+    "u8": 1, "s8": 1, "char": 1, "unsigned char": 1,
+    "u16": 2, "s16": 2, "short": 2, "unsigned short": 2,
+    "u32": 4, "s32": 4, "int": 4, "unsigned int": 4, "unsigned long": 4,
+}
+
+
 def _mined_field_types(header_text: str | None) -> dict[str, str]:
     if not header_text:
         return {}
-    return {offset.lower(): ctype for ctype, offset in _MINED_FIELD_DECL_RE.findall(header_text)}
+    narrowest: dict[str, tuple[int, str]] = {}
+    for ctype, offset in _MINED_FIELD_DECL_RE.findall(header_text):
+        key = offset.lower()
+        normalised = " ".join(ctype.split())
+        width = _C_WIDTHS.get(normalised, 4)
+        if key not in narrowest or width < narrowest[key][0]:
+            narrowest[key] = (width, normalised)
+    return {key: value[1] for key, value in narrowest.items()}
 
 
 def prepare_compile_source(source: str, header_text: str | None = None) -> str:
@@ -178,14 +231,25 @@ def prepare_compile_source(source: str, header_text: str | None = None) -> str:
     # field after the first real gap land 4+ bytes short of its true offset
     # -- confirmed regression, see the padding-bug canary in this module's
     # test coverage. Insert explicit padding to close each gap.
+    # Round 0908 correction: one bare `int` per field assumes every field is
+    # 4 bytes wide, so any halfword or byte access silently OVERLAPS -- `unk2`
+    # after `unk0` gives gap = 2 - 4 = -2, no padding is emitted, no error is
+    # raised, and `unk2` lands at byte 4 instead of byte 2. That is the same
+    # silent-wrong-offset class the padding fix exists to close, and 9 files
+    # in this tree carry unkNN offsets spaced under 4 bytes apart. Size each
+    # field to the room actually available before the next referenced offset.
+    offsets = sorted(int(field[3:], 16) for field in field_names)
+    by_offset = {int(field[3:], 16): field for field in field_names}
     prev_end = 0
-    for field in sorted(field_names, key=lambda item: int(item[3:], 16)):
-        offset = int(field[3:], 16)
+    for index, offset in enumerate(offsets):
         gap = offset - prev_end
         if gap > 0:
             lines.append(f"    char _pad{prev_end:x}[{gap}];")
-        lines.append(f"    int {field};")
-        prev_end = offset + 4
+        room = offsets[index + 1] - offset if index + 1 < len(offsets) else 4
+        width = 4 if room >= 4 else 2 if room >= 2 else 1
+        ctype = {4: "int", 2: "short", 1: "char"}[width]
+        lines.append(f"    {ctype} {by_offset[offset]};")
+        prev_end = offset + width
     lines.extend(["};", ""])
 
     # Pointer-shaped unknown parameters are more useful as the scaffold type
@@ -460,17 +524,8 @@ def build_dossier(region: str, func: str, module: str, *, k: int = 3,
         # back to the project's own third precedent (self-contained local
         # typedefs, e.g. func_ov002_0220a184.c's `typedef int s32;`) for
         # just the signed widths the core header omits.
-        header_redeclares_u32 = bool(
-            dossier.struct_header_text
-            and re.search(r"typedef\s+.+\bu32\s*;", dossier.struct_header_text)
-        )
-        if header_redeclares_u32:
-            includes = ["typedef signed char s8;", "typedef signed short s16;",
-                        "typedef signed int s32;", "typedef signed long long s64;"]
-        else:
-            includes = ["#include <nitro/types.h>"]
-        if dossier.struct_header_path:
-            includes.append(f'#include "{Path(dossier.struct_header_path).name}"')
+        includes = skeleton_includes(
+            dossier.struct_header_path, dossier.struct_header_text)
         dossier.m2c_skeleton = "\n".join(includes) + "\n\n" + raw_skeleton
     except Exception as exc:  # noqa: BLE001 — m2c has many failure modes; the
         # dossier records the failure and proceeds context-less rather than
