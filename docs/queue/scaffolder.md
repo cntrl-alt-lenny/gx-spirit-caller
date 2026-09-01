@@ -2858,3 +2858,35 @@ commit it describes has landed.
 
 ONE PR; verify every number against `git diff --stat`; `python
 tools/work_queue.py done scaffolder cm-257-320-drain-5`.
+
+### cm-257-320-drain-6 — re-run the ov002 sub-pool now that three compile blockers are gone [TODO]
+
+`cm-257-320-drain-5` (PR #1622) shipped **1 of 16 attempted (6.25%)**, all 16 drawn from `ov002` exactly as scoped. Taken at face value that kills the two-pool hypothesis round 0904 dispatched on (`ov002` 6/30 = 20.0% vs `main` 1/34 = 2.9%). **It should not be taken at face value, and this round is the test.**
+
+**WHY THE 6.25% IS A LOWER BOUND, NOT A MEASUREMENT.** Drain-5 found and fixed three real bugs in `cmatch_loop.py`'s auto-scaffold *while draining*, and its own writeup states they "blocked most of this round's compile attempts":
+
+1. `prepare_compile_source` packed `unkNN` fields with no padding for the real byte gap — fixed BEFORE any candidate, so every attempt had it.
+2. **A `u32` redeclaration conflict between `<nitro/types.h>` and `ov002_core.h` — the writeup calls this "a 100% compile blocker for every ov002 candidate."** Found mid-drain.
+3. m2c `--context` field access (`NAME.f_XXX`) on globals that are only structs under `M2C_CONTEXT_BUILD` — "six-plus independent real mwcc failures this round." Found mid-drain.
+
+Bugs 2 and 3 were fixed part-way through a 16-candidate tranche. The 15 parks are therefore a **mixture of candidates measured with a broken scaffold and candidates measured with a fixed one**, and the round reports a single blended rate over both. Brain-recomputed from `attempts.tsv` (16 rows, 34 compile attempts): of the 15 parks, **11 of the 13 with a numeric match sit under 20%**, only two cleared 20% (53.52%, 25.35%), and 2 report `unknown` because they never compiled at all — shapes consistent with a scaffold that mistyped fields, not with a codegen wall.
+
+**SCOPE, IN THIS ORDER.**
+
+1. **Re-attempt all 15 drain-5 parks first, under the current toolchain.** This is the cleanest A/B the campaign has had: same candidates, same lane protocol, one variable changed. The addresses are in `attempts.tsv` under `brief=cm-257-320-drain-5` with `result=parked`. Report their re-attempt rate **separately** from anything else — that number, not a blended one, is what says whether the three fixes matter.
+2. **Then extend to fresh `ov002` candidates to n≈20 total.** Live pool measured on `40e5d826b`: **`overlay002` = 116 candidates / 33,948 B** remaining in the band.
+   REPRODUCER: `python tools/pool_freshness.py --pool wall-bl4-small --min-size 257 --max-size 320 --exclude-attempted --module overlay002`
+   ⚠️ **The module key is `overlay002`, NOT `ov002`.** `--module ov002` returns `count: 0` with no error, and so does `--module not_a_real_module` — the flag fails OPEN (brain-verified on `40e5d826b`). `ov002` is the spelling used in the ledger's own `module` column and in every prior kickoff, so this is a live trap. Do not conclude the pool is empty from a zero; re-run with `--all-modules` and read the breakdown.
+3. **Do NOT take `main` candidates.** If `overlay002` runs dry, stop and report rather than filling from the 2.9% sub-pool.
+
+**THE TOOLCHAIN MOVED AGAIN SINCE DRAIN-5, SO THE A/B IS EVEN CLEANER.** Round 0908's brain audit found and fixed three residual holes in drain-5's own three fixes, all inside `tools/cmatch_loop.py`: (1) the padding fix sized every `unkNN` as 4 bytes, so any halfword access silently overlapped (`unk2` after `unk0` was declared at byte 4); (2) `_mined_field_types` keyed on the hex offset alone, so on the real `ov002_core.h` — where `f_0`, `f_4` and `f_c` are each declared both `int` and `u16` — a `u16` field could be read as an `int` and over-read its neighbour; (3) the `u32` include rule is now in `skeleton_includes()` and actually tested on every host. All three are mutation-verified. **Your re-attempt of the 15 parks therefore tests six fixes, not three** — say so in the PR, and do not attribute a rate change to any single one without evidence.
+
+**PRE-REGISTER, before the first attempt.** Write down the re-attempt rate you would call a real effect vs. noise, and the n you will stop at. State it in the PR. The point of step 1 is that it can come back negative — 0/15 on the re-run is a publishable result that closes the two-pool question for good.
+
+**DENOMINATORS.** Cumulative before this round is **12/100 = 12.0%** across the seven 257-320 B briefs (drain-5's own pinned figure). Re-attempts of already-counted candidates must NOT inflate the denominator — report them as a separate re-attempt cohort and say so explicitly.
+
+**Ledger.** Write a `result=not-attempted` row for anything screened on sight (the round-0903 convention). `park_class` values must be real map rows — no `PROVISIONAL:` prefix in the raw column; check `docs/research/campaign-analytics/park_class_map.tsv` before writing a new value.
+
+**Not in scope:** the `codegen-walls.md` BR ledger backfill (BR-10/11/12) — the other lane has it.
+
+**Gate:** `gate3.py --scope all` on all three regions, verbatim SHA1 PASS lines, `check_activation_invariant.py` and `check_delink_dupes.py` OK. **Regenerate `docs/state-table.md`, `docs/dashboard.md` and `docs/research/README.md` and commit them** before you gate — an un-regenerated `dashboard.md` turns two `test_generate_dashboard.py` tolerance tests red and blocked PR #1622 on a required check. Verify every claim against `git diff --stat origin/main..HEAD`.

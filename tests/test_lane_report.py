@@ -21,6 +21,7 @@ sys.path.insert(0, str(ROOT / "tools"))
 
 from lane_report import (  # noqa: E402
     _role_markers,
+    _project_slug,
     read_inbox,
     recover,
     repo_scope,
@@ -74,7 +75,7 @@ def _codex_session(root: Path, name: str, cwd: str, turns: list[tuple[str, str]]
 
 def _claude_session(root: Path, cwd: str, session_id: str,
                     turns: list[tuple[str, str]]) -> Path:
-    slug = str(cwd).replace("/", "-")
+    slug = _project_slug(cwd)
     project = root / slug
     project.mkdir(parents=True, exist_ok=True)
     path = project / f"{session_id}.jsonl"
@@ -87,6 +88,32 @@ def _claude_session(root: Path, cwd: str, session_id: str,
         })
     path.write_text("\n".join(json.dumps(r) for r in records), encoding="utf-8")
     return path
+
+
+class ProjectSlugTests(unittest.TestCase):
+    """Round 0908. The slug must match what Claude Code actually writes."""
+
+    def test_windows_path_encodes_drive_and_backslashes(self):
+        # Observed live in ~/.claude/projects on the Windows brain host:
+        # C:/Users/leona/Dev/gx-spirit-caller/decomper is stored as
+        # C--Users-leona-Dev-gx-spirit-caller-decomper. The previous
+        # str(p).replace("/", "-") was a no-op there -- str(Path) yields
+        # backslashes and a drive colon -- so scan_claude matched nothing
+        # on the coordinating machine.
+        self.assertEqual(
+            _project_slug(r"C:\Users\leona\Dev\gx-spirit-caller\decomper"),
+            "C--Users-leona-Dev-gx-spirit-caller-decomper",
+        )
+        self.assertEqual(
+            _project_slug("C:/Users/leona/Dev/gx-spirit-caller/decomper"),
+            "C--Users-leona-Dev-gx-spirit-caller-decomper",
+        )
+
+    def test_posix_path_is_unchanged_in_behaviour(self):
+        self.assertEqual(
+            _project_slug("/Users/lenny/Dev/spirit-caller/decomper"),
+            "-Users-lenny-Dev-spirit-caller-decomper",
+        )
 
 
 class RoleMarkerTests(unittest.TestCase):
