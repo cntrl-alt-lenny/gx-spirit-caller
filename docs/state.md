@@ -789,6 +789,59 @@ are not readable from this host. The audit belongs to whichever brain next
 runs on the Mac, and by then rounds 0906/0907 will have been unrecorded for
 three rounds — see the dispatch rows below.
 
+**POST-MERGE AUDIT OF PR #1622, ON THIS HOST, WITH THE REAL TOOLCHAIN.**
+Capabilities were derived live rather than read from a machine note: python
+3.12.10, ninja 1.13.2, `dsd` 0.11.0, native `mwccarm` (no wine on Windows),
+all three baseroms, `build.ninja` configured. The claims verified rather than
+accepted: `[eur] SHA1 PASS`, `[usa] SHA1 PASS`, `[jpn] SHA1 PASS`;
+`check_activation_invariant b14879e28..288253e4b` -> `.c added 1 / .s deleted
+1 / activations 1 / OK`; `check_delink_dupes` OK across 81 delinks; exactly one
+`.s:` -> `.c:` line flipped in EUR, the `.s` gone from disk, USA and JPN
+configs untouched. Ledger recomputed from `attempts.tsv` rather than read from
+prose: 16 rows, 1 shipped / 15 parked / 0 screens = 6.25%, and the six prior
+band briefs sum to exactly 11/84, so the pinned **12/100 = 12.0%** is correct.
+All five generated-doc `--check`s current: no race artefacts survived.
+
+⚠️ **EACH OF THE THREE SCAFFOLD FIXES LEFT A HOLE IN ITS OWN DEFECT CLASS.**
+The corrections are in this PR, each mutation-verified per control 7 (revert it
+and exactly its own test goes red; the four round-0907 tests stay green).
+`tools/cmatch_loop.py` appears **0** times in `build.ninja`, so no region gate
+result is affected.
+
+| # | hole, demonstrated on the real tree | correction |
+|---|---|---|
+| 1 | the padding fix sizes every `unkNN` as 4 bytes, so a halfword access overlaps: `unk2` after `unk0` gives gap `= -2`, no pad, no error, field declared at byte 4. **9 files in this tree** carry sub-4-byte `unkNN` spacing | size each field to the room before the next referenced offset |
+| 2 | `_mined_field_types` keys on the hex offset alone, so the last mined bank parsed wins. The real `ov002_core.h` declares 162 `f_<hex>` fields over 144 offsets and **`f_0`, `f_4`, `f_c` are each declared BOTH `int` and `u16`** — a `u16` read as `int` over-reads its neighbour, the exact failure the lookup exists to prevent | keep the narrowest declared width |
+| 3 | the `u32` fix — which the lane's own writeup calls a 100% compile blocker for every ov002 candidate — is covered only by a `build_dossier` test that SKIPS without a configured EUR build, vendored m2c and `arm-none-eabi-objdump`. It is skipped in CI **and** here, and reverting the fix left the suite green | lift the rule into `skeleton_includes()`, tested on any host |
+
+The `u32` detector itself was checked and left alone: it keys on `u32` only,
+which is narrower than the class, but all 88 `*_core.h` in the tree that
+redeclare any width type redeclare `u32` — no live instance, so no change.
+
+⚠️ **THE GATE CAUGHT A FOURTH DEFECT, AND THE WRAPPER LIED ABOUT IT AGAIN.**
+`gate3.py --scope all` printed three SHA1 PASS lines and then
+`==================== GATE FAIL ====================` with
+`1 failed, 3631 passed` — while the shell wrapper exited **0**, for the third
+round running. The failure is `test_lane_report.py::ClaudeScanTests::test_recovers_last_assistant_turn`, a hermetic test that was green in CI:
+**PR #1621's new tool is blind on Windows.** `scan_claude` built its shortlist
+with `str(p).replace("/", "-")`, a no-op here because `str(Path)` yields
+backslash separators and a drive colon. Measured against the live store: the
+computed slugs never intersected `~/.claude/projects`, which holds
+`C--Users-leona-Dev-gx-spirit-caller-decomper`, and `scan_claude` returned 0
+hits for a role whose directory exists. The fixture had the same bug, which is
+why it failed loudly instead of passing vacuously — a drive-lettered slug makes
+`root / slug` resolve to the drive root, writing the synthetic session outside
+the temporary directory. **This is control 12's evidence path**, unexecutable
+for nine of the last ten rounds, and it would have silently reported "no lane
+sessions" on the coordinating machine. Third instance of the path-separator
+class after PR #1580's `load_module_sections` and carve-15. After the fix the
+shortlist matches 2 real project directories (0 before).
+
+**PR #1020 re-checked, still parked, no owner action requested.** It is
+unchanged since 2026-06-24 and still waits on the private
+`ghcr.io/cntrl-alt-lenny/gx-spirit-caller-build` image; this host's token
+cannot enumerate packages, so the prerequisite is neither satisfied nor
+refutable from here. Left open and declared in `parked-prs`.
 <!-- main-sha: 288253e4b -->
 <!-- parked-prs: 1020 -->
 
