@@ -114,6 +114,156 @@ class TestPrePushBlocksOnInvariantErrors(unittest.TestCase):
         self.assertEqual(0, proc.returncode, proc.stderr)
 
 
+@unittest.skipIf(_bash() is None, "bash unavailable; the hook is a bash script")
+class TestPrePushInvokesTheCheckerCorrectly(unittest.TestCase):
+    """The stub above ignores its argv, so it could not see a malformed call.
+
+    That blind spot hid a real, active defect for the guard's whole life: the
+    line invoking the checker ended in a literal backslash followed by the
+    letter ``n``, where a line continuation was meant. Bash reads that as the
+    single character
+    ``n``, so the process was launched as::
+
+        check_match_invariants.py --version eur n
+
+    ``check_match_invariants.py`` declares no positional argument, so argparse
+    exited **2** -- which this hook reads as "the checker found ERRORS". Every
+    push whose diff touched ``config/`` or ``src/`` was refused, citing a
+    defect that did not exist. Confirmed byte-level with ``od -c``.
+
+    Asserting on the *status* can never catch this; only asserting on the
+    argv can. So this records it.
+    """
+
+    def _run_hook_recording_argv(self) -> list[str]:
+        tmp = Path(tempfile.mkdtemp(prefix="prepush-argv-"))
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        argv_out = tmp / "argv.txt"
+
+        stub = tmp / "stub-python"
+        stub.write_text(
+            "#!/usr/bin/env bash\n"
+            'printf "%s\\n" "$@" > "$ARGV_OUT"\n'
+            "exit 0\n",
+            encoding="utf-8",
+        )
+        stub.chmod(stub.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+
+        env = dict(os.environ, PYTHON=str(stub), ARGV_OUT=str(argv_out))
+        proc = subprocess.run(
+            [_bash(), str(_HOOK)],
+            input=_STDIN.encode("utf-8"),
+            cwd=str(_ROOT),
+            env=env,
+            capture_output=True,
+            timeout=120,
+        )
+        self.assertTrue(
+            argv_out.is_file(),
+            "the hook never invoked the checker at all. "
+            f"stdout={proc.stdout!r} stderr={proc.stderr!r}",
+        )
+        return argv_out.read_text(encoding="utf-8").splitlines()
+
+    def test_checker_receives_exactly_the_documented_arguments(self):
+        self.assertEqual(
+            ["tools/check_match_invariants.py", "--version", "eur"],
+            self._run_hook_recording_argv(),
+        )
+
+    def test_hook_source_has_no_literal_backslash_n(self):
+        """Byte-level twin of the test above; names the remedy on failure.
+
+        Read as BYTES. The hook carries three load-bearing literal CR
+        characters, and universal-newline text decoding turns each into a
+        newline -- which splits a comment into an executable line. Any tool
+        that rewrites this file must use binary I/O.
+        """
+        raw = _HOOK.read_bytes()
+        self.assertNotIn(
+            b"\\n",
+            raw,
+            "`.githooks/pre-push` contains the two-byte sequence backslash-n. "
+            "Bash reads that as the character `n`, not as a line continuation: "
+            "it becomes a stray argument. Use a real backslash-newline.",
+        )
+
+    def test_hook_still_strips_carriage_returns_from_stdin(self):
+        """Guards the CR bytes a text-mode rewrite silently destroys.
+
+        The manifest parser strips a trailing CR with `${local_sha%%<CR>}`,
+        where <CR> is a literal 0x0D byte in the source. Round-tripping this
+        file through `Path.read_text()` / `write_text()` rewrites those bytes
+        to newlines, splitting the comment that documents them into a line
+        bash tries to execute (`makes: command not found`). Encountered for
+        real while fixing the defect above.
+        """
+        raw = _HOOK.read_bytes()
+        self.assertEqual(
+            2,
+            raw.count(b"%%\r"),
+            "the literal CR strippers in `.githooks/pre-push` are gone or "
+            "duplicated. If a rewrite tool ate them, it used text-mode I/O; "
+            "redo the edit with read_bytes()/write_bytes().",
+        )
+
+
+@unittest.skipIf(_bash() is None, "bash unavailable; the hook is a bash script")
+class TestPrePushInterpreterDiscoveryIsVersionGated(unittest.TestCase):
+    """Resolving the name `python3` is not the same as being able to run.
+
+    macOS ships Apple's python3 3.9.6. `check_match_invariants.py` imports
+    `tools/progress.py`, which evaluates `dict | None` at import time -- 3.10+
+    only. Under 3.9 that raises TypeError and the interpreter exits **1**,
+    the hook's "warnings, allow the push" code. Measured on the Mac brain
+    host: the hook exited 0 having never run the check, and said nothing.
+
+    So auto-discovery must probe the *version*, not the name. An explicit
+    `PYTHON=` override is still honoured verbatim -- the caller is naming the
+    interpreter, and the stubs in this file could not answer a probe.
+    """
+
+    def _fake_interpreter(self, path: Path, *, supported: bool, argv_out: Path | None = None):
+        # Behaves like a real interpreter for the hook's two invocations:
+        # the `-c` version probe, and the actual checker run.
+        probe_status = 0 if supported else 1
+        body = "#!/usr/bin/env bash\n"
+        body += f'if [[ "$1" == "-c" ]]; then exit {probe_status}; fi\n'
+        if argv_out is not None:
+            body += f'printf "%s\\n" "$@" > "{argv_out}"\n'
+        body += "exit 0\n"
+        path.write_text(body, encoding="utf-8")
+        path.chmod(path.stat().st_mode | stat.S_IEXEC | stat.S_IXGRP | stat.S_IXOTH)
+
+    def test_an_interpreter_that_fails_the_version_probe_is_skipped(self):
+        tmp = Path(tempfile.mkdtemp(prefix="prepush-ver-"))
+        self.addCleanup(shutil.rmtree, tmp, ignore_errors=True)
+        argv_out = tmp / "argv.txt"
+
+        # First candidate in the hook's own preference order, but too old.
+        self._fake_interpreter(tmp / "python3.13", supported=False)
+        # Next candidate, supported: this is the one that must be chosen.
+        self._fake_interpreter(tmp / "python3.12", supported=True, argv_out=argv_out)
+
+        env = dict(os.environ, PATH=f"{tmp}{os.pathsep}{os.environ['PATH']}")
+        env.pop("PYTHON", None)
+        proc = subprocess.run(
+            [_bash(), str(_HOOK)],
+            input=_STDIN.encode("utf-8"),
+            cwd=str(_ROOT),
+            env=env,
+            capture_output=True,
+            timeout=300,
+        )
+        self.assertEqual(0, proc.returncode, proc.stderr)
+        self.assertTrue(
+            argv_out.is_file(),
+            "the supported interpreter was never reached -- discovery either "
+            "accepted the too-old candidate or fell through it entirely. "
+            f"stdout={proc.stdout!r} stderr={proc.stderr!r}",
+        )
+
+
 class TestHookGuardIsActuallyExercised(unittest.TestCase):
     """Fail loudly if the blocking test can never run in this environment.
 

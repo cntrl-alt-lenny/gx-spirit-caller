@@ -10,23 +10,59 @@ from __future__ import annotations
 
 import argparse
 import os
+import re
 import subprocess
 from dataclasses import dataclass
 from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
-KEEP_BASENAMES = frozenset(
-    {
-        "brain",
-        "decomper",
-        "scaffolder",
-        "kb-map",
-        "kb-types",
-        "codex-decomper-queue",
-        "codex-scaffolder-queue",
-    }
+
+# WHY THIS IS A PATTERN AND NOT A LIST OF DIRECTORY NAMES.
+#
+# It used to be a literal list, and it drifted from reality without anything
+# noticing. The list named `decomper` / `scaffolder` -- the role names
+# `AGENTS.md` documents -- while the live Mac worktrees were
+# `claude-decomper-queue` and `claude-scaffolder-queue`. Neither was on it, so
+# both classified REMOVABLE ("clean and merged into origin/main") and a single
+# `--prune` would have deleted two live lanes. The tool's own test looked like
+# it covered this (`test_mac_lane_basenames_keep_live_lanes_...`) but exercised
+# the two `codex-` names that WERE on the list, so it stayed green throughout.
+#
+# The polarity was the real defect. `tools/prune_worktrees.py` -- the sibling
+# that does this job safely -- only ever considers `claude-<digits>` sandboxes
+# for removal and touches nothing else, so an unrecognised directory is safe by
+# default. Here an unrecognised directory was *deletable* by default, which put
+# the burden of safety on a hand-maintained list staying in sync with four
+# machines. It did not.
+#
+# So: derive lane protection from the ROLE vocabulary AGENTS.md declares
+# normative, and let any provider prefix or queue suffix wrap it. That covers
+# `claude-decomper-queue`, `codex-scaffolder-queue`, a bare `decomper` after a
+# rename, and a `gemini-scaffolder-queue` nobody has created yet, without
+# anyone remembering to edit this file.
+#
+# `tests/test_worktree_gc.py` pins LANE_ROLES against `make_kickoff.py`'s own
+# lane table so the two cannot diverge silently.
+LANE_ROLES = frozenset({"brain", "decomper", "scaffolder", "kb-map", "kb-types"})
+_PROVIDER_PREFIX = r"(?:[a-z0-9]+-)?"
+# `-queue` is the Mac lane suffix; `-claude-<digits>` is the sandbox variant
+# `tools/prune_worktrees.py` also treats as permanent -- keep the two tools
+# agreeing about what a lane looks like.
+_QUEUE_SUFFIX = r"(?:-queue|-claude-\d+)?"
+LANE_BASENAME_RE = re.compile(
+    rf"^{_PROVIDER_PREFIX}(?:{'|'.join(sorted(re.escape(r) for r in LANE_ROLES))})"
+    rf"{_QUEUE_SUFFIX}$"
 )
+
+# Explicit additions for anything the pattern cannot express. Kept so a host
+# can pin an oddly-named standing worktree; NOT the safety mechanism any more.
+KEEP_BASENAMES: frozenset[str] = frozenset()
 WORKTREE_MARKERS = frozenset({"config", "include", "libs", "src", "tests", "tools"})
+
+
+def is_lane_basename(name: str) -> bool:
+    """True for a standing lane worktree, whatever provider named it."""
+    return bool(LANE_BASENAME_RE.match(name))
 
 
 @dataclass(frozen=True)
@@ -117,7 +153,10 @@ def classify_worktree(
 ) -> Classification:
     """Classify one registered worktree without changing repository state."""
     repo = ROOT if repo is None else repo
-    if entry.path.name in KEEP_BASENAMES | set(keep):
+    name = entry.path.name
+    if name in KEEP_BASENAMES | set(keep):
+        return Classification(entry, "KEEP", "pinned basename")
+    if is_lane_basename(name):
         return Classification(entry, "KEEP", "standing lane basename")
     reasons: list[str] = []
     if entry.locked is not None:
