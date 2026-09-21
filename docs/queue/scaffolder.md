@@ -2890,3 +2890,59 @@ Bugs 2 and 3 were fixed part-way through a 16-candidate tranche. The 15 parks ar
 **Not in scope:** the `codegen-walls.md` BR ledger backfill (BR-10/11/12) — the other lane has it.
 
 **Gate:** `gate3.py --scope all` on all three regions, verbatim SHA1 PASS lines, `check_activation_invariant.py` and `check_delink_dupes.py` OK. **Regenerate `docs/state-table.md`, `docs/dashboard.md` and `docs/research/README.md` and commit them** before you gate — an un-regenerated `dashboard.md` turns two `test_generate_dashboard.py` tolerance tests red and blocked PR #1622 on a required check. Verify every claim against `git diff --stat origin/main..HEAD`.
+
+### q-host-portability-sweep — six tools assume one host, and all six fail quietly [TODO]
+
+An external review of the repo's agentic infrastructure produced these as leads; **the brain re-verified every line number against the tree on 2026-09-03 and all six hold.** They share one shape: none raises, none logs, each degrades into a plausible-looking wrong answer. That is the campaign's dominant defect class, applied to host assumptions instead of guards.
+
+The repo is Windows-primary with a Mac brain and a documented Linux path, so "works here" has never been evidence.
+
+**A — `tools/verify.py:198` writes to a directory Windows does not have.**
+
+```python
+out_o = f"/tmp/_verify_{func}.o"
+```
+
+`_compile()` at :190 runs the compiler with `-o` pointing there, then `_verify_one` returns `os.path.exists(out_o)`. On Windows that path does not resolve, nothing is written, and **every function reports `COMPILE FAILED`** — a verdict indistinguishable from a real compile failure. Use `tempfile`, and clean up.
+
+**B — five call sites assume a POSIX venv layout.**
+
+```text
+tools/m2c_bootstrap.py:37   VENV_PY = ROOT / ".venv_permuter" / "bin" / "python"
+tools/m2c_feed.py:82        VENV_PY = ROOT / ".venv_permuter" / "bin" / "python"
+tools/permute.py:786        if not (venv_root / "bin" / "python").is_file():
+tools/permute.py:804        glob(str(venv_root / "lib" / "python*" / "site-packages"))
+tools/permute.py:854        venv_py = str(venv_root / "bin" / "python")
+```
+
+Windows venvs are `Scripts\python.exe` and `Lib\site-packages`. The failure is near-silent by construction: `m2c_feed.py`'s own comment says it falls back to `sys.executable` when the file is absent — and `sys.executable` has no `pycparser`, so m2c fails later, somewhere else, for a reason that does not name this. `permute.py:786` re-creates the venv every run because the check can never be true.
+
+**C — `tools/get_platform.py:56` returns the wrong runner on two of three hosts.**
+
+```python
+def exe_launch_prefix() -> list[str]:
+    ...
+    return ["wine"]
+```
+
+Its docstring says "the same convention `configure.py` uses for the build". It is not. `configure.py:241` uses **wibo** on Linux (`DEFAULT_WIBO_PATH`), and `configure.py:229` resolves macOS through `_resolve_macos_wine()`, which probes `wine` then `wine64` — so a game-porting-toolkit Mac with only `wine64` also gets a bare `wine`. `tools/verify.py:191` is the consumer, and **`verify.py:187`'s own comment asserts the opposite** ("exe_launch_prefix() … covers wine64/wibo per platform"). A comment claiming a property the code does not have is how this survived; fix the comment too, or delete it.
+
+**D — `tools/m2c_gap_coverage.py:50` hardcodes the `.exe` suffix.**
+
+```python
+OBJDUMP = str(ROOT / "tools" / "arm-none-eabi" / "bin" / "arm-none-eabi-objdump.exe")
+```
+
+Every sibling resolves it through `get_platform().exe` and falls back to the bare name — `fastmatch.py:135-136`, `verify.py:153`, `asm_escape.py:89`, all three with the same `_binutil` shape and the same comment. Adopt it; do not invent a fourth spelling.
+
+**E — `.claude/settings.json` hardcodes `python3` for all three hooks, and its own description says why that is unsafe.** ⚠️ **INVESTIGATE BEFORE ADOPTING ANYTHING.** The review suggested copying `edopro-retro-formats`' `.claude/hooks/run_python.sh`, which probes `python3` then `python`. **Do not copy it on faith:** a `.sh` shim only runs if Claude Code executes hook commands through a POSIX shell, and on native Windows it may not. Find out how hooks are actually launched on each host *first*, then pick a mechanism that works on all of them, and say in the PR what you measured. Whatever you adopt must keep `tests/test_claude_hook_interpreter.py` meaningful — it exists to turn a silently-degraded hook into a loud failure, and it deliberately does not assert the name is `python3`.
+
+**F — resolving an interpreter's NAME is not the same as it being able to run the code.** The brain hit this in `.githooks/pre-push` and fixed it there (see the round narrative): `python3` on macOS is Apple's 3.9.6, and `tools/progress.py:477` evaluates `dict | None` at import time, so anything importing it dies under 3.9 — while CLAUDE.md pins the project at 3.11+. **Sweep for other bare `python3` / `python` assumptions in `tools/` and the hooks** and apply the same version probe the hook now uses. Report the ones you find and leave alone with a reason; do not silently skip.
+
+**Scope discipline.** Six independent fixes; take them in one PR but **one commit each**, each with its own before/after evidence. A fix you cannot demonstrate on a host you have does not ship — say so and leave it, rather than shipping an untested guess. Where you cannot test on Windows from here, state exactly that in the PR and describe the check the Windows brain should run.
+
+**Not in scope:** the `tee` exit-status masking (`q-gate-exit-status`, other lane) and the `claude-*-queue` worktree naming decision (brain-owned, awaiting the owner's call).
+
+**BUILD-FREE where possible.** None of these needs a ROM build; A and C touch the compile path, so if you exercise them, coordinate the compiler with Lenny first — the mwcc toolchain serialises machine-wide.
+
+**Gate:** `python3.13 -m pytest -q tests` green AND `python3.13 -m unittest discover -s tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean, plus per-fix before/after evidence. Verify every claim against `git diff --stat origin/main..HEAD`.
