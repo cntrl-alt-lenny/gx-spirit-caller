@@ -19,12 +19,12 @@ POOL_BY_ITEM = {"q-pool-freshness-tool": "wall-bl4-small"}
 # One table is the source of truth for lane-to-worktree routing. Windows was
 # brain-verified on 2026-08-22. Mac decomper/scaffolder were confirmed live
 # by a Mac brain on 2026-09-07 (both are real worktrees under
-# ~/Dev/spirit-caller/). kb-map and kb-types have never been confirmed on
+# ~/Dev/gx-spirit-caller/). kb-map and kb-types have never been confirmed on
 # either host; their entries below are unverified placeholders, and
 # VERIFIED_WORKTREES below is what actually gates generation -- adding a row
 # here is not enough to make it emittable.
 def _mac_worktree(role: str) -> str:
-    return f"~/Dev/spirit-caller/claude-{role}-queue"
+    return f"~/Dev/gx-spirit-caller/claude-{role}-queue"
 
 
 LANE_WORKTREES = {
@@ -38,11 +38,11 @@ LANE_WORKTREES = {
     },
     "kb-map": {
         "windows": "C:/Users/leona/Dev/gx-spirit-caller/kb-map",
-        "mac": "~/Dev/spirit-caller/kb-map",
+        "mac": "~/Dev/gx-spirit-caller/kb-map",
     },
     "kb-types": {
         "windows": "C:/Users/leona/Dev/gx-spirit-caller/kb-types",
-        "mac": "~/Dev/spirit-caller/kb-types",
+        "mac": "~/Dev/gx-spirit-caller/kb-types",
     },
 }
 LANES = tuple(LANE_WORKTREES)

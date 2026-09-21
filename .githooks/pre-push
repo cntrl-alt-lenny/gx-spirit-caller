@@ -72,13 +72,48 @@ if [[ "${touched_interesting}" -eq 0 ]]; then
     exit 0
 fi
 
-# Locate python. Support PYTHON env override for repos with pinned
-# interpreters.
-PYTHON="${PYTHON:-python3}"
-if ! command -v "${PYTHON}" >/dev/null 2>&1; then
-    echo "pre-push: ${PYTHON} not found; skipping invariants check." >&2
-    echo "pre-push: set PYTHON=<path> or install Python to enable." >&2
-    exit 0
+# Locate python. An explicit PYTHON= override is honoured verbatim -- the
+# caller is naming the interpreter to use, and it may be a stub that does not
+# answer a version probe. AUTO-DISCOVERY IS VERSION-GATED, because resolving
+# the name `python3` is not sufficient:
+#
+#   macOS ships Apple's python3 3.9.6. check_match_invariants.py imports
+#   tools/progress.py, which evaluates `dict | None` at import time -- a
+#   3.10+ construct. Under 3.9 that raises TypeError and the process exits
+#   **1**, which is this hook's "warnings, allow the push" code. So on every
+#   Mac this guard waved each push through having never run the check, and
+#   said nothing about it. That is the same fail-open shape the campaign
+#   keeps finding: a guard returning a passing answer on the exact input it
+#   exists to catch. Verified 2026-09-03 on the Mac brain host.
+#
+# CLAUDE.md pins the project at Python 3.11+; probe for it, do not assume.
+_python_is_supported() {
+    command -v "$1" >/dev/null 2>&1 || return 1
+    "$1" -c 'import sys; raise SystemExit(0 if sys.version_info >= (3, 11) else 1)' \
+        >/dev/null 2>&1
+}
+
+if [[ -n "${PYTHON:-}" ]]; then
+    if ! command -v "${PYTHON}" >/dev/null 2>&1; then
+        echo "pre-push: PYTHON=${PYTHON} not found; skipping invariants check." >&2
+        exit 0
+    fi
+else
+    PYTHON=""
+    for _cand in python3.13 python3.12 python3.11 python3 python; do
+        if _python_is_supported "${_cand}"; then
+            PYTHON="${_cand}"
+            break
+        fi
+    done
+    if [[ -z "${PYTHON}" ]]; then
+        echo >&2
+        echo "pre-push: NO Python 3.11+ FOUND -- INVARIANTS WERE NOT CHECKED." >&2
+        echo "pre-push: this push is NOT covered by the match-invariants guard." >&2
+        echo "pre-push: install Python 3.11+ or set PYTHON=<path> to enable it." >&2
+        echo >&2
+        exit 0
+    fi
 fi
 
 # Run the check. --version eur is hardcoded (project baseline);
@@ -92,7 +127,8 @@ out_file="$(mktemp -t invariants.XXXXXX 2>/dev/null || echo "/tmp/invariants.$$.
 trap 'rm -f "${out_file}"' EXIT
 
 rc=0
-"${PYTHON}" tools/check_match_invariants.py --version eur \n    >"${out_file}" 2>&1 || rc=$?
+"${PYTHON}" tools/check_match_invariants.py --version eur \
+    >"${out_file}" 2>&1 || rc=$?
 
 if [[ "${rc}" -ne 0 ]]; then
     if [[ "${rc}" -eq 2 ]]; then

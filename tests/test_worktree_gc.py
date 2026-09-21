@@ -80,8 +80,17 @@ class TestDangerousCases(_RepoCase):
 
 class TestClassificationAndPrune(_RepoCase):
     def test_mac_lane_basenames_keep_live_lanes_and_classify_other_shapes(self) -> None:
-        decomper = self.add_worktree("codex-decomper-queue")
-        scaffolder = self.add_worktree("codex-scaffolder-queue")
+        """The LIVE Mac lane names, not the two that happened to be listed.
+
+        This test previously used `codex-decomper-queue` / `codex-scaffolder-queue`
+        -- the two names that were already in the hardcoded keep list -- while
+        the actual Mac lanes were `claude-decomper-queue` and
+        `claude-scaffolder-queue`, which were NOT. So it read as coverage of
+        "Mac lane basenames" and was green throughout, while `--prune` would
+        have deleted both live lanes as "clean and merged into origin/main".
+        """
+        decomper = self.add_worktree("claude-decomper-queue")
+        scaffolder = self.add_worktree("claude-scaffolder-queue")
         removable = self.add_worktree("mac-clean-merged")
         dirty = self.add_worktree("mac-dirty")
         (dirty / "README.md").write_text("uncommitted\n", encoding="utf-8")
@@ -148,3 +157,87 @@ class TestOrphanReporting(_RepoCase):
 
 if __name__ == "__main__":
     unittest.main()
+
+
+class TestLaneProtectionIsDerivedNotListed(unittest.TestCase):
+    """A hand-maintained keep list drifted from reality and nearly cost two lanes.
+
+    Protection is now derived from the role vocabulary `AGENTS.md` declares
+    normative, wrapped by any provider prefix and lane suffix. These cases pin
+    both directions: every shape a lane is ever spelled in must be KEEP, and
+    the ephemeral sandbox shapes `--prune` exists to collect must stay
+    deletable -- a fix that protected everything would be no fix at all.
+    """
+
+    LANE_SHAPES = (
+        "brain",
+        "decomper",
+        "scaffolder",
+        "kb-map",
+        "kb-types",
+        "claude-decomper-queue",
+        "claude-scaffolder-queue",
+        "codex-decomper-queue",
+        "codex-scaffolder-queue",
+        "gemini-scaffolder-queue",
+        "scaffolder-claude-525",
+    )
+
+    DISPOSABLE_SHAPES = (
+        "claude-525",
+        "claude-1204",
+        "sweep17-batch1",
+        "mainsweep7-p2batch2",
+        "scratch_stash",
+        "merged",
+    )
+
+    def test_every_lane_spelling_is_protected(self) -> None:
+        for name in self.LANE_SHAPES:
+            with self.subTest(name=name):
+                self.assertTrue(
+                    gc.is_lane_basename(name),
+                    f"{name!r} is a standing lane and must never be REMOVABLE",
+                )
+
+    def test_ephemeral_sandbox_shapes_stay_collectable(self) -> None:
+        for name in self.DISPOSABLE_SHAPES:
+            with self.subTest(name=name):
+                self.assertFalse(
+                    gc.is_lane_basename(name),
+                    f"{name!r} is an ephemeral sandbox; over-protecting it "
+                    "turns the tool into a no-op",
+                )
+
+    def test_lane_roles_cover_every_role_make_kickoff_can_dispatch(self) -> None:
+        """The two files must not drift the way the keep list drifted.
+
+        `make_kickoff.py` is what actually sends a worker to a directory. Any
+        role it can emit a kickoff for is, by definition, a lane whose worktree
+        must survive `--prune`.
+        """
+        import make_kickoff
+
+        missing = set(make_kickoff.LANE_WORKTREES) - set(gc.LANE_ROLES)
+        self.assertEqual(
+            set(),
+            missing,
+            "make_kickoff.py dispatches roles that worktree_gc.py does not "
+            f"protect: {sorted(missing)}. Add them to LANE_ROLES.",
+        )
+
+    def test_live_mac_lane_directories_are_all_protected(self) -> None:
+        """Names taken from the Mac host on 2026-09-03, verbatim.
+
+        The regression this file exists to prevent is specifically "the list
+        said `decomper`, the disk said `claude-decomper-queue`". Pin the disk.
+        """
+        for name in (
+            "brain",
+            "claude-decomper-queue",
+            "claude-scaffolder-queue",
+            "codex-decomper-queue",
+            "codex-scaffolder-queue",
+        ):
+            with self.subTest(name=name):
+                self.assertTrue(gc.is_lane_basename(name))

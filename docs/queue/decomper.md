@@ -3187,3 +3187,40 @@ This matters because BR-6 already demonstrated the failure mode: it declared the
 **Scope.** Write BR-10/11/12 from the ledger and the three briefs, not from prose. For each: attempted rate, pool rate, module mix, and what the round pre-registered vs. what it got. Then **reconcile the cumulative figure across all seven 257-320 B briefs and pin one number** — drain-5 pins 12/100 = 12.0%; verify it against `attempts.tsv` yourself and say so, or correct it. Where an earlier BR entry is contradicted by a later one, add the correction inline the way BR-9 corrects BR-8 — do not silently overwrite.
 
 ⚠️ **Row order in `attempts.tsv` is not chronology** (485 of the rows were batch-backfilled). Order by PR number, and fail toward AMBIGUOUS rather than guessing.
+
+### q-gate-exit-status — the merge gate has reported success on failure three rounds running [TODO]
+
+`docs/state.md` records this three times, in three different rounds, each time diagnosed from scratch:
+
+- **round 0831** — "`test_generate_dashboard` freshness failed … **The `tee` wrapper reported exit 0 while the gate had FAILED** — reading the log is what caught it."
+- **round 0904** (line 555) — "⚠️ **The gate FAILED on the first integration run, and the wrapper exited 0.** … **`[exited with code 0]` sat directly beneath `==================== GATE FAIL ====================`** — reading the log is what caught it, for the second round running."
+- **round 0908** (line 824) — "`1 failed, 3631 passed` — while the shell wrapper exited **0**, for the third round running."
+
+`docs/queue/scaffolder.md:1368` already carries the workaround as standing lore: "⚠️ `gate3` piped through `tee` MASKS its exit code (both lanes hit this last round) — read the log, do not trust exit 0."
+
+**A gate that reports success on failure is worse than no gate, because it is trusted.** `AGENTS.md` says of `gate3.py --scope all`: "Nothing below outranks it." Three rounds in a row it was outranked by a pipe.
+
+**BRAIN-VERIFIED, AND IT NARROWS THE FIX.** `gate3.py` itself propagates correctly. Run on this host on 2026-09-03 with plain redirection and no pipe:
+
+```text
+python3.13 tools/gate3.py --scope all > gate.log 2>&1 ; echo "GATE_EXIT=$?"
+  → [eur] SHA1 PASS / [usa] SHA1 PASS / [jpn] SHA1 PASS
+  → 1 failed, 3642 passed, 15 skipped … ==================== GATE FAIL ====================
+  → GATE_EXIT=1
+```
+
+`gate3.py:466` is `sys.exit(main())` and `verdict()` returns the code. **So do not go looking for a bug in `gate3.py` — there isn't one.** The defect is that the workflow *requires* a transcript (every kickoff asks for pasted SHA1 lines, and reading the log is what caught all three incidents) and the only way anyone has to produce one is `| tee`, whose status is `tee`'s. `set -o pipefail` appears nowhere in the repo's docs or kickoffs, is not the default in any shell an agent runs, and has no PowerShell equivalent — `$LASTEXITCODE` after a pipeline is also the last command's.
+
+**Scope.**
+
+1. **CANARY FIRST (control 7).** Reproduce the masked status before changing anything: a command that exits non-zero, piped through `tee`, reporting 0. Paste it. Then show your fix reporting non-zero on the same input. If you cannot reproduce the mask, your model of the bug is wrong: STOP and report that.
+2. **Remove the need for `tee`.** Give `gate3.py` a `--log PATH` that writes the full transcript itself while still streaming to the terminal, and exits with the verdict. A status that cannot be piped away cannot be lost. Keep the existing streaming behaviour byte-for-byte when `--log` is absent.
+3. **Make a masked status visible even when someone pipes anyway.** The transcript's own last line should state the exit code the process is about to return, so a pasted log carries its own verdict and a `[exited with code 0]` under `GATE FAIL` is self-contradicting on sight.
+4. **Regression test.** A failing inner command must produce a non-zero status through whatever path the docs now prescribe. Test the *shape* — an always-fail stub — not a real gate run.
+5. **Then update the instructions that taught the pipe.** `docs/queue/scaffolder.md:1368`'s warning becomes "use `--log`". Sweep AGENTS.md, `docs/decomp-workflow.md`, the kickoff templates in `tools/make_kickoff.py`, and `docs/agents/brain-onboarding.md` for any `| tee` guidance and replace it. Grep, do not recall.
+
+**Explicitly not in scope:** changing what `verdict()` decides, or the gate's scopes. This item is about the status surviving the trip to the caller, nothing else.
+
+**BUILD-FREE.** Do not run `ninja`, do not run a real region gate — the stub in step 4 is the test. The other lane owns the compiler this round.
+
+**Gate:** `python3.13 -m pytest -q tests` green AND `python3.13 -m unittest discover -s tests` green (paste `Ran N tests` + `OK`) + `ruff check` clean, plus the pasted before/after canary from step 1. Verify every claim against `git diff --stat origin/main..HEAD`.
