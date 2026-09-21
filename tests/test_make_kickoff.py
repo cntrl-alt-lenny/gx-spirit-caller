@@ -64,10 +64,10 @@ class TestMakeKickoff(unittest.TestCase):
 
     def test_mac_lane_paths_point_to_real_worktrees(self):
         assert make_kickoff.lane_spec("decomper", "mac").worktree == (
-            "~/Dev/spirit-caller/claude-decomper-queue"
+            "~/Dev/gx-spirit-caller/claude-decomper-queue"
         )
         assert make_kickoff.lane_spec("scaffolder", "mac").worktree == (
-            "~/Dev/spirit-caller/claude-scaffolder-queue"
+            "~/Dev/gx-spirit-caller/claude-scaffolder-queue"
         )
 
     def test_item_without_named_pool_emits_no_number(self):

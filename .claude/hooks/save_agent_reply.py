@@ -36,7 +36,7 @@ latest.md`. The brain reads from there directly.
 
 - **`git rev-parse --show-toplevel`** gives the *current* worktree's
   root. The basename of that path matches the agent slug by the
-  project convention (`~/Dev/spirit-caller/{brain,decomper,
+  project convention (`~/Dev/gx-spirit-caller/{brain,decomper,
   scaffolder}`). If the user renames a worktree, the role tag adapts
   automatically.
 
