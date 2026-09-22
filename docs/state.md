@@ -9,6 +9,19 @@ its full pre-adoption history below unchanged — `tools/check_dispatch_log.py`,
 `tools/progress.py`, `tools/generate_dashboard.py` and others read it, so
 nothing below this section was reordered or removed.
 
+**Dev Hub** (shared Google Drive folder `Software/Dev Hub`, where the
+owner's project Brains message each other in `mail/` and report framework
+problems in `framework-feedback/`; rules in its own README.md) — Brain
+reads it only when the owner says to, and records here what it read or
+sent. On 2026-09-22 this project sent framework-feedback reports
+`2026-09-22_0935` (authority-scan wording and owner override),
+`2026-09-22_0936` (adoption bootstrap first action), and `2026-09-22_1044`
+(installed tools fail `pyflakes`; `authority.py` on the framework's own
+documents), plus mail `2026-09-22_1050` (adoption blocked on the tool lint
+fix). **By owner decision on 2026-09-22, the `Python (ruff)` required
+check is intentionally left red on the adoption PR pending that framework
+fix** — do not try to make it pass here.
+
 Churn-heavy brain log. Split out of `AGENTS.md` so the manifest stays
 stable while this file turns over every working chunk.
 
@@ -875,11 +888,20 @@ they stay here:
    be true *after* this update merges. The `main-sha` anchor has an
    explicit merge tolerance for the same reason; the PR-count claim has
    none.
-3. **The canonical dispatch rule**: the brain hands over **one complete
-   paste-ready message per active standing lane that needs dispatch,
-   normally all four**, in the same final response — never deferred to a
-   later message. `docs/agents/brain-onboarding.md` holds the canonical
-   statement; `AGENTS.md` and `.claude/agents/brain.md` defer to it.
+3. **The canonical dispatch rule**: Brain hands over **one complete
+   paste-ready message per active standing lane that needs dispatch —
+   currently two, Decomper and Scaffolder** (Verifier reviews an exact SHA
+   rather than being dispatched a queue item) — in the same final response,
+   never deferred to a later message. **Corrected 2026-09-22:** this
+   section previously said `docs/agents/brain-onboarding.md` held the
+   canonical statement and that `AGENTS.md` deferred to it; that file
+   described a stale "normally all four" lane count and a "do not ask
+   permission to merge" rule that contradicts the 2026-09-21 owner
+   override. Its operating-protocol content is now archived at
+   `docs/archive/agents-2026-09-22/brain-onboarding.md`, kept for history,
+   not as current guidance. The canonical statement is `AGENTS.md` §
+   Authority and § Topology, and the Brain role contract is
+   `docs/agents/roles/brain.md` — nothing defers to an archived document.
 4. **Branch protection is LIVE** (ruleset `main-protection`). Required
    checks are `Python (ruff)`, `Markdown (markdownlint-cli2)`, `drift-check`
    and — since round 0822b (#1531) — `unittest`, the four that run on EVERY

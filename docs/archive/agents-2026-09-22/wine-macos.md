@@ -1,3 +1,10 @@
+> **ARCHIVED / READ-ONLY (2026-09-22).** This file was entirely genuine
+> one-time machine-setup content (installing the Wine/Game Porting
+> Toolkit runner on macOS). It has been merged into
+> [`docs/machine-setup.md`](../../machine-setup.md) § 4, which is now
+> the current, live copy — edit it there, not here. Kept verbatim for
+> history.
+
 [//]: # (moved verbatim from AGENTS.md 2026-07-15 — Codex 32KB instruction-cap diet)
 
 ### Wine on macOS (post-deprecation)

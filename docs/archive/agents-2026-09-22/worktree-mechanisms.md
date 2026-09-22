@@ -1,13 +1,15 @@
+> **ARCHIVED / READ-ONLY (2026-09-22).** This file described the sibling-
+> folder worktree layout (separate top-level clone-shaped worktrees per
+> role) that the 2026-09-21 framework adoption retired, including a
+> `~/Dev/spirit-caller/...` example path from before this repository was
+> renamed. Superseded by [`git-and-isolation.md`](../git-and-isolation.md)
+> (the current, canonical layout: one checkout per role nested under the
+> primary checkout) and `AGENTS.md` § Topology. Kept verbatim for history;
+> do not set up a new machine this way.
+
 [//]: # (moved verbatim from AGENTS.md 2026-07-15 — Codex 32KB instruction-cap diet)
 
 # Worktree mechanism B (Claude Code sandbox worktrees) + which mechanism to use
-
-**Superseded 2026-09-21.** The framework adoption retired the sibling-folder
-layout this document describes (separate top-level clone-shaped worktrees per
-role) in favor of one checkout per role nested under the primary checkout —
-see [`git-and-isolation.md`](git-and-isolation.md) for the current, canonical
-layout and `AGENTS.md` § Topology for this project's roles. Kept below for
-history; do not set up a new machine this way.
 
 Claude Code on Windows (or anywhere) automatically creates a
 per-session sandbox worktree inside `.claude/worktrees/<auto-name>/`

@@ -1,3 +1,13 @@
+> **ARCHIVED / READ-ONLY (2026-09-22).** Era-specific model-choice notes
+> (Fable 5 / Opus 4.8 era, decided 2026-06-14) — the file
+> itself already said "the CURRENT roster lives in AGENTS.md § Open
+> briefs LANE STATE". No rule in it was judged still load-bearing: the
+> substantive general point — a deterministic gate means a weaker model
+> ships fewer answers, never wrong ones, so model choice is a throughput
+> knob, not a correctness one — is already covered by
+> `docs/agents/CONSTITUTION.md` § Capabilities, not model names. Kept
+> verbatim for history.
+
 [//]: # (moved verbatim from AGENTS.md 2026-07-15 — Codex 32KB instruction-cap diet)
 [//]: # (roster snapshots here are era-specific; the CURRENT roster lives in AGENTS.md § Open briefs LANE STATE)
 
