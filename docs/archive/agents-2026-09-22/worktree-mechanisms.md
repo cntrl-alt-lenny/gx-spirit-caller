@@ -2,7 +2,7 @@
 > folder worktree layout (separate top-level clone-shaped worktrees per
 > role) that the 2026-09-21 framework adoption retired, including a
 > `~/Dev/spirit-caller/...` example path from before this repository was
-> renamed. Superseded by [`git-and-isolation.md`](../git-and-isolation.md)
+> renamed. Superseded by [`git-and-isolation.md`](../../agents/git-and-isolation.md)
 > (the current, canonical layout: one checkout per role nested under the
 > primary checkout) and `AGENTS.md` § Topology. Kept verbatim for history;
 > do not set up a new machine this way.
