@@ -1,5 +1,14 @@
 # State of play
 
+## Current state (2026-09-21)
+
+This project adopted the [agentic framework](../AGENTS.md) on
+2026-09-21. `AGENTS.md` is now the coordination document: roles, scopes,
+invariants, evidence table and what is actually enforced. This file keeps
+its full pre-adoption history below unchanged — `tools/check_dispatch_log.py`,
+`tools/progress.py`, `tools/generate_dashboard.py` and others read it, so
+nothing below this section was reordered or removed.
+
 Churn-heavy brain log. Split out of `AGENTS.md` so the manifest stays
 stable while this file turns over every working chunk.
 
@@ -982,35 +991,44 @@ about a thousand PRs out of date. They were removed rather than refreshed:
 a stale number in the file the next brain reads cold is worse than no number,
 and the live ones are one command away.
 
-## Worktree convention — isolation per agent, two equivalent mechanisms
+## Worktree convention — isolation per agent
 
 Each agent runs in its own worktree to prevent parallel-session
 interference that bit briefs 138 + 140 earlier. **AGENTS.md is the
-canonical spec** (worktree-convention section there now covers both
-mechanisms — updated in this brain-PR). Two mechanisms are
-equivalent:
+canonical spec.** Since the 2026-09-21 framework adoption, the layout is
+one checkout per role, nested under the primary checkout, per
+[`docs/agents/git-and-isolation.md`](agents/git-and-isolation.md):
 
-- **Mac convention (manual sibling worktrees):** `~/Dev/spirit-caller/brain`,
-  `~/Dev/spirit-caller/decomper`, `~/Dev/spirit-caller/scaffolder`
-  — three named siblings under one parent, set up once via `git worktree
-  add`. Each has its own `orig/` baseroms. Adopted during the
-  SHA1-milestone arc; PR #564 documented this in state.md.
-- **Windows convention (Claude Code automatic sandboxes):** Claude
-  Code creates per-session worktrees inside `.claude/worktrees/<auto-
-  name>/` for each agent. No manual setup. They share the main
-  checkout's `orig/` baseroms. Side-effect: `gh pr merge --delete-
-  branch` may fail to clean up the local branch while the agent
-  session is active — harmless, server-side merge still succeeds.
+```
+brain/                       primary checkout — Brain works here
+brain/.worktrees/decomper/   Decomper's isolated checkout
+brain/.worktrees/scaffolder/ Scaffolder's isolated checkout
+brain/.worktrees/verifier/   Verifier's isolated checkout
+```
+
+Each linked worktree has its own `orig/` baseroms (not seeded
+automatically — copy them in once per worktree) and its own `build/`.
+This replaced the older sibling-folder layout (`~/Dev/spirit-caller/brain`,
+`~/Dev/spirit-caller/decomper`, `~/Dev/spirit-caller/scaffolder` as
+separate top-level clone-shaped worktrees, and the Windows automatic
+`.claude/worktrees/<auto-name>/` sandboxes) — both retired in the same
+round that adopted the framework, once every branch they held was
+confirmed on `origin/main`.
 
 Brief 142's clean scaffolder-side work + brief 143's clean decomper-side work
-were the validation that worktree separation (either mechanism) is
-sufficient.
+were the validation that worktree separation is sufficient.
 
 ## Brain-pattern locked
 
-- **Self-merge by default.** Brain reviews + merges autonomously per
-  cntrl_alt_lenny's stated working pattern. User gets the scaffolder /
-  decomper messages afterward, doesn't gate each merge.
+- **Brain reviews and merges reviewed work — but only after the owner's
+  explicit approval of each merge.** This is the standing owner override
+  recorded in `AGENTS.md` § Authority (2026-09-21): Brain still does the
+  independent review and reproduces the gate itself, but the merge waits
+  for cntrl_alt_lenny to say go, one merge at a time — a deliberate,
+  named exception to the framework's default routine-merge pattern, not
+  the prohibited act of a worker accepting or merging its own work
+  (Decomper, Scaffolder and Verifier still never do that, in any
+  circumstance).
 - **PR-URL deliverable.** Every agent message MUST end with "push the
   branch, run `gh pr create`, reply with the PR URL." Brain verifies
   origin before claiming review-ready; PRs missing from origin → ask
