@@ -280,7 +280,7 @@ shapes.
   set).
 - [Brief 086 PRs #474 + #478](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/478)
   — original C-23 discovery + recipe + SP boundary sweep.
-- [Brief 088](../briefs/088-mmio-base-folding-wall-sweep.md) —
+- [Brief 088](../briefs/archive/legacy/088-mmio-base-folding-wall-sweep.md) —
   the 5-variant × 15-SP empirical methodology.
 - [Brief 193 PR #640](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/640)
   — surfaced pick #5 as "StyleA + C-23 stacked".

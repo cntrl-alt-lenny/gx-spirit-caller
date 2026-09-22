@@ -155,8 +155,23 @@ class TestOrphanReporting(_RepoCase):
         self.assertIn("never deleted", output)
 
 
-if __name__ == "__main__":
-    unittest.main()
+class TestNestedRoleWorktreesAreProtected(unittest.TestCase):
+    """2026-09-21 framework adoption: one checkout per role nested under the
+    primary checkout, at `.worktrees/<role>`. `classify_worktree` only ever
+    looks at the basename (`entry.path.name`), so no live git repo is needed
+    here -- this pins the actual nested paths the adoption produced, rather
+    than relying only on the bare role name being covered incidentally."""
+
+    def test_worktrees_verifier_decomper_scaffolder_classify_keep(self) -> None:
+        for role in ("verifier", "decomper", "scaffolder"):
+            with self.subTest(role=role):
+                entry = gc.WorktreeEntry(
+                    path=Path(f"/repo/.worktrees/{role}"),
+                    head="0" * 40,
+                    branch=None,
+                )
+                classification = gc.classify_worktree(entry, repo=Path("/repo"))
+                self.assertEqual(classification.state, "KEEP")
 
 
 class TestLaneProtectionIsDerivedNotListed(unittest.TestCase):
@@ -173,6 +188,7 @@ class TestLaneProtectionIsDerivedNotListed(unittest.TestCase):
         "brain",
         "decomper",
         "scaffolder",
+        "verifier",
         "kb-map",
         "kb-types",
         "claude-decomper-queue",
@@ -241,3 +257,7 @@ class TestLaneProtectionIsDerivedNotListed(unittest.TestCase):
         ):
             with self.subTest(name=name):
                 self.assertTrue(gc.is_lane_basename(name))
+
+
+if __name__ == "__main__":
+    unittest.main()

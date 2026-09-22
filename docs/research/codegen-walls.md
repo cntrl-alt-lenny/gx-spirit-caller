@@ -963,7 +963,7 @@ inline in the PR body.
 ### C-12. Push-r0 arg-preserving thunk via `asm void` + `nofralloc`
 
 (W-E in brief 048's research note classification —
-[`push-r0-wall-research`](../briefs/048-push-r0-wall-research.md).)
+[`push-r0-wall-research`](../briefs/archive/legacy/048-push-r0-wall-research.md).)
 
 **Target asm.** Tiny call-then-restore wrappers that preserve
 their first arg across one or more `bl` calls by using the push

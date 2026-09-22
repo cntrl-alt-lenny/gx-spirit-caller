@@ -16,15 +16,25 @@ import kickoff_lint  # noqa: E402
 
 
 POOL_BY_ITEM = {"q-pool-freshness-tool": "wall-bl4-small"}
-# One table is the source of truth for lane-to-worktree routing. Windows was
-# brain-verified on 2026-08-22. Mac decomper/scaffolder were confirmed live
-# by a Mac brain on 2026-09-07 (both are real worktrees under
-# ~/Dev/gx-spirit-caller/). kb-map and kb-types have never been confirmed on
-# either host; their entries below are unverified placeholders, and
-# VERIFIED_WORKTREES below is what actually gates generation -- adding a row
-# here is not enough to make it emittable.
+# One table is the source of truth for lane-to-worktree routing.
+#
+# 2026-09-21 framework adoption: the Mac layout collapsed from separate
+# top-level sibling worktrees (one per role) to one checkout per role nested
+# under the primary checkout -- see docs/agents/git-and-isolation.md and
+# AGENTS.md § Topology. Mac paths below were updated to match and
+# re-confirmed as real worktrees at that path. Windows was last confirmed
+# 2026-08-22 against the OLD sibling layout; whether Windows also moved to
+# the nested layout is unconfirmed, so its paths are left as historical fact
+# rather than guessed at, and removed from VERIFIED_WORKTREES below -- a
+# Windows brain must confirm the real current path and re-add the row before
+# generation for that host is allowed again.
+#
+# kb-map and kb-types were never confirmed as real worktrees on either host
+# and are retired from this table (2026-09-21) rather than carried forward
+# as permanent unverified placeholders. History: they named a build-free /
+# EUR-baserom-only concurrency lane that was never actually stood up.
 def _mac_worktree(role: str) -> str:
-    return f"~/Dev/gx-spirit-caller/claude-{role}-queue"
+    return f"~/Dev/gx-spirit-caller/brain/.worktrees/{role}"
 
 
 LANE_WORKTREES = {
@@ -35,14 +45,6 @@ LANE_WORKTREES = {
     "scaffolder": {
         "windows": "C:/Users/leona/Dev/gx-spirit-caller/scaffolder",
         "mac": _mac_worktree("scaffolder"),
-    },
-    "kb-map": {
-        "windows": "C:/Users/leona/Dev/gx-spirit-caller/kb-map",
-        "mac": "~/Dev/gx-spirit-caller/kb-map",
-    },
-    "kb-types": {
-        "windows": "C:/Users/leona/Dev/gx-spirit-caller/kb-types",
-        "mac": "~/Dev/gx-spirit-caller/kb-types",
     },
 }
 LANES = tuple(LANE_WORKTREES)
@@ -58,10 +60,8 @@ LANES = tuple(LANE_WORKTREES)
 # LANE_WORKTREES without a matching entry here stays unverified and
 # generation for it is refused.
 VERIFIED_WORKTREES = {
-    ("decomper", "windows"), ("decomper", "mac"),
-    ("scaffolder", "windows"), ("scaffolder", "mac"),
-    ("kb-map", "windows"),
-    ("kb-types", "windows"),
+    ("decomper", "mac"),
+    ("scaffolder", "mac"),
 }
 
 

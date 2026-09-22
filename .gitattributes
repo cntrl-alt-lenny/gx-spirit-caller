@@ -1,1 +1,9 @@
 docs/research/campaign-analytics/attempts.tsv merge=union
+
+# Installed by framework adoption (2026-09-21). This matters because adoption
+# installed `.githooks/pre-push`, a `#!/bin/sh` script: a stale CRLF working
+# file is a portability hazard — macOS Git refuses such a hook outright, and
+# behavior otherwise varies by platform and shell. `eol=lf`, not bare
+# `text=auto`: `text=auto` alone normalises to LF in the repository but still
+# checks out CRLF on Windows, which is exactly the case that breaks.
+* text=auto eol=lf

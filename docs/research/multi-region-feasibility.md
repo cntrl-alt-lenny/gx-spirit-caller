@@ -344,7 +344,7 @@ the throughput unlock.
 - `tools/find_region_siblings.py` (this brief, prototype tool).
 - `extract/{eur,usa,jpn}/` (extracted ROMs, gitignored).
 - Brief 061
-  ([`docs/briefs/061-multi-region-porting-research.md`](../briefs/061-multi-region-porting-research.md))
+  ([`docs/briefs/061-multi-region-porting-research.md`](../briefs/archive/legacy/061-multi-region-porting-research.md))
   scoped the survey + verdict.
 - Brief 048 / 050 / 054 — precedent for the cloud-research +
   prototype-tool pattern.

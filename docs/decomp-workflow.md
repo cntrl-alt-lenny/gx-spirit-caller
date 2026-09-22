@@ -42,19 +42,13 @@ stats live in [`docs/state.md`](state.md).
 
 ## The cast
 
-Three AI agents, one human. Each has a narrow job.
-
-| Agent | Where it lives | What it does |
-|---|---|---|
-| **cntrl_alt_lenny** | meatspace | You. Sets priorities, picks direction, merges PRs. |
-| **brain** | local LLM session (Claude Code or Codex CLI), PC or Mac | Reviews and merges PRs. Runs `ninja` / `dsd` locally to verify each PR doesn't break the build. Writes task briefs. Keeps `AGENTS.md` / `docs/state.md` current. |
-| **decomper** | local LLM session (separate from brain) | The actual decomper. Matches individual functions. Writes C source in `src/`. Renames symbols. |
-| **scaffolder** | LLM session without local toolchain (Claude web, Codex web) | Scaffolder and reviewer. Writes tools (`tools/`), library headers (`libs/`), docs. Can't run the build, so delegates verification to brain. (Formerly `scaffolder`; renamed for role clarity.) |
-
-Why the split? Matching a function is a focused, iterative task (one
-person on one function at a time). Tool-building is parallel work that
-doesn't need the baserom. Reviewing PRs needs a local build to verify.
-Separating those three roles keeps everyone unblocked.
+One human owner and four roles — Brain (coordinator), Decomper, Scaffolder
+and Verifier (executors and reviewer). Who does what, where each runs, and
+who owns which paths is `AGENTS.md` § Topology; the full authority model
+(why Brain merges instead of the owner, and only after the owner's explicit
+per-merge approval) is `AGENTS.md` § Authority and
+`docs/agents/CONSTITUTION.md`. This document does not restate either — see
+those instead of trusting a paraphrase here to stay current.
 
 ## The matching loop
 
@@ -99,7 +93,8 @@ Say the decomper picks `__sinit_ov005_021b16e4`. Here's what happens:
    `delinks.txt` changes. Push to a `decomper/*` branch. Open a PR.
 
 10. **Review + merge**. Brain reviews, runs `./dsd check modules` to
-    confirm no module regressed, and merges.
+    confirm no module regressed, and — once the owner explicitly approves
+    that merge (`AGENTS.md` § Authority) — merges.
 
 Now repeat ~5,000 times. That's the project.
 
@@ -498,14 +493,17 @@ A pull request is just a git branch with a note attached. The flow is:
 2. The agent pushes the branch and opens a PR via the GitHub API. This
    doesn't change `main`; it just says "here's a proposed change".
 3. Brain reviews it: reads the diff, runs `ninja` / `dsd check modules`
-   locally to verify it doesn't break the build, summarizes in plain
-   English, and either merges or asks questions.
-4. You (cntrl_alt_lenny) get a summary from brain and the final say on
-   controversial ones.
+   locally to verify it doesn't break the build, and summarizes in plain
+   English — either asking questions, or asking cntrl_alt_lenny to approve
+   that specific merge.
+4. Brain merges only once cntrl_alt_lenny explicitly approves that merge
+   (`AGENTS.md` § Authority) — the owner also retains veto and reversal
+   over anything, at any time.
 
-**No agent merges their own PRs.** That's the safety boundary. Every
-change passes through brain's local verification before landing on
-`main`.
+**No agent merges their own PRs, and no agent merges without that
+approval.** That's the safety boundary. Every change passes through
+Brain's local verification and the owner's per-merge approval before
+landing on `main`.
 
 ## Common gotchas for a new vibe coder
 
@@ -525,14 +523,14 @@ change passes through brain's local verification before landing on
   [`docs/research/codegen-walls.md`](research/codegen-walls.md)
   catalogues the 27-and-counting recurring divergences with worked
   C source for each.
-- **"Why can't scaffolder just run the build?"**  Scaffolder as a
-  *role* is designed to be runnable in a stateless web session
-  without toolchain access; that's what keeps tool-building
-  parallel to matching. A particular scaffolder session may happen
-  to have the toolchain installed (e.g. on the same machine as
-  brain) but the role's *outputs* — tools, headers, docs — are
-  valid to ship without verifying the rebuilt ROM. Brain is the
-  always-local role that runs the build to verify PRs before merge.
+- **"Does scaffolder run the build?"**  Yes — Scaffolder's own worktree
+  has the full toolchain and all three baseroms (`AGENTS.md` § Topology;
+  `docs/project-rules.md`), and gates its own PRs with
+  `tools/gate3.py --scope all` before opening them. What it does not do is
+  authorize a merge: Brain still independently reproduces the gate on
+  every PR, from any role, before it can land — that verification (and
+  now the owner's explicit per-merge approval) is what actually gates
+  `main`, not which role happened to build it first.
 - **"sinit outliers?"**  All 51 `__sinit_*` functions are now matched
   (sinit tier sits at 100%). Brief 003's bulk-template wave + brief
   009's one-off `__sinit_ov002_022ca7e8` (asm-void escape for mwcc's

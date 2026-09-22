@@ -43,13 +43,18 @@ COORDINATOR = "brain"
 
 NORMATIVE_PATHS: tuple[str, ...] = (
     "AGENTS.md",
+    "docs/project-rules.md",
     "CLAUDE.md",
     "docs/agents/brain-onboarding.md",
     "docs/agents/worktree-mechanisms.md",
     "docs/decomp-workflow.md",
+    # 2026-09-21 framework adoption: decomper.md/scaffolder.md were archived
+    # verbatim to docs/archive/adapters-2026-09-21/ (historical, out of
+    # scope per this module's docstring) and replaced by the generic
+    # worker.md seat; brain.md is now the framework's thin adapter.
     ".claude/agents/brain.md",
-    ".claude/agents/decomper.md",
-    ".claude/agents/scaffolder.md",
+    ".claude/agents/worker.md",
+    ".claude/agents/verifier.md",
     ".codex/agents/brain.toml",
     ".codex/agents/decomper.toml",
     ".codex/agents/scaffolder.toml",
@@ -147,13 +152,14 @@ KNOWN_PROVIDER_COMPOUND = re.compile(
 # ### structural-detectors:end ###
 # Lines that legitimately contain a banned FORM because they prohibit it.
 # Each entry must still match, so a stale exemption fails rather than widens.
-ALLOWED: tuple[tuple[str, str, str], ...] = (
-    (
-        "AGENTS.md",
-        '"Claude Code Decomper"',
-        "the prohibition quotes the banned compound as its own example",
-    ),
-)
+#
+# 2026-09-21: AGENTS.md's own quoted "Claude Code Decomper" counterexample
+# was removed (not reworded) during the framework adoption rewrite -- the
+# prohibition is now stated without repeating the banned compound, and the
+# framework's own docs/agents/topologies.md already demonstrates the same
+# banned shape inside a proper `guard:counterexample` block. No exemption
+# is needed here until a new one is actually written.
+ALLOWED: tuple[tuple[str, str, str], ...] = ()
 
 
 def normative_files() -> list[Path]:
@@ -323,14 +329,18 @@ class TestStructuralInvariants(unittest.TestCase):
                     make_kickoff.lane_spec(bogus, "windows")
 
     def test_generated_core_kickoff_is_provider_neutral(self):
+        # "mac" (not "windows"): 2026-09-21 framework adoption removed
+        # ("decomper"|"scaffolder", "windows") from VERIFIED_WORKTREES --
+        # the real current Windows paths are unconfirmed post-adoption -- so
+        # only "mac" is generatable today. See make_kickoff.py's own comment.
         for role in ROLES:
             with self.subTest(role=role):
-                spec = make_kickoff.lane_spec(role, "windows")
+                spec = make_kickoff.lane_spec(role, "mac")
                 self.assertTrue(
                     spec.worktree.endswith(role),
                     msg="a role's worktree is derived from the role",
                 )
-                text = make_kickoff.render(role, "windows")
+                text = make_kickoff.render(role, "mac")
                 self.assertEqual(
                     scan(text, f"<generated {role} kickoff>"),
                     [],

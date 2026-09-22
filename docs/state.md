@@ -1,5 +1,32 @@
 # State of play
 
+## Current state (2026-09-22)
+
+This project adopted the [agentic framework](../AGENTS.md) on
+2026-09-21. `AGENTS.md` is now the coordination document: roles, scopes,
+invariants, evidence table and what is actually enforced. This project now
+follows agentic-framework release 2.0.0; release 2.0.1 is expected as a
+small follow-up update. This file keeps
+its full pre-adoption history below unchanged — `tools/check_dispatch_log.py`,
+`tools/progress.py`, `tools/generate_dashboard.py` and others read it, so
+nothing below this section was reordered or removed.
+
+**Dev Hub** (shared Google Drive folder `Software/Dev Hub`, where the
+owner's project Brains message each other in `mail/` and report framework
+problems in `framework-feedback/`; rules in its own README.md) — Brain
+reads it only when the owner says to, and records here what it read or
+sent. On 2026-09-22 this project sent framework-feedback reports
+`2026-09-22_0935` (authority-scan wording and owner override),
+`2026-09-22_0936` (adoption bootstrap first action), and `2026-09-22_1044`
+(installed tools fail `pyflakes`; `authority.py` on the framework's own
+documents), plus mail `2026-09-22_1050` (adoption blocked on the tool lint
+fix). On 2026-09-22 Brain read framework replies `2026-09-22_0945` and
+`2026-09-22_0946`, and mail `2026-09-22_1105`, `2026-09-22_1215` (release
+2.0.0) and `2026-09-22_1230` (adoption unblocked), and sent
+framework-feedback `2026-09-22_1320` (owner-override form still
+wording-dependent) and `2026-09-22_1350` (update byte-identity rule versus
+adoption merges).
+
 Churn-heavy brain log. Split out of `AGENTS.md` so the manifest stays
 stable while this file turns over every working chunk.
 
@@ -866,11 +893,20 @@ they stay here:
    be true *after* this update merges. The `main-sha` anchor has an
    explicit merge tolerance for the same reason; the PR-count claim has
    none.
-3. **The canonical dispatch rule**: the brain hands over **one complete
-   paste-ready message per active standing lane that needs dispatch,
-   normally all four**, in the same final response — never deferred to a
-   later message. `docs/agents/brain-onboarding.md` holds the canonical
-   statement; `AGENTS.md` and `.claude/agents/brain.md` defer to it.
+3. **The canonical dispatch rule**: Brain hands over **one complete
+   paste-ready message per active standing lane that needs dispatch —
+   currently two, Decomper and Scaffolder** (Verifier reviews an exact SHA
+   rather than being dispatched a queue item) — in the same final response,
+   never deferred to a later message. **Corrected 2026-09-22:** this
+   section previously said `docs/agents/brain-onboarding.md` held the
+   canonical statement and that `AGENTS.md` deferred to it; that file
+   described a stale "normally all four" lane count and a "do not ask
+   permission to merge" rule that contradicts the 2026-09-21 owner
+   override. Its operating-protocol content is now archived at
+   `docs/archive/agents-2026-09-22/brain-onboarding.md`, kept for history,
+   not as current guidance. The canonical statement is `AGENTS.md` §
+   Authority and § Topology, and the Brain role contract is
+   `docs/agents/roles/brain.md` — nothing defers to an archived document.
 4. **Branch protection is LIVE** (ruleset `main-protection`). Required
    checks are `Python (ruff)`, `Markdown (markdownlint-cli2)`, `drift-check`
    and — since round 0822b (#1531) — `unittest`, the four that run on EVERY
@@ -982,35 +1018,44 @@ about a thousand PRs out of date. They were removed rather than refreshed:
 a stale number in the file the next brain reads cold is worse than no number,
 and the live ones are one command away.
 
-## Worktree convention — isolation per agent, two equivalent mechanisms
+## Worktree convention — isolation per agent
 
 Each agent runs in its own worktree to prevent parallel-session
 interference that bit briefs 138 + 140 earlier. **AGENTS.md is the
-canonical spec** (worktree-convention section there now covers both
-mechanisms — updated in this brain-PR). Two mechanisms are
-equivalent:
+canonical spec.** Since the 2026-09-21 framework adoption, the layout is
+one checkout per role, nested under the primary checkout, per
+[`docs/agents/git-and-isolation.md`](agents/git-and-isolation.md):
 
-- **Mac convention (manual sibling worktrees):** `~/Dev/spirit-caller/brain`,
-  `~/Dev/spirit-caller/decomper`, `~/Dev/spirit-caller/scaffolder`
-  — three named siblings under one parent, set up once via `git worktree
-  add`. Each has its own `orig/` baseroms. Adopted during the
-  SHA1-milestone arc; PR #564 documented this in state.md.
-- **Windows convention (Claude Code automatic sandboxes):** Claude
-  Code creates per-session worktrees inside `.claude/worktrees/<auto-
-  name>/` for each agent. No manual setup. They share the main
-  checkout's `orig/` baseroms. Side-effect: `gh pr merge --delete-
-  branch` may fail to clean up the local branch while the agent
-  session is active — harmless, server-side merge still succeeds.
+```
+brain/                       primary checkout — Brain works here
+brain/.worktrees/decomper/   Decomper's isolated checkout
+brain/.worktrees/scaffolder/ Scaffolder's isolated checkout
+brain/.worktrees/verifier/   Verifier's isolated checkout
+```
+
+Each linked worktree has its own `orig/` baseroms (not seeded
+automatically — copy them in once per worktree) and its own `build/`.
+This replaced the older sibling-folder layout (`~/Dev/spirit-caller/brain`,
+`~/Dev/spirit-caller/decomper`, `~/Dev/spirit-caller/scaffolder` as
+separate top-level clone-shaped worktrees, and the Windows automatic
+`.claude/worktrees/<auto-name>/` sandboxes) — both retired in the same
+round that adopted the framework, once every branch they held was
+confirmed on `origin/main`.
 
 Brief 142's clean scaffolder-side work + brief 143's clean decomper-side work
-were the validation that worktree separation (either mechanism) is
-sufficient.
+were the validation that worktree separation is sufficient.
 
 ## Brain-pattern locked
 
-- **Self-merge by default.** Brain reviews + merges autonomously per
-  cntrl_alt_lenny's stated working pattern. User gets the scaffolder /
-  decomper messages afterward, doesn't gate each merge.
+- **Brain reviews and merges reviewed work — but only after the owner's
+  explicit approval of each merge.** This is the standing owner override
+  recorded in `AGENTS.md` § Authority (2026-09-21): Brain still does the
+  independent review and reproduces the gate itself, but the merge waits
+  for cntrl_alt_lenny to say go, one merge at a time — a deliberate,
+  named exception to the framework's default routine-merge pattern, not
+  the prohibited act of a worker accepting or merging its own work
+  (Decomper, Scaffolder and Verifier still never do that, in any
+  circumstance).
 - **PR-URL deliverable.** Every agent message MUST end with "push the
   branch, run `gh pr create`, reply with the PR URL." Brain verifies
   origin before claiming review-ready; PRs missing from origin → ask
@@ -1202,4 +1247,3 @@ Claude session. State.md is the bridge. Standing conventions:
 
 No. Continuing with 4-slot setup (brain + decomper + scaffolder +
 auto-progress-badge bot).
-
