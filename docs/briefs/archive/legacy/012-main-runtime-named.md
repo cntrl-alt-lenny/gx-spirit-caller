@@ -14,7 +14,7 @@ The remaining 9 are the Thumb-align-wall deferred thunks from brief
 | `0x02000800` | `Entry` | 0x13c | Program entry trampoline — largest target yet (~0x13c = 316 bytes). Sets up stacks, zeroes bss, calls `main`. See `libs/runtime/README.md` for the canonical shape in similar mwcc-ARM decomps (dqix, pokediamond). |
 | `0x02000a74` | `AutoloadCallback` | 0x4 | One-instruction ARM stub. Per CLAUDE.md bootstrap section, this is "just a `bx lr`" — empty C function `void AutoloadCallback(void) {}` should suffice. |
 | `0x02000c34` | `main` | 0x10 | The C `main()` function. 16 bytes ARM = ~4 instructions. Probably calls into Nitro's `NitroMain` or similar and returns. |
-| `0x020b42f4` | `__register_global_object` | 0x20 | CodeWarrior dtor-chain registrar. 32 bytes ARM, used by every `__sinit_*` function. Signature already declared in [`libs/runtime/include/runtime/sinit.h`](../../libs/runtime/include/runtime/sinit.h). |
+| `0x020b42f4` | `__register_global_object` | 0x20 | CodeWarrior dtor-chain registrar. 32 bytes ARM, used by every `__sinit_*` function. Signature already declared in [`libs/runtime/include/runtime/sinit.h`](../../../../libs/runtime/include/runtime/sinit.h). |
 
 **Context:**
 
@@ -74,13 +74,13 @@ verify at a glance.
 
 **Useful references:**
 
-- [`libs/runtime/README.md`](../../libs/runtime/README.md) — the
+- [`libs/runtime/README.md`](../../../../libs/runtime/README.md) — the
   canonical shape of CodeWarrior runtime glue in sibling decomps.
-- [`libs/runtime/include/runtime/sinit.h`](../../libs/runtime/include/runtime/sinit.h)
+- [`libs/runtime/include/runtime/sinit.h`](../../../../libs/runtime/include/runtime/sinit.h)
   — for `__register_global_object`'s signature.
 - pokediamond / pokeplatinum `arm9/src/main.c` and Entry files —
   cross-reference only; verify against our baserom.
-- [`src/overlay002/sinit_ov002_022ca7e8.c`](../../src/overlay002/sinit_ov002_022ca7e8.c)
+- [`src/overlay002/sinit_ov002_022ca7e8.c`](../../../../src/overlay002/sinit_ov002_022ca7e8.c)
   if you hit an RHS-evaluation-order quirk and need the `asm void`
   escape hatch.
 

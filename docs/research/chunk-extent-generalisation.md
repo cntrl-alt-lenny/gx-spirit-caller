@@ -263,9 +263,9 @@ focused, but combining is viable.
 
 ## See also
 
-- [`docs/briefs/177-unified-chunk-extent-generator.md`](../briefs/177-unified-chunk-extent-generator.md)
+- [`docs/briefs/177-unified-chunk-extent-generator.md`](../briefs/archive/legacy/177-unified-chunk-extent-generator.md)
   — original tool spec.
-- [`docs/briefs/178-cross-region-cluster-d3-with-generator.md`](../briefs/178-cross-region-cluster-d3-with-generator.md)
+- [`docs/briefs/178-cross-region-cluster-d3-with-generator.md`](../briefs/archive/legacy/178-cross-region-cluster-d3-with-generator.md)
   — D-3 apply at scale (74 chunks; tool validated).
 - [`docs/research/cluster-c-recipe.md`](cluster-c-recipe.md)
   — cluster C Pattern 1 strings (brief 119).

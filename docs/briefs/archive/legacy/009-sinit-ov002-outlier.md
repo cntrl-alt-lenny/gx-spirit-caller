@@ -19,7 +19,7 @@ that just copies one pointer into a struct field and returns.
   order."*
 - Template reference for the `.init` section pragma and
   `runtime/sinit.h` include:
-  [`src/overlay005/sinit_ov005_021b16e4.c`](../../src/overlay005/sinit_ov005_021b16e4.c).
+  [`src/overlay005/sinit_ov005_021b16e4.c`](../../../../src/overlay005/sinit_ov005_021b16e4.c).
   Copy the pragma shape exactly; only the body changes.
 - ov002 is a passing module (not in the `{main, dtcm, ov004}` failing
   set). ov002's baseline must stay green.

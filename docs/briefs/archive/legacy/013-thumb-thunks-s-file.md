@@ -3,7 +3,7 @@
 **Goal:** Ship the 10 BIOS SWI thunks deferred from brief 011 wave 1
 as a `.s` assembly file, following the pokediamond/pokeheartgold/
 pokeplatinum pattern documented in
-[`docs/research/thumb-align-wall.md`](../research/thumb-align-wall.md).
+[`docs/research/thumb-align-wall.md`](../../../research/thumb-align-wall.md).
 Closes named tier to **22/22** (with the 10 shipped here + the 12
 already matched = 22).
 

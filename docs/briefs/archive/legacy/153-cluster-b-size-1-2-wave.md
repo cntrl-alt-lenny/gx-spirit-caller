@@ -32,7 +32,7 @@ singleton shape." Total estimated drain: ~14-32 claims.
 **Scope:**
 
 Apply workaround #3 per the recipe in [`docs/research/cluster-b-
-size-1-2-recipe.md`](../research/cluster-b-size-1-2-recipe.md).
+size-1-2-recipe.md`](../../../research/cluster-b-size-1-2-recipe.md).
 Per-candidate steps:
 
 1. Identify the size-1/2 candidate from cluster B's W6-rejected

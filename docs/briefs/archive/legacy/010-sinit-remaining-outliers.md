@@ -15,13 +15,13 @@ while ov004 is a failing module.
 - Brief 009 just closed `__sinit_ov002_022ca7e8` (0x18 outlier) — it
   required `asm void` because mwcc's RHS-first evaluation order
   couldn't be beaten in plain C. That PR's header comment at
-  [`src/overlay002/sinit_ov002_022ca7e8.c`](../../src/overlay002/sinit_ov002_022ca7e8.c)
+  [`src/overlay002/sinit_ov002_022ca7e8.c`](../../../../src/overlay002/sinit_ov002_022ca7e8.c)
   documents the escape-hatch pattern and is a useful reference if
   you run into the same wall here.
 - Both ov010 and ov011 are in the passing module set. Their baselines
   must stay green (24/27 OK total).
 - Scouting from 2026-04-21 (Codex-decomper, via
-  [`docs/state.md`](../state.md) history):
+  [`docs/state.md`](../../../state.md) history):
   - **`__sinit_ov010_021b89a8` / `__sinit_ov010_021b89f0`**: "natural
     pair, same 0x48 shape. Each calls two empty ctors, calls another
     empty ctor on base + 0x84/0x8c, then registers a dtor. Likely

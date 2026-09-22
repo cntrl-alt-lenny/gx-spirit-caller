@@ -229,7 +229,7 @@ the new caps.
 
 ## Cross-references
 
-- [`docs/briefs/174-bundle-extent-heuristic-generator.md`](../briefs/174-bundle-extent-heuristic-generator.md)
+- [`docs/briefs/174-bundle-extent-heuristic-generator.md`](../briefs/archive/legacy/174-bundle-extent-heuristic-generator.md)
   — the brief that introduced `cluster_b_bundle_gen.py`.
 - [`docs/briefs/181-...`](../briefs/) — brief 181's commit (PR #624)
   is the deferral source for this brief.

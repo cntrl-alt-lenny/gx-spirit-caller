@@ -26,7 +26,7 @@ brief 057's success clause:
 
 This brief picks the first option but **with a sharper target than
 brief 055**: the 90-candidate thunk-shape pool from PR #397's
-[`docs/research/c20-family-corpus-scan.md`](../research/c20-family-corpus-scan.md).
+[`docs/research/c20-family-corpus-scan.md`](../../../research/c20-family-corpus-scan.md).
 The pool's size distribution is 60 of 90 at 0x20-0x30, 17 at
 0x2c-0x30, and only 6 at the upper edge (0x38-0x40). Cluster
 membership means each candidate has a matched representative the

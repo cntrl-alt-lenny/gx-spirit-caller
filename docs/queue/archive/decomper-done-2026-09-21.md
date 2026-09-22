@@ -92,7 +92,7 @@ Brief 665 retired P-6; r6's reg-alloc finding effectively retires part of P-4. O
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` + per-entry verdict (retired / confirmed-permanent with fresh evidence).
 
-**Result:** P-7/P-8/P-10's stale framing was already corrected in brief 669 (re-verified live on main, no new action). r6's own R&D report (`docs/research/rnd-swarm-2026-07-23-r6.md`) claiming "6 of 8 + P-4's own `func_02084ac4`" falsified was independently re-tested function-by-function: **2/7 shipped** (`func_020a71e4`, `func_020a724c` — both from the broader brief-641 catalog, genuinely fixed via a "grep actual call sites for true arity" lever, not a new allocator lever), **1 false-positive correction** (`func_02084ac4`, P-4's own cited example, re-confirmed PERMANENT across 3 variants — r6 was wrong about this one), **4 partial-progress parks** (`func_0207e214` 42.9%, `func_02096040` 66.7%, two `.thumb.c` candidates at 69-71%). Critical tooling finding: `.thumb.c` files need an explicit `#pragma thumb on` or they silently miscompile in ARM mode. Both ships ported to USA+JPN, individually objdiff-verified 100%. 3-region gate PASS. Full writeup: [`docs/research/brief-671-wall-retire.md`](../research/brief-671-wall-retire.md).
+**Result:** P-7/P-8/P-10's stale framing was already corrected in brief 669 (re-verified live on main, no new action). r6's own R&D report (`docs/research/rnd-swarm-2026-07-23-r6.md`) claiming "6 of 8 + P-4's own `func_02084ac4`" falsified was independently re-tested function-by-function: **2/7 shipped** (`func_020a71e4`, `func_020a724c` — both from the broader brief-641 catalog, genuinely fixed via a "grep actual call sites for true arity" lever, not a new allocator lever), **1 false-positive correction** (`func_02084ac4`, P-4's own cited example, re-confirmed PERMANENT across 3 variants — r6 was wrong about this one), **4 partial-progress parks** (`func_0207e214` 42.9%, `func_02096040` 66.7%, two `.thumb.c` candidates at 69-71%). Critical tooling finding: `.thumb.c` files need an explicit `#pragma thumb on` or they silently miscompile in ARM mode. Both ships ported to USA+JPN, individually objdiff-verified 100%. 3-region gate PASS. Full writeup: [`docs/research/brief-671-wall-retire.md`](../../research/brief-671-wall-retire.md).
 
 ### cm-epilogue-resweep-2 — re-attempt more parked candidates with the routing discriminator [DONE]
 
@@ -100,7 +100,7 @@ The epilogue-routing re-sweep shipped 45 last round from previously-parked funct
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + converted/re-parked.
 
-**Result:** Continued brief 668's mechanical `epilogue-wall-corpus.md` sweep (not the prose sources named above — brief 668 already established the corpus outperforms them 62.5% vs 0%) through its next 17 smallest still-unattempted rows. **13/17 shipped (76.5%)**, 4 parked on pure register-choice residuals. New/confirmed levers: hoist a shared pointer offset out of both if/else branches or the compiler duplicates it; a disassembly's literal flag-variable shape can be load-bearing (don't simplify to `||`); the brief-655 shared-return convergence lever generalizes to a second, unrelated function shape; "re-fetch a global instead of caching it" recurs on 2 more functions. Also fixed a brief-668 tooling bug found via this branch's own CI: 17 EUR delinks.txt headers had the wrong file suffix (plain `.c` instead of the real `.legacy.c`/`.legacy_sp3.c`/`.s`), invisible to the build but flagged by `check_match_invariants.py`. All 13 ported to USA+JPN (4 at MEDIUM confidence, individually verified). Full writeup: [`docs/research/brief-672-epilogue-resweep-2.md`](../research/brief-672-epilogue-resweep-2.md).
+**Result:** Continued brief 668's mechanical `epilogue-wall-corpus.md` sweep (not the prose sources named above — brief 668 already established the corpus outperforms them 62.5% vs 0%) through its next 17 smallest still-unattempted rows. **13/17 shipped (76.5%)**, 4 parked on pure register-choice residuals. New/confirmed levers: hoist a shared pointer offset out of both if/else branches or the compiler duplicates it; a disassembly's literal flag-variable shape can be load-bearing (don't simplify to `||`); the brief-655 shared-return convergence lever generalizes to a second, unrelated function shape; "re-fetch a global instead of caching it" recurs on 2 more functions. Also fixed a brief-668 tooling bug found via this branch's own CI: 17 EUR delinks.txt headers had the wrong file suffix (plain `.c` instead of the real `.legacy.c`/`.legacy_sp3.c`/`.s`), invisible to the build but flagged by `check_match_invariants.py`. All 13 ported to USA+JPN (4 at MEDIUM confidence, individually verified). Full writeup: [`docs/research/brief-672-epilogue-resweep-2.md`](../../research/brief-672-epilogue-resweep-2.md).
 
 ### cm-epilogue-resweep-3 — continue re-attempting parks with the routing discriminator [DONE]
 
@@ -108,14 +108,14 @@ The epilogue re-sweep shipped 45 then 39 the last two rounds — still the highe
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + converted/re-parked.
 
-**Result:** Continued the same mechanical `epilogue-wall-corpus.md` sweep as briefs 668/672 through its next 23 smallest still-unattempted rows. **17/23 shipped (73.9%)**, 6 parked — 45/64 (70.3%) cumulative from this corpus across 3 briefs. New confirmed lever: the brief-655 shared-return convergence generalizes to a 3rd shape (threshold-gated dispatch). New wall sub-class identified: an explicit register-copy of a live-in parameter (`mov r1,r0`-style) is allocator-internal and does not respond to a local-variable source hint — 2 independent confirmations this brief. Also fixed a queue-hygiene dedup bug that had silently reverted cm-epilogue-resweep-2's `[DONE]` status back to an empty `[TODO]` stub. All 17 ported to USA+JPN, individually verified 100%. Full writeup: [`docs/research/brief-673-epilogue-resweep-3.md`](../research/brief-673-epilogue-resweep-3.md).
+**Result:** Continued the same mechanical `epilogue-wall-corpus.md` sweep as briefs 668/672 through its next 23 smallest still-unattempted rows. **17/23 shipped (73.9%)**, 6 parked — 45/64 (70.3%) cumulative from this corpus across 3 briefs. New confirmed lever: the brief-655 shared-return convergence generalizes to a 3rd shape (threshold-gated dispatch). New wall sub-class identified: an explicit register-copy of a live-in parameter (`mov r1,r0`-style) is allocator-internal and does not respond to a local-variable source hint — 2 independent confirmations this brief. Also fixed a queue-hygiene dedup bug that had silently reverted cm-epilogue-resweep-2's `[DONE]` status back to an empty `[TODO]` stub. All 17 ported to USA+JPN, individually verified 100%. Full writeup: [`docs/research/brief-673-epilogue-resweep-3.md`](../../research/brief-673-epilogue-resweep-3.md).
 
 ### cm-small-resweep-upper — size-filtered small sweep, upper range 0x02040000+ [DONE]
 
 The other half of the re-sweep (Scaffolder takes the lower range). `--max-size 256`, route by epilogue.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted.
-**Result:** 3 ships, 3-region PASS (EUR/USA/JPN), each individually fastmatch-verified at 100%. Caught and fixed a region-specific struct-offset porting bug (`func_0204c384`'s USA/JPN ports read the same global-state fields at `0x19e`/`0x198` instead of EUR's `0x1a6`/`0x1a0` — `port_to_region.py` renames symbols but not hardcoded struct-literal offsets, same class as brief 673's finding). KEY process note: the initial USA aggregate gate reported "0 confirmed, 3 culprits" for a genuine single-candidate bug, indistinguishable on its face from brief 675's contamination false-negative — individually fastmatch-testing each port (not just trusting the aggregate gate or its bisection) is what isolated the real culprit. New lever: the predication-vs-real-branch sensitivity from brief 675's early-return findings also applies to a plain `if`/`else` — swapping which branch tests first can flip mwcc's choice. 8 more candidates checked and parked (2 byte-swap idioms with correct values but wrong instruction ordering, 1 stack-layout mystery, several complex multi-call sequences not yet converged). ~520 candidates remain in the fresh 129-256B tier alone. Full writeup: [`docs/research/brief-676-small-resweep-upper.md`](../research/brief-676-small-resweep-upper.md).
+**Result:** 3 ships, 3-region PASS (EUR/USA/JPN), each individually fastmatch-verified at 100%. Caught and fixed a region-specific struct-offset porting bug (`func_0204c384`'s USA/JPN ports read the same global-state fields at `0x19e`/`0x198` instead of EUR's `0x1a6`/`0x1a0` — `port_to_region.py` renames symbols but not hardcoded struct-literal offsets, same class as brief 673's finding). KEY process note: the initial USA aggregate gate reported "0 confirmed, 3 culprits" for a genuine single-candidate bug, indistinguishable on its face from brief 675's contamination false-negative — individually fastmatch-testing each port (not just trusting the aggregate gate or its bisection) is what isolated the real culprit. New lever: the predication-vs-real-branch sensitivity from brief 675's early-return findings also applies to a plain `if`/`else` — swapping which branch tests first can flip mwcc's choice. 8 more candidates checked and parked (2 byte-swap idioms with correct values but wrong instruction ordering, 1 stack-layout mystery, several complex multi-call sequences not yet converged). ~520 candidates remain in the fresh 129-256B tier alone. Full writeup: [`docs/research/brief-676-small-resweep-upper.md`](../../research/brief-676-small-resweep-upper.md).
 
 ### cm-regalloc-discriminator — build a systematic reg-alloc-park discriminator (r8 bets 5/9) [DONE]
 
@@ -123,28 +123,28 @@ Reg-alloc/predication parks dominate (44 of 74) and ship 0%, BUT r8 shows some a
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` + the discriminator writeup + any ships.
 
-**Result:** Verified r8's bet 3 directly: `func_ov004_021dbe68` (parked 3 sessions as an "unbeatable r2/r3 wall") is a mis-classified 2-argument model — its tail-callee reads r2 as a genuine 3rd parameter at instruction 1. Modeling the true 3-arg signature ships 100% first try, correcting a prior (wrong) "confirmed permanent" re-test in `codegen-walls.md`'s P-4 entry. Documented the general discriminator: read the callee before parking a tail-call/thunk — a missing/wrong-arity forwarded argument is falsifiable, a register choice for a value computed purely locally (never crossing a call boundary) is the genuine, reshape-insensitive signature (independently reconfirmed 3× this session already, briefs 672/673, zero movement across every reshape). match_pct correlates with neither case (spot-checked 58-92%). USA/JPN port blocked by a genuine pre-existing un-carved gap in both regions' ov004 delinks.txt — flagged as a separate task. EUR ships alone. Full writeup: [`docs/research/brief-674-regalloc-discriminator.md`](../research/brief-674-regalloc-discriminator.md).
+**Result:** Verified r8's bet 3 directly: `func_ov004_021dbe68` (parked 3 sessions as an "unbeatable r2/r3 wall") is a mis-classified 2-argument model — its tail-callee reads r2 as a genuine 3rd parameter at instruction 1. Modeling the true 3-arg signature ships 100% first try, correcting a prior (wrong) "confirmed permanent" re-test in `codegen-walls.md`'s P-4 entry. Documented the general discriminator: read the callee before parking a tail-call/thunk — a missing/wrong-arity forwarded argument is falsifiable, a register choice for a value computed purely locally (never crossing a call boundary) is the genuine, reshape-insensitive signature (independently reconfirmed 3× this session already, briefs 672/673, zero movement across every reshape). match_pct correlates with neither case (spot-checked 58-92%). USA/JPN port blocked by a genuine pre-existing un-carved gap in both regions' ov004 delinks.txt — flagged as a separate task. EUR ships alone. Full writeup: [`docs/research/brief-674-regalloc-discriminator.md`](../../research/brief-674-regalloc-discriminator.md).
 
 ### cm-main-128-drain — drain the untouched main <=128B high-yield cell (r9 lever #5) [DONE]
 
 r9 drain-aware analysis: ov002 <=128B is ~exhausted (87% but easy wins swept), while main <=128B is the largest UNTOUCHED high-yield block — 873 candidates, only ~10 sampled. Focus here: python tools/wall_aware_headroom.py --json --max-size 128 filtered to main. Route by epilogue first. match_pct is anti-informative for reg-alloc parks (don't chase high-%). This is where the scarce high-EV budget should go.
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS + shipped/attempted on main <=128B.
-**Result:** 9 ships, 3-region (`gate3.py --scope all --no-tests` PASS: EUR/USA/JPN), each individually fastmatch-verified at 100% before the aggregate `batch_sha1.py` gate. KEY: 790 of 829 (95%) of this pool carries an identical stale "GLOBAL_ASM endgame, brief 294/302" boilerplate comment with zero discriminative power (confirms brief 655's finding at even higher prevalence) — reading raw disassembly directly shows most of the pool is ordinary tractable C once the comment is ignored; only the very smallest (~0-48B) sub-tier is genuinely non-C-expressible (shared-epilogue stubs, cross-function raw `.word` branches). Caught and fixed a HIGH-confidence wrong-same-size-sibling USA/JPN porting collision (`func_020a73e8`/`func_020a7414` both auto-resolving to the same target) by deriving the correct `-0xf4` shift from 3 independently-confirmed neighbors. New reusable levers: combining trailing void early-returns with `||` avoids predication; a plain `while` loop (not `do-while`+separate upfront check) lets both loop exits share one tail instead of duplicating it; hardware-register polls require `volatile` on every access. 21 near-misses checked and parked with real word-level diffs documented (including a recurring, unresolved `TST`-vs-`ANDS` instruction-selection residual, and a 4-register-argument-spill ABI puzzle that resisted 4 different source models) — see full writeup for exact residuals so a future attempt doesn't re-derive them from scratch. 2 tool bugs flagged via `spawn_task` rather than fixed inline (`cmatch_loop.py --keep-drafts` leftover-file conflict; `batch_sha1.py`'s `.c`→`.s` suffix-stripping gap for `.thumb.c`/`.legacy.c`/`.legacy_sp3.c`). Process lesson: `batch_sha1.py`'s bisection assumes the candidate's `.s` file still physically exists as a revert target — deleting it before gating produces a false "0 confirmed" across an entire batch regardless of correctness (hit this directly; fixed by verifying each candidate's real match% individually first, then only deleting `.s` immediately before the one real gate call). Full writeup: [`docs/research/brief-675-main-128-drain.md`](../research/brief-675-main-128-drain.md).
+**Result:** 9 ships, 3-region (`gate3.py --scope all --no-tests` PASS: EUR/USA/JPN), each individually fastmatch-verified at 100% before the aggregate `batch_sha1.py` gate. KEY: 790 of 829 (95%) of this pool carries an identical stale "GLOBAL_ASM endgame, brief 294/302" boilerplate comment with zero discriminative power (confirms brief 655's finding at even higher prevalence) — reading raw disassembly directly shows most of the pool is ordinary tractable C once the comment is ignored; only the very smallest (~0-48B) sub-tier is genuinely non-C-expressible (shared-epilogue stubs, cross-function raw `.word` branches). Caught and fixed a HIGH-confidence wrong-same-size-sibling USA/JPN porting collision (`func_020a73e8`/`func_020a7414` both auto-resolving to the same target) by deriving the correct `-0xf4` shift from 3 independently-confirmed neighbors. New reusable levers: combining trailing void early-returns with `||` avoids predication; a plain `while` loop (not `do-while`+separate upfront check) lets both loop exits share one tail instead of duplicating it; hardware-register polls require `volatile` on every access. 21 near-misses checked and parked with real word-level diffs documented (including a recurring, unresolved `TST`-vs-`ANDS` instruction-selection residual, and a 4-register-argument-spill ABI puzzle that resisted 4 different source models) — see full writeup for exact residuals so a future attempt doesn't re-derive them from scratch. 2 tool bugs flagged via `spawn_task` rather than fixed inline (`cmatch_loop.py --keep-drafts` leftover-file conflict; `batch_sha1.py`'s `.c`→`.s` suffix-stripping gap for `.thumb.c`/`.legacy.c`/`.legacy_sp3.c`). Process lesson: `batch_sha1.py`'s bisection assumes the candidate's `.s` file still physically exists as a revert target — deleting it before gating produces a false "0 confirmed" across an entire batch regardless of correctness (hit this directly; fixed by verifying each candidate's real match% individually first, then only deleting `.s` immediately before the one real gate call). Full writeup: [`docs/research/brief-675-main-128-drain.md`](../../research/brief-675-main-128-drain.md).
 
 ### cm-crossregion-ports — harvest the 340 free byte-verified cross-region ports (r10 bet 1 [S], top frontier) [DONE]
 
 The single most gate-safe number-mover found: a verifier drove it end-to-end (port_to_region -> flip .s->.c -> full USA rebuild -> gx-spirit-caller_usa.nds sha1 OK -> reverted clean). **244 HIGH-confidence ports PER REGION remain — 219 of them at masked-byte-sim EXACTLY 1.0** (re-censused by the brain at main post-merge with the now-committed `python tools/port_census.py`: main 131, ov002 83, ov008 8, ov011 6, + a long tail; 18,752 backlog bytes/region; routing mix of the 219: 197 default / 16 legacy_sp3 / 6 legacy / 0 thumb). The old '~170' figure UNDERSOLD it. ⚠️ USE A `sim == 1.0` FLOOR: at sim 1.0 the twin is byte-identical modulo relocations, which eliminates the region-specific struct-offset bug class outright; the 25 sub-1.0 entries are exactly where that bug lives — handle those separately (their byte diffs auto-decode the shifted offsets). Re-run `python tools/port_census.py` first (writes build/port_backlog.json with the enumerated list) — EUR readable-C functions whose USA/JPN twin still ships as .s. Porting moves USA/JPN natural-C% by ~+0.55pt EACH (~44% of the EUR-vs-region gap). Sweep: `python tools/port_to_region.py --confidence-floor HIGH` over the backlog, flip the twin .s->.c, gate. Start main + ov002. NOTE: this is a DERIVATIVE cheap harvest that runs ALONGSIDE EUR work (phased-EUR-first still holds) — it's real readable-C progress on USA/JPN, not a pivot. Watch for symbol-drift port refusals (EUR-only renamed callees).
 
 **Gate:** `python tools/gate3.py --scope all --no-tests` PASS 3-region + ported count per region + any refusals.
-**Result:** 468 ships (234 USA + 234 JPN), 3-region gate PASS. sim==1.0 floor: 211/219 shipped per region (3 excluded: 2 for a stale `ov002_core.h` header missing brief 609/613's struct-bank additions in USA/JPN, 1 for a bss-alias symbol-emission mechanism needing dsd-internals investigation — both documented as follow-ups, not shipped wrong). sub-1.0 tranche: 23/25 fixed per region via ground-truth `.s` comparison (20 shared the same consistent -8 struct-offset shift as briefs 673/676's earlier finds, 1 was a genuinely wrong constant unrelated to any offset bug, 1 was a EUR-vs-target filename-convention mismatch same as the sim==1.0 batch's `ov010_021b6b00` case; JPN needed byte-identical corrections to USA's for all 22 shared fixes, confirmed not assumed); 2 parked (`func_0204f34c`/`func_020500a4`, both `.legacy_sp3`, need a full ~57-slot shared-struct field-offset table, not a quick fix). Found and fixed a real shared-tool bug: `batch_sha1.py` never adopted the `routing_suffixes` module from brief 587, breaking every `.legacy`/`.legacy_sp3` candidate's `.c`->`.s` derivation. Mandatory .c-added==delinks-flipped check verified precisely (not just by count) for both regions: 234==234 each. Full writeup: [`docs/research/brief-677-crossregion-ports.md`](../research/brief-677-crossregion-ports.md).
+**Result:** 468 ships (234 USA + 234 JPN), 3-region gate PASS. sim==1.0 floor: 211/219 shipped per region (3 excluded: 2 for a stale `ov002_core.h` header missing brief 609/613's struct-bank additions in USA/JPN, 1 for a bss-alias symbol-emission mechanism needing dsd-internals investigation — both documented as follow-ups, not shipped wrong). sub-1.0 tranche: 23/25 fixed per region via ground-truth `.s` comparison (20 shared the same consistent -8 struct-offset shift as briefs 673/676's earlier finds, 1 was a genuinely wrong constant unrelated to any offset bug, 1 was a EUR-vs-target filename-convention mismatch same as the sim==1.0 batch's `ov010_021b6b00` case; JPN needed byte-identical corrections to USA's for all 22 shared fixes, confirmed not assumed); 2 parked (`func_0204f34c`/`func_020500a4`, both `.legacy_sp3`, need a full ~57-slot shared-struct field-offset table, not a quick fix). Found and fixed a real shared-tool bug: `batch_sha1.py` never adopted the `routing_suffixes` module from brief 587, breaking every `.legacy`/`.legacy_sp3` candidate's `.c`->`.s` derivation. Mandatory .c-added==delinks-flipped check verified precisely (not just by count) for both regions: 234==234 each. Full writeup: [`docs/research/brief-677-crossregion-ports.md`](../../research/brief-677-crossregion-ports.md).
 
 ### cm-wall-reaudit-p11-p16 — re-audit the two falsified wall entries: P-11 (10/16 members already shipped) + P-16 (r11 [S]/[A]) [DONE]
 
 r11's wall-hygiene audit found two catalogued 'permanent' entries contradicted by the tree itself. **P-11** ('budget zero matches'): **10 of its 16 catalogued members have ALREADY SHIPPED** as matched C — the entry's own population refutes its verdict; re-check the remaining 6 with the current lever set (typed-struct externs, trampoline-arity, tier routing, branch-order/predication) and rewrite or retire the entry. **P-16**: its SOLE falsification attempt used the exact pointer-cast idiom (`*(int*)(base+N)`) that the 07-24 overlay sweep proved is the wrong shape — re-test with typed struct members before the entry keeps deterring anyone. ALSO (cheap, same pass): r11 found **six already-shipped functions are still cited as live walls** in P-4 / lever-payoff.md prose — delete those citations so future agents aren't deterred by functions that are already matched. Update `docs/research/codegen-walls.md` + `lever-payoff.md` with the corrected verdicts. Note the still-standing entries r11 re-confirmed (do NOT reopen these): P-1, P-3, P-4-as-narrowed (true survivors only func_020b3850/func_0208b1ac/func_0207d4dc/func_0207db00), P-14, P-17.
 
 **Gate:** 3-region `python tools/gate3.py --scope all --no-tests` PASS + any ships + the corrected codegen-walls.md/lever-payoff.md entries + the six stale citations removed.
-**Result:** Documentation-only correction (no code shipped). P-11 confirmed by direct file check: 10/16 members shipped (listed), 6 genuinely remain and don't fit any current lever (entry's own framing — resists both permuter and source-shape iteration — already explains why; re-confirmed standing, not exhaustively re-tested). P-16 downgraded from PERMANENT to UNVERIFIED: the typed struct field (`D016C->f_d20`) already exists in `ov002_core.h` and was never tried (only the pointer-cast form was tested) — left as a documented, ready-to-execute lever for a future brief since the surrounding 137-instruction function has no preserved draft to build on (reconstructing it from scratch is its own multi-hour C-match effort, out of scope for a documentation-audit item). 7 stale citations fixed (the 6 named + 1 more found cross-referencing lever-payoff.md: `func_02084ac4`, contradicted by codegen-walls.md's own brief-671 note). Historical per-wave log sections left untouched (changelogs, not live status). P-1/P-3/P-4-as-narrowed/P-14/P-17 not reopened. Full writeup: [`docs/research/brief-678-wall-reaudit-p11-p16.md`](../research/brief-678-wall-reaudit-p11-p16.md).
+**Result:** Documentation-only correction (no code shipped). P-11 confirmed by direct file check: 10/16 members shipped (listed), 6 genuinely remain and don't fit any current lever (entry's own framing — resists both permuter and source-shape iteration — already explains why; re-confirmed standing, not exhaustively re-tested). P-16 downgraded from PERMANENT to UNVERIFIED: the typed struct field (`D016C->f_d20`) already exists in `ov002_core.h` and was never tried (only the pointer-cast form was tested) — left as a documented, ready-to-execute lever for a future brief since the surrounding 137-instruction function has no preserved draft to build on (reconstructing it from scratch is its own multi-hour C-match effort, out of scope for a documentation-audit item). 7 stale citations fixed (the 6 named + 1 more found cross-referencing lever-payoff.md: `func_02084ac4`, contradicted by codegen-walls.md's own brief-671 note). Historical per-wave log sections left untouched (changelogs, not live status). P-1/P-3/P-4-as-narrowed/P-14/P-17 not reopened. Full writeup: [`docs/research/brief-678-wall-reaudit-p11-p16.md`](../../research/brief-678-wall-reaudit-p11-p16.md).
 
 ### q-batch-port — build batch_port — turn the 438-port harvest into a turnkey gated loop (r11 [S]) [DONE]
 
@@ -899,7 +899,7 @@ round.
 > (parked-list said 98.2%, prose claimed "cracked") was reconciled
 > against ground truth (no `.c` file, `delinks.txt` unchanged — it was
 > genuinely parked). See
-> [`cm-ov002-unknown-sweep-15-2026-08-01.md`](../research/cm-ov002-unknown-sweep-15-2026-08-01.md).
+> [`cm-ov002-unknown-sweep-15-2026-08-01.md`](../../research/cm-ov002-unknown-sweep-15-2026-08-01.md).
 
 C-61's early AND/MUL residual is confirmed to generalize — do not
 re-attack it if hit again.
@@ -970,7 +970,7 @@ Keep the one-worktree-one-agent enforcement and the mandatory first-step `pwd`/b
 > mischaracterization where 3 batches independently rediscovered an
 > already-9-member wall without checking the catalogue first — now a
 > recurring failure mode worth a standing pre-dispatch check. See
-> [`cm-ov002-unknown-sweep-17-2026-08-06.md`](../research/cm-ov002-unknown-sweep-17-2026-08-06.md).
+> [`cm-ov002-unknown-sweep-17-2026-08-06.md`](../../research/cm-ov002-unknown-sweep-17-2026-08-06.md).
 
 ### cm-main-tier-sweep-1 — worklist-selected sweep of main's small tier (ledger-independent by design) [DONE]
 
@@ -1009,7 +1009,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship, whichever 
 > gate3's real exit 1) was caught by reading the log per this item's
 > own warning, fixed, and re-verified. 9 new codegen-walls.md entries
 > (C-70–C-76, P-30–P-33) plus a C-55 boundary extension. See
-> [`cm-main-tier-sweep-1-2026-08-08.md`](../research/cm-main-tier-sweep-1-2026-08-08.md).
+> [`cm-main-tier-sweep-1-2026-08-08.md`](../../research/cm-main-tier-sweep-1-2026-08-08.md).
 
 ### cm-main-tier-sweep-2 — continue the main tier, and measure the OTHER shape classes [DONE]
 
@@ -1051,7 +1051,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship.
 > own successful predication-resistance recipe does NOT generalize
 > once a guard chain's success path grows more complex than a bare
 > return. See
-> [`cm-main-tier-sweep-2-2026-08-08.md`](../research/cm-main-tier-sweep-2-2026-08-08.md).
+> [`cm-main-tier-sweep-2-2026-08-08.md`](../../research/cm-main-tier-sweep-2-2026-08-08.md).
 
 ### cm-main-tier-sweep-3 — continue main, and stop trusting the worklist's shape labels [DONE]
 
@@ -1102,7 +1102,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > reconfirmations, and 6 new tentative P-walls (P-40–P-45, including a
 > genuine mwcc 2.0 STR-immediate-truncation correctness bug, not just
 > a match gap). See
-> [`cm-main-tier-sweep-3-2026-08-08.md`](../research/cm-main-tier-sweep-3-2026-08-08.md).
+> [`cm-main-tier-sweep-3-2026-08-08.md`](../../research/cm-main-tier-sweep-3-2026-08-08.md).
 
 ### cm-main-tier-sweep-4 — shape is not the lever; find one that is [DONE]
 
@@ -1145,7 +1145,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > pre-computed tier labels were independently re-verified correct by
 > the batches (0 disagreements). 6 new C-levers, 2 new P-walls, and
 > several extensions to existing entries. See
-> [`cm-main-tier-sweep-4-2026-08-09.md`](../research/cm-main-tier-sweep-4-2026-08-09.md).
+> [`cm-main-tier-sweep-4-2026-08-09.md`](../../research/cm-main-tier-sweep-4-2026-08-09.md).
 
 ### cm-main-tier-sweep-5 — separate callee count from size by design, and probe the mechanism [DONE]
 
@@ -1202,7 +1202,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > freedom for scheduling divergence. 6 new C-levers, 2 new tentative
 > P-walls, 3 new P-36 sub-shapes (2 now confirmed at 2 instances
 > each), extensions to C-45 and C-73. See
-> [`cm-main-tier-sweep-5-2026-08-09.md`](../research/cm-main-tier-sweep-5-2026-08-09.md).
+> [`cm-main-tier-sweep-5-2026-08-09.md`](../../research/cm-main-tier-sweep-5-2026-08-09.md).
 
 ### cm-main-tier-sweep-6 — does the callee-count selector TRANSFER to another module? [DONE]
 
@@ -1264,7 +1264,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > family, a scratch-register-renaming family) but are left unnumbered
 > pending proper cross-reference against the existing catalogue rather
 > than risk a wrong or duplicate entry. See
-> [`cm-main-tier-sweep-6-2026-08-14.md`](../research/cm-main-tier-sweep-6-2026-08-14.md).
+> [`cm-main-tier-sweep-6-2026-08-14.md`](../../research/cm-main-tier-sweep-6-2026-08-14.md).
 
 
 ### cm-main-tier-sweep-7 — power the experiment properly, and start exploiting the selector [DONE]
@@ -1291,7 +1291,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > 50 in the 0-1-call band) for 50/arm: LOW 17/50 (34.0%), HIGH 18/50
 > (36.0%), Fisher **p = 1.0000** — a clean null *within this round*.
 > Two register-choice wall families (a newly-catalogued
-> [P-51](../research/codegen-walls.md) changed-bool-field family, 18
+> [P-51](../../research/codegen-walls.md) changed-bool-field family, 18
 > confirmed members, and the pre-existing register-numbering-
 > permutation-cascade family) landed **100% in the HIGH arm, 0% in
 > LOW** across 21 combined ledger rows — a plausible, evidenced
@@ -1308,7 +1308,7 @@ STOP: at 100 recorded attempts, or 15 consecutive parks with no ship. Effort MAX
 > independently re-verified clean this round: 0/19 disagreements
 > against actual shipped tier (vs. sweep-6's 50% false-positive
 > rate). 43 shipped, 8,116 B, all natural C. See
-> [`cm-main-tier-sweep-7-2026-08-17.md`](../research/cm-main-tier-sweep-7-2026-08-17.md).
+> [`cm-main-tier-sweep-7-2026-08-17.md`](../../research/cm-main-tier-sweep-7-2026-08-17.md).
 
 **Gate:** `python tools/gate3.py --scope all --clean` ONCE on the consolidated branch AFTER any final rebase (read the log — a background wrapper's exit code is not `gate3.py`'s); `check_activation_invariant.py`; `check_delink_dupes.py`; `.c`-added == delinks-activations-flipped; `git restore assets/` after `--clean`. Paste the three per-region sha1 lines VERBATIM, both invariant outputs, the partition, the arm rates with their Fisher p, and the arms' size/tier distributions. Regenerate `docs/research/README.md` LAST — a stale index has now failed `drift-check` on three separate PRs.
 
@@ -1706,7 +1706,7 @@ Address overlap between the two 193-256 B sets: **zero**. Same band, same
 harvests in descending order of tractability, so a band's rate is a property of
 *the pool when it was measured*, not of the band. Sweep-7's 23.5% on 257-320 B
 is the same vintage as the 27.6% that just evaporated. Full write-up:
-[`docs/research/band-rate-vintage.md`](../research/band-rate-vintage.md).
+[`docs/research/band-rate-vintage.md`](../../research/band-rate-vintage.md).
 
 So this item is **not** "drain 257-512 B because it looks like 23%". It is one
 bounded test of a specific hypothesis.
@@ -2009,7 +2009,7 @@ JPN cross-checked (provisional, mid-drain):
 exact-name-lookup impact reproduces almost exactly (50/8,120 B). Did not
 port anything or recommend a direction, per the item's own instruction.
 Full table and every reproducing command:
-[`docs/research/campaign-analytics/port-refusal-taxonomy.md`](../research/campaign-analytics/port-refusal-taxonomy.md).
+[`docs/research/campaign-analytics/port-refusal-taxonomy.md`](../../research/campaign-analytics/port-refusal-taxonomy.md).
 
 **Original brief text below, preserved for context:**
 
@@ -2116,7 +2116,7 @@ confidence on its own; both caveats stated explicitly. No promotion
 implemented, no direction recommended, per the item's own instruction.
 Full measurement, every reproducing command, and the 7-pair unvalidated
 collision list:
-[`docs/research/campaign-analytics/fingerprint-signal-evidence.md`](../research/campaign-analytics/fingerprint-signal-evidence.md).
+[`docs/research/campaign-analytics/fingerprint-signal-evidence.md`](../../research/campaign-analytics/fingerprint-signal-evidence.md).
 
 **Original brief text below, preserved for context:**
 
@@ -2219,7 +2219,7 @@ names swapped in its own prose (the code was never actually wrong; only
 the brief's explanation is backwards) — flagged, not fixed, out of this
 item's scope. Full per-pair evidence, the synthesis of the shared
 mechanism, and a critic pass naming the weakest-evidence pair:
-[`docs/research/campaign-analytics/collision-pair-audit.md`](../research/campaign-analytics/collision-pair-audit.md).
+[`docs/research/campaign-analytics/collision-pair-audit.md`](../../research/campaign-analytics/collision-pair-audit.md).
 
 **Original brief text below, preserved for context:**
 
@@ -2400,7 +2400,7 @@ provenance figure (the 1.2 MB unswept-bands claim, single-classifier-
 sourced) rather than presenting uniform confidence. No direction
 recommended; blank left wherever a rate could not be honestly derived.
 Full costed table, every figure dated and reproducible:
-[`docs/research/campaign-analytics/eur-next-frontier.md`](../research/campaign-analytics/eur-next-frontier.md).
+[`docs/research/campaign-analytics/eur-next-frontier.md`](../../research/campaign-analytics/eur-next-frontier.md).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.
@@ -2517,7 +2517,7 @@ bug in the coverage tool itself silently zeroed every band's count
 during development; caught, fixed, and demonstrated fail→pass via a
 reverted-then-restored test run. Full costed doc, every figure dated
 and reproducible:
-[`docs/research/campaign-analytics/large-band-reachability.md`](../research/campaign-analytics/large-band-reachability.md).
+[`docs/research/campaign-analytics/large-band-reachability.md`](../../research/campaign-analytics/large-band-reachability.md).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.
@@ -2625,7 +2625,7 @@ Incidental: `docs/dashboard.md` was stale on `origin/main` independent of
 this change (a trend-table row from round 0831's PR #1601 was never
 regenerated) — regenerated as part of reaching a green gate, one row added,
 nothing else touched. Full update:
-[`docs/research/campaign-analytics/large-band-reachability.md`](../research/campaign-analytics/large-band-reachability.md).
+[`docs/research/campaign-analytics/large-band-reachability.md`](../../research/campaign-analytics/large-band-reachability.md).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.
@@ -2734,7 +2734,7 @@ both the pure logic and a real subprocess mutation of the committed
 file, with a companion negative test proving two simultaneous
 additions still fail. Full findings, every figure dated and
 reproducible:
-[`docs/research/campaign-analytics/wall-overblock-audit.md`](../research/campaign-analytics/wall-overblock-audit.md).
+[`docs/research/campaign-analytics/wall-overblock-audit.md`](../../research/campaign-analytics/wall-overblock-audit.md).
 
 **BUILD-FREE. Do not compile, do not run `ninja`, do not run `gate3.py` against
 a region.** The other lane owns the compiler this round.

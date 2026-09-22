@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**153 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**159 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (76)
+- [Uncategorised](#uncategorised) (82)
 
 ## Analysis / worklist
 
@@ -405,9 +405,9 @@ Layout follows dqix (https://github.com/StanHash/dqix), with two project- specif
 
 ### `tools/generate_briefs_index.py`
 
-**Regenerate docs/briefs/README.md from the briefs in the same directory.**
+**Regenerate docs/briefs/archive/legacy/README.md from the legacy briefs**
 
-A "brief" is a markdown file named `NNN-slug.md` whose first non-blank line has the form `### <branch>/<slug>` and whose first paragraph labelled `**Goal:**` describes what the brief covers.
+archived in that directory.
 
 ### `tools/generate_heatmap.py`
 
@@ -519,6 +519,12 @@ Ported from khdays-decomp's `tools/audit_callsite_arity.py` (https://github.com/
 
 **Audit repeated attempts.tsv events without treating repeats as duplicates.**
 
+### `tools/authority.py`
+
+**Detect stale authority language in normative text.**
+
+The framework's first version routed every merge back through the human: *review locally, summarize, offer to merge, execute on OK.* That makes the coordinating role a recommender rather than a lead, and puts the owner back in the seat t…
+
 ### `tools/batch_carve.py`
 
 **automate the DETERMINISTIC mechanical carve lanes (brief 456).**
@@ -558,6 +564,12 @@ sibling families by canonicalized-disasm signature.
 **Per-overlay code/data/pointer breakdown for Yu-Gi-Oh! GX Spirit Caller.**
 
 Ported from pret/pokeplatinum's `.github/calcrom/calcrom.py` (MIT-ish "unlicense", per pokeplatinum's LICENSE — no header carried upstream), re-targeted at this project's directory layout:
+
+### `tools/checkout.py`
+
+**Verify that this process started in the checkout for its declared seat.**
+
+Run this as the first action in every role prompt::
 
 ### `tools/clean_macos_junk.py`
 
@@ -725,6 +737,12 @@ The brain needs one thing when a lane finishes: the lane's own final message. Re
 
 **Summarize self-reported match percentages for selected ledger briefs.**
 
+### `tools/line_endings.py`
+
+**Find and repair unsafe line endings in tracked executable text files.**
+
+The framework installs executable scripts in more than one directory. Git's index mode and the script shebang identify those files without maintaining a list that an adapter can outgrow; the fixed ``.githooks`` root is included because G…
+
 ### `tools/m2c_bootstrap.py`
 
 **vendor m2c (the asm->C decompiler) at a pinned commit,**
@@ -748,6 +766,12 @@ mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
 ### `tools/naming_census.py`
 
 **Count placeholder and real function names in committed symbol tables.**
+
+### `tools/neutrality.py`
+
+**Structural provider-neutrality scanner.**
+
+Enforces that a project's *lane identity* — its roles, branch namespaces, task queues and dispatch topology — is derived from ROLES and never from whichever provider, model or tool happens to be running a seat this round.
 
 ### `tools/normalise_park_class.py`
 
@@ -819,6 +843,12 @@ This is a small audit tool, not a replacement queue format. It checks explicit s
 
 cm-ledger-park-bias (2026-08-17): `park_one.py` is the only recorder in regular use, and it always writes `result=parked` -- ships only ever reach the ledger when a lane adds them by hand, which mostly doesn't happen (0 shipped rows acro…
 
+### `tools/report.py`
+
+**Write a role's completion report into the shared, provider-neutral inbox.**
+
+THE PROBLEM. Brain can always see what execution left in the repository — a branch, a diff, commits. It cannot see what execution *said*, because a completion report is prose, not repository state, and repository state proves that execut…
+
 ### `tools/retrieval_eval.py`
 
 **Small pure-Python BM25 evaluation for the matched-pair corpora.**
@@ -870,6 +900,12 @@ mwldarm overlay-swap-blind veneer-generation cascade (brief 132).
 **Emit a candidate `.legacy.c` stub for a StyleA c94 5-arg helper-family**
 
 pick from its disassembly (brief 264, stretch goal).
+
+### `tools/textblocks.py`
+
+**Join soft-wrapped Markdown into logical lines.**
+
+Prose in this repository is hard-wrapped at about 80 columns, so a sentence routinely spans two physical lines. A detector that reads one physical line at a time then sees fragments — and any rule that depends on words appearing near eac…
 
 ### `tools/touch_stamp.py`
 

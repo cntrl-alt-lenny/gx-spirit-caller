@@ -11,7 +11,7 @@ brief — they ship as follow-ups.
 
 - CodeWarrior emits one `__sinit_<obj>_<addr>` per translation unit
   that has a non-trivial static/global initializer. The survey in
-  [`libs/runtime/README.md`](../../libs/runtime/README.md) counts **51
+  [`libs/runtime/README.md`](../../../../libs/runtime/README.md) counts **51
   across 15 overlays**. 44 of the 51 are exactly `0x2c` bytes; the
   bodies are near-identical save/call/restore templates. Match one,
   the other 43 fall in a handful of follow-up commits.
@@ -28,11 +28,11 @@ brief — they ship as follow-ups.
 - Every `__sinit_*` has a companion `.p__sinit_*` data symbol (a word
   pointer, part of the ctor list). Those are already in
   `symbols.txt`; do **not** rename or touch them.
-- [`tools/rename_symbol.py`](../../tools/rename_symbol.py) (PR #12)
+- [`tools/rename_symbol.py`](../../../../tools/rename_symbol.py) (PR #12)
   does validated cross-file symbol renames — use it once a function is
   matched, rather than hand-editing `symbols.txt`. Dry-run first with
   `--check`.
-- [`tools/analyze_symbols.py`](../../tools/analyze_symbols.py) now has
+- [`tools/analyze_symbols.py`](../../../../tools/analyze_symbols.py) now has
   `--diff` (PR #13). Snapshot before starting (`--snapshot
   build/eur/analysis/pre-sinit.json`), snapshot again after, and diff
   to see how many previously-unnamed callers cascade into easier
@@ -44,7 +44,7 @@ Don't guess the C shape from the outside. Load the extracted
 `__sinit_ov005_021b16e4.o` in objdiff, paste its disassembly into the
 `.c` file's leading comment (the ov005 easy-tier PRs already follow
 this convention — see
-[`src/overlay005/ov005_021ab0fc.c`](../../src/overlay005/ov005_021ab0fc.c)
+[`src/overlay005/ov005_021ab0fc.c`](../../../../src/overlay005/ov005_021ab0fc.c)
 for the tone), then iterate a C body until objdiff shows 100% match.
 The expected shape is roughly: save `lr`, call a CodeWarrior ctor-list
 hook (`nn_hook_ctor_list` / `__init_cpp_exceptions` or similar — name
@@ -98,14 +98,14 @@ an unnamed address; leave it unnamed unless the name is obvious.
 Three tools shipped in the last cycle and haven't been namechecked to
 the decomper yet:
 
-- [`tools/rename_symbol.py`](../../tools/rename_symbol.py) — use this
+- [`tools/rename_symbol.py`](../../../../tools/rename_symbol.py) — use this
   instead of hand-editing `symbols.txt`. Validates that the rename is
   consistent across `symbols.txt`, `relocs.txt`, and `delinks.txt`.
-- [`tools/overlay_coupling.py`](../../tools/overlay_coupling.py) —
+- [`tools/overlay_coupling.py`](../../../../tools/overlay_coupling.py) —
   cross-module call-density report. Optional here (the 44 targets are
   structural, not call-graph-driven), but worth a look if the pattern
   matches uncover new cross-overlay edges.
-- [`tools/data_symbol_sizes.py`](../../tools/data_symbol_sizes.py) —
+- [`tools/data_symbol_sizes.py`](../../../../tools/data_symbol_sizes.py) —
   infers `data_*` extents from symbol gaps. Again optional for this
   brief; most useful once you start naming ctor-list globals.
 

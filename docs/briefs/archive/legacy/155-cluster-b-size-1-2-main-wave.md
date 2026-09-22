@@ -28,7 +28,7 @@ correctly rewrite the absorbed-placeholder load literals post-link.
 **Scope:**
 
 Apply brief 152's `.c` recipe per [`docs/research/cluster-b-
-size-1-2-recipe.md`](../research/cluster-b-size-1-2-recipe.md).
+size-1-2-recipe.md`](../../../research/cluster-b-size-1-2-recipe.md).
 Per-candidate steps:
 
 1. Identify the size-1/2 candidate from cluster B's main-module

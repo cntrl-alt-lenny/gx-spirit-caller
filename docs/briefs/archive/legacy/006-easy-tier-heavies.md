@@ -26,15 +26,15 @@ that landed alongside brief 005 to cut per-match setup cost.
 - All 4 modules are in the passing set (24/27 OK today). The `dsd
   check modules` baseline should stay stable.
 - Pattern template reminder — see
-  [`src/overlay005/ov005_021ab260.c`](../../src/overlay005/ov005_021ab260.c)
-  and [`src/overlay007/ov007_021b2ce8.c`](../../src/overlay007/ov007_021b2ce8.c)
+  [`src/overlay005/ov005_021ab260.c`](../../../../src/overlay005/ov005_021ab260.c)
+  and [`src/overlay007/ov007_021b2ce8.c`](../../../../src/overlay007/ov007_021b2ce8.c)
   (brief 005 matches) for the disassembly-prefaced-comment + minimal-C
   shape. Keep that shape.
 
 **New tools you should actually use this time (both landed in the
 last cycle):**
 
-- **[`tools/scaffold_batch.py`](../../tools/scaffold_batch.py)** (#74)
+- **[`tools/scaffold_batch.py`](../../../../tools/scaffold_batch.py)** (#74)
   — pre-creates stub `.c` files with caller/callee/load context in
   the header comment. Run it first per overlay:
 
@@ -48,7 +48,7 @@ last cycle):**
   and iterate against objdiff. Default is dry-run; `--confirm`
   required to write. It skips existing files safely.
 
-- **[`tools/propagate_template.py`](../../tools/propagate_template.py)**
+- **[`tools/propagate_template.py`](../../../../tools/propagate_template.py)**
   (#73) — if during this brief you notice a cluster of functions in
   the same overlay that look near-identical (same size, same reloc
   shape), match ONE by hand then batch-propagate to the rest:
@@ -63,10 +63,10 @@ last cycle):**
   `TemplateMismatch` if they diverge, so you can't accidentally
   ship the wrong C.
 
-- [`tools/find_callsites.py`](../../tools/find_callsites.py) (#61) —
+- [`tools/find_callsites.py`](../../../../tools/find_callsites.py) (#61) —
   when signatures aren't obvious, check who calls the function:
   `python tools/find_callsites.py --version eur ov011 0x021d2c5c`.
-- [`tools/check_match_invariants.py`](../../tools/check_match_invariants.py)
+- [`tools/check_match_invariants.py`](../../../../tools/check_match_invariants.py)
   (#67) — still the pre-PR hygiene gate. Also now runs in CI (#69)
   on every PR — your PR gets a clean comment if zero errors;
   `missing_tu_source` errors hard-gate merge.

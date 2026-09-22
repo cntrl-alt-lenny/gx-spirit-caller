@@ -14,7 +14,7 @@ shipped due to a residual bug in `tools/patch_ov004_veneers.py`'s
 `_fix_ctor_and_pad` (assumed fixed 16-byte cluster shape; at n<86
 mwldarm emits 12 bytes — patcher over-read by 4 → 4-byte short →
 SHA1 FAIL). Decomper's research note
-[`docs/research/ov004-rodata-patcher-blocker.md`](../research/ov004-rodata-patcher-blocker.md)
+[`docs/research/ov004-rodata-patcher-blocker.md`](../../../research/ov004-rodata-patcher-blocker.md)
 characterised the bug with three independent reproducer shapes.
 
 Brief 146 (PR #570) shipped the fix: byte-detect cluster shape from

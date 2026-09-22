@@ -811,7 +811,7 @@ Continuation of `cm-bss-convert-1`: re-derive the fresh candidate pool (excludin
 
 Continuation: keep the exact per-symbol reconciliation rule and keep declining — do not let the ratio drift upward under volume. Prefer struct-typed conversions where evidence genuinely supports one (`Named-struct` 1.09% is furthest behind `Typed-array` 3.31%), but never force a struct onto array-shaped evidence. File the wave-2 `progress.py` brace-nesting finding on the `codex-scaffolder` queue rather than fixing it in this lane. `ov000`/`ov002` remain out of scope.
 
-**Result: 23 fresh symbols reconciled (16 CONVERT, 7 DECLINE), 3,460 B shipped.** Filed [`q-typed-array-brace-nesting-fix`](archive/codex-scaffolder.md) separately (PR #1406) before starting the carve batch. Full per-symbol table and process notes: `docs/research/data/cm-bss-convert-3-2026-07-31.md`.
+**Result: 23 fresh symbols reconciled (16 CONVERT, 7 DECLINE), 3,460 B shipped.** Filed [`q-typed-array-brace-nesting-fix`](codex-scaffolder.md) separately (PR #1406) before starting the carve batch. Full per-symbol table and process notes: `docs/research/data/cm-bss-convert-3-2026-07-31.md`.
 `Typed-array`: 158,304 → 161,736 (**+3,432 B**, 3.31% → 3.39%). `Named-struct`: 52,040 → 52,068 (**+28 B**, 1.09% → 1.09%). Both deltas match the per-symbol hand-predicted totals exactly — no struct-internal-field leakage this wave, since none of this wave's Named-struct typedefs contain an internal array field (the specific shape that caused wave 2's classifier discrepancy).
 **Two new DispatchState-pattern members investigated, one converted, one genuinely declined** — found directly from the commit that shipped the first four, not a prescan. `data_ov016_021b9740` converted cleanly (6th confirmed instance of the pattern). `data_ov014_021b5040` declined despite matching the pattern on its surface: unlike its 5 already-shipped siblings, 3 *real* consumers (not draft speculation) dereference an offset landing inside the neighboring symbol. First case in the campaign where a symbol matching an already-proven pattern was independently investigated and declined — the reconciliation discipline isn't rubber-stamping pattern matches.
 Two shipped `char[]` conversions (`data_0218fd10`, `data_021a071c`) have unusually strong flagged struct-shape alternates (one backed by 5 independent ground-truth `.s` files) that were deliberately not shipped as structs — stride is solidly evidenced, exact field types are not, and unlike every Named-struct conversion shipped so far, neither struct name exists in already-matched code. Kept as documented leads rather than inventing a new type from partial evidence.
@@ -831,7 +831,7 @@ Focused sub-item: resolve `data_0218fd10`/`data_021a071c`'s flagged struct alter
 
 Continue, keep weighting toward struct-typed candidates (`Named-struct` 1.11% still trails `Typed-array` 3.34%). New sub-item: apply the wave-4 lower-bound rule retroactively to the 5 DispatchState members shipped before that rule existed — a second independent consumer or ground-truth `.s` write for every field; fix any found short. Keep the transitive-callee tracing technique for any partial-stride lead. Note the wave-4 build-tooling wall (`data_ov001_021ca420_alias`) as a queue item for whichever lane owns the tool, rather than carrying the workaround forward silently.
 
-**Result: all 5 pre-wave-4 DispatchState members (`data_ov023_021b23a0`, `data_ov009_*`, `data_ov016_021bab44`, `data_ov017_*`, `data_ov019_*`) CONFIRMED CORRECT against the lower-bound standard — zero fixes needed.** Filed [`q-zero-width-bss-tu-fix`](archive/codex-scaffolder.md) separately (PR #1415, not yet merged) for the wave-4 build wall before starting the carve batch. Two dedicated leads resolved: `data_ov019_021b6848` → `Ov019SceneBState` (204 B, a straight `Typed-array`→`Named-struct` swap, not a free addition, since the struct is genuinely heterogeneous and can't keep an array bracket); `data_0219b490`/`data_021a5340` → real vendored-SDK `OSThread` (a first for this project — mechanism confirmed safe by reading `configure.py`'s include-path logic directly, not assumed). **Fresh batch: 15 symbols investigated (9 CONVERT, 6 DECLINE), all 9 shipped**, plus 1 bonus alignment-pairing symbol (`data_ov004_0229164c`) found and shipped mid-carve, for 10 symbols across 9 files. Full per-symbol table and process notes: `docs/research/data/cm-bss-convert-5-2026-08-01.md`.
+**Result: all 5 pre-wave-4 DispatchState members (`data_ov023_021b23a0`, `data_ov009_*`, `data_ov016_021bab44`, `data_ov017_*`, `data_ov019_*`) CONFIRMED CORRECT against the lower-bound standard — zero fixes needed.** Filed [`q-zero-width-bss-tu-fix`](codex-scaffolder.md) separately (PR #1415, not yet merged) for the wave-4 build wall before starting the carve batch. Two dedicated leads resolved: `data_ov019_021b6848` → `Ov019SceneBState` (204 B, a straight `Typed-array`→`Named-struct` swap, not a free addition, since the struct is genuinely heterogeneous and can't keep an array bracket); `data_0219b490`/`data_021a5340` → real vendored-SDK `OSThread` (a first for this project — mechanism confirmed safe by reading `configure.py`'s include-path logic directly, not assumed). **Fresh batch: 15 symbols investigated (9 CONVERT, 6 DECLINE), all 9 shipped**, plus 1 bonus alignment-pairing symbol (`data_ov004_0229164c`) found and shipped mid-carve, for 10 symbols across 9 files. Full per-symbol table and process notes: `docs/research/data/cm-bss-convert-5-2026-08-01.md`.
 `Typed-array`: 159,508 → 160,072 (**+564 B**, 3.34% → 3.35%). `Named-struct`: 52,836 → 53,352 (**+516 B**, 1.11% → 1.12%). Both deltas match the per-symbol hand-predicted totals exactly, measured against a fresh `git stash` baseline on this exact branch point (matches wave 4's own reported ending values exactly, confirming a clean anchor).
 **Headline finding: the retroactive audit closes a real risk with a real (negative) result.** The `relocs.txt` structural-proof technique (counting every `kind:load ... to:<addr>` relocation in the shipped ROM's own relocation table) definitively ruled out hidden consumers for 2 of the 5 audited members — a stronger guarantee than grep-based reference counting. The DispatchState family (7 shipped members) is now fully verified end-to-end with zero known undersizing risk; no future wave needs to re-run this check.
 **One genuine metric-classification nuance surfaced**: `data_ov019_021b6848`'s retype is a straight bucket *swap* (-204 `Typed-array` / +204 `Named-struct`), unlike wave 4's two RETYPE precedents which were free additions (outer array bracket kept, so `Typed-array` was untouched). The difference is structural — this struct is genuinely heterogeneous (a 2-element record array plus 5 scalar tail fields) and can't honestly keep a top-level array bracket, landing in the bracket-less-singleton case `tools/progress.py` already special-cases.
@@ -920,9 +920,9 @@ PR: #1437.
 Companion to `cm-main-sweep-h`, done **after** it, not instead of it. No
 source files changed — pure investigation, both open leads resolved as
 declined. Full write-up:
-[`docs/research/data/cm-data-restock-check-2026-08-03.md`](../research/data/cm-data-restock-check-2026-08-03.md)
+[`docs/research/data/cm-data-restock-check-2026-08-03.md`](../../research/data/cm-data-restock-check-2026-08-03.md)
 (candidate table in the companion
-[`cm-data-restock-census-2026-08-03.md`](../research/data/cm-data-restock-census-2026-08-03.md)).
+[`cm-data-restock-census-2026-08-03.md`](../../research/data/cm-data-restock-census-2026-08-03.md)).
 
 1. **Pool census: did NOT restock in the depletion→regrowth sense — it was
    never visible to the `cm-data-inference`/`cm-bss-convert` series'
@@ -1003,7 +1003,7 @@ Three dossiers, derived from real disassembly, contradict them:
 ---
 
 **Done.** Full write-up:
-[`docs/research/cm-f-cf8-contradiction-2026-08-03.md`](../research/cm-f-cf8-contradiction-2026-08-03.md).
+[`docs/research/cm-f-cf8-contradiction-2026-08-03.md`](../../research/cm-f-cf8-contradiction-2026-08-03.md).
 
 **Canary verdict**: `f_cf8` is a 5-value field (0-4), not the documented
 4-value 0-3 — confirmed a genuine new value, not a rejected transient or a
@@ -1066,7 +1066,7 @@ Then re-check the remaining 4 of the 7 you surveyed. Your 3/7 was measured again
 
 **Done, combined with `cm-f-cf8-reopen`** (same sweep, filed together
 per instruction). Full write-up:
-[`docs/research/cm-f-cf8-reopen-2026-08-04.md`](../research/cm-f-cf8-reopen-2026-08-04.md).
+[`docs/research/cm-f-cf8-reopen-2026-08-04.md`](../../research/cm-f-cf8-reopen-2026-08-04.md).
 
 `Ov006SubState`: producer sweep of `data_ov006_021cf140` across all 4
 assignment syntaxes the codebase uses (bare `=`, `.f0=`, `[0]=`,
@@ -1134,7 +1134,7 @@ Do this **alongside** the `Ov006SubState` / `Ov004Phase` corrections in `cm-enum
 ---
 
 **Done.** Full write-up:
-[`docs/research/cm-f-cf8-reopen-2026-08-04.md`](../research/cm-f-cf8-reopen-2026-08-04.md).
+[`docs/research/cm-f-cf8-reopen-2026-08-04.md`](../../research/cm-f-cf8-reopen-2026-08-04.md).
 
 **CANARY reproduced first**: both cited sites confirmed exactly —
 `func_ov002_021aec04.s:176` (`mov r1,#0x5` / `str r1,[r0,#0xcf8]`) and
@@ -1211,7 +1211,7 @@ transfer to bitmask fields without a broadened producer-detection
 method first. Real, useful finding — just not the MED-vs-HIGH hit rate
 the sample set out to measure. That original question is still open.
 
-Full write-up: [`docs/research/q-producer-consumer-sample-2026-08-04.md`](../research/q-producer-consumer-sample-2026-08-04.md).
+Full write-up: [`docs/research/q-producer-consumer-sample-2026-08-04.md`](../../research/q-producer-consumer-sample-2026-08-04.md).
 
 ### q-producer-consumer-sample-2 — repair: method-compatible control, canary passes, full sample clean [DONE]
 
@@ -1263,7 +1263,7 @@ not counted toward either hit rate — third occurrence of the same
 shape, worth a dedicated broadened method later, not stretched into
 this round's number.
 
-Full write-up: [`docs/research/q-producer-consumer-sample-2-2026-08-04.md`](../research/q-producer-consumer-sample-2-2026-08-04.md).
+Full write-up: [`docs/research/q-producer-consumer-sample-2-2026-08-04.md`](../../research/q-producer-consumer-sample-2-2026-08-04.md).
 
 **Gate:** doc-only, no build.
 

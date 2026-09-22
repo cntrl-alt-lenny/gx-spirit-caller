@@ -74,10 +74,10 @@ e.g. `claude-pc/trivial-stubs-ov006-ov007`).
 
 **Useful new tools (both landed today):**
 
-- [`tools/next_targets.py`](../../tools/next_targets.py) — this
+- [`tools/next_targets.py`](../../../../tools/next_targets.py) — this
   brief's source of truth. Filter by tier+module to get the exact
   address list per PR.
-- [`tools/find_callsites.py`](../../tools/find_callsites.py) — if
+- [`tools/find_callsites.py`](../../../../tools/find_callsites.py) — if
   you wonder whether a stub is really a leaf or has meaningful
   callers, `python tools/find_callsites.py --version eur <module>
   <addr>` shows callers/callees/loads in one shot. Handy for

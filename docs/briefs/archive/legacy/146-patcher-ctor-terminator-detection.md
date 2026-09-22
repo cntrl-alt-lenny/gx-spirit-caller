@@ -20,7 +20,7 @@ cluster claims. **0 shipped.** Decomper reproduced the bug
 across three independent claim shapes (Pattern 1 .c, Pattern 1
 .s, Pattern 3 chunk via brief 125 generator) — all produced
 an identical 4-byte shift in `.data`. Decomper filed the
-research note at [`docs/research/ov004-rodata-patcher-blocker.md`](../research/ov004-rodata-patcher-blocker.md)
+research note at [`docs/research/ov004-rodata-patcher-blocker.md`](../../../research/ov004-rodata-patcher-blocker.md)
 characterising the bug + recommending the fix shape.
 
 Diagnostic (from PR #566 body):

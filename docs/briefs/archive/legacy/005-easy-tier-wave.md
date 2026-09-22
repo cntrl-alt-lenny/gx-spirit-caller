@@ -26,7 +26,7 @@ own small decomp puzzle.
   | **Target for this brief** | **~25** |
 
 - Pattern template: the 5 ov005 easy leaves from PR #11 (before the
-  brain handoff) — e.g. [`src/overlay005/ov005_021ab0fc.c`](../../src/overlay005/ov005_021ab0fc.c)
+  brain handoff) — e.g. [`src/overlay005/ov005_021ab0fc.c`](../../../../src/overlay005/ov005_021ab0fc.c)
   — show the shape:
     1. Leading comment with the raw disassembly + what the
        instructions actually do (which registers, which loads).
@@ -37,7 +37,7 @@ own small decomp puzzle.
   disassembly, hypothesise the struct shape, write the C.
 - For functions with >0 callers, run
   [`python tools/find_callsites.py --version eur <module>
-  <addr>`](../../tools/find_callsites.py) first. A leaf called from
+  <addr>`](../../../../tools/find_callsites.py) first. A leaf called from
   5 callsites probably has a meaningful name; one called from
   nowhere is safe to leave as `func_<mod>_<addr>`.
 
@@ -86,16 +86,16 @@ own small decomp puzzle.
 
 **Useful toolchain for this brief:**
 
-- [`tools/next_targets.py`](../../tools/next_targets.py) — per-overlay
+- [`tools/next_targets.py`](../../../../tools/next_targets.py) — per-overlay
   filtered lists, e.g. `--version eur --tier easy --module ov006
   --top 10 --no-outputs`.
-- [`tools/find_callsites.py`](../../tools/find_callsites.py) —
+- [`tools/find_callsites.py`](../../../../tools/find_callsites.py) —
   bidirectional xref to guess signatures and naming.
-- [`tools/rename_symbol.py`](../../tools/rename_symbol.py) — for
+- [`tools/rename_symbol.py`](../../../../tools/rename_symbol.py) — for
   validated renames after objdiff confirms a match.
-- [`tools/check_match_invariants.py`](../../tools/check_match_invariants.py)
+- [`tools/check_match_invariants.py`](../../../../tools/check_match_invariants.py)
   — pre-merge sanity check for metadata coherence.
-- [`docs/decomp-workflow.md`](../decomp-workflow.md) (Cloud's new
+- [`docs/decomp-workflow.md`](../../../decomp-workflow.md) (Cloud's new
   onboarding guide) — the narrative loop in one place.
 
 **After this brief lands:**
