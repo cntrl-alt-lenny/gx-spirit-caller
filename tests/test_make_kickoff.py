@@ -63,26 +63,34 @@ class TestMakeKickoff(unittest.TestCase):
         assert f"REPRODUCER: {expected_interpreter} tools/pool_freshness.py --pool wall-bl4-small" in text
 
     def test_mac_lane_paths_point_to_real_worktrees(self):
+        # Updated 2026-09-21: the framework adoption collapsed the Mac
+        # layout from separate top-level sibling worktrees to one checkout
+        # per role nested under the primary checkout.
         assert make_kickoff.lane_spec("decomper", "mac").worktree == (
-            "~/Dev/gx-spirit-caller/claude-decomper-queue"
+            "~/Dev/gx-spirit-caller/brain/.worktrees/decomper"
         )
         assert make_kickoff.lane_spec("scaffolder", "mac").worktree == (
-            "~/Dev/gx-spirit-caller/claude-scaffolder-queue"
+            "~/Dev/gx-spirit-caller/brain/.worktrees/scaffolder"
         )
 
     def test_item_without_named_pool_emits_no_number(self):
-        text = make_kickoff.generate("scaffolder", "windows", item="q-make-kickoff-generator")
+        # "windows" was removed from VERIFIED_WORKTREES 2026-09-21 (real
+        # current Windows paths are unconfirmed post-adoption); "mac" is
+        # verified and exercises the same non-pool-item code path.
+        text = make_kickoff.generate("scaffolder", "mac", item="q-make-kickoff-generator")
         assert "LIVE POOL" not in text
         assert "REPRODUCER:" not in text
 
     def test_stripped_establishment_is_refused(self):
         text = make_kickoff.render(
             "scaffolder",
-            "windows",
+            "mac",
             item="q-make-kickoff-generator",
         )
+        # "mac" (unlike the now-unverified "windows" host) establishes
+        # location with `cd`, not `Set-Location` -- strip that line instead.
         sabotaged = "\n".join(
-            line for line in text.splitlines() if not line.strip().startswith("Set-Location")
+            line for line in text.splitlines() if not line.strip().startswith("cd ")
         )
         assert "location-guard" in {check.key for check in make_kickoff.required_failures(sabotaged)}
         try:

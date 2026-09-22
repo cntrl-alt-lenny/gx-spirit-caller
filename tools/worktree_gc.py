@@ -43,7 +43,7 @@ ROOT = Path(__file__).resolve().parent.parent
 #
 # `tests/test_worktree_gc.py` pins LANE_ROLES against `make_kickoff.py`'s own
 # lane table so the two cannot diverge silently.
-LANE_ROLES = frozenset({"brain", "decomper", "scaffolder", "kb-map", "kb-types"})
+LANE_ROLES = frozenset({"brain", "decomper", "scaffolder", "verifier", "kb-map", "kb-types"})
 _PROVIDER_PREFIX = r"(?:[a-z0-9]+-)?"
 # `-queue` is the Mac lane suffix; `-claude-<digits>` is the sandbox variant
 # `tools/prune_worktrees.py` also treats as permanent -- keep the two tools
