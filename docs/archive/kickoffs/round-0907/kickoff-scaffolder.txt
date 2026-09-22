@@ -1,0 +1,157 @@
+SCAFFOLDER — round 0907. Item: cm-257-320-drain-5. TOOLCHAIN-BOUND. Effort HIGH.
+
+You are the Scaffolder. You own the compiler this round — the other lane is
+build-free, so nothing else should be running mwcc/mwld/ninja on this machine.
+The Metrowerks licence is a machine-wide lock.
+
+⚠️ YOU WERE RIGHT LAST ROUND AND THE MACHINE IS NOW FREE. Round 0906 gave you
+this same item while the brain still held the compiler. You detected the
+competing gate3/ninja with live mwccarm processes, declined to compile, declined
+to kill another lane's processes, and paused. That was the correct call and the
+brain's sequencing was the fault. The gate has since finished — three regions
+byte-identical — and no build, gate or wine process is running now. If you
+detect a competing build this round, pause the same way again.
+
+PREFLIGHT — STOP and report on any failure, do not work around it:
+
+    cd /Users/leo/Dev/spirit-caller/claude-scaffolder-queue
+    EXPECT=/Users/leo/Dev/spirit-caller/claude-scaffolder-queue
+    [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || { echo "WRONG WORKTREE"; exit 1; }
+    git fetch origin || exit 1
+    git switch -c scaffolder/cm-257-320-drain-5 origin/main || exit 1
+    ls orig/ >/dev/null || { echo "NO BASEROM"; exit 1; }
+    python3.13 tools/work_queue.py next scaffolder --claim || exit 1
+
+Your branch is scaffolder/cm-257-320-drain-5, cut from origin/main, which is
+7b8b6bd3f. The worktree was reset to a clean detached origin/main for you and
+the stale branch from last round was deleted, so the -c above will succeed.
+Lane identity is the ROLE, not a provider or a model — branches are
+<role>/<scope> and tests/test_role_lane_neutrality.py fails closed on anything
+else.
+
+EVIDENCE RULE. Every number, rate and verdict you report must be pasted with the
+exact command that produced it, in the same block. Do not restate a number from
+this kickoff as though you had measured it — re-run it. Do not hand-compute a
+rate a tool can emit.
+
+THE BAND IS TWO POOLS, AND drain-4 DRAINED THE WRONG ONE. PR #1616 shipped 1 of
+17 attempted (5.9%) and correctly reported that as a divergence. The brain
+quantified it from the ledger across all six briefs that have worked this band:
+
+    ov002              6/30 = 20.0%     132 candidates remaining
+    main               1/34 =  2.9%      56 candidates remaining
+    everything else    4/20 = 20.0%      10 candidates remaining
+
+Per-round rate tracks module mix almost exactly: drain-1 (10 main / 6 ov002)
+17.6%, drain-2 (6/7) 7.1%, drain-3 (0 main / 12 ov002) 12.5%, drain-4 (16 main /
+1 ov002) 5.9%. Selection artefact, not band exhaustion.
+
+Pool numbers you re-measured yourself last round and confirmed, on a tree whose
+only changes since are docs, tests and two Python tools with no src/, delinks or
+ledger among them:
+
+    python3.13 tools/pool_freshness.py --pool wall-bl4-small --min-size 257 --max-size 320 --exclude-attempted --all-modules
+        -> 198 candidates / 57,976 B
+
+    python3.13 tools/pool_freshness.py --pool wall-bl4-small --min-size 257 --max-size 320 --exclude-attempted --module overlay002
+        -> 132 candidates / 38,608 B
+
+The 132 is the pool you are draining. Re-run both and STOP if either has moved.
+
+m2c COMPILE CONTEXT — this machine has one, and it is the round's advantage.
+An earlier kickoff said m2ctx.py hardcodes gcc and "this machine has none"; that
+was the other machine. Here /usr/bin/gcc exists as the Apple clang shim:
+
+    build_context('eur','ov002')  -> build/eur/_m2c_ctx/ov002_core.ctx.c, 5,035 bytes, exists
+    build_context('eur','main')   -> None
+
+main legitimately returns None because it has no core header, which is why
+drain-4 was unaffected. Report whether the context changes m2c's output AS A
+DIFF, not as a description. Take one ov002 candidate, run m2c twice — once with
+build/eur/_m2c_ctx/ov002_core.ctx.c as context, once with none — write both to
+files, and paste:
+
+    diff -u <no-context-output> <with-context-output> | head -60
+
+An EMPTY diff is a valid and valuable result: it retires a two-round hypothesis.
+Paste it and say so. Beyond one sentence naming what kind of thing changed
+(types, names, or neither), write no prose about it — the diff is the finding.
+
+context_error is still written at tools/cmatch_loop.py:361 and read nowhere, so
+a context-less run announces nothing. Surface it wherever the dossier is
+rendered. That fix stands even though this machine does not trip it.
+
+SCOPE, in this order. Three items. Do not add a fourth.
+
+1. FIX THE AUTO-SCAFFOLD PADDING BUG FIRST, BEFORE ANY CANDIDATE.
+   prepare_compile_source declares every referenced unkNN field as a
+   sequentially-packed int with no padding for the real byte gap, so a compile
+   succeeds at the wrong field offsets. The gap is derivable from the numeric
+   suffixes already in the field names. Your own evidence from drain-3: one
+   char _pad[N] insertion took the shipped function from 95.89% to 100.0%, and
+   moved func_0201cab4 from 10.96% to 83.6%.
+
+   CANARY, control 7, non-negotiable: construct a case with a known byte gap,
+   confirm the generator emits the WRONG struct before your fix and the RIGHT
+   one after. If it is already correct on the current tree, your reading of the
+   bug is wrong — STOP and report that rather than proceeding. Paste both.
+
+2. DRAIN ov002-FIRST. Take the 132 ov002 candidates in pool order, target n≈20.
+   Do NOT take main candidates this round. If you exhaust ov002, stop and report
+   rather than filling the tranche from the 2.9% pool — a short honest tranche is
+   the correct outcome, a padded one is not.
+
+   Route before you draft: read each target's own epilogue first. sub sp,#4 plus
+   a separate pop {lr} / bx lr means name the file *.legacy.c; a fused
+   pop {..., pc} means *.legacy_sp3.c; otherwise plain .c. Choosing the tier
+   before writing the body removed an epilogue mismatch worth ~14% of one
+   earlier sample.
+
+   Park the reg-alloc/scratch-register wall on sight (identical instructions,
+   one register swapped throughout) — 100% lever-insensitive, do not iterate on
+   it. Keep writing result=not-attempted ledger rows when you screen.
+
+3. DO NOT EDIT docs/research/codegen-walls.md. The catalogue backfill is off
+   your scope and the brain is doing it. At the end of your PR body, paste your
+   tranche's RAW ledger rows under a heading "LEDGER ROWS, VERBATIM" — unedited,
+   no totals, no summary table. The brain writes the catalogue entry from those.
+
+ONE DENOMINATOR, PINNED — quote it, do not recompute it. Three competing
+cumulative figures for this band are in circulation: 4/31 = 12.9%, 8/51 = 15.7%,
+and 11/84 = 13.1%. 11/84 across all six briefs is correct. State its scope every
+time you quote it.
+
+REPORT ALL OF, each with its command: attempted-rate, pool-rate, screens split by
+grounds, cumulative P-20 encounters (18 at the start of this round), the module
+mix of your tranche, and how many m2c compile-context failures you hit.
+
+BRAIN BASELINE — the brain ran python3.13 tools/gate3.py --scope all on this
+machine against main at 6ab979c3c and got three-region byte-identical ninja
+sha1: [eur] SHA1 PASS, [usa] SHA1 PASS, [jpn] SHA1 PASS, GATE PASS, with the
+full pytest suite green. main has since moved to 7b8b6bd3f, which adds only
+docs, tests and one standalone Python tool that nothing in the build imports —
+zero files under src/, config/, libs/, include/ or extract/ — so the ROM is
+unchanged and that baseline still holds. Any gate failure you see is yours, not
+inherited. If your first gate run disagrees, STOP and say so rather than
+bisecting into the baseline.
+
+VERIFY YOUR OWN CLAIMS. Before writing the PR body or any commit message,
+reconcile every sentence against git diff --stat origin/main..HEAD. Count .c
+files added against delinks.txt activations flipped — they MUST be equal; a
+function shipped with a stale .s activation still builds a byte-correct ROM, so
+no gate catches it and only the count check does.
+
+A SHORT ROUND IS AN ACCEPTABLE ROUND. A 12-candidate tranche fully pasted beats
+a 20-candidate tranche summarised.
+
+GATE — one run, on the consolidated branch, never per-batch:
+
+    python3.13 tools/gate3.py --scope all
+
+Read the gate's own output to the end before concluding. The wrapper has printed
+"[exited with code 0]" directly beneath "GATE FAIL" in two recent rounds; the
+exit code is not the verdict, the PASS/FAIL banner is.
+Paste the three sha1 PASS lines, the pytest tail, and git diff --stat verbatim.
+
+When done: python3.13 tools/work_queue.py done scaffolder cm-257-320-drain-5,
+commit, push the branch, run gh pr create, and reply with the PR URL.

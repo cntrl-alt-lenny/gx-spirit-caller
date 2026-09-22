@@ -61,7 +61,7 @@ request to approve that specific merge → receive the next prompt.
 Owner (cntrl_alt_lenny)
   |  direction, scope, veto, per-merge approval
   v
-Brain (primary checkout, brain/)
+Brain (primary checkout, repository root `~/Dev/gx-spirit-caller` on this Mac)
   |  briefs, review, merge (after owner approval), one lane at a time:
   +-- decomper   at .worktrees/decomper
   +-- scaffolder at .worktrees/scaffolder
@@ -70,7 +70,7 @@ Brain (primary checkout, brain/)
 
 | Role | Runs from | Owns these paths | Hands-off paths |
 |---|---|---|---|
-| **Brain** | the primary checkout (`brain/`) | `AGENTS.md`, `docs/state.md`, `docs/briefs/`, `docs/queue/`, `docs/project-rules.md` | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`, `.github/` |
+| **Brain** | the primary checkout (repository root; roles below `.worktrees/`) | `AGENTS.md`, `docs/state.md`, `docs/briefs/`, `docs/queue/`, `docs/project-rules.md` | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`, `.github/` |
 | **Decomper** | `.worktrees/decomper` | `src/`, `config/<region>/**/symbols.txt` (renames only — never hand-edit `arm9/config.yaml`), `assets/` | `tools/`, `libs/`, `include/`, `AGENTS.md` |
 | **Scaffolder** | `.worktrees/scaffolder` | `tools/`, `libs/`, `include/`, `.github/` | `src/`, `config/**/symbols.txt`, `AGENTS.md` |
 | **Verifier** | `.worktrees/verifier` | none — reviews an exact SHA independently in its own checkout and writes findings; owns no path and never commits project source | everything; it never writes source, and never merges |

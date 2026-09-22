@@ -3,8 +3,8 @@
 The genuine one-time setup steps for a fresh machine — clone, baserom, Python
 deps, toolchain, first build, baseline. This is **not** a role's operating
 loop; for who does what and how work gets accepted, see `AGENTS.md` and
-`docs/agents/`. For the current checkout layout (one isolated checkout per
-role, nested under the primary checkout), see
+`docs/agents/`. For the current checkout layout (the primary checkout is the
+repository root; one isolated checkout per role is nested under it), see
 [`docs/agents/git-and-isolation.md`](agents/git-and-isolation.md) — a fresh
 setup does **not** use the older sibling-folder layout some archived
 documents describe.
@@ -24,17 +24,27 @@ git fetch origin && git pull --ff-only
 ```
 
 Then set up the isolated checkout your role needs per
-`docs/agents/git-and-isolation.md` — the primary checkout is Brain's; every
-other role gets its own `.worktrees/<role>` linked worktree.
+`docs/agents/git-and-isolation.md` — on this Mac the primary checkout is
+`~/Dev/gx-spirit-caller`, and every other role gets its own `.worktrees/<role>`
+linked worktree beneath it.
 
 ## 2. Place the baseroms
 
-Copy each region's `baserom_<region>.nds` into `orig/`. These are
-never committed and never redistributed — get a clean dump from someone who
-already has one. The SHA-1s are pinned in `tools/configure.py` and
-`gx-spirit-caller_<ver>.sha1`; `configure.py` verifies them and fails loudly
-on a mismatch (do not bypass that check) — see `CLAUDE.md` for the
-authoritative table:
+For a new role checkout, link the primary checkout's ROMs into it:
+
+```bash
+python3.13 tools/link_baseroms.py .worktrees/<role>
+```
+
+Run the command from the primary checkout, replacing `<role>` with the role
+checkout's path. It finds the primary through Git's common directory, verifies
+each available source against the SHA-1s pinned in `tools/configure.py`, and
+creates hard links. If an existing target is a byte-identical copy, add
+`--replace-copies`; a differing target is always refused. A missing source is
+reported and skipped. These files are never committed or redistributed — get
+a clean dump from someone who already has one. If the filesystems do not
+support hard links, the tool prints a loud warning and falls back to a copy.
+See `CLAUDE.md` for the authoritative table:
 
 | Region | Path | SHA-1 |
 |---|---|---|
@@ -42,8 +52,8 @@ authoritative table:
 | USA | `orig/baserom_usa.nds` | `9e53dcc74d8a9db4de6b655d62a1da6f5e9c2a83` |
 | JPN | `orig/baserom_jpn.nds` | `761fbfc62f4fe74f867e973a5eda91b8e86424f6` |
 
-Every linked worktree needs its own copy of all three (`orig/` is
-gitignored and not shared automatically by `git worktree`).
+`orig/` is gitignored and not populated automatically by `git worktree`; use
+the tool above for every role checkout.
 
 ## 3. Install Python dependencies
 

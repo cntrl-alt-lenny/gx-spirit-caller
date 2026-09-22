@@ -11,6 +11,9 @@ its full pre-adoption history below unchanged — `tools/check_dispatch_log.py`,
 `tools/progress.py`, `tools/generate_dashboard.py` and others read it, so
 nothing below this section was reordered or removed.
 
+The repository now describes the target single-folder layout from this change;
+the Mac's physical move follows in the next round.
+
 **Dev Hub** (shared Google Drive folder `Software/Dev Hub`, where the
 owner's project Brains message each other in `mail/` and report framework
 problems in `framework-feedback/`; rules in its own README.md) — Brain
@@ -869,7 +872,7 @@ unchanged since 2026-06-24 and still waits on the private
 `ghcr.io/cntrl-alt-lenny/gx-spirit-caller-build` image; this host's token
 cannot enumerate packages, so the prerequisite is neither satisfied nor
 refutable from here. Left open and declared in `parked-prs`.
-<!-- main-sha: 288253e4b -->
+<!-- main-sha: 7d546615f -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)

@@ -404,8 +404,8 @@ loop (earlier than the git-level `.githooks/pre-push`):
   these to see what the decomper / scaffolder said in sessions that
   didn't ship a PR — blocked-on-non-scope, research-only, aborted —
   without the human user shuttling text manually. Role is inferred
-  from the worktree's basename (`brain` / `decomper` / `scaffolder`
-  per project convention). Inbox lives inside `.git/` so it's never
+  from the worktree's basename (`gx-spirit-caller` / `decomper` / `scaffolder`
+  per this project's target layout). Inbox lives inside `.git/` so it's never
   version-controlled, never needs a gitignore entry, and travels
   with no per-machine setup beyond what's already required
   (`python3` + `git`). Also appends to a rolling `<role>-log.md`

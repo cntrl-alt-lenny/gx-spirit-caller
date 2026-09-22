@@ -1,0 +1,118 @@
+DECOMPER — round 0905. Item: q-handoff-guard-repair. BUILD-FREE. Effort MAX.
+
+You are the Decomper. This round runs on the Mac, and the other lane owns the
+compiler. Do NOT compile, do NOT run ninja, do NOT run gate3.py against a
+region. Everything below is text, tests and CI.
+
+PREFLIGHT — STOP and report on any failure, do not work around it:
+
+    cd /Users/leo/Dev/spirit-caller/claude-decomper-queue
+    EXPECT=/Users/leo/Dev/spirit-caller/claude-decomper-queue
+    [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || { echo "WRONG WORKTREE"; exit 1; }
+    git fetch origin || exit 1
+    git switch -c decomper/q-handoff-guard-repair origin/main || exit 1
+    python3.13 -c "import sys; assert sys.version_info[:2] >= (3,11)" || exit 1
+    python3.13 tools/work_queue.py next decomper --claim || exit 1
+
+Your branch is decomper/q-handoff-guard-repair, cut from origin/main. Lane
+identity is the ROLE, not a provider or a model — branches are <role>/<scope>
+and tests/test_role_lane_neutrality.py fails closed on anything else.
+
+CONTEXT — PR #1615 is already merged and its queue item is closed. The brain
+integrated it on the Mac, fixed the two defects that held it, and CI went
+green. Do not re-take it. What the brain changed, so you are not surprised by
+the diff: .github/workflows/tests.yml gained fetch-depth: 0 on the unittest
+job, and tools/make_kickoff.py's _run_pool now executes sys.executable instead
+of spec.interpreter. The python3.13 pin round 0903 reserved is UNTOUCHED and
+was verified on the Mac: lane_spec('scaffolder','mac').interpreter is still
+python3.13.
+
+THE ROUND'S WORK — both handoff guards are inert, and the brain re-derived
+that on current main at 1592a2568. This is the third "documented, installed,
+inert" finding in three rounds, so treat the pattern as the target, not just
+the two instances.
+
+GUARD 1 — tools/queue_state_drift.py measures anchor staleness with
+git rev-list --count --merges <anchor>..<ref>. The repo has squash-merged
+exclusively since 2026-08-25 (efb512d32 is the last real merge commit), so
+merges_since is ALWAYS 0 and the _STALE_MERGE_TOLERANCE branch is unreachable.
+Brain-measured on main, paste-able, reproduce it before you change anything:
+
+    git rev-list --count --merges efb512d32..HEAD      ->  0
+    git rev-list --count efb512d32..HEAD               ->  36
+
+    python3.13 -c "import sys; sys.path.insert(0,'tools'); from pathlib import Path; import queue_state_drift as q; c=q.main_anchor_checker(Path('.'),'HEAD'); print(c('0b2f8c630'), c('676fed454'), c('efb512d32'))"
+
+That prints (True, 0) (True, 0) (True, 0) — "fresh, zero behind" for anchors
+5, ~10 and 36 commits back. 0b2f8c630 is the anchor docs/state.md carries right
+now; 676fed454 is the one round 0903 left stale.
+
+GUARD 2 — tools/check_dispatch_log.py requires a dispatch row only when the
+"Last updated:" BLOCK changes (that line through the next blank line). A round
+appending its narrative anywhere else in docs/state.md skips the requirement
+silently, which is exactly what round 0903 did.
+
+NEITHER IS WIRED INTO CI. .github/workflows/generated-files-drift.yml runs the
+three index --checks plus validate_attempts.py and nothing else. A guard that
+no workflow invokes is not installed, whatever the docs say.
+
+SCOPE, in this order.
+
+1. Fix both guards so they measure what they claim. Count squash-merge commits
+   (or PR-numbered subjects), not --merges. For guard 2, key the requirement on
+   the round narrative changing at all, not on one paragraph.
+2. Wire both into CI, in the workflow where they belong. Say which workflow and
+   why that one.
+3. Correct docs/guard-coverage-review.md. It lists test_install_git_hooks.py as
+   FIRES-CORRECTLY while the pre-push hook it installs was inert for its entire
+   life — it audited the installer, not the behaviour. Add a line saying the
+   table cannot be cited as proof a guard fires, and that a guard needs a
+   behavioural canary.
+
+CANARY — control 7, non-negotiable, do this BEFORE the fix. For EACH guard,
+reconstruct the round-0903 tree (anchor 676fed454, main at 050f06c0f, no 0903
+dispatch row) and show the guard GREEN on that input — i.e. failing to catch a
+handoff that was genuinely broken. Then show it RED on the same input after
+your fix. If either guard is already RED before your fix, your model of the bug
+is wrong: STOP and report that instead of proceeding. Paste both runs.
+
+4. Two boundary defects the brain found this round while working in
+   tools/make_kickoff.py. Both are small, both are in your lane, take them
+   after the guards:
+   (a) tools/pool_freshness.py hardcodes the string "python tools/pool_freshness.py ..."
+       as its own REPRODUCER output, regardless of host. A Mac-host kickoff
+       therefore prints a reproducer the Mac cannot run, because macOS has no
+       plain python. Make the emitted reproducer name an interpreter that
+       exists on the host it is addressed to.
+   (b) tools/make_kickoff.py's LANE_WORKTREES mac paths are
+       ~/Dev/spirit-caller/decomper and ~/Dev/spirit-caller/scaffolder. Neither
+       directory exists on this Mac — the real lane worktrees are
+       claude-decomper-queue and claude-scaffolder-queue. A generated Mac
+       kickoff would send a lane to a nonexistent directory, and the location
+       guard would correctly STOP it after the paste. Make the mac paths match
+       reality, or make the generator refuse to emit a path that does not
+       exist. State which you chose.
+
+SUB-AGENTS PERMITTED, READ-ONLY ONLY. The worktree is shared: dispatch
+investigation as read-only Explore agents with no Write/Edit/Bash-write access,
+and do every write, commit and git operation yourself, sequentially.
+
+VERIFY YOUR OWN CLAIMS. Before writing the PR body or any commit message,
+reconcile every sentence against git diff --stat origin/main..HEAD. An omitted
+edit is byte-identical to a correct no-op and no test can tell them apart —
+that is how PR #1383 shipped a change that was never written.
+
+GATE — paste all of these outputs, not a summary of them:
+
+    python3.13 -m pytest -q tests
+    python3.13 -m unittest discover -s tests
+    python3.13 -m ruff check .
+    git diff --stat origin/main..HEAD
+
+Paste the pytest summary line and the git diff --stat output verbatim, paste
+the "Ran N tests" + "OK" line from unittest, and paste the
+before/after canary runs for both guards. A self-report that the guards now
+work is not evidence; the pasted red/green pair is.
+
+When done: python3.13 tools/work_queue.py done decomper q-handoff-guard-repair,
+commit, push the branch, run gh pr create, and reply with the PR URL.

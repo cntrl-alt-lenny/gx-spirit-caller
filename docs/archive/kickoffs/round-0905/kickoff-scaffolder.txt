@@ -1,0 +1,142 @@
+SCAFFOLDER — round 0905. Item: cm-257-320-drain-5. TOOLCHAIN-BOUND. Effort MAX.
+
+You are the Scaffolder. You own the compiler this round — the other lane is
+build-free, so nothing else should be running mwcc/mwld/ninja on this machine.
+The Metrowerks licence is a machine-wide lock; if a build stalls, check for a
+competing process before treating it as a failure.
+
+PREFLIGHT — STOP and report on any failure, do not work around it:
+
+    cd /Users/leo/Dev/spirit-caller/claude-scaffolder-queue
+    EXPECT=/Users/leo/Dev/spirit-caller/claude-scaffolder-queue
+    [ "$(git rev-parse --show-toplevel)" = "$EXPECT" ] || { echo "WRONG WORKTREE"; exit 1; }
+    git fetch origin || exit 1
+    git switch -c scaffolder/cm-257-320-drain-5 origin/main || exit 1
+    ls orig/ >/dev/null || { echo "NO BASEROM"; exit 1; }
+    python3.13 tools/work_queue.py next scaffolder --claim || exit 1
+
+Your branch is scaffolder/cm-257-320-drain-5, cut from origin/main. Lane
+identity is the ROLE, not a provider or a model — branches are <role>/<scope>
+and tests/test_role_lane_neutrality.py fails closed on anything else.
+
+THE BAND IS TWO POOLS, AND drain-4 DRAINED THE WRONG ONE. PR #1616 shipped
+1 of 17 attempted (5.9%), 1 of 17 pool, zero screens, and correctly reported
+that as a divergence rather than adjusting it. The brain then quantified the
+prose explanation you gave, across all six briefs that have worked this band:
+
+    ov002              6/30 = 20.0%     132 candidates remaining
+    main               1/34 =  2.9%      56 candidates remaining
+    everything else    4/20 = 20.0%      10 candidates remaining
+
+The per-round rate tracks the module mix almost exactly: drain-1 (10 main /
+6 ov002) 17.6%, drain-2 (6/7) 7.1%, drain-3 (0 main / 12 ov002) 12.5%,
+drain-4 (16 main / 1 ov002) 5.9%. Your tranche drew 16 of 17 from the 2.9%
+sub-pool while 132 candidates sat in the 20.0% one. Selection artefact, not
+band exhaustion.
+
+Pool re-measured by the brain on post-merge main at 1592a2568, not carried
+over from last round:
+
+    python3.13 tools/pool_freshness.py --pool wall-bl4-small --min-size 257 --max-size 320 --exclude-attempted --all-modules
+        -> 198 candidates / 57,976 B
+
+    python3.13 tools/pool_freshness.py --pool wall-bl4-small --min-size 257 --max-size 320 --exclude-attempted --module overlay002
+        -> 132 candidates / 38,608 B
+
+The 132 is the pool you are draining. Re-run both yourself and stop if either
+number has moved.
+
+⚠️ THE m2ctx BLOCKER FROM LAST ROUND DOES NOT APPLY ON THIS MACHINE, AND THIS
+IS THE ROUND'S REAL ADVANTAGE. The kickoff you were given last round said
+m2ctx.py hardcodes gcc and "this machine has none" — that was true of the
+Windows PC. This round runs on the Mac, where /usr/bin/gcc exists as the Apple
+clang shim. The brain verified the consequence directly on main:
+
+    build_context('eur','ov002')  -> build/eur/_m2c_ctx/ov002_core.ctx.c, 5,035 bytes, exists
+    build_context('eur','main')   -> None
+
+So ov002 gets a REAL m2c compile context this round, and main legitimately
+returns None because it has no core header — which is exactly why drain-4 was
+unaffected and why your attribution of your near-misses to the scaffold rather
+than the context was correct. This is the first ov002 tranche with a working
+context. Report whether it changes m2c's output: take one candidate, run it
+with the context and describe what the context gave you that a context-less
+run did not. If you see no difference, say so plainly — a negative result here
+is worth as much as a positive one and it retires a two-round hypothesis.
+
+context_error is still written at tools/cmatch_loop.py:361 and read nowhere,
+so a context-less run announces nothing. Surface it wherever the dossier is
+rendered. That fix stands even though this machine does not trip it — the
+Windows PC still will.
+
+SCOPE, in this order.
+
+1. FIX THE AUTO-SCAFFOLD PADDING BUG FIRST, BEFORE ANY CANDIDATE.
+   prepare_compile_source declares every referenced unkNN field as a
+   sequentially-packed int with no padding for the real byte gap, so a compile
+   succeeds at the wrong field offsets. The gap is derivable from the numeric
+   suffixes already present in the field names. Your own evidence from last
+   round: one char _pad[N] insertion took the shipped function from 95.89% to
+   100.0%, and moved func_0201cab4 from 10.96% to 83.6%.
+
+   CANARY, control 7, non-negotiable: construct a case with a known byte gap,
+   confirm the generator emits the WRONG struct before your fix and the RIGHT
+   one after. If it is already correct on the current tree, your reading of the
+   bug is wrong — STOP and report that rather than proceeding. Paste both.
+
+2. DRAIN ov002-FIRST. Take the 132 ov002 candidates in pool order, target
+   n≈20. Do NOT take main candidates this round. If you exhaust ov002, stop and
+   report rather than filling the tranche from the 2.9% pool — a short honest
+   tranche is the correct outcome, a padded one is not.
+
+   Route before you draft: read each target's own epilogue first. sub sp,#4
+   plus a separate pop {lr} / bx lr means name the file *.legacy.c; a fused
+   pop {..., pc} means *.legacy_sp3.c; otherwise plain .c. Choosing the tier
+   before writing the body removed an epilogue mismatch worth ~14% of one
+   earlier sample.
+
+   Park the reg-alloc/scratch-register wall on sight (identical instructions,
+   one register swapped throughout) — it is 100% lever-insensitive; do not
+   iterate on it. Keep writing result=not-attempted ledger rows when you
+   screen; that is standing practice now.
+
+3. BACKFILL THE WALL CATALOGUE. docs/research/codegen-walls.md's BR ledger
+   stops at BR-9 — drain-3 and drain-4 never added entries. Add BR-10 (drain-3,
+   2/16 attempted, 2/17 pool) and BR-11 (drain-4, 1/17, 1/17) from the ledger,
+   then add your own as BR-12. A catalogue that stops being updated is the same
+   narrative-versus-ledger divergence your C-63 recovery found in the other
+   direction.
+
+⚠️ ONE DENOMINATOR, PINNED. Three competing cumulative figures for this band
+are in circulation: 4/31 = 12.9% (BR-8+BR-9 only), 8/51 = 15.7% (BR-4+drains),
+and 11/84 = 13.1% (all six briefs). 11/84 is the correct one — you derived it
+independently and the brain's recomputation matched exactly. Quote that one,
+and state its scope every time you quote it.
+
+REPORT ALL OF: attempted-rate, pool-rate, screens split by grounds, cumulative
+P-20 encounters (18 at the start of this round), the module mix of your tranche,
+and how many m2c compile-context failures you hit.
+
+BRAIN BASELINE — main at 1592a2568 was gated clean on this Mac before you
+started: three-region byte-identical ninja sha1. Any gate failure you see is
+yours, not inherited. If your first gate run disagrees with that, STOP and say
+so rather than bisecting into the baseline.
+
+VERIFY YOUR OWN CLAIMS. Before writing the PR body or any commit message,
+reconcile every sentence against git diff --stat origin/main..HEAD. Count .c
+files added against delinks.txt activations flipped — they MUST be equal; a
+function shipped with a stale .s activation still builds a byte-correct ROM, so
+no gate catches it and only the count check does. An omitted edit is
+byte-identical to a correct no-op.
+
+GATE — one run, on the consolidated branch, never per-batch:
+
+    python3.13 tools/gate3.py --scope all
+
+Read the gate's own output to the end before concluding. The wrapper has
+printed "[exited with code 0]" directly beneath "GATE FAIL" in each of the last
+two rounds; the exit code is not the verdict, the PASS/FAIL banner is.
+Paste the three sha1 PASS lines, the pytest tail, and git diff --stat verbatim.
+
+When done: python3.13 tools/work_queue.py done scaffolder cm-257-320-drain-5,
+commit, push the branch, run gh pr create, and reply with the PR URL.
