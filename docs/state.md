@@ -872,7 +872,7 @@ unchanged since 2026-06-24 and still waits on the private
 `ghcr.io/cntrl-alt-lenny/gx-spirit-caller-build` image; this host's token
 cannot enumerate packages, so the prerequisite is neither satisfied nor
 refutable from here. Left open and declared in `parked-prs`.
-<!-- main-sha: 288253e4b -->
+<!-- main-sha: 7d546615f -->
 <!-- parked-prs: 1020 -->
 
 ## Durable conventions (lifted out of the archived round narrative)
