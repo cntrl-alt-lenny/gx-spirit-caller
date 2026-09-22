@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**159 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**160 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -19,7 +19,7 @@ git add docs/tools-index.md
 - [Hygiene / invariants](#hygiene--invariants) (9)
 - [CI formatters](#ci-formatters) (7)
 - [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (82)
+- [Uncategorised](#uncategorised) (83)
 
 ## Analysis / worklist
 
@@ -742,6 +742,12 @@ The brain needs one thing when a lane finishes: the lane's own final message. Re
 **Find and repair unsafe line endings in tracked executable text files.**
 
 The framework installs executable scripts in more than one directory. Git's index mode and the script shebang identify those files without maintaining a list that an adapter can outgrow; the fixed ``.githooks`` root is included because G…
+
+### `tools/link_baseroms.py`
+
+**Install the primary checkout's baseroms in a role checkout.**
+
+The normal result is a hard link, so linked worktrees do not keep duplicate ROM copies.  The source files remain in the primary checkout and are checked against the hashes owned by ``tools/configure.py`` before anything is linked.
 
 ### `tools/m2c_bootstrap.py`
 
