@@ -54,14 +54,14 @@ from __future__ import annotations
 
 import re
 import sys
+from collections.abc import Iterable, Sequence
 from dataclasses import dataclass, field
-from typing import Iterable, Sequence
+from pathlib import Path
 
 from textblocks import (
     COUNTEREXAMPLE_CLOSE,
     COUNTEREXAMPLE_OPEN,
     counterexample_blocks,
-    logical_lines,
     logical_lines_with_positions,
     negated,
 )
@@ -103,6 +103,34 @@ class Counterexample:
     findings: tuple[Finding, ...]
 
 
+#: This scanner's own rule vocabulary. Used only to recognise when a
+#: counterexample block declares EXCLUSIVELY a rule some OTHER scanner owns
+#: (`tools/authority.py`'s `routine-approval` / `executor-self-merge` share
+#: the same `guard:counterexample` wrapper and `guard:violation` syntax) --
+#: so this scanner never claims such a block is "inert". It was never this
+#: scanner's block to judge in the first place; see inert_counterexamples().
+RULES = frozenset(
+    {"compound-lane", "prefixed-lane", "branch-namespace", "queue-identity",
+     "lane-count"}
+)
+
+#: The bare rule-name token from any `guard:violation <rule> ...` line,
+#: regardless of which scanner's full declaration syntax follows it --
+#: deliberately looser than `_COUNTEREXAMPLE_DECLARATION` below, which
+#: validates a complete declaration this scanner can act on. This is used
+#: only to determine ownership, never to validate one.
+_DECLARED_RULE = re.compile(
+    r'^\s*<!--\s*guard:violation\s+(?P<rule>[a-z][a-z0-9-]*)\b'
+)
+
+
+def _declared_rule_names(body: str) -> set[str]:
+    return {
+        m.group("rule") for line in body.splitlines()
+        if (m := _DECLARED_RULE.match(line))
+    }
+
+
 @dataclass
 class ScanResult:
     findings: list[Finding] = field(default_factory=list)
@@ -113,13 +141,28 @@ class ScanResult:
         return bool(self.findings)
 
     def inert_counterexamples(self) -> list[Counterexample]:
-        """Blocks that suppress nothing — i.e. exemptions protecting nothing.
+        """Blocks that suppress nothing of THIS scanner's own — i.e.
+        exemptions protecting nothing, restricted to blocks this scanner
+        could plausibly own.
 
-        A caller should treat a non-empty result as a failure: either the
-        example is not actually a violation (so the document is teaching the
-        wrong thing), or the rule that used to catch it has regressed.
+        A block whose every `guard:violation` declares a rule outside
+        `RULES` belongs entirely to a different scanner (e.g. authority.py's
+        `routine-approval`) and is skipped here: it was never this
+        scanner's finding to make, so its absence is not this scanner's
+        defect to report. A caller should treat a non-empty result as a
+        failure: either the example is not actually a violation (so the
+        document is teaching the wrong thing), or the rule that used to
+        catch it has regressed.
         """
-        return [c for c in self.counterexamples if not c.findings]
+        result = []
+        for c in self.counterexamples:
+            if c.findings:
+                continue
+            declared = _declared_rule_names(c.text)
+            if declared and declared.isdisjoint(RULES):
+                continue
+            result.append(c)
+        return result
 
     def report(self) -> str:
         return "\n".join(str(f) for f in self.findings)
@@ -282,7 +325,7 @@ def _live_lines(text: str) -> list[str]:
     return live
 
 
-def _namespace_evidence(root: "Path", prefix: str) -> bool:
+def _namespace_evidence(root: Path, prefix: str) -> bool:
     """Require a tracked project-structure witness for custom namespaces.
 
     This proves project-owned structure exists; it does not prove anything
@@ -356,7 +399,7 @@ def _namespace_carries_role(prefix: str, role_prefixes: set[str]) -> bool:
 
 
 def branch_namespace_declarations(
-    text: str, *, root: "Path | None" = None,
+    text: str, *, root: Path | None = None,
     roles: Iterable[str] = (), coordinator: str = "brain",
 ) -> tuple[str, ...]:
     """Read the bounded declaration from a project document.
@@ -403,9 +446,7 @@ def branch_namespace_declarations(
     return prefixes
 
 
-def _project_root_for_paths(paths: Sequence[str]) -> "Path | None":
-    from pathlib import Path
-
+def _project_root_for_paths(paths: Sequence[str]) -> Path | None:
     roots = []
     for raw in paths:
         path = Path(raw).resolve()
@@ -930,8 +971,7 @@ def adapter_policy_hits(text: str) -> list[str]:
 # a scanner that needs a private helper module breaks when only it is copied.
 
 
-def _iter_files(paths: Sequence[str]) -> list["Path"]:
-    from pathlib import Path
+def _iter_files(paths: Sequence[str]) -> list[Path]:
     out: list[Path] = []
     for raw in paths:
         p = Path(raw)

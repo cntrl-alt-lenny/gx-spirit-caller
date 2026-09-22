@@ -130,15 +130,61 @@ manual: retrieve the exact report from the source clone and carry its complete
 body, including its provenance header, to the owner/Verifier. The pull-request
 body may carry that copied text, but it is only a carrier, not provenance.
 
-`tools/report.py delivery` therefore has two different failure states. Before
-the branch is strictly ahead of the literal base, **not delivered yet** is
-retryable. After the branch is ahead but this clone has no matching report, it
-says **branch delivered but report unavailable in this clone** and exits
-non-zero. That does not establish delivery and repeating the same prompt cannot
-fix it. Obtain the report from the source clone or carry it manually; then the
-Verifier compares the carried header and body with the exact role, Brief-ID,
-and branch head and records that mechanical delivery was unavailable in its
-clone. A branch or pull request alone never substitutes for a report.
+`tools/report.py delivery` therefore has three different failure states, not
+two. Before the branch is strictly ahead of the literal base, **not delivered
+yet** is retryable. After the branch is ahead, an absent matching report
+splits on what this clone actually holds:
+
+- **No report for the role at that exact head, under any task.** It says
+  **branch delivered but report unavailable in this clone** and exits
+  non-zero. That does not establish delivery and repeating the same prompt
+  cannot fix it. Obtain the report from the source clone or carry it
+  manually; then the Verifier compares the carried header and body with the
+  exact role, Brief-ID, and branch head and records that mechanical delivery
+  was unavailable in its clone. A branch or pull request alone never
+  substitutes for a report.
+- **A report for the role at that exact head, filed under a DIFFERENT task.**
+  This clone is not missing anything — a real round hit exactly this: an
+  executor wrote its own report under a mistaken Brief-ID. Blaming an
+  unavailable report and pointing at another clone sends the reader chasing
+  something that was never the problem. The check instead names what it
+  found: the role, the head, the task it was actually filed under, and the
+  task that was requested, and says plainly that the fix is the executor
+  rewriting its own report under the correct Brief-ID — never a cross-clone
+  fetch. This state is still **not delivered yet**, not a subtler kind of
+  delivered: the wrong-task report is not evidence the right task shipped.
+
+### Leaving a machine
+
+Reports deliberately never leave their clone on their own — see *Clone and
+machine boundary* above. That means switching machines can strand one: a
+Worker delivers, the owner switches before the Verifier runs, and the report
+— and the round it describes — stays behind on the machine that is no longer
+in front of anyone. Nothing about that state is visible from a fresh session
+on the *new* machine, because the report was never where it could look.
+
+Before leaving a clone, run:
+
+```
+python3 tools/report.py leave-check --base <default-branch>
+```
+
+This reads every local report this clone holds, across every role, and
+checks each report's `head=` against `<default-branch>`: a head that is an
+ancestor is merged, nothing pending; a head that is not is **a round the
+owner must finish or carry before leaving**; a head this clone cannot
+resolve at all — or a base it cannot resolve — is reported as **unknown**,
+which counts as pending too. Unknown is never treated as safe: a check that
+quietly waves through what it could not establish is worse than no check,
+because it gets counted as coverage. Exit 0 means every local report is
+confirmed merged, or there are none. Exit non-zero lists each pending report
+by role, Brief-ID and head.
+
+This check answers "is it safe to leave", not "did the round finish" — a
+round can be genuinely in flight, mid-review, with its report correctly
+unmerged; the point is that the owner (or Brain) sees that state named
+before the machine changes, rather than discovering a stalled round from a
+cold start on the other one.
 
 ## Reading what this produces
 

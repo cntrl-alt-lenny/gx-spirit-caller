@@ -597,6 +597,284 @@ class TestCLI(RepoCase):
             "First CLI report.", Path(proc.stdout.strip()).read_text(encoding="utf-8")
         )
 
+    def test_write_cli_accepts_cwd_for_a_checkout_other_than_the_process_cwd(self):
+        """`framework/adoption.md`'s pre-adoption bootstrap route: the
+        framework's own `report.py`, invoked from anywhere, writing into a
+        DIFFERENT checkout's inbox by explicit `--cwd`."""
+        self._elsewhere_tmp = tempfile.TemporaryDirectory()
+        self.addCleanup(self._elsewhere_tmp.cleanup)
+        elsewhere = Path(self._elsewhere_tmp.name)
+        init_repo(elsewhere)
+        proc = self._run(
+            ["write", "--task", "cwd-task", "--cwd", str(elsewhere)],
+            cwd=self.repo, stdin="Written into a different checkout.\n",
+        )
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        target_inbox = report.git_common_dir(elsewhere) / "agent-inbox"
+        self.assertIn(
+            "Written into a different checkout.",
+            (target_inbox / "brain-latest.md").read_text(encoding="utf-8"),
+        )
+        self.assertFalse((self.inbox() / "brain-latest.md").exists())
+
+
+def add_worktree_on_branch(repo: Path, rel: str, branch: str) -> Path:
+    wt = repo / rel
+    subprocess.run(
+        ["git", "worktree", "add", "-b", branch, str(wt), "HEAD"],
+        cwd=repo, check=True, capture_output=True,
+    )
+    return wt
+
+
+class TestDeliveryStatus(RepoCase):
+    """`report.py delivery` -- the mechanical check a Verifier runs before
+    reviewing anything. `framework/reports.md` documents three outcomes: not
+    delivered yet (retryable), delivered, and an absent report that is either
+    genuinely unavailable in this clone or -- the case round-18 hit, and this
+    class exists to close -- present in this clone under the wrong Brief-ID.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.base_branch = subprocess.run(
+            ["git", "branch", "--show-current"], cwd=self.repo,
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+        self.builder = add_worktree_on_branch(self.repo, ".worktrees/builder", "builder/round-18")
+        (self.builder / "g").write_text("work\n", encoding="utf-8")
+        subprocess.run(["git", "add", "g"], cwd=self.builder, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "work"], cwd=self.builder, check=True)
+        self.head = commit_head_sha(self.builder)
+
+    def _status(self, *, role="builder", task="round-018-real-brief"):
+        return report.delivery_status(
+            branch="builder/round-18", base=self.base_branch, role=role,
+            task=task, cwd=self.builder,
+        )
+
+    def test_missing_branch_is_retryable_not_delivered_yet(self):
+        code, message = report.delivery_status(
+            branch="builder/does-not-exist", base=self.base_branch,
+            role="builder", task="round-018-real-brief", cwd=self.builder,
+        )
+        self.assertEqual(code, 1)
+        self.assertIn("not delivered yet", message)
+
+    def test_branch_still_at_base_is_retryable_not_delivered_yet(self):
+        code, message = report.delivery_status(
+            branch=self.base_branch, base=self.base_branch, role="builder",
+            task="round-018-real-brief", cwd=self.builder,
+        )
+        self.assertEqual(code, 1)
+        self.assertIn("still at the base", message)
+
+    def test_no_report_at_all_is_unavailable_in_this_clone(self):
+        code, message = self._status()
+        self.assertEqual(code, 1)
+        self.assertIn("report unavailable in this clone", message)
+        self.assertIn("source clone", message)
+
+    def test_correct_task_delivers(self):
+        report.write_report(
+            "Round 18 done.", task="round-018-real-brief", cwd=self.builder,
+        )
+        code, message = self._status()
+        self.assertEqual(code, 0, message)
+        self.assertIn("delivered:", message)
+
+    def test_task_mismatch_at_the_exact_head_is_named_plainly(self):
+        """The reported incident, reproduced exactly: the report exists, in
+        THIS clone, at the exact delivered head -- just filed under the
+        wrong Brief-ID."""
+        report.write_report(
+            "Round 18 done.", task="round-018-wrong-id", cwd=self.builder,
+        )
+        code, message = self._status()
+        self.assertEqual(code, 1)
+        self.assertNotIn(
+            "report unavailable in this clone", message,
+            "must not blame a missing report when this clone actually has one",
+        )
+        self.assertNotIn(
+            "obtain the report from the source clone", message,
+            "must not instruct the reader to go fetch from another clone "
+            "for a report that is sitting right here in this one",
+        )
+        self.assertIn("round-018-wrong-id", message)
+        self.assertIn("round-018-real-brief", message)
+        self.assertIn(self.head, message)
+        self.assertIn("wrong Brief-ID", message)
+
+    def test_task_mismatch_resolves_once_the_executor_rewrites_its_own_report(self):
+        report.write_report(
+            "Round 18 done.", task="round-018-wrong-id", cwd=self.builder,
+        )
+        code, _ = self._status()
+        self.assertEqual(code, 1)
+        report.write_report(
+            "Round 18 done, correct task now.",
+            task="round-018-real-brief", cwd=self.builder,
+        )
+        code, message = self._status()
+        self.assertEqual(code, 0, message)
+
+    def test_a_stale_report_under_the_correct_task_is_still_not_delivered(self):
+        """Right task, wrong (earlier) head -- must stay the existing
+        head-mismatch message, not the new task-mismatch one."""
+        report.write_report(
+            "Old work.", task="round-018-real-brief", cwd=self.builder,
+        )
+        (self.builder / "h").write_text("more\n", encoding="utf-8")
+        subprocess.run(["git", "add", "h"], cwd=self.builder, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "more work"], cwd=self.builder, check=True)
+        code, message = self._status()
+        self.assertEqual(code, 1)
+        self.assertIn("does not match branch", message)
+        self.assertNotIn("wrong Brief-ID", message)
+
+    def test_a_mismatched_report_at_a_different_head_does_not_trigger_the_new_message(self):
+        """A task mismatch is only reported when the mismatched report sits
+        at the EXACT delivered head -- a leftover report from an earlier,
+        superseded head must not be surfaced as if it explained this one."""
+        report.write_report(
+            "Earlier round, different task.", task="round-017-old-brief",
+            cwd=self.builder,
+        )
+        (self.builder / "h").write_text("more\n", encoding="utf-8")
+        subprocess.run(["git", "add", "h"], cwd=self.builder, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", "more work"], cwd=self.builder, check=True)
+        code, message = self._status()
+        self.assertEqual(code, 1)
+        self.assertIn("report unavailable in this clone", message)
+        self.assertNotIn("wrong Brief-ID", message)
+
+    def test_a_different_roles_report_at_the_same_head_does_not_trigger_the_new_message(self):
+        """A report exists at the exact head, but for a different checkout's
+        role entirely -- the mismatch message is scoped to the REQUESTED
+        role, never borrowed from another role's report."""
+        verifier = add_worktree_on_branch(self.repo, ".worktrees/verifier", "verifier/round-18")
+        subprocess.run(
+            ["git", "merge", "--no-edit", "-q", "builder/round-18"],
+            cwd=verifier, check=True, capture_output=True,
+        )
+        report.write_report(
+            "Verifier's own report, different role.", task="round-018-verifier-task",
+            cwd=verifier,
+        )
+        code, message = self._status(role="builder")
+        self.assertEqual(code, 1)
+        self.assertIn("report unavailable in this clone", message)
+        self.assertNotIn("wrong Brief-ID", message)
+
+
+class TestLeaveCheck(RepoCase):
+    """`report.py leave-check` -- "make sure nothing is left behind" before
+    switching machines, made mechanical. A real round hit this: a Builder
+    delivered on one machine, the owner switched before the Verifier ran,
+    and the report stayed behind with the round stalled. This proves the
+    check actually distinguishes merged work from a round still waiting.
+    """
+
+    def setUp(self):
+        super().setUp()
+        self.base_branch = subprocess.run(
+            ["git", "branch", "--show-current"], cwd=self.repo,
+            capture_output=True, text=True, check=True,
+        ).stdout.strip()
+
+    def _deliver_round(self, seat: str, task: str, *, merge: bool = False) -> Path:
+        branch = f"{seat}/{task}"
+        worktree = add_worktree_on_branch(self.repo, f".worktrees/{seat}", branch)
+        (worktree / f"{task}.txt").write_text("work\n", encoding="utf-8")
+        subprocess.run(["git", "add", f"{task}.txt"], cwd=worktree, check=True)
+        subprocess.run(["git", "commit", "-q", "-m", task], cwd=worktree, check=True)
+        report.write_report(f"{task} done.", task=task, cwd=worktree, source="cli")
+        if merge:
+            subprocess.run(
+                ["git", "merge", "--no-edit", "-q", branch], cwd=self.repo, check=True,
+            )
+        return worktree
+
+    def test_no_local_reports_is_clean_to_leave(self):
+        code, message = report.leave_check_status(self.base_branch, cwd=self.repo)
+        self.assertEqual(code, 0, message)
+        self.assertIn("clean to leave", message)
+
+    def test_a_merged_round_is_not_reported_as_pending(self):
+        self._deliver_round("worker", "round-merged", merge=True)
+        code, message = report.leave_check_status(self.base_branch, cwd=self.repo)
+        self.assertEqual(code, 0, message)
+
+    def test_a_delivered_but_unmerged_round_blocks_leaving(self):
+        """The reported incident: delivered, not yet reviewed or merged."""
+        self._deliver_round("worker", "round-unmerged", merge=False)
+        code, message = report.leave_check_status(self.base_branch, cwd=self.repo)
+        self.assertEqual(code, 1)
+        self.assertIn("DO NOT LEAVE", message)
+        self.assertIn("worker", message)
+        self.assertIn("round-unmerged", message)
+        self.assertIn("unmerged", message)
+
+    def test_one_merged_and_one_unmerged_report_are_told_apart(self):
+        """The exact evidence shape required: one clone, two reports, only
+        one of them flagged."""
+        self._deliver_round("worker", "round-merged", merge=True)
+        self._deliver_round("verifier", "round-unmerged", merge=False)
+        code, message = report.leave_check_status(self.base_branch, cwd=self.repo)
+        self.assertEqual(code, 1)
+        self.assertNotIn("round-merged", message)
+        self.assertIn("round-unmerged", message)
+
+    def test_an_unresolvable_head_is_unknown_never_treated_as_safe(self):
+        worker = add_worktree_on_branch(self.repo, ".worktrees/worker", "worker/round-x")
+        report.write_report("Round X.", task="round-x", cwd=worker, source="cli")
+        latest = self.inbox() / "worker-latest.md"
+        latest.write_text(
+            latest.read_text(encoding="utf-8").replace(
+                self.head_of(worker), "deadbeefdeadbeefdeadbeefdeadbeefdeadbeef",
+            ),
+            encoding="utf-8",
+        )
+        for archived in (self.inbox() / "by-task" / "worker").glob("*.md"):
+            archived.write_text(latest.read_text(encoding="utf-8"), encoding="utf-8")
+        code, message = report.leave_check_status(self.base_branch, cwd=self.repo)
+        self.assertEqual(
+            code, 1,
+            "an unresolvable head must never be reported as safe to leave",
+        )
+        self.assertIn("unknown", message)
+        self.assertIn("does not have commit", message)
+
+    def test_an_unresolvable_base_makes_every_report_unknown_not_safe(self):
+        self._deliver_round("worker", "round-a", merge=False)
+        code, message = report.leave_check_status(
+            "this-branch-does-not-exist", cwd=self.repo,
+        )
+        self.assertEqual(code, 1)
+        self.assertIn("unknown", message)
+
+    def test_cli_reports_zero_when_clean_and_one_when_not(self):
+        proc = subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "report.py"), "leave-check",
+             "--base", self.base_branch],
+            cwd=self.repo, capture_output=True, text=True,
+        )
+        self.assertEqual(proc.returncode, 0, proc.stdout + proc.stderr)
+        self.assertIn("clean to leave", proc.stdout)
+
+        self._deliver_round("worker", "round-cli", merge=False)
+        proc = subprocess.run(
+            [sys.executable, str(ROOT / "tools" / "report.py"), "leave-check",
+             "--base", self.base_branch],
+            cwd=self.repo, capture_output=True, text=True,
+        )
+        self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+        self.assertIn("DO NOT LEAVE", proc.stdout)
+
+    def head_of(self, path: Path) -> str:
+        return commit_head_sha(path)
+
 
 if __name__ == "__main__":
     unittest.main()

@@ -106,6 +106,9 @@ __all__ = [
     "latest_report_provenance",
     "check_status",
     "delivery_status",
+    "PendingRound",
+    "local_reports_pending_merge",
+    "leave_check_status",
 ]
 
 
@@ -318,7 +321,11 @@ def write_report(
     inbox = git_common_dir(cwd) / "agent-inbox"
     role = role_tag(cwd)
     sha = head_sha(cwd) or "unknown"
-    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")
+    # `datetime.UTC` (ruff UP017) needs Python 3.11+; `timezone.utc` is the
+    # portable spelling and this framework's installed tools support 3.9 --
+    # see framework/adoption.md's "Python compatibility". Deliberately not
+    # applied.
+    stamp = datetime.now(timezone.utc).isoformat(timespec="seconds")  # noqa: UP017
 
     inbox.mkdir(parents=True, exist_ok=True)
     _seed_readme(inbox)
@@ -595,6 +602,51 @@ def _is_ancestor(base: str, head: str, cwd: str | Path | None = None) -> bool:
         return False
 
 
+def _reports_for_role(inbox: Path, role: str) -> list[Path]:
+    """Every report file this clone holds for ``role``, for a bounded local
+    scan -- never another role's reports, never another clone's.
+
+    Includes the full `by-task/<role>/` archive (every distinct Brief-ID this
+    clone has ever recorded for the role) plus the legacy `<role>-latest.md`
+    / `coordinator-latest.md` compatibility files, so an inbox from an older
+    adoption that predates the per-task archive is still covered.
+    """
+    paths: list[Path] = []
+    role_dir = inbox / "by-task" / role
+    if role_dir.is_dir():
+        paths += sorted(role_dir.glob("*.md"))
+    latest = _latest_path(inbox, role)
+    if latest.is_file():
+        paths.append(latest)
+    if role == "brain":
+        legacy = inbox / "coordinator-latest.md"
+        if legacy.is_file():
+            paths.append(legacy)
+    return paths
+
+
+def _report_at_head_under_another_task(
+    inbox: Path, role: str, head: str, task: str,
+) -> Provenance | None:
+    """A report this clone holds for ``role``, at the exact ``head``, but
+    filed under some task OTHER than ``task`` -- the shape of a real
+    incident: an executor wrote its own report under a mistaken Brief-ID, in
+    the same clone, at the exact delivered head. The delivery check must name
+    that plainly rather than reporting the report as merely unavailable and
+    pointing at another clone that does not have it either.
+    """
+    for path in _reports_for_role(inbox, role):
+        provenance = _read_provenance(path)
+        if (
+            provenance is not None
+            and provenance.role == role
+            and provenance.head == head
+            and provenance.task != task
+        ):
+            return provenance
+    return None
+
+
 def delivery_status(
     *,
     branch: str,
@@ -612,9 +664,14 @@ def delivery_status(
     performs this check from a linked worktree, while separate clones remain
     coordinator-only because their inboxes are private. A missing branch, an
     unavailable base, or a branch still at the base is retryable. Once the
-    branch is strictly ahead of the base, an absent matching report is a
-    different state: the work may have been delivered in another clone, but
-    delivery is not established from this clone.
+    branch is strictly ahead of the base, an absent matching report is not
+    one state but two, and this distinguishes them: if this clone holds NO
+    report for the role at that exact head under any task, the work may have
+    been delivered in another clone -- obtain or carry the report manually.
+    If this clone DOES hold a report for the role at that exact head, just
+    filed under a different task (an executor's own mistake, not a missing
+    report), this says so by name instead of pointing at another clone that
+    does not have it either.
     """
     _fetch_branch(branch, cwd)
     head, conflict = _delivery_branch_head(branch, cwd)
@@ -635,6 +692,19 @@ def delivery_status(
 
     report_path = find_report(role=role, task=task, cwd=cwd)
     if report_path is None:
+        inbox = git_common_dir(cwd) / "agent-inbox"
+        mismatch = _report_at_head_under_another_task(inbox, role, head, task)
+        if mismatch is not None:
+            return 1, (
+                f"not delivered yet: this clone holds a report for role "
+                f"'{role}' at the exact delivered head {head}, but filed "
+                f"under task {mismatch.task!r}, not the requested task "
+                f"{task!r}. The report is present, in this clone -- it was "
+                f"filed under the wrong Brief-ID. Have the executor rewrite "
+                f"its own report under the correct task; fetching from "
+                f"another clone will not fix this. Delivery is not "
+                f"established by this check"
+            )
         return 1, (
             "branch delivered but report unavailable in this clone: no matching "
             f"report for role '{role}' and task '{task}' at branch head {head}; "
@@ -658,6 +728,118 @@ def delivery_status(
     return 0, f"delivered: role={role} task={task} branch={branch} head={head}"
 
 
+@dataclass(frozen=True)
+class PendingRound:
+    """One local report describing work that may not be safe to leave behind.
+
+    ``status`` is one of ``"merged"`` (this report's head is an ancestor of
+    the base branch -- nothing pending), ``"unmerged"`` (the head exists in
+    this clone and is genuinely not yet merged), or ``"unknown"`` (this
+    clone cannot establish either way -- treated the same as unmerged by
+    every caller, never as safe; see ``leave_check_status``).
+    """
+
+    path: Path
+    provenance: Provenance
+    status: str
+    detail: str
+
+
+def _local_report_files(inbox: Path) -> list[Path]:
+    """Every report file this clone holds, across every role -- the
+    leave-machine check must see the whole inbox, not one role's slice.
+
+    Deliberately does not deduplicate here: a `by-task/<role>/<key>.md` file
+    and the matching `<role>-latest.md` are usually the same report twice,
+    but a legacy inbox may have only the latter, so both are gathered and
+    ``local_reports_pending_merge`` dedupes by the provenance it actually
+    reads back, not by which file happened to exist.
+    """
+    paths: list[Path] = []
+    by_task = inbox / "by-task"
+    if by_task.is_dir():
+        for role_dir in sorted(p for p in by_task.iterdir() if p.is_dir()):
+            paths += sorted(role_dir.glob("*.md"))
+    paths += sorted(inbox.glob("*-latest.md"))
+    legacy = inbox / "coordinator-latest.md"
+    if legacy.is_file():
+        paths.append(legacy)
+    return paths
+
+
+def local_reports_pending_merge(
+    base: str, cwd: str | Path | None = None,
+) -> list[PendingRound]:
+    """Every distinct (role, Brief-ID) this clone has a report for, with
+    whether that report's head has actually landed in ``base``.
+
+    This is the mechanical half of "make sure nothing is left behind" before
+    switching machines: a report describes real delivered work, and a report
+    whose head never reached the default branch is a round the owner must
+    finish or carry, not a round that quietly stopped mattering. Unresolvable
+    state -- the base cannot be read, or this clone does not have the
+    report's head commit at all -- is reported as ``"unknown"``, never
+    folded into "merged"; see the module's *Unknown means unknown* link to
+    the constitution.
+    """
+    inbox = git_common_dir(cwd) / "agent-inbox"
+    base_sha = _commit_for_ref(base, cwd)
+    seen: set[tuple[str, str]] = set()
+    results: list[PendingRound] = []
+    for path in _local_report_files(inbox):
+        provenance = _read_provenance(path)
+        if provenance is None or not provenance.role or not provenance.task:
+            continue
+        key = (provenance.role, provenance.task)
+        if key in seen:
+            continue
+        seen.add(key)
+
+        head = provenance.head
+        if base_sha is None:
+            status, detail = "unknown", f"base {base!r} could not be resolved in this clone"
+        elif not head:
+            status, detail = "unknown", "report has no readable head"
+        elif _exact_commit(head, cwd) is None:
+            status, detail = "unknown", f"this clone does not have commit {head}"
+        elif head == base_sha or _is_ancestor(head, base_sha, cwd):
+            status, detail = "merged", f"head {head} is an ancestor of {base!r}"
+        else:
+            status, detail = "unmerged", f"head {head} is not yet merged into {base!r}"
+        results.append(PendingRound(path=path, provenance=provenance, status=status, detail=detail))
+    return results
+
+
+def leave_check_status(base: str, cwd: str | Path | None = None) -> tuple[int, str]:
+    """Is it safe to leave this clone/machine right now?
+
+    Returns (exit_code, message): 0 only when every local report this clone
+    holds is confirmed merged into ``base`` (or there are none at all). Any
+    ``"unmerged"`` or ``"unknown"`` report is a reason not to leave, and is
+    listed by role, Brief-ID and head so the owner or Brain knows exactly
+    which round to finish, merge, or carry before switching machines. This
+    never fetches: it reports what THIS clone can currently establish, which
+    is the honest question when the machine is about to change.
+    """
+    reports = local_reports_pending_merge(base, cwd)
+    pending = [r for r in reports if r.status != "merged"]
+    if not pending:
+        return 0, (
+            f"clean to leave: {len(reports)} local report(s) checked against "
+            f"{base!r}, none unmerged or unknown"
+        )
+    lines = [
+        f"  {r.provenance.role} / {r.provenance.task}: {r.status} -- "
+        f"{r.detail} ({r.path})"
+        for r in pending
+    ]
+    return 1, (
+        f"DO NOT LEAVE YET: {len(pending)} of {len(reports)} local report(s) "
+        f"describe work not confirmed merged into {base!r}:\n"
+        + "\n".join(lines)
+    )
+
+
 def main(argv: list[str] | None = None) -> int:
     ap = argparse.ArgumentParser(description=__doc__.splitlines()[0])
     sub = ap.add_subparsers(dest="command", required=True)
@@ -675,6 +857,15 @@ def main(argv: list[str] | None = None) -> int:
     write_p.add_argument(
         "--source", default="cli",
         help="who invoked this -- informational only, never role identity",
+    )
+    write_p.add_argument(
+        "--cwd", default=None,
+        help="checkout whose role and inbox this writes to (default: the "
+             "current directory). Required when this command is invoked "
+             "from outside the seat's own worktree -- e.g. the framework's "
+             "own copy, run by absolute path during an adoption round "
+             "before the project has its own tools/report.py; see "
+             "framework/adoption.md.",
     )
 
     status_p = sub.add_parser(
@@ -709,12 +900,25 @@ def main(argv: list[str] | None = None) -> int:
         help="repository checkout to inspect (default: current directory)",
     )
 
+    leave_p = sub.add_parser(
+        "leave-check",
+        help="before switching machines: is every local report merged?",
+    )
+    leave_p.add_argument(
+        "--base", required=True,
+        help="the default/base branch or ref reports must be merged into",
+    )
+    leave_p.add_argument(
+        "--cwd", default=None,
+        help="repository checkout to inspect (default: current directory)",
+    )
+
     args = ap.parse_args(argv)
 
     if args.command == "write":
         text = Path(args.file).read_text(encoding="utf-8") if args.file else sys.stdin.read()
         try:
-            path = write_report(text, task=args.task, source=args.source)
+            path = write_report(text, task=args.task, cwd=args.cwd, source=args.source)
         except ReportError as exc:
             print(f"report: {exc}", file=sys.stderr)
             return 1
@@ -756,6 +960,15 @@ def main(argv: list[str] | None = None) -> int:
             return 1
         print(path)
         return 0
+
+    if args.command == "leave-check":
+        try:
+            code, message = leave_check_status(args.base, args.cwd)
+        except ReportError as exc:
+            print(f"report: {exc}", file=sys.stderr)
+            return 3
+        print(message)
+        return code
 
     return 2  # pragma: no cover - argparse enforces a valid subcommand
 
