@@ -64,14 +64,19 @@ Brain (primary checkout, brain/)
 
 | Role | Runs from | Owns these paths | Hands-off paths |
 |---|---|---|---|
-| **Brain** | the primary checkout (`brain/`) | `AGENTS.md`, `CLAUDE.md`, `docs/` (state, briefs, agents, project-rules, queue, research), CI config under `.github/` | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt` |
+| **Brain** | the primary checkout (`brain/`) | `AGENTS.md`, `docs/state.md`, `docs/briefs/`, `docs/queue/`, `docs/project-rules.md` | `src/`, `tools/`, `libs/`, `include/`, `config/**/symbols.txt`, `.github/` |
 | **Decomper** | `.worktrees/decomper` | `src/`, `config/<region>/**/symbols.txt` (renames only — never hand-edit `arm9/config.yaml`), `assets/` | `tools/`, `libs/`, `include/`, `AGENTS.md` |
-| **Scaffolder** | `.worktrees/scaffolder` | `tools/`, `libs/`, `include/` | `src/`, `config/**/symbols.txt`, `AGENTS.md` |
+| **Scaffolder** | `.worktrees/scaffolder` | `tools/`, `libs/`, `include/`, `.github/` | `src/`, `config/**/symbols.txt`, `AGENTS.md` |
 | **Verifier** | `.worktrees/verifier` | none — reviews an exact SHA independently in its own checkout and writes findings; owns no path and never commits project source | everything; it never writes source, and never merges |
 
-`tests/` and `.github/` are shared infrastructure: a change there travels
-with the code change it verifies or gates, whichever role authors that
-change, rather than belonging to one role.
+`.github/` moved from Brain to Scaffolder 2026-09-22: CI configuration is
+ordinary project work, authored by an executor and reviewed like any other
+change — `docs/agents/CONSTITUTION.md` § Authority is explicit that Brain
+does not implement it itself. `CLAUDE.md`, `docs/agents/`, `docs/research/`
+and `tests/` are shared infrastructure without one owning role: a change
+there travels with the code change it verifies, documents or gates,
+authored by whichever role that change belongs to, then reviewed the same
+way as anything else.
 
 **Roles are contracts, not vendors.** Any capable tool may hold any seat,
 and doing so changes nothing about the topology, the branch namespace, the
