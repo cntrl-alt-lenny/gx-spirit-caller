@@ -176,14 +176,14 @@ class TestTruncateBalanced(unittest.TestCase):
 
 
 class TestCommittedIndexIsCurrent(unittest.TestCase):
-    """Regression pin: the committed docs/briefs/README.md must be
-    up to date. CI gate runs `--check` and fails the workflow if
+    """Regression pin: the committed docs/briefs/archive/legacy/README.md
+    must be up to date. CI gate runs `--check` and fails the workflow if
     drifted; running the same logic here catches it earlier."""
 
     def test_committed_index_matches_regeneration(self):
         if not INDEX_PATH.is_file():
             self.fail(
-                "docs/briefs/README.md is missing — run "
+                "docs/briefs/archive/legacy/README.md is missing — run "
                 "`python tools/generate_briefs_index.py` and commit.",
             )
         # Mirror the main() collection logic.
@@ -196,12 +196,12 @@ class TestCommittedIndexIsCurrent(unittest.TestCase):
                 continue
             briefs.append(parsed)
         if not briefs:
-            self.fail("no briefs in docs/briefs/ — generated index cannot be validated")
+            self.fail("no briefs in docs/briefs/archive/legacy/ — generated index cannot be validated")
         expected = render_index(briefs)
         actual = INDEX_PATH.read_text(encoding="utf-8")
         self.assertEqual(
             actual, expected,
-            "docs/briefs/README.md is stale. Run "
+            "docs/briefs/archive/legacy/README.md is stale. Run "
             "`python tools/generate_briefs_index.py` and commit.",
         )
 

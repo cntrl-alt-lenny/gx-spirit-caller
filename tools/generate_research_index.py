@@ -20,9 +20,9 @@ bare filename would link both to the same, wrong target.
 
 This is the third member of the auto-generated docs trio:
 
-  - `docs/tools-index.md`      ← `tools/generate_tool_index.py`
-  - `docs/briefs/README.md`    ← `tools/generate_briefs_index.py`
-  - `docs/research/README.md`  ← this script (NEW)
+  - `docs/tools-index.md`                  ← `tools/generate_tool_index.py`
+  - `docs/briefs/archive/legacy/README.md` ← `tools/generate_briefs_index.py`
+  - `docs/research/README.md`              ← this script (NEW)
 
 Same shape as `tools/generate_briefs_index.py`. CI gate at
 `.github/workflows/generated-files-drift.yml` runs `--check`
