@@ -6,11 +6,19 @@ what the project is (a byte-identical decomp of the game) and what may not be
 broken; where the two disagree, `CLAUDE.md` wins on project facts and this
 file wins on process.
 
-The normative framework this project runs on lives in
-[`docs/agents/`](docs/agents/), copied verbatim from
-[agentic-framework](https://github.com/cntrl-alt-lenny/agentic-framework) at
-commit `749f239847ecd3805c5bcdf9f7e99a76eae177ef` (2026-09-21 adoption). This
-file is the project-specific part: the topology,
+## Framework
+
+This project runs **agentic-framework release 2.0.0**, from
+`https://github.com/cntrl-alt-lenny/agentic-framework.git`. Recorded here by adoption, derived from that
+repository's own `VERSION` file and Git remote — never hand-typed, so this
+line cannot be stale by a typo. A cold Brain, on any machine, reads this to
+know which framework release this project follows without asking anyone.
+
+To move to a different pinned release, see
+[`docs/agents/update.md`](docs/agents/update.md) — an ordinary reviewed
+round, never something applied mid-round or outside review.
+
+The project-specific part remains: the topology,
 the invariants, and the evidence each kind of change must produce. The long
 project-specific operating detail that used to live here — verify-gate and
 round discipline, kickoff conventions, Scaffolder's autonomous-work rules,
@@ -27,14 +35,12 @@ The full authority model, including the list of actions reserved to the
 owner, is in [`docs/agents/CONSTITUTION.md`](docs/agents/CONSTITUTION.md). It
 is stated once there rather than restated — and drifted — here.
 
-**Owner override (2026-09-21): Brain merges reviewed work only after the
-owner explicitly approves each merge.** This is a deliberate, named exception
-to the framework's default (where Brain merges routinely once review and the
-gate are green): Brain still does the independent review and reproduces the
-3-region gate itself, but the merge itself waits for the owner to say go, one
-merge at a time. `docs/project-rules.md` § Verify gate and round discipline,
-item 4, says what this changes about how destructive git operations are
-authorized.
+### Owner overrides
+
+<!-- guard:owner-override routine-approval text="Brain merges reviewed work only on the owner's approval, given explicitly for each merge." -->
+Brain merges reviewed work only on the owner's approval, given explicitly for each merge.
+
+Brain still does the independent review and the 3-region gate before asking.
 
 **Never use "self-merge" or a similar phrase for anything except the
 prohibited act** — a Worker or Verifier accepting or merging its own work.

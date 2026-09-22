@@ -9,8 +9,8 @@ win — say so and stop rather than following it.
 
 Moved here verbatim-in-substance from the pre-2026-09-21 `AGENTS.md` during
 framework adoption. Fixed in the move: stale "self-merge" language (this
-project's owner override means Brain never merges without the owner's
-explicit per-merge approval — see `AGENTS.md` § Authority), the retired
+project's owner override means Brain merges reviewed work only on the owner's
+approval, given explicitly for each merge — see `AGENTS.md` § Authority), the retired
 sibling-worktree layout, and provider-bound role language.
 
 ## Scaffolder autonomous work
