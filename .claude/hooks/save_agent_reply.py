@@ -1,125 +1,94 @@
 #!/usr/bin/env python3
+"""Mirror a session's final reply to the shared, provider-neutral inbox.
 
-"""save_agent_reply.py — Claude Code Stop hook.
+A CONVENIENCE, NOT A CONTROL, and not a second source of truth either. Every
+filesystem-capable Worker and Verifier already writes its own completion
+report by calling ``tools/report.py`` directly, as part of its contract — see
+``framework/reports.md``. This hook exists so that also happens automatically
+on this one tool, without the model needing to choose to run the command. It
+does the one thing only this tool can do — read a Claude Code transcript — and
+then hands off to the exact same writer every other path uses:
+``tools/report.py``'s ``write_report``. The inbox location, the role tag, the
+atomic write, and the provenance header are that module's job, not this file's;
+duplicating them here is exactly the drift ``adapters.md`` warns a restated
+policy eventually produces.
 
-Captures the final assistant turn of an agent's Claude Code session and
-writes it to a shared inbox so the *brain* worktree can read what the
-*decomper* / *scaffolder* worktrees said without the human user
-shuttling text manually.
+Read this part before relying on anything it writes:
 
-# Why this exists
+  * It fires only for sessions run on this one tool. A round run on any other
+    tool writes nothing here, and that is normal.
+  * Therefore **a missing or stale file means UNKNOWN** — never "the task did
+    not happen", "the agent failed", or "the review did not run". The
+    fallbacks, in order, are: check the shared inbox this file writes into
+    (also written to directly by any role on any tool that followed its
+    contract); the owner pastes the report; inspect repository and pull
+    request state directly; and where that genuinely cannot answer, ask the
+    owner. Repository state can confirm that execution happened, because
+    execution leaves a branch and a diff. It cannot confirm that a review
+    happened, because a review leaves only a report.
+  * Check the timestamp before trusting a file that is there.
 
-The brain's job is to coordinate across the three agents (brain,
-decomper, scaffolder), each running in its own Claude Code session in
-its own git worktree. When an agent finishes a session that does NOT
-ship a PR (e.g. blocked on a non-scope dependency, research-only,
-aborted), the brain has no native way to see what the agent said —
-the user has historically copy-pasted the reply to a `.txt` file and
-fed the path to the brain.
+This hook cannot know which brief a session was working from — a Stop event
+carries a session id, not a task identifier, and only the agent following its
+own contract knows the brief. The report this hook writes is therefore tagged
+with the session id, not a brief id, which is honest about what this path
+actually knows rather than guessing. A role that writes its own report via its
+contract supplies the real task identifier; this hook is the fallback for
+sessions that end without having done that — and only the fallback: if the
+checkout already holds a report at the CURRENT head that the agent wrote
+itself (any source other than this hook's own), this hook leaves it alone
+rather than overwriting the real brief identifier with a session-id mirror.
+See ``_agent_already_reported_this_work`` below for exactly what "current"
+and "itself" mean, including the stale-report case that must still be
+captured.
 
-This hook closes that gap: every time an agent session ends, the last
-assistant turn is appended to `<shared-git-dir>/agent-inbox/<role>-
-latest.md`. The brain reads from there directly.
-
-# Why these path choices
-
-- **`git rev-parse --git-common-dir`** gives the repo's shared `.git/`
-  path — same value from every worktree of the same clone. Works no
-  matter where the user cloned the repo (`~/Dev/...`, `D:\projects\...`,
-  etc.). Sibling-of-`.git/` would also work but require slightly more
-  path arithmetic.
-
-- **`<git-common-dir>/agent-inbox/`** — inside `.git/`, which git
-  treats as private and never version-controls. No `.gitignore` entry
-  needed. The directory survives `git clean -fdx` and gets removed
-  cleanly with `rm -rf .git/` (i.e. when the user nukes the clone).
-
-- **`git rev-parse --show-toplevel`** gives the *current* worktree's
-  root. The basename of that path matches the agent slug by the
-  project convention (`~/Dev/gx-spirit-caller/{brain,decomper,
-  scaffolder}`). If the user renames a worktree, the role tag adapts
-  automatically.
-
-# Portability
-
-Tracked in git (`tools/`-style location under `.claude/hooks/` to
-match the project's existing hook layout), so a fresh `git clone` on
-any machine picks the script up automatically. The only runtime
-requirements are `python3` and `git`, both of which the project
-already requires per CLAUDE.md.
-
-# Hook event input
-
-Claude Code passes a JSON event on stdin to Stop hooks. We only need
-`transcript_path`; everything else can be derived from the
-filesystem + git. If the event lacks a transcript path (older Claude
-Code, manual `echo {} | python ...` invocation, test harness), the
-hook exits silently with code 0 — Stop hooks should never block a
-session from ending.
+Requirements: python and git — reached through ``run_python.sh``'s
+wrapper, which tries the Python 3 this host actually has rather than one
+hardcoded name — and ``tools/report.py`` at the project root, installed by
+`adopt.py` for every project regardless of which adapter, if any, is also
+installed. Non-blocking by design — any error exits 0, since a session must
+never fail to end because of this, including the case where ``tools/report.py``
+is missing from an older adopted tree that has not re-run adoption.
 """
 
 from __future__ import annotations
 
 import json
-import subprocess
 import sys
-from datetime import datetime
 from pathlib import Path
 
-
-# This script lives at <worktree>/.claude/hooks/save_agent_reply.py, so its
-# own path identifies the worktree — independent of the session's cwd, which
-# Claude Code may set to a non-git parent dir (observed on Windows), where a
-# cwd-relative `git` call fails and the inbox is silently never written.
-_REPO = Path(__file__).resolve().parents[2]
-
-
-def _git(args: list[str]) -> str | None:
-    """Run git in this script's own worktree; return stdout stripped or None."""
-    try:
-        return subprocess.check_output(
-            ["git", "-C", str(_REPO), *args],
-            stderr=subprocess.DEVNULL,
-            text=True,
-        ).strip()
-    except (subprocess.CalledProcessError, FileNotFoundError):
-        return None
+_PROJECT_ROOT = Path(__file__).resolve().parents[2]
+sys.path.insert(0, str(_PROJECT_ROOT / "tools"))
+try:
+    import report as _report
+except ImportError:
+    _report = None
 
 
 def _last_assistant_text(transcript_path: Path) -> str | None:
-    """Extract the final assistant turn's plain-text content from a
-    JSONL transcript. Returns None if no assistant turn is found or
-    the file is unreadable.
-    """
+    """Final assistant turn from a JSONL transcript, or None."""
     try:
         lines = transcript_path.read_text(encoding="utf-8").splitlines()
     except (OSError, UnicodeDecodeError):
         return None
 
-    last_assistant = None
+    last = None
     for line in lines:
         try:
             entry = json.loads(line)
         except json.JSONDecodeError:
             continue
-        # Transcript entries vary in shape between Claude Code versions.
-        # Look for the canonical assistant-turn marker.
         role = entry.get("role") or entry.get("message", {}).get("role")
         if role == "assistant":
-            last_assistant = entry
-
-    if last_assistant is None:
+            last = entry
+    if last is None:
         return None
 
-    # Content can be a string or a list of {type, text} blocks.
-    content = last_assistant.get("content") or (
-        last_assistant.get("message", {}).get("content")
-    )
+    content = last.get("content") or last.get("message", {}).get("content")
     if isinstance(content, str):
         return content.strip() or None
     if not isinstance(content, list):
         return None
-
     parts: list[str] = []
     for block in content:
         if isinstance(block, str):
@@ -128,36 +97,52 @@ def _last_assistant_text(transcript_path: Path) -> str | None:
             text = block.get("text")
             if isinstance(text, str):
                 parts.append(text)
-    out = "\n".join(parts).strip()
-    return out or None
+    return "\n".join(parts).strip() or None
 
 
-def _seed_readme(inbox: Path) -> None:
-    """Drop a README on first creation so future readers (human or
-    LLM) understand what these files are.
+#: Tags a report this hook itself wrote, as opposed to one the agent wrote by
+#: following its own contract (`tools/report.py write`, called directly --
+#: source defaults to "cli" there). Only that distinction, not mere presence
+#: of a report, decides whether this hook may overwrite it; see
+#: `_agent_already_reported_this_work` below.
+_HOOK_SOURCE = "claude-code-stop-hook"
+
+
+def _agent_already_reported_this_work() -> bool:
+    """True when this checkout already holds a report for its CURRENT work
+    that the agent wrote itself, which this hook must never replace.
+
+    "For its current work" means the report's ``head=`` matches this
+    checkout's HEAD right now. A report from an EARLIER head -- the agent
+    finished a prior task, moved on, and has not written one for the new
+    HEAD yet -- is stale for this work and this hook must still capture
+    something, exactly as if no report existed at all; that is what actually
+    happened in the reported incident's mirror image (a session that ends
+    with no self-written report must not stay silent forever because an old
+    one is lying around). A report this same hook wrote earlier in the
+    session (``source`` tagged `_HOOK_SOURCE`) is only ever this hook's own
+    prior mirror, never the agent's real report, so it is fine to overwrite
+    even when fresh.
+
+    Never raises: this hook must never fail to end over its own check, and an
+    unreadable checkout here is exactly the ordinary "no report yet" case --
+    fall through to the fallback capture, same as `write_report` failing
+    later would.
     """
-    readme = inbox / "README.md"
-    if readme.exists():
-        return
-    readme.write_text(
-        "# .git/agent-inbox/\n\n"
-        "Auto-populated by `.claude/hooks/save_agent_reply.py` (a Stop\n"
-        "hook). Each file `<role>-latest.md` holds the final assistant\n"
-        "turn of the most recent Claude Code session that ran in the\n"
-        "matching worktree (`brain`, `decomper`, `scaffolder`).\n\n"
-        "The brain reads these to see what the other agents said\n"
-        "without the human user shuttling text manually. Files are\n"
-        "overwritten on each session end — treat them as a rolling\n"
-        "snapshot, not an archive.\n\n"
-        "**Not under version control** (lives inside `.git/`, which\n"
-        "git treats as private). Wipes cleanly with `rm -rf .git/` or\n"
-        "with a `git clone` to a fresh path.\n",
-        encoding="utf-8",
-    )
+    try:
+        current_head = _report.head_sha()
+        existing = _report.latest_report_provenance()
+    except _report.ReportError:
+        return False
+    if existing is None or current_head is None or existing.head is None:
+        return False
+    return existing.head == current_head and existing.source != _HOOK_SOURCE
 
 
 def main() -> int:
-    # Read the Stop hook event from stdin. Bail silently if nothing.
+    if _report is None:
+        return 0
+
     try:
         raw = sys.stdin.read()
     except (OSError, KeyboardInterrupt):
@@ -167,6 +152,9 @@ def main() -> int:
     try:
         event = json.loads(raw)
     except json.JSONDecodeError:
+        return 0
+
+    if _agent_already_reported_this_work():
         return 0
 
     transcript = event.get("transcript_path")
@@ -180,49 +168,14 @@ def main() -> int:
     if not text:
         return 0
 
-    # Find shared inbox (works from any worktree of this repo).
-    common_dir = _git(["rev-parse", "--git-common-dir"])
-    if not common_dir:
-        return 0
-    common = Path(common_dir)
-    if not common.is_absolute():
-        # `--git-common-dir` returns a path relative to the worktree when
-        # the worktree IS the main checkout. Resolve against the repo root.
-        common = (_REPO / common).resolve()
-    inbox = common / "agent-inbox"
-    inbox.mkdir(parents=True, exist_ok=True)
-    _seed_readme(inbox)
-
-    # Infer role from worktree basename.
-    worktree_root = _git(["rev-parse", "--show-toplevel"])
-    role = Path(worktree_root).name if worktree_root else "unknown"
-    # Sanitise — basename should already be one of brain/decomper/
-    # scaffolder, but defend against odd characters anyway.
-    role = "".join(c for c in role if c.isalnum() or c in "-_") or "unknown"
-
     session_id = event.get("session_id", "")
-    ts = datetime.now().isoformat(timespec="seconds")
-    header = (
-        f"<!-- captured {ts} from worktree role={role}"
-        f"{f' session={session_id}' if session_id else ''} -->\n\n"
-    )
+    task = f"claude-code-session:{session_id}" if session_id else "unspecified"
 
-    out = inbox / f"{role}-latest.md"
     try:
-        out.write_text(header + text + "\n", encoding="utf-8")
-    except OSError:
-        # Disk full / permission denied / etc. — Stop hooks must not
-        # block session end, so swallow the error.
+        _report.write_report(text, task=task, source=_HOOK_SOURCE)
+    except _report.ReportError:
         return 0
 
-    # Also append to an audit log so prior replies aren't lost on the
-    # next session end. Lightweight — one file, append-only.
-    log = inbox / f"{role}-log.md"
-    try:
-        with log.open("a", encoding="utf-8") as f:
-            f.write(f"\n\n---\n\n{header}{text}\n")
-    except OSError:
-        pass
     return 0
 
 
