@@ -1,10 +1,12 @@
 # State of play
 
-## Current state (2026-09-21)
+## Current state (2026-09-22)
 
 This project adopted the [agentic framework](../AGENTS.md) on
 2026-09-21. `AGENTS.md` is now the coordination document: roles, scopes,
-invariants, evidence table and what is actually enforced. This file keeps
+invariants, evidence table and what is actually enforced. This project now
+follows agentic-framework release 2.0.0; release 2.0.1 is expected as a
+small follow-up update. This file keeps
 its full pre-adoption history below unchanged — `tools/check_dispatch_log.py`,
 `tools/progress.py`, `tools/generate_dashboard.py` and others read it, so
 nothing below this section was reordered or removed.
@@ -18,9 +20,12 @@ sent. On 2026-09-22 this project sent framework-feedback reports
 `2026-09-22_0936` (adoption bootstrap first action), and `2026-09-22_1044`
 (installed tools fail `pyflakes`; `authority.py` on the framework's own
 documents), plus mail `2026-09-22_1050` (adoption blocked on the tool lint
-fix). **By owner decision on 2026-09-22, the `Python (ruff)` required
-check is intentionally left red on the adoption PR pending that framework
-fix** — do not try to make it pass here.
+fix). On 2026-09-22 Brain read framework replies `2026-09-22_0945` and
+`2026-09-22_0946`, and mail `2026-09-22_1105`, `2026-09-22_1215` (release
+2.0.0) and `2026-09-22_1230` (adoption unblocked), and sent
+framework-feedback `2026-09-22_1320` (owner-override form still
+wording-dependent) and `2026-09-22_1350` (update byte-identity rule versus
+adoption merges).
 
 Churn-heavy brain log. Split out of `AGENTS.md` so the manifest stays
 stable while this file turns over every working chunk.
@@ -1242,4 +1247,3 @@ Claude session. State.md is the bridge. Standing conventions:
 
 No. Continuing with 4-slot setup (brain + decomper + scaffolder +
 auto-progress-badge bot).
-
