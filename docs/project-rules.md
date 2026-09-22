@@ -265,6 +265,7 @@ in these worktrees. On Mac, use the installed Python 3.13 interpreter
 (`python3.13`) for the same commands.
 
 Worktree capabilities: `decomper`, `scaffolder` and `verifier` (nested
-under the primary checkout at `.worktrees/<role>` — see
+under the repository-root primary checkout at `.worktrees/<role>` — see
 `docs/agents/git-and-isolation.md`) each need all three baseroms
-(EUR/USA/JPN) copied into their own `orig/` to run the build-path gate.
+(EUR/USA/JPN) linked into their own `orig/` with
+`tools/link_baseroms.py` to run the build-path gate.

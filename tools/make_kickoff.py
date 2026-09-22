@@ -34,7 +34,7 @@ POOL_BY_ITEM = {"q-pool-freshness-tool": "wall-bl4-small"}
 # as permanent unverified placeholders. History: they named a build-free /
 # EUR-baserom-only concurrency lane that was never actually stood up.
 def _mac_worktree(role: str) -> str:
-    return f"~/Dev/gx-spirit-caller/brain/.worktrees/{role}"
+    return f"~/Dev/gx-spirit-caller/.worktrees/{role}"
 
 
 LANE_WORKTREES = {

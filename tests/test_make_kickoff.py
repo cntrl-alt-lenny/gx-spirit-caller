@@ -63,14 +63,13 @@ class TestMakeKickoff(unittest.TestCase):
         assert f"REPRODUCER: {expected_interpreter} tools/pool_freshness.py --pool wall-bl4-small" in text
 
     def test_mac_lane_paths_point_to_real_worktrees(self):
-        # Updated 2026-09-21: the framework adoption collapsed the Mac
-        # layout from separate top-level sibling worktrees to one checkout
-        # per role nested under the primary checkout.
+        # Updated 2026-09-22: the target layout puts the primary at the
+        # repository root and each role in a nested linked worktree.
         assert make_kickoff.lane_spec("decomper", "mac").worktree == (
-            "~/Dev/gx-spirit-caller/brain/.worktrees/decomper"
+            "~/Dev/gx-spirit-caller/.worktrees/decomper"
         )
         assert make_kickoff.lane_spec("scaffolder", "mac").worktree == (
-            "~/Dev/gx-spirit-caller/brain/.worktrees/scaffolder"
+            "~/Dev/gx-spirit-caller/.worktrees/scaffolder"
         )
 
     def test_item_without_named_pool_emits_no_number(self):
