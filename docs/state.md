@@ -52,7 +52,9 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
 - **Data-carve residue, deferred indefinitely** (none of it moves the headline
   metric): the 14.8 KB `data_020c9694`, `data_ov002_022ccc2e`, 34 odd-aligned
   ov004 data symbols, USA and JPN cross-region apply of brief 182 (its +36 B
-  cascade exceeds `MAX_SHIFT_BYTES = 4`), cluster C/D cross-region apply at scale.
+  cascade exceeds `MAX_SHIFT_BYTES = 4`), cluster C/D cross-region apply at scale,
+  brief 190 saturation chains (waiting for a recipe) and brief 188 epilogue
+  orphans (2 picks).
 - **Frontier above 376 B:** 1/20 = 5.0% at 377-512 B and 0/15 above 512 B;
   near-misses stop at compiler-internal register allocation. The 257-320 B band
   (ov002 sub-pool 6/30 = 20% on 2026-09-04) is the only pocket above 10%.

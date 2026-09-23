@@ -35,7 +35,9 @@ steps are in [`BUILD.md`](BUILD.md).
 | Verifier | Reviews one exact commit blind, writes findings, never writes production code or merges | its own checkout, detached at the commit |
 
 The names Decomper and Scaffolder and the per-role path-ownership table are
-retired: a Worker's scope is its brief. Any capable tool may hold any seat.
+retired: a Worker's scope is its brief. A Worker starts from the brief in fresh
+context; a session carrying over an earlier round is not independent. Any
+capable tool may hold any seat.
 Every seat starts with its `fw.py` command (see the framework). Two seats never
 share a checkout. Adding or retiring a role is the owner's decision.
 
@@ -84,6 +86,8 @@ share a checkout. Adding or retiring a role is the owner's decision.
 - Use `python3.13` for this project's scripts and tests (macOS ships no plain
   `python`, and its `python3` is 3.9). On Windows, `python`. The framework's
   own `fw.py` runs under `python3`, `py -3` or `python`.
+- `progress-visuals` is a CI-owned branch: the progress-badge workflow commits
+  generated assets there. Never commit to it by hand.
 - A gate that sits at 0 objects built and 0% CPU for minutes is hung on a stale
   wineserver lock, not slow: `pkill -9 wineserver`, relaunch `ninja sha1`, and
   watch the object count climb.

@@ -14,6 +14,9 @@ python tools/configure.py eur                        # eur | usa | jpn
 ninja sha1                                           # round-trip build + verify byte-identical
 ```
 
+The region is a positional argument to `configure.py` and appears in `config/`
+and `build/` subpaths. All three may coexist; configure one per run.
+
 A single `ninja` run pulls the toolchain, extracts the ROM, delinks every
 object, compiles `src/`, links, rebuilds the ROM, and compares its SHA-1 to
 the original. If the configure-time hash check fails, the error tells you
@@ -40,6 +43,10 @@ edit src/foo.c
    │  ninja report     aggregate into build/<ver>/report.json
    ▼  ninja sha1       final gate: byte-identical ROM
 ```
+
+`ninja check` runs dsd's module and symbol consistency checks. A function is
+"matched" when objdiff shows it identical to the original `.o` that
+`dsd delink` produced.
 
 Inner loop once decomp is under way:
 
@@ -108,8 +115,8 @@ assembly (`.s`) to keep the ROM round-tripping, then converted to C later.
   [`docs/research/wine-migration.md`](docs/research/wine-migration.md)).
   `configure.py` picks `wine` from `PATH`, and defaults `WINEPREFIX` to
   `<checkout>/.wine-lane` (auto-created, gitignored) so each checkout has its
-  own wineserver; the `mwld` link step stays serialized machine-wide
-  (`tools/wine_link_lock.py`). Use `python3.13`: macOS ships no plain `python`
+  own wineserver (set `WINEPREFIX` to override); the `mwld` link step stays
+  serialized machine-wide (`tools/wine_link_lock.py`). Use `python3.13`: macOS ships no plain `python`
   and its `/usr/bin/python3` is 3.9.
 - **Linux:** `wibo` runs the Win32 compilers. **Windows:** they run natively.
 
