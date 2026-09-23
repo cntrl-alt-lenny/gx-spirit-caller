@@ -99,13 +99,25 @@ exit status (framework rule 7). CI is the backstop, not the primary evidence.
 
 | Changed | Required evidence |
 |---|---|
-| Anything on the build path: `src/`, `libs/`, `include/`, `config/`, hand-written `.s`, or a `tools/*.py` the build or gate runs | `python3.13 tools/gate3.py --scope all > <log> 2>&1`, then `grep -nE "SHA1 (PASS\|FAIL)\|INFRASTRUCTURE\|CLEAN-FAIL\|SKIP\|GATE [A-Z]+\|[0-9]+ (passed\|failed)" <log>`. It passes only with `[eur]`, `[usa]` and `[jpn]` `SHA1 PASS`, a pytest summary with no failures, `GATE PASS`, and no `SKIP` standing in for a region. Quote those lines and name the commit. |
+| Anything on the build path: `src/`, `libs/`, `include/`, `config/`, hand-written `.s`, or a `tools/*.py` the build or gate runs | `python3.13 tools/gate3.py --scope all > <log> 2>&1`, then the log check below. It passes only with `[eur]`, `[usa]` and `[jpn]` `SHA1 PASS`, a pytest summary with no failures, `GATE PASS`, and no `SKIP` standing in for a region. Quote those lines and name the commit. |
 | `config/**/delinks.txt` | `python3.13 tools/check_delink_dupes.py` clean on the merged tree: a sweep that re-derives an already-carved function doubles its block and breaks `dsd lcf` at merge while its own branch is green. |
 | `src/` or `config/` | `python3.13 tools/check_match_invariants.py --version eur` reports no errors (exit 2 means errors). |
 | Symbol renames | The build-path row, plus the output of `tools/rename_symbol.py --cascade` showing the rename reached every region. |
 | `tools/` or `docs/` only, off the build path | `python3.13 -m pytest -q tests`, `python3.13 -m unittest discover -s tests` and `ruff check .`, all clean. |
 | `AGENTS.md`, `CLAUDE.md`, `docs/state.md`, `docs/agents/`, `docs/rounds/` | `python3 tools/fw.py check` with 0 errors and 0 warnings. |
 | A newly added test | Show it red on a known-bad input before trusting it green. |
+
+The log check, in the form for the shell you are in (copy it verbatim; `<log>`
+is the file the gate wrote):
+
+```text
+grep -nE "SHA1 (PASS|FAIL)|INFRASTRUCTURE|CLEAN-FAIL|SKIP|GATE [A-Z]+|[0-9]+ (passed|failed)" <log>
+Select-String -Pattern 'SHA1 (PASS|FAIL)|INFRASTRUCTURE|CLEAN-FAIL|SKIP|GATE [A-Z]+|[0-9]+ (passed|failed)' <log>
+python3.13 -c "import re,sys;[print(n,l,end='') for n,l in enumerate(open(sys.argv[1],errors='replace'),1) if re.search(r'SHA1 (PASS|FAIL)|INFRASTRUCTURE|CLEAN-FAIL|SKIP|GATE [A-Z]+|[0-9]+ (passed|failed)',l)]" <log>
+```
+
+The first is for macOS and Linux, the second for PowerShell on Windows, and the
+third works on both (on Windows use `python` for `python3.13`).
 
 A unit test cannot see a ROM regression, so citing the test suite as evidence
 for a build-path change is a blocking finding.
@@ -129,9 +141,10 @@ That executors never merge, and that Brain waits for the owner's yes, are rules
 the agents keep, not locks GitHub checks. Do not describe either as
 server-enforced.
 
-`python3 tools/fw.py status` says "safe to leave this machine: NO" while
-`archive/*` tags exist only locally; that is a false alarm (they are on GitHub,
-framework issue 18). Ignore that line only.
+`python3 tools/fw.py status` lists the `archive/*` tags as "not on GitHub yet" and
+says "safe to leave this machine: NO". That is a false alarm: the tags are on
+GitHub (`git ls-remote --tags origin 'archive/*'` lists them), and the framework
+issue is 18. Ignore that line only.
 
 ## Where to look
 

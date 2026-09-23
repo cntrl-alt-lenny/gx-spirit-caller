@@ -168,7 +168,7 @@ readability.
 
 ### Cross-region consistency
 
-The byte content for `0x021ceae4, 0x021cef74)` is **identical**
+The byte content for `[0x021ceae4, 0x021cef74)` is **identical**
 between USA and JPN ov006 (verified by direct comparison: 546
 non-zero out of 1168 bytes, byte-for-byte match). The same
 artifact ships to both regions. EUR doesn't have this candidate
@@ -229,7 +229,7 @@ the new caps.
 
 ## Cross-references
 
-- [`docs/briefs/174-bundle-extent-heuristic-generator.md` (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/briefs/archive/legacy/174-bundle-extent-heuristic-generator.md`)
+- `docs/briefs/174-bundle-extent-heuristic-generator.md` (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/briefs/archive/legacy/174-bundle-extent-heuristic-generator.md`)
   — the brief that introduced `cluster_b_bundle_gen.py`.
 - `docs/briefs/181-...` (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/briefs`) — brief 181's commit (PR #624)
   is the deferral source for this brief.

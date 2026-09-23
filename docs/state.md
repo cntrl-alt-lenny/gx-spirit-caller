@@ -65,8 +65,12 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
   synced, with citations remapped.
 - **Wider-than-2-way concurrent linking through `wine_link_lock.py`** was never
   tested; only the link step serializes.
-- **decomp.dev CI** (was PR #1020) is closed; it needed a private image only the
-  owner could build.
+- **decomp.dev CI** was closed; it needed a private image only the owner could
+  build.
+- **Retired hook still seeded:** `docs/agents/framework.json` still lists
+  `.githooks/pre-push` as a seed file (framework issue 25), so the next
+  framework update would re-create it; that update round must delete the hook
+  again.
 - **Tool defects reported 2026-09-08, not re-checked:** `pool_freshness.py
   --module` returning an empty pool for a spelling it does not know, and
   `m2ctx.py` needing a `gcc` the Windows PC lacks. Re-verify in rounds C and E.
@@ -87,5 +91,7 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
   `5ad1a7a2a9733b191d5c838a36593d429bd7a841`, `main` before the redesign.
 - 2026-09-23, pilot baseline: EUR natural-C is 17.38% (414,738 B) by
   `python3.13 tools/progress.py --version eur`. The one-week pilot is measured
-  against the 0.2-point EUR natural-C gain made between 19 August and
-  1 September.
+  against the EUR natural-C gain made by hand between 19 August and 1 September:
+  16.79% (400,530 B) at `555c2aeac`, the last `main` commit of 19 August, to
+  17.38% (414,738 B) at `722d7b385`, the last of 1 September, which is 0.59
+  points (14,208 B) in 13 days.
