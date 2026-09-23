@@ -1,0 +1,76 @@
+{
+  "about": "Written by the agentic framework's tools/adopt.py. Do not edit by hand, except 'settings'.",
+  "files": {
+    ".claude/agents/brain.md": {
+      "kind": "copy",
+      "sha256": "33f6ec7cb33f2c66a2689c716153af950d680699d518dac96c1ddce6aabd2c91"
+    },
+    ".claude/agents/verifier.md": {
+      "kind": "copy",
+      "sha256": "86d3ae5fafbf965d35adc38353ff69bf2a156a34df3703eb8d18056667056840"
+    },
+    ".claude/agents/worker.md": {
+      "kind": "copy",
+      "sha256": "a4bd118f5a139f8d96ae26943ea0523abb96e96387659a5c39dcdad7c4573a80"
+    },
+    ".claude/commands/status.md": {
+      "kind": "copy",
+      "sha256": "57292b249ebee4d43ef0148a79f1250a55e609174711e8510865cd7d9f54fe60"
+    },
+    ".gitattributes": {
+      "kind": "seed"
+    },
+    ".githooks/pre-push": {
+      "kind": "seed"
+    },
+    "AGENTS.md": {
+      "kind": "seed"
+    },
+    "CLAUDE.md": {
+      "kind": "seed"
+    },
+    "docs/agents/FRAMEWORK.md": {
+      "kind": "copy",
+      "sha256": "1a4200bfac8f38e6c6d11da637822684aa2544696aa6bb8540ff3ebde12edc79"
+    },
+    "docs/agents/roles/brain.md": {
+      "kind": "copy",
+      "sha256": "a0615ee8bb8eedab5fa012e070701550f2d7fa3ad033f37ccb1d2ff29313073a"
+    },
+    "docs/agents/roles/verifier.md": {
+      "kind": "copy",
+      "sha256": "91adc6229c2b6e71f42488dba52eaf6853b939dff7a84f0c4f35c4c3a3f3d896"
+    },
+    "docs/agents/roles/worker.md": {
+      "kind": "copy",
+      "sha256": "8a01532479c52fb180d5000c83982910b5716ba9dc633b2a2b589951121942cb"
+    },
+    "docs/rounds/README.md": {
+      "kind": "seed"
+    },
+    "docs/state.md": {
+      "kind": "seed"
+    },
+    "tests/test_framework.py": {
+      "kind": "copy",
+      "sha256": "6880cbbb58af85a4726faf684781c24de0eb74f0945f7bfe40803ce1bf1dbc76"
+    },
+    "tools/fw.py": {
+      "kind": "copy",
+      "sha256": "4b5be2f4acf77a4a33a40d58fb235f484b0f6d9f3410c2aee85e875d6053f588"
+    }
+  },
+  "framework": {
+    "release": "3.0.0",
+    "repository": "https://github.com/cntrl-alt-lenny/agentic-framework"
+  },
+  "options": {
+    "adapters": [
+      "claude-code"
+    ],
+    "hooks": true
+  },
+  "settings": {
+    "state_words": 1000
+  }
+}
