@@ -1,3 +1,12 @@
+<!-- fw-report
+round: 002-round-a-corrections-and-gate
+role: worker
+branch: worker/002-round-a-corrections-and-gate
+head: 517c80dba7d17d23cc485d162565cb6d36e327c0
+os: macOS 27.0
+python: 3.9.6
+written: 2026-09-23T19:11:11Z
+-->
 ## Verified
 
 Final content commit: `e61eb2431d37f02058c5d85169b22daf771bf51b` (branch
