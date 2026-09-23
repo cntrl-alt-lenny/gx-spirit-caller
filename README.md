@@ -48,8 +48,9 @@ ninja sha1                        # round-trip build + verify byte-identical
 ```
 
 You supply your own clean dump; this repo never ships ROMs. Full per-OS setup,
-project layout, and the toolchain table are in **[BUILD.md](BUILD.md)**;
-collaborator conventions are in **[CLAUDE.md](CLAUDE.md)**.
+project layout, conventions and the toolchain table are in
+**[BUILD.md](BUILD.md)**; the rules for contributors and agents are in
+**[AGENTS.md](AGENTS.md)**.
 
 ## How matching works
 
@@ -65,7 +66,7 @@ hashes equal to the baserom, every byte is accounted for.
 Small, careful PRs are very welcome — a single unmatched function, a better
 symbol name (`func_020b3a7c` → `Duel_ShuffleDeck`), or a tooling fix. Open an
 issue first for structural changes. Good starting points are in
-[BUILD.md](BUILD.md) and [CLAUDE.md](CLAUDE.md).
+[BUILD.md](BUILD.md) and [AGENTS.md](AGENTS.md).
 
 ## Credits
 
