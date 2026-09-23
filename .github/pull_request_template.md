@@ -18,7 +18,7 @@ any of these (e.g. wiki, CI, docs), just describe what changed and why.
 - [ ] Tooling / build (changes under `tools/`, `configure.py`, ninja rules)
 - [ ] Headers / types (changes under `include/` or `libs/<lib>/include/`)
 - [ ] Bootstrapping (region init, overlay layout, dsd config)
-- [ ] Wiki / docs (changes under `wiki/`, `docs/`, `README.md`, `CLAUDE.md`)
+- [ ] Wiki / docs (changes under `wiki/`, `docs/`, `README.md`, `AGENTS.md`)
 - [ ] Other: ___
 
 ---

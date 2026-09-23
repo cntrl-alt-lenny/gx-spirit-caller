@@ -7,8 +7,8 @@ name: Generated files drift
 #
 # Currently gates:
 #   docs/tools-index.md                  ← tools/generate_tool_index.py
-#   docs/briefs/archive/legacy/README.md ← tools/generate_briefs_index.py
 #   docs/research/README.md              ← tools/generate_research_index.py
+#   docs/research/campaign-analytics/attempts.tsv ← tools/validate_attempts.py
 #
 # Does NOT gate assets/progress-heatmap.svg — its committed form is
 # generated from `report.json` (post-`ninja report`, requires baserom),
@@ -21,15 +21,12 @@ name: Generated files drift
 # — it does not resolve as "passed", it stays pending forever. So a required
 # check must run on EVERY pull request or it is a merge deadlock, not a gate.
 #
-# This bit for real: PR #1360 (the pytest-CI fix) touched only
-# `docs/queue/*.md` + `tests/*.py`, matched none of the old paths below, and
-# sat BLOCKED with all five of its actual checks green. The campaign had not
-# hit it earlier only because every worker PR happens to write a
-# `docs/research/**.md` writeup, which the old filter matched by luck.
+# This bit for real: PR #1360 (the pytest-CI fix) touched only a queue
+# document and `tests/*.py`, matched none of the old path filter, and sat
+# BLOCKED with all five of its actual checks green.
 #
-# The old filter listed: tools/**.py, docs/tools-index.md, docs/briefs/**.md,
-# docs/research/**.md, and this workflow file. The job is checkout + Python +
-# three `--check` invocations, so running it unconditionally is cheap.
+# The job is checkout + Python + a few `--check` invocations, so running it
+# unconditionally is cheap.
 #
 # If this is ever re-filtered, drop it from the required-check list in the
 # same change — the two settings are only safe together.
@@ -62,22 +59,8 @@ jobs:
       - name: Check tools-index drift
         run: python tools/generate_tool_index.py --check
 
-      - name: Check briefs-index drift
-        run: python tools/generate_briefs_index.py --check
-
       - name: Check research-index drift
         run: python tools/generate_research_index.py --check
 
       - name: Validate attempts ledger
         run: python tools/validate_attempts.py
-
-      - name: Check queue/state drift
-        env:
-          GH_TOKEN: ${{ github.token }}
-        run: python tools/queue_state_drift.py --ref HEAD
-
-      - name: Check dispatch-log handoff
-        run: >-
-          python tools/check_dispatch_log.py
-          --base ${{ github.event.pull_request.base.sha }}
-          --head HEAD

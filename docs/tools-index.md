@@ -7,7 +7,7 @@ python tools/generate_tool_index.py
 git add docs/tools-index.md
 ```
 
-**160 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
+**141 tools** across 9 categories. Every tool's full help is available via `python tools/<name>.py --help`.
 
 ## Contents
 
@@ -16,10 +16,10 @@ git add docs/tools-index.md
 - [Match acceleration](#match-acceleration) (12)
 - [Multi-region porting](#multi-region-porting) (3)
 - [Cross-project source mining](#cross-project-source-mining) (4)
-- [Hygiene / invariants](#hygiene--invariants) (9)
+- [Hygiene / invariants](#hygiene--invariants) (7)
 - [CI formatters](#ci-formatters) (7)
-- [Infrastructure / build-patching](#infrastructure--build-patching) (19)
-- [Uncategorised](#uncategorised) (83)
+- [Infrastructure / build-patching](#infrastructure--build-patching) (17)
+- [Uncategorised](#uncategorised) (68)
 
 ## Analysis / worklist
 
@@ -313,19 +313,11 @@ Failure mode (real incident: PR #1365, and #1360 blocked by it): a status check 
 
 Failure mode (real incidents: PR #948, #198): a sweep PR carves a function at an address some *other* file on `main` already delinks. After the merge the region's `delinks.txt` lists that `.text start:ADDR` under two different source fil…
 
-### `tools/check_dispatch_log.py`
-
-**Require a new dispatch-log row when a round updates the state handoff.**
-
 ### `tools/check_match_invariants.py`
 
 **pre-flight sanity checks before claiming a match.**
 
 The metadata scattered across `symbols.txt`, `delinks.txt`, and the C sources in `src/` can drift out of sync in ways that silently break the decomp loop. This tool catches the common footguns:
-
-### `tools/check_metric_canon.py`
-
-**Reject unqualified function-count completion claims in metric docs.**
 
 ### `tools/check_park_class_drift.py`
 
@@ -403,12 +395,6 @@ Layout follows dqix (https://github.com/StanHash/dqix), with two project- specif
 
 **Download the project's external tools and verify extracted executables.**
 
-### `tools/generate_briefs_index.py`
-
-**Regenerate docs/briefs/archive/legacy/README.md from the legacy briefs**
-
-archived in that directory.
-
 ### `tools/generate_heatmap.py`
 
 **Generates an SVG treemap visualizing decomp progress per unit.**
@@ -430,12 +416,6 @@ Walks `tools/*.py`, parses each file's module docstring, extracts the first-line
 ### `tools/get_platform.py`
 
 **(no docstring)**
-
-### `tools/install_git_hooks.py`
-
-**point git at the repo's committed hooks dir.**
-
-Git hooks normally live in `.git/hooks/`, which is untracked. That's fine for per-developer customisation but terrible for consistency across agent machines / clones. This installer sets `core.hooksPath=.githooks` so every clone uses the…
 
 ### `tools/ninja_syntax.py`
 
@@ -519,12 +499,6 @@ Ported from khdays-decomp's `tools/audit_callsite_arity.py` (https://github.com/
 
 **Audit repeated attempts.tsv events without treating repeats as duplicates.**
 
-### `tools/authority.py`
-
-**Detect stale authority language in normative text.**
-
-The framework's first version routed every merge back through the human: *review locally, summarize, offer to merge, execute on OK.* That makes the coordinating role a recommender rather than a lead, and puts the owner back in the seat t…
-
 ### `tools/batch_carve.py`
 
 **automate the DETERMINISTIC mechanical carve lanes (brief 456).**
@@ -564,12 +538,6 @@ sibling families by canonicalized-disasm signature.
 **Per-overlay code/data/pointer breakdown for Yu-Gi-Oh! GX Spirit Caller.**
 
 Ported from pret/pokeplatinum's `.github/calcrom/calcrom.py` (MIT-ish "unlicense", per pokeplatinum's LICENSE — no header carried upstream), re-targeted at this project's directory layout:
-
-### `tools/checkout.py`
-
-**Verify that this process started in the checkout for its declared seat.**
-
-Run this as the first action in every role prompt::
 
 ### `tools/clean_macos_junk.py`
 
@@ -681,6 +649,12 @@ separate a CORRECT cross-region sibling resolution from an INCORRECT one? (q-fin
 
 Routing tiers are encoded in source filenames (``.legacy.c``, ``.legacy_sp3.c``, and ``.thumb.c``). A stale plain ``.c`` header can leave a build green while making the invariant checker unable to find the TU source. This preflight repor…
 
+### `tools/fw.py`
+
+**fw.py -- the one tool the agentic framework installs into a project.**
+
+Every command works the same on Windows, macOS and Linux, in any AI tool that can run git and Python 3.9+. Standard library only.
+
 ### `tools/gate3.py`
 
 **the brain's one-command 3-region clean-tree gate.**
@@ -693,55 +667,19 @@ The merge gate (`ninja sha1` for eur, usa AND jpn, byte-identical) is the most-r
 
 PR #1327's 2047-line bank was reverted: adversarial review found 59/102 sampled conflicts had a prototype that CONTRADICTED its own matched C body (33 arity mismatches, 26 return-type mismatches), because it derived signatures by majorit…
 
-### `tools/generate_dashboard.py`
-
-**regenerate docs/dashboard.md, the committed**
-
-one-page status snapshot every number on which is tool-derived.
-
 ### `tools/generate_progress_bars.py`
 
 **Combined per-region progress-bar SVG (one card, three nested bars).**
 
 Shows TWO honest metrics per region on a shared 0-100% axis: - decompiled-to-C   (green)  — NATURAL C only: readable C recovered by hand, excluding `asm { }`-bodied `.c` files (those are byte-matched placeholders wearing a `.c` extension…
 
-### `tools/generate_state_table.py`
-
-**regenerate docs/state-table.md, the committed**
-
-snapshot of "where the project actually is".
-
 ### `tools/generate_walls_index.py`
 
 **Generate a navigable index for the codegen wall catalog.**
 
-### `tools/integrate.py`
-
-**deterministic merge-round driver for the brain lane.**
-
-Merge a list of reviewed branches into the current integration branch with the repository's three recurring conflict policies, then refresh generated indexes and run the requested gate.  The driver deliberately does not push: the integra…
-
-### `tools/kickoff_lint.py`
-
-**a pre-send gate on agent kickoff text (R&D r8, §4).**
-
-The 3-region `gate3.py` is our *merge* gate — the strongest possible arbiter of correctness. But it fires only after an agent has already spent its hour. The recurring void-work incidents (b576 transcription-without-invariant, b589 wrong…
-
-### `tools/lane_report.py`
-
-**recover a finished lane's final report without a manual paste.**
-
-The brain needs one thing when a lane finishes: the lane's own final message. Repository state alone cannot supply it. Round 0906 proved that concretely — the Scaffolder produced zero commits, and `git status` could not distinguish "corr…
-
 ### `tools/ledger_analytics.py`
 
 **Summarize self-reported match percentages for selected ledger briefs.**
-
-### `tools/line_endings.py`
-
-**Find and repair unsafe line endings in tracked executable text files.**
-
-The framework installs executable scripts in more than one directory. Git's index mode and the script shebang identify those files without maintaining a list that an adapter can outgrow; the fixed ``.githooks`` root is included because G…
 
 ### `tools/link_baseroms.py`
 
@@ -765,19 +703,9 @@ mirroring `permute.py`'s decomp-permuter bootstrap (brief 381).
 
 **Mechanically reclassify the main small-tier worklist from .s bodies.**
 
-### `tools/make_kickoff.py`
-
-**Emit and self-lint the mechanical part of an agent kickoff.**
-
 ### `tools/naming_census.py`
 
 **Count placeholder and real function names in committed symbol tables.**
-
-### `tools/neutrality.py`
-
-**Structural provider-neutrality scanner.**
-
-Enforces that a project's *lane identity* — its roles, branch namespaces, task queues and dispatch topology — is derived from ROLES and never from whichever provider, model or tool happens to be running a seat this round.
 
 ### `tools/normalise_park_class.py`
 
@@ -831,29 +759,11 @@ This is a thin, fail-closed entry point around port_census + batch_port. It alwa
 
 code-decomp resumption wave (brief 189).
 
-### `tools/prune_worktrees.py`
-
-**cap the number of ephemeral claude-NNN task worktrees.**
-
-The multi-agent convention (AGENTS.md § Worktree convention) spins up a new numbered sibling worktree per task session (`claude-525`, `claude-526`, ...). Nothing retires them automatically, so the count only ever grows — 27+ were observe…
-
-### `tools/queue_state_drift.py`
-
-**Find contradictions between queue/state claims and repository state.**
-
-This is a small audit tool, not a replacement queue format. It checks explicit shipped/resolved/merged evidence in non-final queue items, compares the current state section with the ACTIVE open PRs, and verifies that docs/state.md carrie…
-
 ### `tools/record_shipped.py`
 
 **Record one successfully-shipped C-match attempt in attempts.tsv.**
 
 cm-ledger-park-bias (2026-08-17): `park_one.py` is the only recorder in regular use, and it always writes `result=parked` -- ships only ever reach the ledger when a lane adds them by hand, which mostly doesn't happen (0 shipped rows acro…
-
-### `tools/report.py`
-
-**Write a role's completion report into the shared, provider-neutral inbox.**
-
-THE PROBLEM. Brain can always see what execution left in the repository — a branch, a diff, commits. It cannot see what execution *said*, because a completion report is prose, not repository state, and repository state proves that execut…
 
 ### `tools/retrieval_eval.py`
 
@@ -907,12 +817,6 @@ mwldarm overlay-swap-blind veneer-generation cascade (brief 132).
 
 pick from its disassembly (brief 264, stretch goal).
 
-### `tools/textblocks.py`
-
-**Join soft-wrapped Markdown into logical lines.**
-
-Prose in this repository is hard-wrapped at about 80 columns, so a sentence routinely spans two physical lines. A detector that reads one physical line at a time then sees fragments — and any rule that depends on words appearing near eac…
-
 ### `tools/touch_stamp.py`
 
 **Touch a Ninja stamp output after a side-effecting rule succeeds.**
@@ -958,18 +862,6 @@ cm-main-wall-filtered-sweep-1.
 **serialise the Wine-backed mwld link step machine-wide.**
 
 Brief 608 (docs/research/brief-608-wineprefix-spike.md) measured near-linear compile scaling once each worktree gets its own WINEPREFIX (no shared wineserver left to fight over), but only 2-way concurrency for the link itself, with no co…
-
-### `tools/work_queue.py`
-
-**the autonomous self-chaining work queue (2026-07-20).**
-
-Named `work_queue.py`, not `queue.py`: running any `python3.13 tools/X.py` script puts `tools/` first on `sys.path`, so a file literally named `queue.py` there shadows the stdlib `queue` module for every script in this directory -- inclu…
-
-### `tools/worktree_gc.py`
-
-**Report and safely prune stale registered git worktrees.**
-
-Only a clean worktree whose HEAD is an ancestor of ``origin/main`` can be removed.  Unregistered worktree-like directories are reported for human review and are never removed by this tool.
 
 ### `tools/xmap_normalize.py`
 

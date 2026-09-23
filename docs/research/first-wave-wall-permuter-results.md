@@ -161,4 +161,4 @@ python tools/permute_batch.py \
 - [`docs/research/cluster-b-e-permuter-targets.json`](cluster-b-e-permuter-targets.json) — the 9-pick worklist.
 - [Brief 190 PR #637](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/637) — Cluster B discovery (picks #8, #18, #22, #24).
 - [Brief 193 PR #640](https://github.com/cntrl-alt-lenny/gx-spirit-caller/pull/640) — Cluster E discovery (picks #7, #8, #12, #13, #14).
-- [Brief 098](../briefs/archive/legacy/098-permuter-sweep-byte-diff.md) — original permuter sweep brief (8 candidates in main + ov000, conventions for batch use established).
+- Brief 098 (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/briefs/archive/legacy/098-permuter-sweep-byte-diff.md`) — original permuter sweep brief (8 candidates in main + ov000, conventions for batch use established).

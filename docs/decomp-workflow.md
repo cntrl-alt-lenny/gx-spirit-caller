@@ -40,15 +40,14 @@ function-count percentages — the bulk of the ROM lives in the
 "hard" tier (~4 %) where each function takes more work. Live
 stats live in [`docs/state.md`](state.md).
 
-## The cast
+## Who does what
 
-One human owner and four roles — Brain (coordinator), Decomper, Scaffolder
-and Verifier (executors and reviewer). Who does what, where each runs, and
-who owns which paths is `AGENTS.md` § Topology; the full authority model
-(why Brain merges instead of the owner, and only after the owner's explicit
-per-merge approval) is `AGENTS.md` § Authority and
-`docs/agents/CONSTITUTION.md`. This document does not restate either — see
-those instead of trusting a paraphrase here to stay current.
+One human owner directs the work. Brain plans and merges (only after the
+owner says yes to that merge), a Worker carries out one brief, and a Verifier
+reviews an exact commit. [`AGENTS.md`](../AGENTS.md) has the roles and the
+evidence each kind of change needs. This guide was written under the older
+"Decomper" and "Scaffolder" lane names: read "the decomper" below as "the
+worker who is matching functions".
 
 ## The matching loop
 
@@ -59,7 +58,7 @@ Say the decomper picks `__sinit_ov005_021b16e4`. Here's what happens:
 
 1. **Pick**. They consult `tools/next_targets.py` for the current
    worklist — unmatched functions sorted easiest-first. Or they're
-   following a brief (`docs/briefs/NNN-*.md`) that already picked the
+   following a brief (`docs/rounds/<id>/brief.md`) that already picked the
    target.
 
 2. **Context**. They look at callers, callees, and data refs with
@@ -326,7 +325,7 @@ regression report looks like against a synthetic fixture. Read that
 once to calibrate before running against a real PR.
 
 **When to skip the check:** brain-only PRs (docs, state.md refreshes,
-`docs/briefs/*`) don't touch `config/` or `src/`, so they can't move
+round briefs) don't touch `config/` or `src/`, so they can't move
 the match state. Only run the delta on PRs touching code or config.
 
 ## Reading the progress numbers
@@ -360,150 +359,17 @@ doesn't merge. Brain re-verifies pre-merge.
 The terminal goal stays "the SHA-1 of the rebuilt ROM matches the
 baserom SHA-1 across EUR + USA + JPN". Everything else is a proxy.
 
-## Local setup extras (optional but recommended)
-
-One-time hook installation that catches metadata-drift errors
-before they reach CI:
-
-```bash
-python tools/install_git_hooks.py
-```
-
-This sets `core.hooksPath=.githooks` so every `git push` runs
-`tools/check_match_invariants.py` and blocks if errors are found.
-Warnings (currently ~317 pre-existing `complete_tu_rename` backlog)
-are let through. Bypass a single push with `git push --no-verify`;
-uninstall with `python tools/install_git_hooks.py --uninstall`.
-
-Caught #135's `.c`-listed-but-`.s`-on-disk delinks mismatch in
-testing before CI would have flagged it — same shape of bug that
-costs a PR round-trip each time it happens.
-
-### Claude Code hooks (if you run Claude Code)
-
-`.claude/settings.json` wires two hooks that fire inside the agent
-loop (earlier than the git-level `.githooks/pre-push`):
-
-- **PostToolUse on Edit / Write / MultiEdit** →
-  `.claude/hooks/post_edit.py` runs `ruff check` on any edited
-  `tools/*.py` or `tests/*.py` file, then `python -m unittest
-  discover -s tests` if ruff was clean. Non-blocking — surfaces
-  issues in tool output so the agent can fix before committing.
-  Addresses the "F401 unused import found at commit time" class
-  of friction seen across multiple scaffolder sessions.
-- **PreToolUse on Bash** → `.claude/hooks/pre_bash.py` inspects
-  the Bash command for `git push`; if it matches, runs
-  `check_match_invariants.py --version eur` and BLOCKS (exit 2)
-  on errors. Bypass with `SKIP_INVARIANTS_HOOK=1 git push ...`
-  or `git push --no-verify`. Same backstop as `.githooks/pre-push`
-  but catches the drift earlier in the agent turn.
-- **Stop** → `.claude/hooks/save_agent_reply.py` captures the
-  final assistant turn of every agent session and writes it to a
-  shared inbox at `<repo-shared-git-dir>/agent-inbox/<role>-latest.md`
-  (i.e. `.git/agent-inbox/` of the main clone). The brain reads
-  these to see what the decomper / scaffolder said in sessions that
-  didn't ship a PR — blocked-on-non-scope, research-only, aborted —
-  without the human user shuttling text manually. Role is inferred
-  from the worktree's basename (`gx-spirit-caller` / `decomper` / `scaffolder`
-  per this project's target layout). Inbox lives inside `.git/` so it's never
-  version-controlled, never needs a gitignore entry, and travels
-  with no per-machine setup beyond what's already required
-  (`python3` + `git`). Also appends to a rolling `<role>-log.md`
-  so prior session replies aren't lost. Non-blocking by design:
-  any error (no transcript, malformed event, disk full, etc.)
-  exits silently with code 0.
-
-These hooks are opt-in per Claude Code session — they only fire
-when Claude Code reads `.claude/settings.json`. Raw `git` from a
-terminal uses `.githooks/pre-push` (the installer above); Claude
-Code uses both paths and checks complementarily.
-
-## Lane report recovery
-
-When a lane finishes, the brain needs one artifact: the lane's own
-final message. Repository state cannot substitute for it. Round 0906
-is the canary — the Scaffolder produced **zero commits**, and nothing
-in `git status` could distinguish *"correctly paused because the brain
-held the compiler lock"* from *"failed to do any work"*. Only its final
-message carried that, and it said the first.
-
-So the brain must never infer "nothing happened" from an empty diff,
-and never default to asking the user to paste. Recovery has three
-layers, in order:
-
-1. **The shared inbox artifact** —
-   `<repo-shared-git-dir>/agent-inbox/<role>-latest.md`. Provider-neutral
-   and canonical. Written today by the Claude Code Stop hook described
-   above; the long-term aim is that every lane writes this itself,
-   whatever harness it runs in, at which case layers 2 and 3 stop mattering.
-2. **Provider transcript recovery** — `tools/lane_report.py`, the
-   fallback that reads the harness's own on-disk session store for
-   whichever provider ran that lane. This is what makes an already-finished
-   report recoverable when layer 1 was never written.
-3. **UNKNOWN** — and a manual paste request. A report that cannot be
-   recovered is UNKNOWN. It is never evidence that the lane did nothing.
-
-```bash
-python3.13 tools/lane_report.py --probe            # what is installed here
-python3.13 tools/lane_report.py --role scaffolder  # walk the layers
-```
-
-Exit codes: `0` recovered, `3` UNKNOWN (paste required), `4` ambiguous,
-`2` usage error.
-
-### Provider capability, by class
-
-Which providers are usable is a property of the harness, not of this
-repository. Machine-specific paths belong in
-`<repo-shared-git-dir>/agent-inbox/providers.local.json`, which lives
-inside `.git/` and is therefore never committed. Do not record them
-here or in `docs/state.md`.
-
-| provider | recovery | mechanism |
-| --- | --- | --- |
-| Claude Code | automatic | Stop hook writes layer 1 directly; per-session transcript also readable as a fallback |
-| Codex | automatic | per-session rollout log; each finished turn records the final agent message as a first-class field |
-| Antigravity | **manual paste** | conversation store exposes no workspace or cwd, so no lane can be proven |
-
-Antigravity is refused rather than guessed. Its store is readable, but
-it carries nothing that ties a conversation to a worktree, so any answer
-would be a guess about *which* lane — the one error this tool must not
-make.
-
-### Matching rules
-
-The tool never takes "the newest chat on the machine", and it does not
-accept a session merely because that session *mentions* a lane — the
-brain and the sibling lane both do that constantly, and an early build
-of this tool duly returned the brain's own session as the Scaffolder
-report. A session qualifies only if it was **addressed as** the lane:
-the kickoff header in a user-authored turn, or a working directory
-inside a worktree named for the role. Branch and worktree mentions are
-corroboration, never qualification. Worktree geometry comes from
-`git worktree list`, so no path is hardcoded. When more than one session
-still qualifies, the tool reports the ambiguity instead of picking.
-
 ## What a PR means in this setup
 
-A pull request is just a git branch with a note attached. The flow is:
-
-1. An agent writes code on a branch named like `scaffolder/foo` or
-   `decomper/bar`. The `<agent>/<slug>` shape is a convention so
-   everyone can see at a glance who made it.
-2. The agent pushes the branch and opens a PR via the GitHub API. This
-   doesn't change `main`; it just says "here's a proposed change".
-3. Brain reviews it: reads the diff, runs `ninja` / `dsd check modules`
-   locally to verify it doesn't break the build, and summarizes in plain
-   English — either asking questions, or asking cntrl_alt_lenny to approve
-   that specific merge.
-4. Brain merges only once cntrl_alt_lenny explicitly approves that merge
-   (`AGENTS.md` § Authority) — the owner also retains veto and reversal
-   over anything, at any time.
-
-**No agent merges their own PRs, and no agent merges without that
-approval.** That's the safety boundary. Every change passes through
-Brain's local verification and the owner's per-merge approval before
-landing on `main`.
+A pull request is just a git branch with a note attached. A Worker pushes a
+branch (named `worker/<round-id>`), and opens a PR through GitHub. That does
+not change `main`; it says "here is a proposed change". Brain reviews the
+exact commit, reproduces the checks, and asks the owner to approve that
+specific merge. **No agent merges its own PR, and no agent merges without the
+owner's approval.** Every change passes through Brain's independent
+verification and the owner's approval before landing on `main`
+([`AGENTS.md`](../AGENTS.md) and
+[`docs/agents/FRAMEWORK.md`](agents/FRAMEWORK.md)).
 
 ## Common gotchas for a new vibe coder
 
@@ -523,14 +389,6 @@ landing on `main`.
   [`docs/research/codegen-walls.md`](research/codegen-walls.md)
   catalogues the 27-and-counting recurring divergences with worked
   C source for each.
-- **"Does scaffolder run the build?"**  Yes — Scaffolder's own worktree
-  has the full toolchain and all three baseroms (`AGENTS.md` § Topology;
-  `docs/project-rules.md`), and gates its own PRs with
-  `tools/gate3.py --scope all` before opening them. What it does not do is
-  authorize a merge: Brain still independently reproduces the gate on
-  every PR, from any role, before it can land — that verification (and
-  now the owner's explicit per-merge approval) is what actually gates
-  `main`, not which role happened to build it first.
 - **"sinit outliers?"**  All 51 `__sinit_*` functions are now matched
   (sinit tier sits at 100%). Brief 003's bulk-template wave + brief
   009's one-off `__sinit_ov002_022ca7e8` (asm-void escape for mwcc's
@@ -546,20 +404,17 @@ landing on `main`.
 
 ## Where to dig deeper
 
-- **`CLAUDE.md`** — complete technical spec: toolchain versions,
-  directory conventions, bootstrap commands, the whole matching
-  protocol. Read this when you want precise answers.
-- **`AGENTS.md`** — full agent coordination manifest: who owns which
-  paths, how to add/retire agents, autonomous-work policy.
-- **`docs/state.md`** — the churn log. What shipped recently, what's
-  in flight, what's next. Updated at the end of every session.
-- **`docs/briefs/`** — task briefs. Each file describes one scoped
-  piece of work, who's doing it, what success looks like. The
-  decomper follows these; reading them is a good way to see what
-  "one unit of work" actually looks like.
-- **Reference projects** — `CLAUDE.md` lists two similar decomps
-  (dqix, SonicRushAdventure-Decomp) that inspired this project's
-  layout.
+- **[`AGENTS.md`](../AGENTS.md)** — the project's rules: roles, invariants and
+  the evidence each kind of change must produce.
+- **[`BUILD.md`](../BUILD.md)** — toolchain versions, directory conventions,
+  bootstrap commands and the per-region source tree.
+- **[`docs/state.md`](state.md)** — the owner's standing decisions and what is
+  parked. What is in flight comes from `python3 tools/fw.py status`.
+- **[`docs/rounds/`](rounds/)** — one folder per round: the brief and each
+  seat's report. Reading a brief is a good way to see what "one unit of
+  work" looks like.
+- **Reference projects** — [`BUILD.md`](../BUILD.md) names two similar decomps
+  (dqix, SonicRushAdventure-Decomp) that inspired this project's layout.
 
 ## Code-decomp resumption — the post-scaffold playbook
 
@@ -754,8 +609,7 @@ rather than shipping the data inline.
 
 ### After a PR lands
 
-Brain updates `docs/state.md` § *Today's merges* with the
-shipped match count + delta. The `cascades-diff.yml` CI workflow
+The `cascades-diff.yml` CI workflow
 auto-comments per-rename cascade impact. If your match opened up
 sibling candidates (renaming X promoted N hard-tier siblings to
 medium-tier), the workflow surfaces that.
@@ -765,8 +619,8 @@ medium-tier), the workflow surfaces that.
 - The point is to rebuild a ROM from C source, byte-identical.
 - Matching happens one function at a time, usually with 2-20
   iterations each.
-- Three agents split roles so they don't clobber each other; brain
-  is the only one that merges.
+- Roles are split so agents don't clobber each other; Brain is the only one
+  that merges, and only with the owner's approval.
 - The tools in `tools/` each shorten one step of the loop — start
   with `tools/next_targets.py` to see the worklist and
   `tools/find_callsites.py` to understand a specific function's

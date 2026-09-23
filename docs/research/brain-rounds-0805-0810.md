@@ -474,5 +474,5 @@ roster. Queue: **b575** Luna wave-11 ov002 mop-up (the ONE wine lane), **b576** 
 endgame ledger (wine-free census), **b577** Sonnet `main`-floor autopsy (wine-free, b549
 pattern), **b578** Sonnet EUR data-blob emitter (wine-free tool+tests).
 
-Historical dated round log moved to [STATE-LOG.md](../STATE-LOG.md) by Brief 599.
+Historical dated round log moved to STATE-LOG.md (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/STATE-LOG.md`) by Brief 599.
 

@@ -18,7 +18,7 @@ brain's six-item hardening proposal and approved all of it. Executed this round:
 `tests.yml`, added the context to `required-checks.txt` and the live
 `main-protection` ruleset; `check_ci_contract.py --verify-ruleset` clean. The
 machine-local-SHA class from #1520 now fails in CI, not at the brain's gate.
-(2) **[`docs/dispatch-log.md`](../dispatch-log.md)** — one row per round: host,
+(2) **`docs/dispatch-log.md` (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/dispatch-log.md`)** — one row per round: host,
 model, lanes, transcript location. Closes the machine-locality gap structurally;
 appending a row is now part of every seeding PR (see durable convention 5).
 (3) **[`docs/research/post-small-pool-strategy.md`](post-small-pool-strategy.md)**

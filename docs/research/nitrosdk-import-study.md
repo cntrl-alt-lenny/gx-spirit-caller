@@ -100,9 +100,9 @@ Relevant history and prior assessment:
 * [`brief-280-main-sdk-sourcemine-triage.md`](brief-280-main-sdk-sourcemine-triage.md)
   narrows the main opportunity to a modest SDK-shaped minority and records
   the 7/8-instruction DIV/MMIO pilot.
-* [`brief-069-cross-project-bulk-port-wave-1.md`](../briefs/archive/legacy/069-cross-project-bulk-port-wave-1.md),
-  [`brief-071-cross-project-bulk-port-wave-1-rerun.md`](../briefs/archive/legacy/071-cross-project-bulk-port-wave-1-rerun.md),
-  and [`brief-074-cross-project-bulk-port-wave-3.md`](../briefs/archive/legacy/074-cross-project-bulk-port-wave-3.md)
+* `brief-069-cross-project-bulk-port-wave-1.md` (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/briefs/archive/legacy/069-cross-project-bulk-port-wave-1.md`),
+  `brief-071-cross-project-bulk-port-wave-1-rerun.md` (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/briefs/archive/legacy/071-cross-project-bulk-port-wave-1-rerun.md`),
+  and `brief-074-cross-project-bulk-port-wave-3.md` (removed from `main`; at tag `archive/pre-redesign-2026-09-23`: `docs/briefs/archive/legacy/074-cross-project-bulk-port-wave-3.md`)
   record the actual wave gates and their outcomes.
 
 The ports are not evidence that all remaining `func_` files in `main` are

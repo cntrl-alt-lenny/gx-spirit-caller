@@ -2,18 +2,8 @@
 
 The genuine one-time setup steps for a fresh machine — clone, baserom, Python
 deps, toolchain, first build, baseline. This is **not** a role's operating
-loop; for who does what and how work gets accepted, see `AGENTS.md` and
-`docs/agents/`. For the current checkout layout (the primary checkout is the
-repository root; one isolated checkout per role is nested under it), see
-[`docs/agents/git-and-isolation.md`](agents/git-and-isolation.md) — a fresh
-setup does **not** use the older sibling-folder layout some archived
-documents describe.
-
-Moved out of `docs/agents/brain-onboarding.md` and `docs/agents/wine-macos.md`
-during the 2026-09-22 adoption cleanup (round 2b), which found those files'
-non-setup content stale — see
-[`docs/archive/agents-2026-09-22/`](archive/agents-2026-09-22/) for that
-history.
+loop; for who does what and how work gets accepted, see
+[`AGENTS.md`](../AGENTS.md).
 
 ## 1. Clone and sync
 
@@ -23,28 +13,27 @@ cd gx-spirit-caller
 git fetch origin && git pull --ff-only
 ```
 
-Then set up the isolated checkout your role needs per
-`docs/agents/git-and-isolation.md` — on this Mac the primary checkout is
-`~/Dev/gx-spirit-caller`, and every other role gets its own `.worktrees/<role>`
-linked worktree beneath it.
+Any seat can work in its own clone or linked `git worktree`; a second
+checkout needs its own baseroms (next step) and its own `build/`.
 
 ## 2. Place the baseroms
 
-For a new role checkout, link the primary checkout's ROMs into it:
+For a new linked worktree, link the primary checkout's ROMs into it:
 
 ```bash
-python3.13 tools/link_baseroms.py .worktrees/<role>
+python3.13 tools/link_baseroms.py <path-to-the-linked-worktree>
 ```
 
-Run the command from the primary checkout, replacing `<role>` with the role
-checkout's path. It finds the primary through Git's common directory, verifies
+Run the command from the primary checkout. It finds the primary through Git's
+common directory (so it works for linked worktrees, not for an independent
+clone), verifies
 each available source against the SHA-1s pinned in `tools/configure.py`, and
 creates hard links. If an existing target is a byte-identical copy, add
 `--replace-copies`; a differing target is always refused. A missing source is
 reported and skipped. These files are never committed or redistributed — get
 a clean dump from someone who already has one. If the filesystems do not
 support hard links, the tool prints a loud warning and falls back to a copy.
-See `CLAUDE.md` for the authoritative table:
+The pinned hashes live in `tools/configure.py`; for reference:
 
 | Region | Path | SHA-1 |
 |---|---|---|
@@ -53,13 +42,13 @@ See `CLAUDE.md` for the authoritative table:
 | JPN | `orig/baserom_jpn.nds` | `761fbfc62f4fe74f867e973a5eda91b8e86424f6` |
 
 `orig/` is gitignored and not populated automatically by `git worktree`; use
-the tool above for every role checkout.
+the tool above for every linked worktree.
 
 ## 3. Install Python dependencies
 
-Python 3.11+ is required (`CLAUDE.md`'s toolchain table; this project
-otherwise pins `python3.13` in agent-facing commands on Mac — see
-`docs/project-rules.md` § Python and worktree portability).
+Python 3.11+ is required (see [`BUILD.md`](../BUILD.md)). On a Mac, use
+`python3.13` for every project script: macOS ships no plain `python`, and
+`/usr/bin/python3` is Apple's 3.9, which lacks `match` statements.
 
 ```bash
 python3.13 -m pip install -r tools/requirements.txt   # Mac
@@ -87,18 +76,11 @@ python -m pip install -r tools/requirements.txt        # Windows
   (auto-created, gitignored) so concurrent worktrees don't serialize on each
   other's wineserver; the `mwld` link step still serializes machine-wide
   regardless (`tools/wine_link_lock.py`).
-- **Windows, native — unverified against the current nested worktree
-  layout.** `mwccarm.exe` / `mwldarm.exe` run natively on Windows; no Wine or
-  other runner is needed (`CLAUDE.md` § Platform notes). Beyond that, this
-  document does not assert a specific Windows worktree path: the 2026-09-21
-  framework adoption moved Mac to one checkout per role nested under the
-  primary checkout, and whether the Windows machine also moved to that layout
-  (versus the older sibling-folder convention some archived documents
-  describe) has not been confirmed by a session running there. A Windows
-  brain should confirm its actual layout against
-  `docs/agents/git-and-isolation.md` and record what it finds — see
-  `tools/make_kickoff.py`'s own comment on `VERIFIED_WORKTREES` for the same
-  gap in kickoff generation.
+- **Windows, native.** `mwccarm.exe` / `mwldarm.exe` run natively on Windows;
+  no Wine or other runner is needed ([`BUILD.md`](../BUILD.md) § Per-OS
+  prerequisites). The Windows 11 desktop is where the matching factory is
+  planned to run (see [`docs/state.md`](state.md)); a Windows setup is
+  otherwise unrecorded here.
 - **Linux:** `wibo` (`0.6.16`) is auto-downloaded and runs the Win32
   compiler; no manual step.
 
@@ -113,7 +95,7 @@ First run auto-downloads the native `dsd`, `objdiff-cli`, and
 `mwccarm`/`mwldarm` (via `wibo` on Linux, `wine`/GPTK on macOS, natively on
 Windows) — takes a few minutes; subsequent builds are seconds. Repeat
 `configure.py` for `usa` and `jpn` as needed, and re-run it whenever new
-`.c` files land in `src/` from another role's work, or the linker errors with
+`.c` files land in `src/` from another checkout's work, or the linker errors with
 "`.o` not found".
 
 ## 6. Confirm the 3-region baseline
@@ -127,11 +109,12 @@ each region's `ninja sha1` is byte-identical, and runs the full `pytest -q
 tests` suite. All three regions matching, and all 27 modules × 3 regions
 green (`dsd check modules`), is the correct current baseline — a diverging
 region is a real break, not an expected artifact. This is the same command
-`AGENTS.md` § Evidence discipline names as the merge gate for any build-path
-change; see there for what evidence a given change actually needs.
+`AGENTS.md` § Evidence names as the merge gate for any build-path change;
+see there for what evidence a given change actually needs. `gate3.py`'s exit
+status cannot be trusted until round C: read its log's own pass and fail lines.
 
 ## After setup
 
-Read [`docs/state.md`](state.md) for current project state, then
-`AGENTS.md` and `docs/agents/kickoff.md` for how work gets assigned and
-accepted.
+Read [`AGENTS.md`](../AGENTS.md) for how work gets assigned and accepted, then
+[`docs/state.md`](state.md) for the owner's standing decisions. What is in
+flight comes from `python3 tools/fw.py status` and git.
