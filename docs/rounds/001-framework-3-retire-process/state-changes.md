@@ -6,8 +6,10 @@ Round 001-framework-3-retire-process. Sentence-by-sentence account of
 **archived**; every sentence of the new file is quoted under Added. Units are
 sentences, table rows, headings, fenced blocks and HTML comments; a table's
 separator row is not a sentence. Consecutive quoted sentences share the mark of
-the group heading above them unless a line carries its own. Home folders and
-email addresses in quoted old text are replaced by `<home>` and `<email>`.
+the group heading above them unless a line carries its own. A Markdown link in
+quoted text is shown as its label followed by (link: and the target in backticks),
+so it does not resolve from this folder. Home folders and email addresses in
+quoted old text are replaced by `<home>` and `<email>`.
 
 Documents removed whole are listed by path in the worker report, not by
 sentence.
@@ -24,7 +26,7 @@ sentence.
 
 ### Old lines 5-5: archived: history of the 2026-09-21 framework adoption and the 2.0.0 pin; superseded by round A (the pin is in `docs/agents/framework.json`, and `tools/check_dispatch_log.py`, which it names, is retired).
 
-- L5: "This project adopted the [agentic framework](../AGENTS.md) on 2026-09-21."
+- L5: "This project adopted the agentic framework (link: `../AGENTS.md`) on 2026-09-21."
 - L5: "`AGENTS.md` is now the coordination document: roles, scopes, invariants, evidence table and what is actually enforced."
 - L5: "This project now follows agentic-framework release 2.0.0; release 2.0.1 is expected as a small follow-up update."
 - L5: "This file keeps its full pre-adoption history below unchanged — `tools/check_dispatch_log.py`, `tools/progress.py`, `tools/generate_dashboard.py` and others read it, so nothing below this section was reordered or removed."
@@ -50,8 +52,8 @@ sentence.
 ### Old lines 41-41: archived: pointers to research files that hold older round narrative; those files stay for round B, and the pointers are history.
 
 - L41: "**Older rounds archived.**"
-- L41: "0818b, 0822b, 0825b, 0827, 0828 and 0828b were lifted verbatim to [`docs/research/brain-rounds-0822-0828b.md`](research/brain-rounds-0822-0828b.md) on 2026-09-02 to keep this file at its intended size."
-- L41: "Earlier archives: [0805-0810](research/brain-rounds-0805-0810.md), [0817-0818](research/brain-rounds-0817-0818.md)."
+- L41: "0818b, 0822b, 0825b, 0827, 0828 and 0828b were lifted verbatim to `docs/research/brain-rounds-0822-0828b.md` (link: `research/brain-rounds-0822-0828b.md`) on 2026-09-02 to keep this file at its intended size."
+- L41: "Earlier archives: 0805-0810 (link: `research/brain-rounds-0805-0810.md`), 0817-0818 (link: `research/brain-rounds-0817-0818.md`)."
 
 ### Old lines 48-128: archived: round 0829 narrative (history). The standing facts in it survive elsewhere: ports and EUR flatness in `docs/state.md` Parked; the gate-ledger practice is retired with the queue.
 
@@ -554,7 +556,7 @@ sentence.
 ### Old lines 878-880: archived: heading and intro of a list of five conventions, each dispositioned below.
 
 - L878: "## Durable conventions (lifted out of the archived round narrative)"
-- L880: "Per-round narrative for rounds 0805-0810 now lives in [`docs/research/brain-rounds-0805-0810.md`](research/brain-rounds-0805-0810.md)."
+- L880: "Per-round narrative for rounds 0805-0810 now lives in `docs/research/brain-rounds-0805-0810.md` (link: `research/brain-rounds-0805-0810.md`)."
 - L880: "These four conventions were buried inside it and are load-bearing, so they stay here:"
 
 ### Old lines 885-892: archived: conventions 1 and 2 describe the machine-checked anchors and the PR-count rule of the retired `queue_state_drift.py`.
@@ -583,7 +585,7 @@ sentence.
 
 ### Old lines 922-922: archived: convention 5 is the retired dispatch-log row (owner decision 2).
 
-- L922: "5. **Every seeding/doc PR appends a row to [`docs/dispatch-log.md`](dispatch-log.md)** — round, date, host, brain model, lanes dispatched, transcript location."
+- L922: "5. **Every seeding/doc PR appends a row to `docs/dispatch-log.md` (link: `dispatch-log.md`)** — round, date, host, brain model, lanes dispatched, transcript location."
 - L922: "Machine-locality has burned this campaign at least five distinct ways (#1504's correction, the 0822 transcript-audit gap, #1520's local git object, the WRONG-WORKTREE void dispatch); the log is the structural fix."
 - L922: "A kickoff is written for the host in that row, never forwarded across machines."
 
@@ -674,7 +676,7 @@ sentence.
 
 - L1012: "**Historical metrics, retained for provenance only — NOT the headline.**"
 - L1012: "`complete_units`, `matched_code_percent`, `matched_functions` and `fuzzy_match_percent` from `build/<ver>/report.json` were the canonical indicators in the 2026-05 scaffold era."
-- L1012: "The brief 199/202/203 diagnosis of why objdiff's fuzzy metrics under-count `.legacy.c` and `.s` ships is still correct and worth reading — [`objdiff-fuzzy-vs-complete-metric.md`](research/objdiff-fuzzy-vs-complete-metric.md) — but the figures that used to sit here were from the brief-671 era and are about a thousand PRs out of date."
+- L1012: "The brief 199/202/203 diagnosis of why objdiff's fuzzy metrics under-count `.legacy.c` and `.s` ships is still correct and worth reading — `objdiff-fuzzy-vs-complete-metric.md` (link: `research/objdiff-fuzzy-vs-complete-metric.md`) — but the figures that used to sit here were from the brief-671 era and are about a thousand PRs out of date."
 - L1012: "They were removed rather than refreshed: a stale number in the file the next brain reads cold is worse than no number, and the live ones are one command away."
 
 ### Old lines 1024-1032: archived: the nested per-role worktree layout is retired; seats are not tied to a folder (framework release 3.0.0).
@@ -682,7 +684,7 @@ sentence.
 - L1024: "## Worktree convention — isolation per agent"
 - L1026: "Each agent runs in its own worktree to prevent parallel-session interference that bit briefs 138 + 140 earlier."
 - L1026: "**AGENTS.md is the canonical spec.**"
-- L1026: "Since the 2026-09-21 framework adoption, the layout is one checkout per role, nested under the primary checkout, per [`docs/agents/git-and-isolation.md`](agents/git-and-isolation.md):"
+- L1026: "Since the 2026-09-21 framework adoption, the layout is one checkout per role, nested under the primary checkout, per `docs/agents/git-and-isolation.md` (link: `agents/git-and-isolation.md`):"
 - L1032: "(fenced block) ''' brain/                       primary checkout — Brain works here brain/.worktrees/decomper/   Decomper's isolated checkout brain/.worktrees/scaffolder/ Scaffolder's isolated checkout brain/.worktrees/verifier/   Verifier's isolated checkout '''"
 
 ### Old lines 1039-1039: moved: `AGENTS.md` Working rules and `docs/machine-setup.md` step 2 (a checkout needs its own `orig/` baseroms, linked with `tools/link_baseroms.py`).
@@ -735,7 +737,7 @@ sentence.
 
 - L1093: "**0. ✅ DECIDED 2026-08-05 (round 0805, see top): adopted the pret-style public ladder + verdict-complete gate; rejected attainment-as-completion."
 - L1093: "Original item kept below for the reasoning trail.**"
-- L1093: "(2026-07-25, q-readable-c-done-definition) Decide the "readable-C done" definition; ceiling model corrected, not a completion criterion anymore. r11 found the tractable-C ceiling self-contradicting (48.03% vs r7-14's 14-24% band); fixed with shown arithmetic (main's headroom fraction 0.75 -> 0.10, region-wide ceiling 48.03% -> 30.19%) but explicitly NOT reconciled to the band — see [`docs/research/q-readable-c-done-definition-2026-07-25.md`](../docs/research/q-readable-c-done-definition-2026-07-25.md) for why forcing an exact match would be false precision, and for the larger still-flagged-not-fixed `FINISHABLE_HEADROOM_FRACTION` residual."
+- L1093: "(2026-07-25, q-readable-c-done-definition) Decide the "readable-C done" definition; ceiling model corrected, not a completion criterion anymore. r11 found the tractable-C ceiling self-contradicting (48.03% vs r7-14's 14-24% band); fixed with shown arithmetic (main's headroom fraction 0.75 -> 0.10, region-wide ceiling 48.03% -> 30.19%) but explicitly NOT reconciled to the band — see `docs/research/q-readable-c-done-definition-2026-07-25.md` (link: `../docs/research/q-readable-c-done-definition-2026-07-25.md`) for why forcing an exact match would be false precision, and for the larger still-flagged-not-fixed `FINISHABLE_HEADROOM_FRACTION` residual."
 - L1093: "That doc gives 3 candidate "readable-C done" definitions (pret-style public ladder / attainment=100%-of-ceiling / internal verdict-complete gate) with a recommendation (adopt the ladder + verdict-gate together, reject attainment as a completion criterion) — **the brain decides** which to formally adopt."
 - L1093: "If verdict-complete is chosen, note the freshness-cutoff nuance in that doc (key it per-lever-family off `codegen-walls.md`'s own correction history, not one global date)."
 
@@ -942,8 +944,8 @@ name the old lines they come from. New line numbers are `N<line>`.
 
 ### New lines from N76: added: pointers to the new entry points (`AGENTS.md`, `docs/rounds/`, `BUILD.md`, `docs/decomp-workflow.md`), the ledger's path (checked with `git ls-files`) and the archive tag.
 
-- N76: "- Rules, roles and evidence: [`AGENTS.md`](../AGENTS.md); one folder per round in [`docs/rounds/`](rounds/)."
-- N78: "- Build and toolchain: [`BUILD.md`](../BUILD.md); the matching guide: [`docs/decomp-workflow.md`](decomp-workflow.md)."
+- N76: "- Rules, roles and evidence: `AGENTS.md` (link: `../AGENTS.md`); one folder per round in `docs/rounds/` (link: `rounds/`)."
+- N78: "- Build and toolchain: `BUILD.md` (link: `../BUILD.md`); the matching guide: `docs/decomp-workflow.md` (link: `decomp-workflow.md`)."
 - N80: "- The attempts ledger is `docs/research/campaign-analytics/attempts.tsv`, checked by `tools/validate_attempts.py`; round B decides its final home."
 - N82: "- Everything retired lives at the git tag `archive/pre-redesign-2026-09-23`."
 
