@@ -91,7 +91,7 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
   `5ad1a7a2a9733b191d5c838a36593d429bd7a841`, `main` before the redesign.
 - 2026-09-23, pilot baseline: EUR natural-C is 17.38% (414,738 B) by
   `python3.13 tools/progress.py --version eur`. The one-week pilot is measured
-  against the EUR natural-C gain made by hand between 19 August and 1 September:
+  against the EUR natural-C gain made between 19 August and 1 September:
   16.79% (400,530 B) at `555c2aeac`, the last `main` commit of 19 August, to
   17.38% (414,738 B) at `722d7b385`, the last of 1 September, which is 0.59
   points (14,208 B) in 13 days.
