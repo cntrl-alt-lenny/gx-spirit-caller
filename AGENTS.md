@@ -34,7 +34,7 @@ steps are in [`BUILD.md`](BUILD.md).
 | Worker | Carries out one brief, reports, never merges or accepts its own work | its own checkout, on `worker/<round-id>` |
 | Verifier | Reviews one exact commit blind, writes findings, never writes production code or merges | its own checkout, detached at the commit |
 
-The names Decomper and Scaffolder and the per-role path-ownership table are
+The earlier specialist executor names and the per-role path-ownership table are
 retired: a Worker's scope is its brief. A Worker starts from the brief in fresh
 context; a session carrying over an earlier round is not independent. Any
 capable tool may hold any seat.
