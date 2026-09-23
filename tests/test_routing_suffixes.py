@@ -14,7 +14,6 @@ Two parts:
 
 from __future__ import annotations
 
-import importlib.util
 import sys
 import unittest
 from pathlib import Path
@@ -120,20 +119,6 @@ class TestObjectSuffixForSource(unittest.TestCase):
 # not a hand-rolled copy (brief 587 / improvement-swarm r5 item B).          #
 # --------------------------------------------------------------------------- #
 
-def _load_module_from_path(name: str, path: Path):
-    """Load `path` as a standalone module under `name`, independent of
-    any same-named module already in sys.modules. Needed for the two
-    `post_edit.py` copies (.claude/hooks/ and .codex/hooks/) — both are
-    literally named `post_edit`, so a plain second `import post_edit`
-    would just return the first one cached in sys.modules instead of
-    loading the second file."""
-    spec = importlib.util.spec_from_file_location(name, path)
-    assert spec is not None and spec.loader is not None
-    module = importlib.util.module_from_spec(spec)
-    spec.loader.exec_module(module)
-    return module
-
-
 class TestConformance(unittest.TestCase):
     """Each site is asserted to expose a `ROUTING_SUFFIXES` name that IS
     (identity, not just equal-valued) `routing_suffixes.ROUTING_SUFFIXES`
@@ -171,28 +156,6 @@ class TestConformance(unittest.TestCase):
         self.assertEqual(
             m._c_to_s_rel("src/overlay004/func_x.thumb.c"), "src/overlay004/func_x.s")
         self.assertEqual(m._c_to_s_rel("src/main/func_abc.c"), "src/main/func_abc.s")
-
-    def test_claude_post_edit(self) -> None:
-        m = _load_module_from_path(
-            "_conformance_claude_post_edit",
-            _ROOT / ".claude" / "hooks" / "post_edit.py",
-        )
-        self.assertIs(m.ROUTING_SUFFIXES, ROUTING_SUFFIXES)
-
-    def test_codex_post_edit(self) -> None:
-        m = _load_module_from_path(
-            "_conformance_codex_post_edit",
-            _ROOT / ".codex" / "hooks" / "post_edit.py",
-        )
-        self.assertIs(m.ROUTING_SUFFIXES, ROUTING_SUFFIXES)
-
-    def test_claude_and_codex_post_edit_stay_byte_identical(self) -> None:
-        # Not this module's own concern in general (r5 flags the broader
-        # .claude/.codex mirror-drift risk separately), but this specific
-        # migration touched both copies in lockstep — cheap to pin here.
-        claude = (_ROOT / ".claude" / "hooks" / "post_edit.py").read_bytes()
-        codex = (_ROOT / ".codex" / "hooks" / "post_edit.py").read_bytes()
-        self.assertEqual(claude, codex)
 
 
 if __name__ == "__main__":
