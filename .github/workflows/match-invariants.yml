@@ -7,10 +7,8 @@ name: Match invariants
 #   - Orphan `extern` declarations in src/ whose target was renamed (warn)
 #   - Placeholder-named symbols inside `complete` TUs (warn)
 #
-# On PRs: upserts a single comment summarising the findings. Job
-# exit status reflects whether any error-severity issues were found
-# (errors block merge iff this check is required in branch protection;
-# warnings never block).
+# On PRs the job fails when any error-severity issue is found and prints
+# the findings in its log; warnings never fail it.
 #
 # Does NOT build the ROM or run dsd — this is a pure metadata check
 # that works from the committed config/ files alone.
@@ -21,7 +19,6 @@ on:
       - 'config/**'
       - 'src/**'
       - 'tools/check_match_invariants.py'
-      - 'tools/ci_format_invariants.py'
       - 'tools/progress.py'
       - 'tools/analyze_symbols.py'
       - '.github/workflows/match-invariants.yml'
@@ -46,7 +43,6 @@ jobs:
     continue-on-error: ${{ matrix.version != 'eur' }}
     permissions:
       contents: read
-      pull-requests: write
     steps:
       - uses: actions/checkout@v4
 
@@ -74,21 +70,6 @@ jobs:
           errors=$(python -c "import json; print(json.load(open('/tmp/invariants-${{ matrix.version }}.json'))['errors'])")
           echo "errors=${errors}" >> "$GITHUB_OUTPUT"
 
-      - name: Format report as Markdown
-        run: |
-          python tools/ci_format_invariants.py \
-              /tmp/invariants-${{ matrix.version }}.json -o /tmp/comment-${{ matrix.version }}.md
-
-      - name: Upsert PR comment
-        env:
-          GH_TOKEN: ${{ secrets.GITHUB_TOKEN }}
-          PR_NUMBER: ${{ github.event.pull_request.number }}
-        # Shared upsert script — see .github/scripts/upsert-pr-comment.sh.
-        run: |
-          .github/scripts/upsert-pr-comment.sh \
-            '<sub>🤖 Posted by `.github/workflows/match-invariants.yml` (${{ matrix.version }})' \
-            /tmp/comment-${{ matrix.version }}.md
-
       - name: Block merge on error-severity issues only
         # Warnings are informational (brief 003 intentional-placeholder
         # cases). Errors represent build-breaking drift (e.g. a TU in
@@ -98,7 +79,7 @@ jobs:
           errors=${{ steps.invariants.outputs.errors }}
           if [ "${errors}" -gt 0 ]; then
             echo "::error::Found ${errors} error-severity invariant issue(s)."
-            echo "See the PR comment for details; re-run by pushing a fix."
+            python tools/check_match_invariants.py --version ${{ matrix.version }}
             exit 1
           fi
           echo "No error-severity issues (warnings do not block merge)."

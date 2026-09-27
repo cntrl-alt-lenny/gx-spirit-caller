@@ -1,5 +1,0 @@
-name: OS_RestoreIrq
-signatures:
-  - bitmask: ////////////////////////////////
-    pattern: ABAP4YAgweMAIILhAvAh4YAAAeIe/y/h
-    relocations: []

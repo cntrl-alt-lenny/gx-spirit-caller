@@ -47,7 +47,7 @@ any of these (e.g. wiki, CI, docs), just describe what changed and why.
 
 - [ ] `ninja` rebuilds cleanly
 - [ ] `ninja objdiff` shows the function(s) matched
-- [ ] `ninja sha1` passes (the project gate — byte-identical ROM, all 3 regions) and `dsd check modules` is green. (`dsd check symbols` is **informational only** — it has known pre-existing noise on unmatched gap data; see [`docs/research/ov004-check-symbols-diagnosis.md`](../docs/research/ov004-check-symbols-diagnosis.md).)
+- [ ] `ninja sha1` passes (the project gate — byte-identical ROM, all 3 regions) and `dsd check modules` is green. (`dsd check symbols` is **informational only** — it has known pre-existing noise on unmatched gap data.)
 - [ ] Symbol renamed in `symbols.txt` if a function newly matched
 - [ ] `assets/progress-heatmap.svg` regenerated and committed if matched % changed
 - [ ] No comments explaining what well-named identifiers already convey
@@ -58,12 +58,3 @@ any of these (e.g. wiki, CI, docs), just describe what changed and why.
 ### Notes for reviewers
 
 <!-- Anything non-obvious: workarounds, why a particular cast, related upstream issues, etc. -->
-
-### Inline-assembly visibility
-
-For PRs that change C under `src/` or `libs/`, paste the non-blocking report
-from `python tools/asm_void_counter.py --base origin/main --head HEAD --region eur`:
-
-```
-asm-void counter (eur): <.text bytes> .text bytes in <N> changed asm-C TU(s) (<N> changed C file(s) scanned)
-```

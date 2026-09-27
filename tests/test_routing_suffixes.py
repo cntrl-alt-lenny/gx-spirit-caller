@@ -134,10 +134,6 @@ class TestConformance(unittest.TestCase):
         import port_to_region as m
         self.assertIs(m.ROUTING_SUFFIXES, ROUTING_SUFFIXES)
 
-    def test_sig_census(self) -> None:
-        import sig_census as m
-        self.assertIs(m._ROUTING_SUFFIXES, ROUTING_SUFFIXES)
-
     def test_batch_sha1(self) -> None:
         # brief 690: batch_sha1.py's own _c_to_s_rel() hand-rolled a bare
         # `c_rel[:-2] + ".s"` that never stripped the routing infix, so

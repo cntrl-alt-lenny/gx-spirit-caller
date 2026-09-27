@@ -1,5 +1,0 @@
-name: OS_DefaultIrqHandler
-signatures:
-  - bitmask: /////w==
-    pattern: Hv8v4Q==
-    relocations: []

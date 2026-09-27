@@ -1,5 +1,0 @@
-name: CpuSet
-signatures:
-  - bitmask: /////w==
-    pattern: C99wRw==
-    relocations: []

@@ -1,5 +1,0 @@
-name: DC_WaitWriteBufferEmpty
-signatures:
-  - bitmask: ////////////////
-    pattern: AACg45oPB+4e/y/h
-    relocations: []

@@ -1,5 +1,0 @@
-name: OS_Halt
-signatures:
-  - bitmask: ////////////////
-    pattern: AACg45APB+4e/y/h
-    relocations: []

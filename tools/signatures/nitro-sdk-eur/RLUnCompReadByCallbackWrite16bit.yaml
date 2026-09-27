@@ -1,5 +1,0 @@
-name: RLUnCompReadByCallbackWrite16bit
-signatures:
-  - bitmask: /////w==
-    pattern: Fd9wRw==
-    relocations: []

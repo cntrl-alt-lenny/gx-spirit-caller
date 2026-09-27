@@ -1,5 +1,0 @@
-name: OSi_DequeueItem
-signatures:
-  - bitmask: ////////////////////////////////////////////////
-    pattern: ECCR5RQQkeUAAFLjjBCABRQQghUAAFHjiCCABRAggRUe/y/h
-    relocations: []

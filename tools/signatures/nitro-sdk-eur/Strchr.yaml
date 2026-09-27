@@ -1,5 +1,0 @@
-name: Strchr
-signatures:
-  - bitmask: ////////////////////////////////////////////////////////////////////////////////
-    pattern: 0SDQ4AEcoOFBHKDhAABS4wUAAAoBAFLhAQBAAh7/LwHRINDgAABS4/n//xoAAFHjAACgEwEAQAIe/y/h
-    relocations: []
