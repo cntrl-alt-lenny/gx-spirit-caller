@@ -16,7 +16,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parent.parent
 MAP_PATH = ROOT / "tools" / "park_class_map.tsv"
-LEDGER_PATH = ROOT / "docs" / "research" / "campaign-analytics" / "attempts.tsv"
+LEDGER_PATH = ROOT / "docs" / "ledger" / "attempts.tsv"
 LEDGER_FIELDS = (
     "addr", "module", "text_size", "tier", "shape", "result",
     "match_pct", "park_class", "park_family", "brief", "attempts",

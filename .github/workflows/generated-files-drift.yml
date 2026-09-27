@@ -1,19 +1,9 @@
 name: Generated files drift
 
-# Gates auto-generated docs against drift. Each generator exposes a
-# `--check` mode that exits non-zero if the committed output differs
-# from a fresh regeneration. Catches PRs that add a new tool or brief
-# without re-running the regenerator.
-#
-# Currently gates:
-#   docs/tools-index.md                  ← tools/generate_tool_index.py
-#   docs/research/README.md              ← tools/generate_research_index.py
-#   docs/research/campaign-analytics/attempts.tsv ← tools/validate_attempts.py
-#
-# Does NOT gate assets/progress-heatmap.svg — its committed form is
-# generated from `report.json` (post-`ninja report`, requires baserom),
-# while CI falls back to `delinks.txt` synthesis which produces a
-# structurally-different SVG. A CI gate would always false-fail.
+# Checks the project's recorded state on every pull request:
+#   docs/ledger/attempts.tsv  <- tools/validate_attempts.py
+#   the framework's own checks  <- tools/fw.py check (links, the state budget,
+#                                  personal paths, report shape)
 
 # DELIBERATELY UNFILTERED. `drift-check` is a REQUIRED status check in the
 # `main-protection` ruleset. GitHub blocks a PR until every required check
@@ -25,8 +15,8 @@ name: Generated files drift
 # document and `tests/*.py`, matched none of the old path filter, and sat
 # BLOCKED with all five of its actual checks green.
 #
-# The job is checkout + Python + a few `--check` invocations, so running it
-# unconditionally is cheap.
+# The job is checkout + Python + two checks, so running it unconditionally is
+# cheap.
 #
 # If this is ever re-filtered, drop it from the required-check list in the
 # same change — the two settings are only safe together.
@@ -56,11 +46,8 @@ jobs:
       - name: Install Python deps
         run: pip install -r tools/requirements.txt
 
-      - name: Check tools-index drift
-        run: python tools/generate_tool_index.py --check
-
-      - name: Check research-index drift
-        run: python tools/generate_research_index.py --check
-
       - name: Validate attempts ledger
         run: python tools/validate_attempts.py
+
+      - name: Framework check
+        run: python tools/fw.py check

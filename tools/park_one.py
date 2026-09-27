@@ -33,7 +33,7 @@ from normalise_park_class import derive_family
 from validate_attempts import audit_event
 from wall_aware_headroom import _source_module
 
-_ATTEMPTS_REL = Path("docs/research/campaign-analytics/attempts.tsv")
+_ATTEMPTS_REL = Path("docs/ledger/attempts.tsv")
 _ATTEMPTS_HEADER = (
     "addr", "module", "text_size", "tier", "shape", "result",
     "match_pct", "park_class", "park_family", "brief", "attempts",

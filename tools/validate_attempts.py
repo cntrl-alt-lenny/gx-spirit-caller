@@ -32,7 +32,7 @@ from parsers import parse_delinks_file
 from wall_aware_headroom import _source_module
 
 ROOT = Path(__file__).resolve().parent.parent
-LEDGER = ROOT / "docs/research/campaign-analytics/attempts.tsv"
+LEDGER = ROOT / "docs/ledger/attempts.tsv"
 FIELDS = (
     "addr", "module", "text_size", "tier", "shape", "result",
     "match_pct", "park_class", "park_family", "brief", "attempts",

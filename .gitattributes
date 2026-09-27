@@ -1,4 +1,4 @@
-docs/research/campaign-analytics/attempts.tsv merge=union
+docs/ledger/attempts.tsv merge=union
 
 # Installed by framework adoption (2026-09-21). This matters because adoption
 # installed `.githooks/pre-push`, a `#!/bin/sh` script: a stale CRLF working

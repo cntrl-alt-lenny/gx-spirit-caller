@@ -15,7 +15,7 @@ class ParkOneLedgerTests(TestCase):
     def test_real_ledger_rejects_not_attempted_measurements(self) -> None:
         import csv
 
-        ledger = ROOT / "docs/research/campaign-analytics/attempts.tsv"
+        ledger = ROOT / "docs/ledger/attempts.tsv"
         with ledger.open(newline="", encoding="utf-8") as stream:
             contradictions = [
                 row["addr"]
@@ -35,7 +35,7 @@ class ParkOneLedgerTests(TestCase):
             c_path = root / c_rel
             s_path = root / s_rel
             delinks = root / "config/eur/arm9/delinks.txt"
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             c_path.parent.mkdir(parents=True)
             delinks.parent.mkdir(parents=True)
             ledger.parent.mkdir(parents=True)
@@ -89,7 +89,7 @@ class ParkOneLedgerTests(TestCase):
             c_path = root / c_rel
             s_path = root / s_rel
             delinks = root / "config/eur/arm9/overlays/ov002/delinks.txt"
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             c_path.parent.mkdir(parents=True)
             delinks.parent.mkdir(parents=True)
             ledger.parent.mkdir(parents=True)
@@ -128,7 +128,7 @@ class ParkOneLedgerTests(TestCase):
 
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             ledger.parent.mkdir(parents=True)
             ledger.write_text(
                 "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\tattempts\n",
@@ -161,7 +161,7 @@ class ParkOneLedgerTests(TestCase):
             s_rel = "src/main/func_02000010.s"
             c_path, s_path = root / c_rel, root / s_rel
             delinks = root / "config/eur/arm9/delinks.txt"
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             c_path.parent.mkdir(parents=True)
             delinks.parent.mkdir(parents=True)
             ledger.parent.mkdir(parents=True)
@@ -185,7 +185,7 @@ class ParkOneLedgerTests(TestCase):
             s_rel = "src/main/func_02000010.s"
             c_path, s_path = root / c_rel, root / s_rel
             delinks = root / "config/eur/arm9/delinks.txt"
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             c_path.parent.mkdir(parents=True)
             delinks.parent.mkdir(parents=True)
             ledger.parent.mkdir(parents=True)
@@ -223,7 +223,7 @@ class ParkOneLedgerTests(TestCase):
             s_rel = "src/main/func_02000010.s"
             c_path, s_path = root / c_rel, root / s_rel
             delinks = root / "config/eur/arm9/delinks.txt"
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             c_path.parent.mkdir(parents=True)
             delinks.parent.mkdir(parents=True)
             ledger.parent.mkdir(parents=True)
@@ -245,7 +245,7 @@ class ParkOneLedgerTests(TestCase):
 
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             ledger.parent.mkdir(parents=True)
             ledger.write_text(
                 "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\tattempts\n"
@@ -276,7 +276,7 @@ class ParkOneLedgerTests(TestCase):
         )
         with tempfile.TemporaryDirectory() as temp:
             root = Path(temp)
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             ledger.parent.mkdir(parents=True)
             lines = [
                 "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief"
@@ -301,7 +301,7 @@ class ParkOneLedgerTests(TestCase):
                 "0x020915e4", "0x020458d8", "0x020967bc",
             )
         } | {("ov002", "0x022476e8")}
-        ledger = ROOT / "docs/research/campaign-analytics/attempts.tsv"
+        ledger = ROOT / "docs/ledger/attempts.tsv"
         self.assertTrue(measured <= headroom._attempted_keys(ledger))
 
     def test_diagnosed_never_attempted_walls_remain_excluded(self) -> None:
@@ -313,5 +313,5 @@ class ParkOneLedgerTests(TestCase):
             ("main", "0x02023478"),
             ("main", "0x0209085c"),
         }
-        ledger = ROOT / "docs/research/campaign-analytics/attempts.tsv"
+        ledger = ROOT / "docs/ledger/attempts.tsv"
         self.assertTrue(diagnosed <= headroom._attempted_keys(ledger))

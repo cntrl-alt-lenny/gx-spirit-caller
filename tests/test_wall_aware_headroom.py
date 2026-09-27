@@ -316,7 +316,7 @@ class ScanCandidateAccounting(unittest.TestCase):
             )
             with (root / "config/delinks.txt").open("a", encoding="utf-8") as stream:
                 stream.write("\nsrc/overlay002/func_ov002_02100010.s:\n    complete\n")
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             ledger.parent.mkdir(parents=True)
             ledger.write_text(
                 "addr\tmodule\ttext_size\ttier\tshape\tresult\tmatch_pct\tpark_class\tpark_family\tbrief\n"

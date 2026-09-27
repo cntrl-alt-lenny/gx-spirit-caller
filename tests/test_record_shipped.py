@@ -19,7 +19,7 @@ class TestRecordShipped(unittest.TestCase):
             root = Path(temp)
             c_rel = "src/main/func_02000020.c"
             delinks = root / "config/eur/arm9/delinks.txt"
-            ledger = root / "docs/research/campaign-analytics/attempts.tsv"
+            ledger = root / "docs/ledger/attempts.tsv"
             (root / c_rel).parent.mkdir(parents=True)
             delinks.parent.mkdir(parents=True)
             ledger.parent.mkdir(parents=True)

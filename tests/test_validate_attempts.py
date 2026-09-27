@@ -126,14 +126,14 @@ class TestValidateAttemptsLiveLedger(unittest.TestCase):
     def test_committed_ledger_has_no_hard_validation_errors(self) -> None:
         report = validate_attempts.audit_file(
             Path(__file__).resolve().parents[1]
-            / "docs/research/campaign-analytics/attempts.tsv"
+            / "docs/ledger/attempts.tsv"
         )
         assert not report.error_count
 
     def test_committed_ledger_c_lever_exemption_is_property_shaped(self) -> None:
         report = validate_attempts.audit_file(
             Path(__file__).resolve().parents[1]
-            / "docs/research/campaign-analytics/attempts.tsv"
+            / "docs/ledger/attempts.tsv"
         )
         _assert_c_lever_exemption_shape(report)
         assert not report.error_count

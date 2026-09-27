@@ -258,7 +258,7 @@ def _file_metadata(
     return {"path": rel, "addr": addr, "text_size": text_sizes.get(rel)}
 
 
-_ATTEMPTS_REL = Path("docs/research/campaign-analytics/attempts.tsv")
+_ATTEMPTS_REL = Path("docs/ledger/attempts.tsv")
 _DIAGNOSED_WALL_PARK_CLASSES = frozenset({
     "complexity", "permanent-header", "c-23-c-36", "c-31",
 })
