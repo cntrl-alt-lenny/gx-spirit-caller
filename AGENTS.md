@@ -41,6 +41,22 @@ capable tool may hold any seat.
 Every seat starts with its `fw.py` command (see the framework). Two seats never
 share a checkout. Adding or retiring a role is the owner's decision.
 
+## Prompts and sign-off lines
+
+The owner's rule until the framework adopts it (framework issue 26):
+
+- The first line of every prompt Brain writes for the owner is
+  `<project> · ROUND <number> · <ROLE>`, for example
+  `gx-spirit-caller · ROUND 003 · WORKER`. A second message to the same seat in
+  the same round adds `· message N` (`gx-spirit-caller · ROUND 003 · WORKER ·
+  message 2`).
+- Every seat's prompt tells it to end its final reply with one line in the
+  same form: `<project> · ROUND <number> · <ROLE> · DONE — report pushed at
+  <commit>`, or `· STOPPED — <reason>` or `· BLOCKED — <reason>`.
+- Whenever the owner comes back, Brain starts by saying, for each round in
+  flight, which seats have reported and which prompt the owner should send
+  next, and re-prints that prompt.
+
 ## Invariants
 
 - **Every matched function stays matched.** A change must never turn a
