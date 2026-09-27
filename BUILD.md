@@ -48,16 +48,65 @@ edit src/foo.c
 "matched" when objdiff shows it identical to the original `.o` that
 `dsd delink` produced.
 
-Inner loop once decomp is under way:
+Matching one function by hand:
 
-1. Pick an unmatched function from `config/<ver>/**/symbols.txt`.
-2. Write a C version in `src/…` (or `libs/…` for SDK code).
-3. `ninja` rebuilds; `ninja objdiff` generates a per-function diff; iterate to 100%.
-4. Rename the symbol in `symbols.txt` from `func_02001234` to its real name once it matches.
-5. `python tools/progress.py --version <ver>` prints a per-region table.
+1. Pick an unmatched function from `config/<ver>/**/symbols.txt` and read its
+   assembly (`./dsd dis`, or the objdiff GUI on its `_dsd_gap@…` unit).
+2. Choose the compiler tier from the prologue and epilogue: `.c`,
+   `.legacy.c` or `.legacy_sp3.c` (see [Toolchain](#toolchain) and
+   [`docs/compiler-quirks.md`](docs/compiler-quirks.md), which also lists the
+   codegen traps worth checking before iterating).
+3. Write the C in `src/<module>/`, or `libs/…` for SDK code, and give it its
+   own unit in the module's `delinks.txt` (`config/<ver>/arm9/delinks.txt`
+   for main, `config/<ver>/arm9/overlays/ov<NNN>/delinks.txt` for an overlay):
+
+   ```text
+   src/main/func_020467f4.legacy_sp3.c:
+       complete
+       .text start:0x020467f4 end:0x02046828
+   ```
+
+   Re-run `python3.13 tools/configure.py <ver>` so the new file is in the
+   build graph.
+4. Iterate with `python3.13 tools/fastmatch.py <ver> src/…/file.c` (one unit,
+   relocations resolved) or `ninja objdiff`, until it is 100%.
+   `ninja build/<ver>/path/to/file.ctx.c` writes a preprocessed context to
+   paste into decomp.me next to the assembly.
+5. Rename it with `python3.13 tools/rename_symbol.py --cascade func_<addr>
+   Module_FunctionName` (convention below).
+6. Run the three-region gate, `python3.13 tools/gate3.py --scope all`, and read
+   its log as [`AGENTS.md`](AGENTS.md) § Evidence describes.
+   `python3.13 tools/progress.py --version <ver>` prints the per-region
+   progress table.
 
 Hard functions that resist a clean C match can be shipped as byte-exact
 assembly (`.s`) to keep the ROM round-tripping, then converted to C later.
+`tools/cmatch_loop.py` drafts, compiles and scores a list of candidates
+(steps 3 and 4); it never commits, and nothing it accepts counts until the
+three-region gate passes. Each attempt's outcome goes in the attempts ledger,
+[`docs/ledger/attempts.tsv`](docs/ledger/attempts.tsv) (schema:
+[`docs/ledger/attempts-schema.md`](docs/ledger/attempts-schema.md)), through
+`park_one.py` or `record_shipped.py`.
+
+## Tools
+
+Everything in `tools/` is used by the build, the gate, the matching loop, CI or
+the ledger. The ones you run yourself:
+
+| Tool | When |
+|---|---|
+| `configure.py <ver>` | Before building a region, and whenever `.c` files are added |
+| `gate3.py --scope all` | The three-region check for any build-path change |
+| `fastmatch.py`, `cmatch_loop.py` | Checking one unit fast; drafting and scoring a batch of candidates |
+| `progress.py --version <ver>` | The progress number any report quotes |
+| `rename_symbol.py --cascade` | Renaming a symbol in every region's config and in `src/` |
+| `port_to_region.py` | Porting an EUR match to USA and JPN |
+| `check_delink_dupes.py` | After editing any `delinks.txt` |
+| `check_match_invariants.py --version <ver>` | After changing `src/` or `config/` |
+| `validate_attempts.py`, `park_one.py`, `record_shipped.py` | Checking and writing the attempts ledger |
+| `link_baseroms.py <checkout>` | Giving a linked worktree the baseroms |
+| `check_ci_contract.py` | After changing a workflow or `.github/required-checks.txt` |
+| `download_tool.py` | Run by the build; by hand only to restore a tool |
 
 ## Project layout
 
@@ -81,7 +130,7 @@ assembly (`.s`) to keep the ROM round-tripping, then converted to C later.
 
 | Tool          | Version      | Notes                                                |
 |---------------|--------------|------------------------------------------------------|
-| `mwccarm`     | `2.0/sp1p5`  | Default; decomp.me id `mwcc_30_131`. Per-TU alternatives by filename suffix: `*.legacy.c` uses `1.2/sp2p3` (Style A epilogue, see [`docs/research/style-a-epilogue.md`](docs/research/style-a-epilogue.md)); `*.legacy_sp3.c` uses `1.2/sp3` (`sub sp, #4` prologue with a `pop {regs, pc}` epilogue, see [`docs/research/sp3-routing-decision.md`](docs/research/sp3-routing-decision.md)) |
+| `mwccarm`     | `2.0/sp1p5`  | Default; decomp.me id `mwcc_30_131`. Per-TU alternatives by filename suffix: `*.legacy.c` uses `1.2/sp2p3` (two-step `pop {regs, lr}; bx lr` epilogue); `*.legacy_sp3.c` uses `1.2/sp3` (`sub sp, #4` prologue with a `pop {regs, pc}` epilogue); see [`docs/compiler-quirks.md`](docs/compiler-quirks.md) |
 | `mwldarm`     | `2.0/sp1p5`  | ships alongside `mwccarm`                             |
 | `dsd`         | `v0.11.0`    | [ds-decomp](https://github.com/AetiasHax/ds-decomp); macOS arm64 + Linux + Windows |
 | `objdiff-cli` | `v2.7.1`     | per-function diffing; macOS/Linux/Windows            |
@@ -111,8 +160,9 @@ assembly (`.s`) to keep the ROM round-tripping, then converted to C later.
 
 - **macOS (Apple Silicon):** install the
   [Game Porting Toolkit cask](https://github.com/Gcenx/homebrew-wine) and
-  Rosetta 2 (see [`docs/machine-setup.md`](docs/machine-setup.md) and
-  [`docs/research/wine-migration.md`](docs/research/wine-migration.md)).
+  Rosetta 2 (see [`docs/machine-setup.md`](docs/machine-setup.md); the
+  reasoning is `docs/research/wine-migration.md` at the tag
+  `archive/pre-redesign-2026-09-23`).
   `configure.py` picks `wine` from `PATH`, and defaults `WINEPREFIX` to
   `<checkout>/.wine-lane` (auto-created, gitignored) so each checkout has its
   own wineserver (set `WINEPREFIX` to override); the `mwld` link step stays

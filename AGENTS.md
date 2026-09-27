@@ -152,8 +152,10 @@ issue is 18. Ignore that line only.
 - Rounds, one folder each (brief and reports): [`docs/rounds/`](docs/rounds/)
 - Build, toolchain, conventions and bootstrap: [`BUILD.md`](BUILD.md),
   [`docs/machine-setup.md`](docs/machine-setup.md)
-- How matching is done: [`docs/decomp-workflow.md`](docs/decomp-workflow.md),
-  the research corpus in [`docs/research/`](docs/research/) and the tool
-  catalogue [`docs/tools-index.md`](docs/tools-index.md)
-- Everything retired in the redesign: the git tag
-  `archive/pre-redesign-2026-09-23`
+- How matching is done, and the tools you run: [`BUILD.md`](BUILD.md); what
+  the compilers do that you would not expect:
+  [`docs/compiler-quirks.md`](docs/compiler-quirks.md)
+- The attempts ledger: [`docs/ledger/attempts.tsv`](docs/ledger/attempts.tsv),
+  checked by `tools/validate_attempts.py`
+- Everything retired in the redesign, including the research corpus: the git
+  tag `archive/pre-redesign-2026-09-23`

@@ -71,18 +71,17 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
   `.githooks/pre-push` as a seed file (framework issue 25), so the next
   framework update would re-create it; that update round must delete the hook
   again.
-- **Tool defects reported 2026-09-08, not re-checked:** `pool_freshness.py
-  --module` returning an empty pool for a spelling it does not know, and
-  `m2ctx.py` needing a `gcc` the Windows PC lacks. Re-verify in rounds C and E.
+- **Tool defect reported 2026-09-08, not re-checked:** `m2ctx.py` needing a
+  `gcc` the Windows PC lacks. Re-verify in rounds C and E.
 
 ## Pointers
 
 - Rules, roles and evidence: [`AGENTS.md`](../AGENTS.md); one folder per round in
   [`docs/rounds/`](rounds/).
-- Build and toolchain: [`BUILD.md`](../BUILD.md); the matching guide:
-  [`docs/decomp-workflow.md`](decomp-workflow.md).
-- The attempts ledger is `docs/research/campaign-analytics/attempts.tsv`,
-  checked by `tools/validate_attempts.py`; round B decides its final home.
+- Build, toolchain and how to match a function: [`BUILD.md`](../BUILD.md);
+  compiler quirks: [`docs/compiler-quirks.md`](compiler-quirks.md).
+- The attempts ledger is [`docs/ledger/attempts.tsv`](ledger/attempts.tsv),
+  checked by `tools/validate_attempts.py`.
 - Everything retired lives at the git tag `archive/pre-redesign-2026-09-23`.
 
 ## Historical anchors

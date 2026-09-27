@@ -71,7 +71,8 @@ python -m pip install -r tools/requirements.txt        # Windows
   casks are deprecated and disabled by Apple Gatekeeper as of 2026-09-01; if a
   machine is still on one of those, `brew uninstall --cask wine-stable` first
   to satisfy GPTK's conflicts-with check. Rationale and verified baseline:
-  [`docs/research/wine-migration.md`](research/wine-migration.md).
+  `docs/research/wine-migration.md` at the tag
+  `archive/pre-redesign-2026-09-23`.
   `configure.py` defaults `WINEPREFIX` to `<worktree>/.wine-lane`
   (auto-created, gitignored) so concurrent worktrees don't serialize on each
   other's wineserver; the `mwld` link step still serializes machine-wide
