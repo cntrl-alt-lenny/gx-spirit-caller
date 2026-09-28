@@ -58,6 +58,11 @@ jobs:
       - name: Run unittest suite
         run: python -m unittest discover -s tests -v
 
+      - name: Fake-match lint (round 004)
+        # Fails source that reaches identical bytes by something other than
+        # real C; tolerates only tools/fake_match_baseline.txt, never growth.
+        run: python tools/check_fake_matches.py
+
   configure-windows:
     # Windows-only smoke gate added with brief 058 / PR #393.
     #
