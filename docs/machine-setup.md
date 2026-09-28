@@ -102,7 +102,7 @@ Windows) — takes a few minutes; subsequent builds are seconds. Repeat
 ## 6. Confirm the 3-region baseline
 
 ```bash
-python3.13 tools/gate3.py --scope all
+python3.13 tools/gate3.py --scope all --log ../gate.log
 ```
 
 This reconfigures and rebuilds all three regions from a clean tree, verifies
@@ -111,8 +111,9 @@ tests` suite. All three regions matching, and all 27 modules × 3 regions
 green (`dsd check modules`), is the correct current baseline — a diverging
 region is a real break, not an expected artifact. This is the same command
 `AGENTS.md` § Evidence names as the merge gate for any build-path change;
-see there for what evidence a given change actually needs. `gate3.py`'s exit
-status cannot be trusted until round C: read its log's own pass and fail lines.
+see there for what evidence a given change actually needs. `--log` writes the
+transcript itself, so never pipe the gate; the log's last line,
+`gate3: GATE EXIT <n>`, is the exit status it returned.
 
 ## After setup
 

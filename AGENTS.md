@@ -125,9 +125,9 @@ exit status (framework rule 7). CI is the backstop, not the primary evidence.
 
 | Changed | Required evidence |
 |---|---|
-| Anything on the build path: `src/`, `libs/`, `include/`, `config/`, hand-written `.s`, or a `tools/*.py` the build or gate runs | `python3.13 tools/gate3.py --scope all > <log> 2>&1`, then the log check below. It passes only with `[eur]`, `[usa]` and `[jpn]` `SHA1 PASS`, a pytest summary with no failures, `GATE PASS`, and no `SKIP` standing in for a region. Quote those lines and name the commit. |
+| Anything on the build path: `src/`, `libs/`, `include/`, `config/`, hand-written `.s`, or a `tools/*.py` the build or gate runs | `python3.13 tools/gate3.py --scope all --log <log>`, then the log check below. It passes only with `[eur]`, `[usa]` and `[jpn]` `SHA1 PASS`, a pytest summary with no failures, `GATE PASS`, last line `gate3: GATE EXIT 0`, and no `SKIP` standing in for a region; then `python3.13 tools/check_references.py --version eur --version usa --version jpn` prints `OK`. Quote those lines and name the commit. |
 | `config/**/delinks.txt` | `python3.13 tools/check_delink_dupes.py` clean on the merged tree: a sweep that re-derives an already-carved function doubles its block and breaks `dsd lcf` at merge while its own branch is green. |
-| `src/` or `config/` | `python3.13 tools/check_match_invariants.py --version eur` reports no errors (exit 2 means errors). |
+| `src/` or `config/` | `python3.13 tools/check_match_invariants.py --version eur` reports no errors (exit 2 means errors), and `python3.13 tools/check_fake_matches.py` prints `OK`. |
 | Symbol renames | The build-path row, plus the output of `tools/rename_symbol.py --cascade` showing the rename reached every region. |
 | `tools/` or `docs/` only, off the build path | `python3.13 -m pytest -q tests`, `python3.13 -m unittest discover -s tests` and `ruff check .`, all clean. |
 | `AGENTS.md`, `CLAUDE.md`, `docs/state.md`, `docs/agents/`, `docs/rounds/` | `python3 tools/fw.py check` with 0 errors and 0 warnings. |
@@ -148,10 +148,9 @@ third works on both (on Windows use `python` for `python3.13`).
 A unit test cannot see a ROM regression, so citing the test suite as evidence
 for a build-path change is a blocking finding.
 
-**Until round C, the gate's exit status cannot be trusted.** Piping `gate3.py`
-through `tee` has reported success on failure three rounds running. Write the
-gate to a log with no pipe and quote the log's own pass and fail lines; an exit
-code alone proves nothing.
+**Never pipe the gate:** through `tee` the status is `tee`'s, and a failed gate
+passed three rounds running. `--log` writes the transcript; its last line,
+`gate3: GATE EXIT <n>`, is the gate's status.
 
 ## What is actually enforced
 
@@ -161,7 +160,7 @@ Checked 2026-09-23 with `gh api repos/cntrl-alt-lenny/gx-spirit-caller/rulesets/
 |---|---|
 | `main-protection` ruleset, active on `refs/heads/main` | The one server-side guarantee, where it binds. Requires a pull request (squash merges only) with `required_approving_review_count` 0, so no human review is required. Blocks deletion and non-fast-forward pushes. Requires the five checks in `.github/required-checks.txt`, each running on every pull request: `Python (ruff)`, `Markdown (markdownlint-cli2)`, `drift-check`, `unittest`, `configure-windows`. Changing the set is the owner's decision. |
 | Administrator bypass | Defeats the layer above. `cntrl-alt-lenny` is the only collaborator, holds `admin`, and the ruleset's `bypass_actors` gives that role `bypass_mode: "always"`. Every agent authenticates as this account, so nothing stops an agent pushing to `main`. |
-| Local hooks | None. The git pre-push hook and the Claude Code and Codex hooks were retired in round A; round C writes new Claude Code and Codex settings that stop agents editing checksums, the original ROMs or generated files. |
+| Agent settings | `.claude/settings.json` and `.codex/hooks.json` deny edits to the paths in `tools/protected_paths.py` (checksums, `orig/`, generated files): an agent's own edits, not programs it runs; read at session start. |
 
 That executors never merge, and that Brain waits for the owner's yes, are rules
 the agents keep, not locks GitHub checks. Do not describe either as

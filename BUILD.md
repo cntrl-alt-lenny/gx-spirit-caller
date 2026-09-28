@@ -74,8 +74,9 @@ Matching one function by hand:
    paste into decomp.me next to the assembly.
 5. Rename it with `python3.13 tools/rename_symbol.py --cascade func_<addr>
    Module_FunctionName` (convention below).
-6. Run the three-region gate, `python3.13 tools/gate3.py --scope all`, and read
-   its log as [`AGENTS.md`](AGENTS.md) § Evidence describes.
+6. Run the three-region gate, `python3.13 tools/gate3.py --scope all --log
+   <log>`, and read its log as [`AGENTS.md`](AGENTS.md) § Evidence describes;
+   then run the reference check and the fake-match lint (below).
    `python3.13 tools/progress.py --version <ver>` prints the per-region
    progress table.
 
@@ -96,7 +97,10 @@ the ledger. The ones you run yourself:
 | Tool | When |
 |---|---|
 | `configure.py <ver>` | Before building a region, and whenever `.c` files are added |
-| `gate3.py --scope all` | The three-region check for any build-path change |
+| `gate3.py --scope all --log <log>` | The three-region check for any build-path change |
+| `check_references.py --version <ver>` | After the gate: every unit's relocations against the original's |
+| `check_fake_matches.py` | After changing `src/` or `libs/`; CI runs it too |
+| `protected_paths.py --check <path>` | Whether agent settings protect a path |
 | `fastmatch.py`, `cmatch_loop.py` | Checking one unit fast; drafting and scoring a batch of candidates |
 | `progress.py --version <ver>` | The progress number any report quotes |
 | `rename_symbol.py --cascade` | Renaming a symbol in every region's config and in `src/` |
@@ -107,6 +111,41 @@ the ledger. The ones you run yourself:
 | `link_baseroms.py <checkout>` | Giving a linked worktree the baseroms |
 | `check_ci_contract.py` | After changing a workflow or `.github/required-checks.txt` |
 | `download_tool.py` | Run by the build; by hand only to restore a tool |
+
+## The checker
+
+The byte-identical ROM is necessary, not sufficient. Three checks sit on top
+of it, each with a baseline of what `main` already has, which may shrink and
+never grow (a change that grows one is a review finding):
+
+- **The gate's own status.** `gate3.py --log <log>` writes the transcript
+  itself, so it never needs a pipe (a pipe through `tee` reports `tee`'s
+  status, not the gate's), and its last line is always `gate3: GATE EXIT <n>`,
+  the status it returns. The same command works in PowerShell and zsh.
+- **The reference check,** `tools/check_references.py --version <ver>`, run on
+  a built region. It compares each unit's relocations in the object dsd
+  delinked (`build/<ver>/delinks/<source>.o`) with the object built from the
+  source (`build/<ver>/<source>.o`): a missing relocation (a raw number where
+  the original named a symbol, such as `0x027e0000` for `data_027e0000`), an
+  extra one, or one against a different symbol, offset or type all fail,
+  though the ROM is byte-identical. Baseline: `tools/reference_baseline.txt`;
+  `--list` prints every difference. It needs a build, so CI cannot run it.
+- **The fake-match lint,** `tools/check_fake_matches.py`, lexical, in CI's
+  `unittest` job. It fails data directives (`dcd`, `.word`, `.incbin`, ...)
+  in C, `__declspec(section)` / `__attribute__((section))`, data inside a
+  `#pragma section` region, a `.text` unit whose source defines no function,
+  GCC register pins, `do { ... } while (0)` in a function body, and `volatile`
+  scalar locals. The `asm` function escape hatch with real mnemonics is
+  honest asm-C and passes; hardcoded addresses are the reference check's job.
+  Baseline: `tools/fake_match_baseline.txt`.
+
+Agents cannot edit the paths in `tools/protected_paths.py` (checksums,
+`orig/`, ROMs, generated files, downloaded tools and the settings
+themselves): Claude Code through `permissions.deny` rules in
+`.claude/settings.json`, Codex through a `PreToolUse` hook on `apply_patch` in
+`.codex/hooks.json`. Neither can stop a program the agent runs from writing
+(the build must write `build/`), a session reads its settings only at start,
+and the Codex hook loads only in a project Codex trusts.
 
 ## Project layout
 
