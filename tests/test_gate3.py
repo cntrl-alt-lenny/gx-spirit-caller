@@ -38,9 +38,69 @@ class TestVerdict(unittest.TestCase):
 
 class TestArgumentGuard(unittest.TestCase):
     def test_tests_scope_no_tests_is_rejected(self):
-        with self.assertRaises(SystemExit) as ctx:
-            gate3.main(["--scope", "tests", "--no-tests"])
-        self.assertEqual(ctx.exception.code, 2)
+        stdout = io.StringIO()
+        with contextlib.redirect_stdout(stdout), \
+                contextlib.redirect_stderr(io.StringIO()):
+            code = gate3.main(["--scope", "tests", "--no-tests"])
+        self.assertEqual(code, 2)
+        self.assertEqual(stdout.getvalue().splitlines()[-1], "gate3: GATE EXIT 2")
+
+
+class TestExitStatusSurvives(unittest.TestCase):
+    """Round 004: the status must reach the caller through the documented
+    invocation (`--log PATH`, no pipe), and the transcript's last line must
+    state it. Driven through a real subprocess with an always-failing stub
+    region, so what is tested is the process exit status, not a return value."""
+
+    STUB = (
+        "import sys\n"
+        "sys.path.insert(0, sys.argv[1])\n"
+        "import gate3\n"
+        "gate3.check_dsd_binary = lambda: True\n"
+        "gate3.run = lambda cmd: gate3.CommandResult(\n"
+        "    1 if cmd == ['ninja', 'sha1'] else 0,\n"
+        "    'gx-spirit-caller_eur.nds: FAILED\\n' if cmd == ['ninja', 'sha1'] else '')\n"
+        "sys.exit(gate3.main(sys.argv[2:]))\n"
+    )
+
+    def _run_stub(self, *gate_args):
+        import subprocess
+        with tempfile.TemporaryDirectory() as directory:
+            stub = Path(directory) / "stub_gate.py"
+            stub.write_text(self.STUB, encoding="utf-8")
+            log = Path(directory) / "logs" / "gate.log"
+            proc = subprocess.run(
+                [sys.executable, str(stub), str(_TOOLS), *gate_args, "--log", str(log)],
+                capture_output=True, text=True, check=False,
+            )
+            text = log.read_text(encoding="utf-8") if log.exists() else ""
+        return proc, text
+
+    def test_failing_gate_exits_nonzero_through_log_path(self):
+        proc, log = self._run_stub("--scope", "eur", "--no-tests")
+        self.assertEqual(proc.returncode, 1, proc.stdout + proc.stderr)
+        self.assertIn("[eur] SHA1 FAIL", log)
+        self.assertIn("GATE FAIL", log)
+        self.assertEqual(log.splitlines()[-1], "gate3: GATE EXIT 1")
+        self.assertEqual(proc.stdout.splitlines()[-1], "gate3: GATE EXIT 1")
+
+    def test_usage_error_is_logged_with_its_status(self):
+        proc, log = self._run_stub("--scope", "bogus")
+        self.assertEqual(proc.returncode, 2)
+        self.assertIn("unknown --scope", log)
+        self.assertEqual(log.splitlines()[-1], "gate3: GATE EXIT 2")
+
+    def test_crash_still_ends_with_its_status(self):
+        def boom(ap, args):
+            raise RuntimeError("synthetic crash")
+
+        stdout = io.StringIO()
+        with patch.object(gate3, "_gate", side_effect=boom), \
+                contextlib.redirect_stdout(stdout), \
+                contextlib.redirect_stderr(io.StringIO()):
+            code = gate3.main(["--scope", "eur"])
+        self.assertEqual(code, 1)
+        self.assertEqual(stdout.getvalue().splitlines()[-1], "gate3: GATE EXIT 1")
 
 
 class TestInfrastructureAttribution(unittest.TestCase):

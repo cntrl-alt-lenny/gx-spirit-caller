@@ -34,10 +34,21 @@ additionally runs tools/check_match_invariants.py as an ADVISORY report (it
 never gates — see run_tests).
 
 Usage:
+    python tools/gate3.py --log PATH      # the documented form: full gate, transcript to PATH
     python tools/gate3.py                # full 3-region gate + invariants + tests
     python tools/gate3.py --scope eur     # one region (fast smoke)
     python tools/gate3.py --scope tests    # invariants + pytest only (wine-free)
     python tools/gate3.py --clean          # force a full rebuild each region
+
+The exit status survives the trip to the caller (round 004). Piping the gate
+through `tee` replaced its status with tee's own 0, and three rounds in a row a
+failed gate was reported as a pass. So:
+
+  * `--log PATH` writes the full transcript itself while still streaming to the
+    terminal, so no pipe is ever needed, in any shell.
+  * The transcript's last line is always `gate3: GATE EXIT <n>`, the status
+    this process is about to return. A pasted log carries its own verdict, and
+    a shell reporting 0 under `GATE EXIT 1` contradicts itself on sight.
 
 Exit codes:
     0   every requested region byte-identical (+ invariants/tests green)
@@ -52,7 +63,9 @@ from dataclasses import dataclass
 import json
 import subprocess
 import sys
+import traceback
 from pathlib import Path
+from typing import TextIO
 
 ROOT = Path(__file__).resolve().parent.parent
 PY = sys.executable  # the python3.13 running this script
@@ -338,7 +351,78 @@ def verdict(*, failed: list[str], checks_run: int, tests_ok: bool,
     return "PASS", 0
 
 
+class _Tee:
+    """A text stream that writes to the terminal stream and the log file."""
+
+    def __init__(self, stream: TextIO, log: TextIO) -> None:
+        self._stream = stream
+        self._log = log
+
+    def write(self, text: str) -> int:
+        self._stream.write(text)
+        self._log.write(text)
+        return len(text)
+
+    def flush(self) -> None:
+        self._stream.flush()
+        self._log.flush()
+
+    def __getattr__(self, name: str) -> object:
+        return getattr(self._stream, name)
+
+
+def exit_line(code: int) -> str:
+    """The transcript's last line: the status the process returns."""
+    return f"gate3: GATE EXIT {code}"
+
+
 def main(argv: list[str] | None = None) -> int:
+    """Run the gate; always end the transcript with the status returned.
+
+    Every path out of the gate, including an argument error and an uncaught
+    exception, prints `exit_line(code)` last and returns that same code, both
+    to the terminal and, with `--log`, to the log file.
+    """
+    ap = build_parser()
+    try:
+        args = ap.parse_args(argv)
+    except SystemExit as exc:  # a usage error, before any log could be opened
+        code = exc.code if isinstance(exc.code, int) else 2
+        print(exit_line(code), flush=True)
+        return code
+    log: TextIO | None = None
+    saved = sys.stdout, sys.stderr
+    if args.log:
+        try:
+            log_path = Path(args.log)
+            log_path.parent.mkdir(parents=True, exist_ok=True)
+            log = open(log_path, "w", encoding="utf-8", errors="replace")
+        except OSError as exc:
+            print(f"gate3: cannot open --log {args.log!r}: {exc}", file=sys.stderr)
+            print(exit_line(2), flush=True)
+            return 2
+        sys.stdout, sys.stderr = _Tee(saved[0], log), _Tee(saved[1], log)
+    try:
+        try:
+            code = _gate(ap, args)
+        except SystemExit as exc:
+            code = exc.code if isinstance(exc.code, int) else (0 if exc.code is None else 1)
+        except KeyboardInterrupt:
+            print("gate3: interrupted", file=sys.stderr, flush=True)
+            code = 130
+        except Exception:  # noqa: BLE001 - the status line must still be written
+            traceback.print_exc()
+            code = 1
+        sys.stderr.flush()
+        print(exit_line(code), flush=True)
+        return code
+    finally:
+        sys.stdout, sys.stderr = saved
+        if log is not None:
+            log.close()
+
+
+def build_parser() -> argparse.ArgumentParser:
     ap = argparse.ArgumentParser(
         description="Brain 3-region clean-tree `ninja sha1` gate driver."
     )
@@ -357,8 +441,13 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--invariants", action="store_true",
                     help="also run tools/check_match_invariants.py (ADVISORY only: "
                          "noisy, carries standing pre-existing drift, never gates)")
-    args = ap.parse_args(argv)
+    ap.add_argument("--log", metavar="PATH",
+                    help="also write the whole transcript to PATH (use this "
+                         "instead of piping through tee, which loses the exit status)")
+    return ap
 
+
+def _gate(ap: argparse.ArgumentParser, args: argparse.Namespace) -> int:
     if args.scope.lower() == "tests" and args.no_tests:
         ap.error(
             "GATE VACUOUS: --scope tests --no-tests would execute zero checks"
