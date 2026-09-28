@@ -1,0 +1,17 @@
+{
+  "hooks": {
+    "PreToolUse": [
+      {
+        "matcher": "apply_patch|Edit|Write",
+        "hooks": [
+          {
+            "type": "command",
+            "command": "python3 tools/protected_paths.py --codex-hook",
+            "commandWindows": "python tools/protected_paths.py --codex-hook",
+            "statusMessage": "Checking protected paths"
+          }
+        ]
+      }
+    ]
+  }
+}

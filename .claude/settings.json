@@ -1,0 +1,30 @@
+{
+  "$schema": "https://json.schemastore.org/claude-code-settings.json",
+  "permissions": {
+    "deny": [
+      "Edit(/**/*.sha1)",
+      "Edit(/orig/**)",
+      "Edit(/**/*.nds)",
+      "Edit(/**/*bios.bin)",
+      "Edit(/build/**)",
+      "Edit(/extract/**)",
+      "Edit(/build.ninja)",
+      "Edit(/objdiff.json)",
+      "Edit(/.ninja_log)",
+      "Edit(/.ninja_lock)",
+      "Edit(/config/*/arm9/config.yaml)",
+      "Edit(/dsd)",
+      "Edit(/dsd.exe)",
+      "Edit(/objdiff-cli)",
+      "Edit(/objdiff-cli.exe)",
+      "Edit(/wibo)",
+      "Edit(/ninja.exe)",
+      "Edit(/tools/mwccarm/**)",
+      "Edit(/tools/arm-none-eabi/**)",
+      "Edit(/tools/_dl/**)",
+      "Edit(/.claude/settings.json)",
+      "Edit(/.codex/hooks.json)",
+      "Edit(/tools/protected_paths.py)"
+    ]
+  }
+}
