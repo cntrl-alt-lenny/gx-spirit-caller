@@ -31,8 +31,8 @@ steps are in [`BUILD.md`](BUILD.md).
 |---|---|---|
 | Owner | Decides what is built and why; approves each merge; can veto anything | conversation |
 | Brain | Plans, writes briefs, reviews returned work at an exact commit, re-derives one claim, merges after the owner's yes | the primary checkout, on `brain/<round-id>` branches |
-| Worker | Carries out one brief, reports, never merges or accepts its own work | its own checkout, on `worker/<round-id>` |
-| Verifier | Reviews one exact commit blind, writes findings, never writes production code or merges | its own checkout, detached at the commit |
+| Worker | Carries out one brief, reports, never merges or accepts its own work | its own worktree (below), on `worker/<round-id>` |
+| Verifier | Reviews one exact commit blind, writes findings, never writes production code or merges | its own worktree (below), on `verifier/<round-id>` |
 
 The earlier specialist executor names and the per-role path-ownership table are
 retired: a Worker's scope is its brief. A Worker starts from the brief in fresh
@@ -40,6 +40,17 @@ context; a session carrying over an earlier round is not independent. Any
 capable tool may hold any seat.
 Every seat starts with its `fw.py` command (see the framework). Two seats never
 share a checkout. Adding or retiring a role is the owner's decision.
+
+**Where seats work (owner decision, 2026-09-22).** On the owner's machines the
+project is one folder. A Worker or Verifier works in a linked worktree inside
+it, `.worktrees/<role>-<round>` (for example `.worktrees/worker-003`; the folder
+is git-ignored), created from the primary checkout with `git worktree add`, with
+the baseroms hard-linked by `python3.13 tools/link_baseroms.py <worktree>` run
+from the primary checkout. Never a clone beside the project. A cloud session
+may clone inside its own workspace. Every seat prompt Brain writes says where
+to work. After a round merges, Brain removes its worktrees with
+`git worktree remove`, once it has confirmed each is clean, has no stash and has
+no commit that is not on GitHub.
 
 ## Prompts and sign-off lines
 
@@ -85,10 +96,9 @@ The owner's rule until the framework adopts it (framework issue 26):
   USA and JPN ports made by `tools/port_to_region.py`, and `libs/` is
   region-neutral; `tools/configure.py` filters them per region. C is the
   default language, and a `.cpp` file opts in to C++ ([`BUILD.md`](BUILD.md)).
-- A checkout needs all three baseroms in its own `orig/` to run the gate. A
-  linked worktree gets them with `python3.13 tools/link_baseroms.py
-  <checkout>` run from the primary checkout; an independent clone needs the
-  dumps copied in. Re-run `tools/configure.py <region>` whenever new `.c` files
+- A checkout needs all three baseroms in its own `orig/` to run the gate; a
+  seat's worktree gets them as above (a cloud clone needs the dumps copied
+  in). Re-run `tools/configure.py <region>` whenever new `.c` files
   land in `src/`.
 - Success for a matching brief is the named functions passing the three-region
   gate with objdiff at 100%, never "a percentage went up". Do not choose which
