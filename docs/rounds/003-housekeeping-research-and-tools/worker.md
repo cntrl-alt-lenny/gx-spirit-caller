@@ -2,16 +2,29 @@
 round: 003-housekeeping-research-and-tools
 role: worker
 branch: worker/003-housekeeping-research-and-tools
-head: 8add4efd64d29ef4ea33b435b3a0fcb449a4b600
+head: 1a576d63bee0735ddad3d5e981b0ab02c02c3f89
 os: macOS 27.0
 python: 3.9.6
-written: 2026-09-27T18:17:42Z
+written: 2026-09-28T12:38:28Z
 -->
 ## Verified
 
 All at commit `8add4efd6` (branch `worker/003-housekeeping-research-and-tools`)
 unless stated; the start commit is `454935356` (the round's brief on `main`).
 Commands run on macOS (arm64, Rosetta 2, Wine), `python3.13`.
+
+- **Correction checks (Brain message 2)** — run in a linked worktree on
+  `1a576d63b` plus this report edit (no baseroms, no rebuild; the report is the
+  only file changed), all exit 0:
+
+  ```text
+  python3.13 -m pytest -q tests          -> 1239 passed, 16 skipped, 41 subtests passed in 10.60s
+  python3.13 -m unittest discover -s tests -> Ran 1255 tests in 8.356s / OK (skipped=16)
+  python3 tools/fw.py check              -> 0 error(s), 0 warning(s)
+  ```
+
+  `tests/test_docs_links.py` is among the passing tests; it failed at
+  `1a576d63b` on the five quoted links before the edit.
 
 - **Three-region gate passes** — `python3.13 tools/gate3.py --scope all > <scratch>/gate3-8add4efd6.log 2>&1`
   (log outside the checkout, no pipe; process exit 0), then the `AGENTS.md`
@@ -371,6 +384,10 @@ except the path changes listed under Changed.
 
 ## Changed
 
+- Correction after review (Brain message 2): the five `docs/state.md` links quoted
+  under the `docs/state.md` entry below are now plain code spans, so they no longer
+  resolve against `docs/rounds/003-housekeeping-research-and-tools/` and
+  `tests/test_docs_links.py` passes; no other live link or personal path was found.
 - `docs/ledger/attempts.tsv`, `docs/ledger/attempts-schema.md`: moved from
   `docs/research/campaign-analytics/` (byte-identical).
 - `tools/park_one.py`, `tools/validate_attempts.py`, `tools/wall_aware_headroom.py`,
@@ -408,10 +425,10 @@ except the path changes listed under Changed.
 - `docs/state.md`, every sentence changed:
   - Removed: "**Tool defects reported 2026-09-08, not re-checked:** `pool_freshness.py --module` returning an empty pool for a spelling it does not know, and `m2ctx.py` needing a `gcc` the Windows PC lacks. Re-verify in rounds C and E."
   - Added: "**Tool defect reported 2026-09-08, not re-checked:** `m2ctx.py` needing a `gcc` the Windows PC lacks. Re-verify in rounds C and E."
-  - Removed: "Build and toolchain: [`BUILD.md`](../BUILD.md); the matching guide: [`docs/decomp-workflow.md`](decomp-workflow.md)."
-  - Added: "Build, toolchain and how to match a function: [`BUILD.md`](../BUILD.md); compiler quirks: [`docs/compiler-quirks.md`](compiler-quirks.md)."
+  - Removed: "Build and toolchain: `BUILD.md` (link target `../BUILD.md`); the matching guide: `docs/decomp-workflow.md` (link target `decomp-workflow.md`)."
+  - Added: "Build, toolchain and how to match a function: `BUILD.md` (link target `../BUILD.md`); compiler quirks: `docs/compiler-quirks.md` (link target `compiler-quirks.md`)."
   - Removed: "The attempts ledger is `docs/research/campaign-analytics/attempts.tsv`, checked by `tools/validate_attempts.py`; round B decides its final home."
-  - Added: "The attempts ledger is [`docs/ledger/attempts.tsv`](ledger/attempts.tsv), checked by `tools/validate_attempts.py`."
+  - Added: "The attempts ledger is `docs/ledger/attempts.tsv` (link target `ledger/attempts.tsv`), checked by `tools/validate_attempts.py`."
 
 ## Open questions
 
