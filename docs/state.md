@@ -67,10 +67,10 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
   tested; only the link step serializes.
 - **decomp.dev CI** was closed; it needed a private image only the owner could
   build.
-- **Retired hook still seeded:** `docs/agents/framework.json` still lists
-  `.githooks/pre-push` as a seed file (framework issue 25), so the next
-  framework update would re-create it; that update round must delete the hook
-  again.
+- **Retired hook stays retired:** `docs/agents/framework.json` still lists
+  `.githooks/pre-push` as a seed and `"hooks": true` (framework issue 25), but
+  the 3.1.0 adopter reports the file `gone` and does not re-create it. The stale
+  manifest entry is framework feedback, not ours to edit.
 - **Tool defect reported 2026-09-08, not re-checked:** `m2ctx.py` needing a
   `gcc` the Windows PC lacks. Re-verify in rounds C and E.
 

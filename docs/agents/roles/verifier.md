@@ -45,6 +45,7 @@ result; never inflate severity.
 
 Write `docs/rounds/<id>/verifier.md`, then run
 `python3 tools/fw.py report --role verifier --round <id> --push`.
+Quote text as code, with no live links or personal paths.
 
 ```markdown
 Reviewed commit: <full id>. Commands I ran myself: <list, with exit codes>.
@@ -60,7 +61,8 @@ One paragraph: what you believe is true about this change, and how
 confident you are. It informs Brain's decision; it is not the decision.
 ```
 
-Then give the owner the same report, briefly, in plain English.
+Then give the owner the same report, briefly, in plain English, ending with
+the line `fw.py report` prints.
 
 ## Never
 

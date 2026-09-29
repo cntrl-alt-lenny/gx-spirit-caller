@@ -3,7 +3,7 @@
 Instructions for every AI agent in this repository, whatever tool it runs in.
 Tool-specific files (`CLAUDE.md`) only point here.
 
-This project runs the agentic framework, release 3.0.0: read
+This project runs the agentic framework, release 3.1.0: read
 [`docs/agents/FRAMEWORK.md`](docs/agents/FRAMEWORK.md) and your role card in
 [`docs/agents/roles/`](docs/agents/roles/). This file adds the project's own
 rules, which take precedence over the framework's.
@@ -38,29 +38,11 @@ a session carrying over an earlier round is not independent. Any capable tool
 may hold any seat.
 Every seat starts with its `fw.py` command. Two seats never share a checkout. Adding or retiring a role is the owner's decision.
 
-**Where seats work (owner decision, 2026-09-22).** On the owner's machines the
-project is one folder. A Worker or Verifier works in a linked worktree inside
-it, `.worktrees/<role>-<round>` (for example `.worktrees/worker-003`; the folder
-is git-ignored), created from the primary checkout with `git worktree add`, with
-the baseroms hard-linked by `python3.13 tools/link_baseroms.py <worktree>` run
-from the primary checkout. Never a clone beside the project (a cloud session may clone in its workspace). Every seat prompt says where to work. After
-a round merges, Brain removes its worktrees with `git worktree remove`, once
-each is clean, has no stash and has no commit missing from GitHub.
-
-## Prompts and sign-off lines
-
-The owner's rule until the framework adopts it (framework issue 26):
-
-- The first line of every prompt Brain writes for the owner is
-  `<project> · ROUND <number> · <ROLE>`, for example
-  `gx-spirit-caller · ROUND 003 · WORKER`. A second message to the same seat in
-  the same round adds `· message N` (`gx-spirit-caller · ROUND 003 · WORKER ·
-  message 2`).
-- Every seat's prompt tells it to end its final reply with one line in the
-  same form: `<project> · ROUND <number> · <ROLE> · DONE — report pushed at
-  <commit>`, or `· STOPPED — <reason>` or `· BLOCKED — <reason>`.
-- When the owner comes back, Brain says which seats have reported in each round
-  in flight, which prompt to send next, and re-prints it.
+**Where seats work.** A Worker or Verifier works in the framework's
+`.worktrees/<role>-<number>`, made from the primary checkout with `git worktree
+add`, with the baseroms hard-linked by `python tools/link_baseroms.py
+<worktree>` run from the primary checkout. Never a clone beside the project (a
+cloud session may clone in its workspace).
 
 ## Invariants
 
@@ -156,10 +138,6 @@ Checked 2026-09-23 with `gh api repos/cntrl-alt-lenny/gx-spirit-caller/rulesets/
 
 That executors never merge and that Brain waits for the owner's yes are rules
 the agents keep, not locks GitHub checks; never call either server-enforced.
-
-`python3 tools/fw.py status` says the `archive/*` tags are "not on GitHub yet"
-and "safe to leave this machine: NO". False alarm (framework issue 18): the tags
-are on GitHub (`git ls-remote --tags origin 'archive/*'`). Ignore that line only.
 
 ## Where to look
 

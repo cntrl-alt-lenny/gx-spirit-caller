@@ -7,14 +7,15 @@ it in plain English.
 
 ## Every session
 
-1. Run `python3 tools/fw.py status`. It reports the framework release, rounds
-   in flight, anything this machine has not pushed, and the project checks.
-   Git is the truth; documents are claims to spot-check.
+1. Run `python3 tools/fw.py status`. Git is the truth; documents are claims
+   to spot-check.
 2. Read `AGENTS.md`, `docs/agents/FRAMEWORK.md`, this card and
    `docs/state.md`. Read other documents only when the task needs them.
-3. If a round is in flight, deal with it first. If a newer **major**
-   framework release exists, propose the update round before new work. Report
-   what `status` flagged, in plain words.
+3. Open your reply with `status`'s `next:` line and, for each round in
+   flight, which seats have reported; re-print any prompt that is due with
+   `fw.py prompt` (`--message N` if resent). Deal with rounds in flight
+   first. If `status` reports a newer framework release, propose its update
+   round before new work. Report what else it flagged, plainly.
 
 ## Writing a round
 
@@ -25,16 +26,10 @@ it in plain English.
   and push it. Describe the **problem and its acceptance criteria**, not the
   solution. Frame investigations neutrally: "establish whether", never
   "confirm that".
-- Give the owner the prompt(s), each as one code block, each paragraph on one
-  line:
-
-```
-You are the Worker for <project>, round <id>. Open this project (clone <repository URL> if it is not here). First run python3 tools/fw.py start --role worker --round <id> (use py -3 or python if python3 is not found) and stop if it fails. Then read AGENTS.md, docs/agents/FRAMEWORK.md, docs/agents/roles/worker.md and docs/rounds/<id>/brief.md, and carry out the brief. Finish, even if you stop early, by writing docs/rounds/<id>/worker.md and running python3 tools/fw.py report --role worker --round <id> --push.
-```
-
-  Use the project's own role names. For Tier 2, add the Verifier prompt (the
-  same shape, with `--role verifier` and `roles/verifier.md`) and say plainly:
-  **send this one only after the Worker has finished.**
+- Give the owner each seat's prompt as one code block, exactly as
+  `python3 tools/fw.py prompt --round <id> --role <role>` prints it, with
+  the project's own role names. For Tier 2, give the Verifier prompt too and
+  say plainly: **send this one only after the Worker has finished.**
 
 ## Judging a round
 
@@ -54,7 +49,9 @@ You are the Worker for <project>, round <id>. Open this project (clone <reposito
 5. Merge the branch holding the complete round (the Verifier's branch for
    Tier 2, the Worker's otherwise) through a pull request where the host
    supports one, following the merge rule and its merge card. Delete merged
-   task branches afterwards.
+   task branches afterwards, and remove the round's seat checkouts that
+   `status` lists as removable (`git worktree remove <folder>`, which refuses
+   one with uncommitted changes).
 6. Update `docs/state.md` only for decisions worth keeping, as Tier 0
    housekeeping or alongside the next brief. Then offer the next round.
 
