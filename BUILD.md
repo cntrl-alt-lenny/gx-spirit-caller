@@ -138,12 +138,14 @@ shrink and never grow:
   objects). It fails a data directive in an `asm` body however it is spelled,
   `__declspec(section)` / `__attribute__((section))`, data inside a
   `#pragma section` region, a `.text` unit whose source defines no function,
-  GCC register pins, `do { ... } while (0)` (any zero spelling) in a function
-  body, and `volatile` locals (also a volatile pointer, or through a typedef or
-  macro). Macro and typedef aliases are collected tree-wide. The object check
+  GCC register pins, `do { ... } while (0)` in a function body (common zero
+  spellings; the rule is lexical, so `while ((int)0)` still passes), and
+  `volatile` locals (also a volatile pointer, or through a typedef or macro;
+  also lexical, with known misses). Macro and typedef aliases are collected tree-wide. The object check
   (`data-in-text`) flags a data word in a code section that no pc-relative load
   or relocation reaches, which catches the directive whatever its spelling,
-  token pasting included. The `asm` escape hatch with real mnemonics is honest
+  token pasting included, unless a real pc-relative load also reads the word:
+  that is indistinguishable from an honest literal pool, and passes. The `asm` escape hatch with real mnemonics is honest
   asm-C and passes; hardcoded addresses are the reference check's job.
   Baseline: `tools/fake_match_baseline.txt`.
 - **Baselines only shrink.** A line is one finding (format 2,
