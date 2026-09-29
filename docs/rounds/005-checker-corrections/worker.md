@@ -1,3 +1,12 @@
+<!-- fw-report
+round: 005-checker-corrections
+role: worker
+branch: worker/005-checker-corrections
+head: 93417fd169659328f31d74a6a59d5e19d620953c
+os: Windows 11
+python: 3.12.10
+written: 2026-09-29T10:34:46Z
+-->
 # 005-checker-corrections: Worker report
 
 Environment, from commands: Windows 11 (`10.0.26200`), Python 3.12.10, Claude
