@@ -1,3 +1,12 @@
+<!-- fw-report
+round: 006-framework-3-1-0
+role: worker
+branch: worker/006-framework-3-1-0
+head: 18cbab63ef6b8dff65f1d3c5b609e915d1b2a5cd
+os: Windows 11
+python: 3.12.10
+written: 2026-09-29T12:40:22Z
+-->
 # 006-framework-3-1-0: Worker report
 
 Windows 11, Python 3.12.10, worktree `.worktrees/worker-006` from the brief
