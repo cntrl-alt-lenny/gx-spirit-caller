@@ -3,15 +3,22 @@
 protected_paths.py — the paths no agent may edit, and the Codex hook that
 enforces them.
 
-One list, two enforcers (round 004):
+One list, two enforcers (rounds 004 and 005):
 
-  * Claude Code: `.claude/settings.json` has one `permissions.deny` rule
-    `Edit(/<pattern>)` per pattern below. Claude Code applies it to its own
-    file tools, to the file commands it recognises in Bash (`sed`, `tee`, ...)
-    and to Bash redirections, in every permission mode.
+  * Claude Code: `.claude/settings.json` has `permissions.deny` rules
+    `Edit(/<pattern>)` per pattern below, and `Edit(/.worktrees/*/<pattern>)`
+    beside each, so a session started in the primary checkout is denied the
+    same paths inside a seat's worktree (`claude_rules()` writes the list; a
+    test keeps the file in step). Claude Code applies a rule to its own file
+    tools, to the file commands it recognises in Bash and to Bash
+    redirections, in every permission mode. Which Bash forms are checked
+    depends on the version: the permissions page says input redirects from
+    v2.1.257 and `tee` targets from v2.1.269, so `... | tee build.ninja` is
+    not checked before that.
   * Codex CLI: `.codex/hooks.json` runs `protected_paths.py --codex-hook` as a
     PreToolUse hook on `apply_patch`. It reads the hook's JSON from stdin and
-    denies a patch that adds, updates, deletes or moves a protected path.
+    denies a patch that adds, updates, deletes or moves a protected path,
+    including one under `.worktrees/<seat>/`. Not observed inside Codex.
 
 Neither stops a program the agent runs that writes files itself (a Python
 script, `ninja`, `git checkout`): the build must keep writing `build/` and
@@ -59,7 +66,32 @@ PATTERNS = (
     ".claude/settings.json",      # the enforcers themselves
     ".codex/hooks.json",
     "tools/protected_paths.py",
+    "tools/reference_baseline.txt",   # the tolerated findings may only shrink
+    "tools/fake_match_baseline.txt",
 )
+
+WORKTREES = ".worktrees"  # seats work in .worktrees/<role>-<round>, inside the primary checkout
+
+
+def claude_rules() -> list[str]:
+    """The `permissions.deny` rules for `.claude/settings.json`.
+
+    A `/` rule is anchored at the directory the session starts in. Started in
+    a worktree that is the worktree; started in the primary checkout, the
+    worktree is `.worktrees/<seat>/`, so each pattern gets a second rule there.
+    A `**/` pattern already reaches into it.
+    """
+    rules = [f"Edit(/{p})" for p in PATTERNS]
+    rules += [f"Edit(/{WORKTREES}/*/{p})" for p in PATTERNS if not p.startswith("**/")]
+    return rules
+
+
+def _inside_worktree(rel: str) -> str | None:
+    """`.worktrees/<seat>/x/y` -> `x/y`; None for a path outside any worktree."""
+    parts = rel.split("/")
+    if len(parts) > 2 and parts[0] == WORKTREES:
+        return "/".join(parts[2:])
+    return None
 
 
 def _pattern_regex(pattern: str) -> re.Pattern[str]:
@@ -105,10 +137,12 @@ def protected_pattern(path: str, *, root: Path = ROOT, cwd: Path | None = None) 
     rel = repo_relative(path, root=root, cwd=cwd)
     if rel is None or rel in ("", "."):
         return None
+    forms = [rel]
     if os.sep == "\\" or sys.platform == "darwin":
-        rel_cmp = rel.lower()  # case-insensitive file systems
-        return next((p for p, rx in _REGEXES if rx.match(rel_cmp) or rx.match(rel)), None)
-    return next((p for p, rx in _REGEXES if rx.match(rel)), None)
+        forms.append(rel.lower())  # case-insensitive file systems
+    candidates = list(forms)
+    candidates += [inner for f in forms if (inner := _inside_worktree(f)) is not None]
+    return next((p for p, rx in _REGEXES if any(rx.match(c) for c in candidates)), None)
 
 
 _PATCH_PATH_RE = re.compile(

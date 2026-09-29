@@ -1,7 +1,7 @@
 # Yu-Gi-Oh! GX Spirit Caller decomp
 
-Instructions for every AI agent working in this repository, whatever tool it
-runs in. Tool-specific files (`CLAUDE.md`) only point here.
+Instructions for every AI agent in this repository, whatever tool it runs in.
+Tool-specific files (`CLAUDE.md`) only point here.
 
 This project runs the agentic framework, release 3.0.0: read
 [`docs/agents/FRAMEWORK.md`](docs/agents/FRAMEWORK.md) and your role card in
@@ -11,8 +11,7 @@ rules, which take precedence over the framework's.
 Merge rule: owner-approves
 
 Brain shows the owner the merge card for a reviewed round and merges only after
-the owner says yes to that specific merge. A passing gate is necessary, never
-sufficient. Only the owner changes this rule.
+the owner says yes to that merge. A passing gate is necessary, not sufficient. Only the owner changes this rule.
 
 ## What this project is
 
@@ -20,9 +19,8 @@ A matching decompilation of *Yu-Gi-Oh! GX Spirit Caller* for the Nintendo DS:
 C source that rebuilds a byte-identical ROM, verified by SHA-1, for three
 regions: EUR (`AYXP`), USA (`AYXE`) and JPN (`AYXJ`). Each owner-supplied dump
 lives at `orig/baserom_<region>.nds` and is never committed or redistributed.
-The direction is a lean "matching factory" (a script drives the matching and
-the three-ROM rebuild is the reviewer); the owner's decisions and the round
-plan are in [`docs/state.md`](docs/state.md). Toolchain, layout and build
+The direction is a lean "matching factory" (a script drives the matching, the
+three-ROM rebuild reviews it); decisions and the round plan are in [`docs/state.md`](docs/state.md). Toolchain, layout and build
 steps are in [`BUILD.md`](BUILD.md).
 
 ## Roles
@@ -34,23 +32,20 @@ steps are in [`BUILD.md`](BUILD.md).
 | Worker | Carries out one brief, reports, never merges or accepts its own work | its own worktree (below), on `worker/<round-id>` |
 | Verifier | Reviews one exact commit blind, writes findings, never writes production code or merges | its own worktree (below), on `verifier/<round-id>` |
 
-The earlier specialist executor names and the per-role path-ownership table are
-retired: a Worker's scope is its brief. A Worker starts from the brief in fresh
-context; a session carrying over an earlier round is not independent. Any
-capable tool may hold any seat.
-Every seat starts with its `fw.py` command (see the framework). Two seats never
-share a checkout. Adding or retiring a role is the owner's decision.
+The old specialist executor names and per-role path table are retired: a
+Worker's scope is its brief. A Worker starts from the brief in fresh context;
+a session carrying over an earlier round is not independent. Any capable tool
+may hold any seat.
+Every seat starts with its `fw.py` command. Two seats never share a checkout. Adding or retiring a role is the owner's decision.
 
 **Where seats work (owner decision, 2026-09-22).** On the owner's machines the
 project is one folder. A Worker or Verifier works in a linked worktree inside
 it, `.worktrees/<role>-<round>` (for example `.worktrees/worker-003`; the folder
 is git-ignored), created from the primary checkout with `git worktree add`, with
 the baseroms hard-linked by `python3.13 tools/link_baseroms.py <worktree>` run
-from the primary checkout. Never a clone beside the project. A cloud session
-may clone inside its own workspace. Every seat prompt Brain writes says where
-to work. After a round merges, Brain removes its worktrees with
-`git worktree remove`, once it has confirmed each is clean, has no stash and has
-no commit that is not on GitHub.
+from the primary checkout. Never a clone beside the project (a cloud session may clone in its workspace). Every seat prompt says where to work. After
+a round merges, Brain removes its worktrees with `git worktree remove`, once
+each is clean, has no stash and has no commit missing from GitHub.
 
 ## Prompts and sign-off lines
 
@@ -64,9 +59,8 @@ The owner's rule until the framework adopts it (framework issue 26):
 - Every seat's prompt tells it to end its final reply with one line in the
   same form: `<project> · ROUND <number> · <ROLE> · DONE — report pushed at
   <commit>`, or `· STOPPED — <reason>` or `· BLOCKED — <reason>`.
-- Whenever the owner comes back, Brain starts by saying, for each round in
-  flight, which seats have reported and which prompt the owner should send
-  next, and re-prints that prompt.
+- When the owner comes back, Brain says which seats have reported in each round
+  in flight, which prompt to send next, and re-prints it.
 
 ## Invariants
 
@@ -76,8 +70,8 @@ The owner's rule until the framework adopts it (framework issue 26):
   is the project's correctness proof; nothing else substitutes for it.
 - **Symbol files are preserved.** `config/<region>/**/symbols.txt` is the
   durable record of every name. Rename there (convention
-  `ModuleName_FunctionName`), never hand-edit `arm9/config.yaml`, and never drop
-  or corrupt entries.
+  `ModuleName_FunctionName`), never hand-edit `arm9/config.yaml`, never drop or
+  corrupt entries.
 - **The baserom SHA-1 check is never bypassed.** `tools/configure.py` fails
   loudly on a wrong or unset hash; fix the dump, not the check.
 - **ROMs and generated output are never committed:** `*.nds`, BIOS dumps,
@@ -96,27 +90,25 @@ The owner's rule until the framework adopts it (framework issue 26):
   USA and JPN ports made by `tools/port_to_region.py`, and `libs/` is
   region-neutral; `tools/configure.py` filters them per region. C is the
   default language, and a `.cpp` file opts in to C++ ([`BUILD.md`](BUILD.md)).
-- A checkout needs all three baseroms in its own `orig/` to run the gate; a
-  seat's worktree gets them as above (a cloud clone needs the dumps copied
-  in). Re-run `tools/configure.py <region>` whenever new `.c` files
+- A checkout needs all three baseroms in its own `orig/` to run the gate (a
+  worktree gets them as above; a cloud clone needs them copied in). Re-run `tools/configure.py <region>` whenever new `.c` files
   land in `src/`.
 - Success for a matching brief is the named functions passing the three-region
-  gate with objdiff at 100%, never "a percentage went up". Do not choose which
-  functions to attempt by what maximizes a metric.
+  gate with objdiff at 100%, never "a percentage went up"; do not pick functions
+  by what maximizes a metric.
 - Any progress number quoted comes from `python3.13 tools/progress.py
   --version <region>` at a stated commit. The headline, natural-C, counts
-  `.text` only: data and carve work cannot move it, so any "EUR is stuck" claim
-  must name the metric.
-- Fix the defect class, not the first example. A flaw found along the way is
-  reported as a defect, never reframed as a quirk of the existing setup.
+  `.text` only (data and carve work cannot move it), so "EUR is stuck" must
+  name the metric.
+- Fix the defect class, not the first example. Report a flaw found along the way
+  as a defect, never as a quirk of the setup.
 - Use `python3.13` for this project's scripts and tests (macOS ships no plain
   `python`, and its `python3` is 3.9). On Windows, `python`. The framework's
   own `fw.py` runs under `python3`, `py -3` or `python`.
 - `progress-visuals` is a CI-owned branch: the progress-badge workflow commits
   generated assets there. Never commit to it by hand.
-- A gate that sits at 0 objects built and 0% CPU for minutes is hung on a stale
-  wineserver lock, not slow: `pkill -9 wineserver`, relaunch `ninja sha1`, and
-  watch the object count climb.
+- A gate at 0 objects built and 0% CPU for minutes is hung on a stale
+  wineserver lock: `pkill -9 wineserver`, relaunch `ninja sha1`.
 
 ## Evidence
 
@@ -125,9 +117,9 @@ exit status (framework rule 7). CI is the backstop, not the primary evidence.
 
 | Changed | Required evidence |
 |---|---|
-| Anything on the build path: `src/`, `libs/`, `include/`, `config/`, hand-written `.s`, or a `tools/*.py` the build or gate runs | `python3.13 tools/gate3.py --scope all --log <log>`, then the log check below. It passes only with `[eur]`, `[usa]` and `[jpn]` `SHA1 PASS`, a pytest summary with no failures, `GATE PASS`, last line `gate3: GATE EXIT 0`, and no `SKIP` standing in for a region; then `python3.13 tools/check_references.py --version eur --version usa --version jpn` prints `OK`. Quote those lines and name the commit. |
+| Anything on the build path: `src/`, `libs/`, `include/`, `config/`, hand-written `.s`, or a `tools/*.py` the build or gate runs | `python3.13 tools/gate3.py --scope all --log <log>`, then the log check below. It passes only with `[eur]`, `[usa]` and `[jpn]` `SHA1 PASS`, a pytest summary with no failures, `GATE PASS`, last line `gate3: GATE EXIT 0`, and no `SKIP` standing in for a region. The gate runs the reference check and the fake-match lint itself, so `GATE PASS` needs both. Quote those lines and name the commit. |
 | `config/**/delinks.txt` | `python3.13 tools/check_delink_dupes.py` clean on the merged tree: a sweep that re-derives an already-carved function doubles its block and breaks `dsd lcf` at merge while its own branch is green. |
-| `src/` or `config/` | `python3.13 tools/check_match_invariants.py --version eur` reports no errors (exit 2 means errors), and `python3.13 tools/check_fake_matches.py` prints `OK`. |
+| `src/` or `config/` | `python3.13 tools/check_match_invariants.py --version eur` reports no errors (exit 2 means errors), and `python3.13 tools/check_fake_matches.py` prints `OK`. The two baselines in `tools/` may only shrink (`--prune-baseline`). |
 | Symbol renames | The build-path row, plus the output of `tools/rename_symbol.py --cascade` showing the rename reached every region. |
 | `tools/` or `docs/` only, off the build path | `python3.13 -m pytest -q tests`, `python3.13 -m unittest discover -s tests` and `ruff check .`, all clean. |
 | `AGENTS.md`, `CLAUDE.md`, `docs/state.md`, `docs/agents/`, `docs/rounds/` | `python3 tools/fw.py check` with 0 errors and 0 warnings. |
@@ -142,8 +134,8 @@ Select-String -Pattern 'SHA1 (PASS|FAIL)|INFRASTRUCTURE|CLEAN-FAIL|SKIP|GATE [A-
 python3.13 -c "import re,sys;[print(n,l,end='') for n,l in enumerate(open(sys.argv[1],errors='replace'),1) if re.search(r'SHA1 (PASS|FAIL)|INFRASTRUCTURE|CLEAN-FAIL|SKIP|GATE [A-Z]+|[0-9]+ (passed|failed)',l)]" <log>
 ```
 
-The first is for macOS and Linux, the second for PowerShell on Windows, and the
-third works on both (on Windows use `python` for `python3.13`).
+The first is for macOS and Linux, the second for PowerShell, the third for
+both (on Windows `python` for `python3.13`).
 
 A unit test cannot see a ROM regression, so citing the test suite as evidence
 for a build-path change is a blocking finding.
@@ -160,16 +152,14 @@ Checked 2026-09-23 with `gh api repos/cntrl-alt-lenny/gx-spirit-caller/rulesets/
 |---|---|
 | `main-protection` ruleset, active on `refs/heads/main` | The one server-side guarantee, where it binds. Requires a pull request (squash merges only) with `required_approving_review_count` 0, so no human review is required. Blocks deletion and non-fast-forward pushes. Requires the five checks in `.github/required-checks.txt`, each running on every pull request: `Python (ruff)`, `Markdown (markdownlint-cli2)`, `drift-check`, `unittest`, `configure-windows`. Changing the set is the owner's decision. |
 | Administrator bypass | Defeats the layer above. `cntrl-alt-lenny` is the only collaborator, holds `admin`, and the ruleset's `bypass_actors` gives that role `bypass_mode: "always"`. Every agent authenticates as this account, so nothing stops an agent pushing to `main`. |
-| Agent settings | `.claude/settings.json` and `.codex/hooks.json` deny edits to the paths in `tools/protected_paths.py` (checksums, `orig/`, generated files): an agent's own edits, not programs it runs; read at session start. |
+| Agent settings | Shown denying, round 005, Claude Code 2.1.284 on Windows: the Edit tool on `*.sha1`, `build.ninja` and a baseline, and Bash `>`, `>>` and `tee` to them, started inside a worktree and started at a stand-in primary root aimed at `.worktrees/<seat>/`. Round 004's file let that Edit through. Only the agent's own edits, not programs it runs; read at session start. The Codex hook is untested (Codex is not installed here), and open issue openai/codex 27833 reports a PreToolUse deny on `apply_patch` that fires without blocking on some builds. |
 
-That executors never merge, and that Brain waits for the owner's yes, are rules
-the agents keep, not locks GitHub checks. Do not describe either as
-server-enforced.
+That executors never merge and that Brain waits for the owner's yes are rules
+the agents keep, not locks GitHub checks; never call either server-enforced.
 
-`python3 tools/fw.py status` lists the `archive/*` tags as "not on GitHub yet" and
-says "safe to leave this machine: NO". That is a false alarm: the tags are on
-GitHub (`git ls-remote --tags origin 'archive/*'` lists them), and the framework
-issue is 18. Ignore that line only.
+`python3 tools/fw.py status` says the `archive/*` tags are "not on GitHub yet"
+and "safe to leave this machine: NO". False alarm (framework issue 18): the tags
+are on GitHub (`git ls-remote --tags origin 'archive/*'`). Ignore that line only.
 
 ## Where to look
 

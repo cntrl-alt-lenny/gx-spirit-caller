@@ -28,6 +28,8 @@ PROTECTED = [
     ".claude/settings.json",
     ".codex/hooks.json",
     "tools/protected_paths.py",
+    "tools/reference_baseline.txt",
+    "tools/fake_match_baseline.txt",
 ]
 FREE = [
     "src/main/func_02000000.c",
@@ -60,6 +62,44 @@ class TestPatterns(unittest.TestCase):
         self.assertEqual(pp.protected_pattern(str(pp.ROOT / "gx-spirit-caller_usa.sha1")), "**/*.sha1")
         self.assertEqual(pp.protected_pattern("../orig/x", cwd=pp.ROOT / "src"), "orig/**")
         self.assertIsNone(pp.protected_pattern("/somewhere/else/x.sha1"))
+
+
+class TestWorktrees(unittest.TestCase):
+    """Round 005: the same paths are protected inside `.worktrees/<seat>/`, whether
+    the session started in the primary checkout (root = primary) or in the
+    worktree (root = the worktree, whose own copy of the tools and settings runs)."""
+
+    def test_from_the_primary_checkout(self):
+        for rel in PROTECTED:
+            with self.subTest(rel=rel):
+                inside = f".worktrees/worker-005/{rel}"
+                self.assertIsNotNone(pp.protected_pattern(inside, root=pp.ROOT, cwd=pp.ROOT))
+                absolute = str(pp.ROOT / inside)
+                self.assertIsNotNone(pp.protected_pattern(absolute, root=pp.ROOT))
+
+    def test_from_inside_the_worktree(self):
+        worktree = pp.ROOT / ".worktrees" / "worker-005"
+        for rel in PROTECTED:
+            with self.subTest(rel=rel):
+                self.assertIsNotNone(pp.protected_pattern(rel, root=worktree, cwd=worktree))
+
+    def test_ordinary_worktree_paths_stay_free(self):
+        for rel in FREE:
+            with self.subTest(rel=rel):
+                self.assertIsNone(pp.protected_pattern(f".worktrees/worker-005/{rel}",
+                                                       root=pp.ROOT, cwd=pp.ROOT))
+
+    def test_only_a_seat_folder_is_unwrapped(self):
+        # `.worktrees/build.ninja` is not inside a seat; nothing to unwrap, but
+        # `build.ninja` protection is by name at the root only.
+        self.assertIsNone(pp.protected_pattern(".worktrees/notes.txt", root=pp.ROOT, cwd=pp.ROOT))
+
+    def test_hook_denies_a_worktree_path_from_the_primary_checkout(self):
+        reason = pp.codex_hook({"cwd": str(pp.ROOT),
+                                "tool_input": {"command": patch(
+                                    "Update File: .worktrees/worker-005/build.ninja")}})
+        self.assertIsNotNone(reason)
+        self.assertIn("build.ninja", reason)
 
 
 class TestCodexHook(unittest.TestCase):
@@ -99,8 +139,15 @@ class TestCodexHook(unittest.TestCase):
 class TestSettingsFiles(unittest.TestCase):
     def test_claude_settings_deny_exactly_the_list(self):
         settings = json.loads((_ROOT / ".claude" / "settings.json").read_text(encoding="utf-8"))
-        self.assertEqual(settings["permissions"]["deny"], [f"Edit(/{p})" for p in pp.PATTERNS])
+        self.assertEqual(settings["permissions"]["deny"], pp.claude_rules())
         self.assertNotIn("hooks", settings)  # rules only: nothing to run, nothing OS-specific
+
+    def test_claude_rules_cover_the_worktrees(self):
+        rules = pp.claude_rules()
+        for pattern in pp.PATTERNS:
+            self.assertIn(f"Edit(/{pattern})", rules)
+            if not pattern.startswith("**/"):
+                self.assertIn(f"Edit(/.worktrees/*/{pattern})", rules)
 
     def test_codex_hook_is_wired_for_both_shells(self):
         hooks = json.loads((_ROOT / ".codex" / "hooks.json").read_text(encoding="utf-8"))

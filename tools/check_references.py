@@ -28,16 +28,19 @@ A relocation's target is the symbol's name when it is undefined in the unit
 unit, so a local label and a section symbol that land on the same place
 compare equal. Debug sections are ignored.
 
-Existing differences are listed in `tools/reference_baseline.txt`, one
-`region<TAB>unit<TAB>kind<TAB>count` line each. The check fails when a count
-exceeds its baseline or a baseline entry is stale, exactly like
-`check_fake_matches.py`. It needs a built tree: run it after `ninja` (the gate
+Existing differences are listed in `tools/reference_baseline.txt`, ONE LINE PER
+DIFFERENCE (format 2, `tools/baseline_file.py`): `region<TAB>unit<TAB>kind<TAB>detail`,
+the detail naming the section offset and both relocations. The check fails on a
+difference that is not listed and on a listed one that is gone, so fixing one
+reference and breaking another in the same unit fails twice. A baseline can only
+shrink: `--prune-baseline` deletes stale lines and adds nothing, and
+`tools/check_baseline_growth.py` fails CI on any added line. It needs a built tree: run it after `ninja` (the gate
 builds every region) for each region you built.
 
 Usage:
     python tools/check_references.py --version eur [--version usa ...]
     python tools/check_references.py --version eur --list
-    python tools/check_references.py --version eur --write-baseline
+    python tools/check_references.py --version eur --prune-baseline
 
 Exit codes: 0 clean against the baseline, 1 new or stale differences,
 2 missing inputs (no build for the region, or a delinked object missing).
@@ -52,11 +55,17 @@ from dataclasses import dataclass
 from pathlib import Path
 
 sys.path.insert(0, str(Path(__file__).resolve().parent))
+import baseline_file  # noqa: E402
 from progress import parse_delinks_file  # noqa: E402
 
 ROOT = Path(__file__).resolve().parent.parent
 BASELINE = Path("tools") / "reference_baseline.txt"
 REGIONS = ("eur", "usa", "jpn")
+HEADER = [
+    "# Reference-check baseline: relocation differences on main that CI tolerates, one per line.",
+    "# region<TAB>unit<TAB>kind<TAB>detail. It may only shrink: `--prune-baseline` removes stale",
+    "# lines, and tools/check_baseline_growth.py fails CI on any added line.",
+]
 KINDS = ("missing-reloc", "extra-reloc", "wrong-target")
 SOURCE_SUFFIXES = (".c", ".cpp", ".s")
 
@@ -93,6 +102,13 @@ class Difference:
     function: str
     original: Reloc | None
     built: Reloc | None
+
+    def key(self) -> tuple[str, ...]:
+        """The baseline entry for this one difference (no function name: it is context)."""
+        orig = self.original.describe() if self.original else "none"
+        built = self.built.describe() if self.built else "none"
+        return (self.region, self.unit, self.kind,
+                f"{self.section}+0x{self.offset:x} original {orig} built {built}")
 
     def describe(self) -> str:
         where = f"{self.section}+0x{self.offset:x}" + (f" in {self.function}" if self.function else "")
@@ -218,7 +234,7 @@ def check_region(root: Path, region: str) -> tuple[list[Difference], list[str]]:
         rel = Path(unit).with_suffix(".o")
         original_path, built_path = build / "delinks" / rel, build / rel
         if not original_path.is_file() or not built_path.is_file():
-            missing = [str(p.relative_to(root)) for p in (original_path, built_path) if not p.is_file()]
+            missing = [p.relative_to(root).as_posix() for p in (original_path, built_path) if not p.is_file()]
             problems.append(f"[{region}] {unit}: missing {', '.join(missing)}")
             continue
         try:
@@ -228,30 +244,18 @@ def check_region(root: Path, region: str) -> tuple[list[Difference], list[str]]:
     return diffs, problems
 
 
-def load_baseline(path: Path, regions: tuple[str, ...]) -> Counter:
-    counts: Counter = Counter()
-    if path.is_file():
-        for raw in path.read_text(encoding="utf-8").splitlines():
-            line = raw.strip()
-            if line and not line.startswith("#"):
-                region, unit, kind, count = line.split("\t")
-                if region in regions:
-                    counts[(region, unit, kind)] = int(count)
-    return counts
+def load_baseline(path: Path, regions: tuple[str, ...]) -> set[tuple[str, ...]]:
+    """The tolerated findings for `regions`: (region, unit, kind, detail) each."""
+    return {e for e in baseline_file.load(path) if e[0] in regions}
 
 
-def write_baseline(path: Path, counts: Counter, regions: tuple[str, ...]) -> None:
+def write_baseline(path: Path, found: set[tuple[str, ...]], regions: tuple[str, ...]) -> None:
     """Rewrite the entries for `regions`, keeping the other regions' entries."""
-    kept = Counter({k: v for k, v in load_baseline(path, REGIONS).items() if k[0] not in regions})
-    kept.update(counts)
-    path.parent.mkdir(parents=True, exist_ok=True)
-    lines = [
-        "# Reference-check baseline: relocation differences on main that CI tolerates.",
-        "# Written only by `tools/check_references.py --write-baseline`.",
-        "# region<TAB>unit<TAB>kind<TAB>count. It may shrink; growth is a review finding.",
-    ]
-    lines += [f"{r}\t{u}\t{k}\t{n}" for (r, u, k), n in sorted(kept.items())]
-    path.write_text("\n".join(lines) + "\n", encoding="utf-8")
+    try:
+        kept = {e for e in baseline_file.load(path) if e[0] not in regions}
+    except baseline_file.BaselineError:
+        kept = set()  # a format-1 file is being replaced
+    baseline_file.write(path, HEADER, kept | found)
 
 
 def main(argv: list[str] | None = None) -> int:
@@ -261,7 +265,11 @@ def main(argv: list[str] | None = None) -> int:
     ap.add_argument("--root", type=Path, default=ROOT)
     ap.add_argument("--baseline", type=Path)
     ap.add_argument("--list", action="store_true", help="print every difference")
-    ap.add_argument("--write-baseline", action="store_true")
+    ap.add_argument("--write-baseline", action="store_true",
+                    help="record today's differences as the tolerated baseline (first fill only; "
+                         "CI fails a baseline that gains lines)")
+    ap.add_argument("--prune-baseline", action="store_true",
+                    help="delete baseline lines that are no longer found; adds nothing")
     args = ap.parse_args(argv)
 
     root = args.root.resolve()
@@ -286,29 +294,34 @@ def main(argv: list[str] | None = None) -> int:
         print("check_references: INPUT ERROR - no verdict")
         return 2
 
-    found = Counter((d.region, d.unit, d.kind) for d in diffs)
+    found = {d.key() for d in diffs}
     if args.write_baseline:
         write_baseline(baseline_path, found, regions)
         print(f"check_references: wrote {len(found)} baseline entries for {', '.join(regions)}")
         return 0
-    baseline = load_baseline(baseline_path, regions)
-    grown = [key for key, n in sorted(found.items()) if n > baseline.get(key, 0)]
-    stale = [f"{r} {u} {k}: baseline {n}, found {found.get((r, u, k), 0)}"
-             for (r, u, k), n in sorted(baseline.items()) if found.get((r, u, k), 0) < n]
+    try:
+        baseline = load_baseline(baseline_path, regions)
+    except baseline_file.BaselineError as exc:
+        print(f"check_references: {exc}", file=sys.stderr)
+        return 2
+    new = sorted(found - baseline)
+    stale = sorted(baseline - found)
+    if args.prune_baseline:
+        every = baseline_file.load(baseline_path)
+        baseline_file.write(baseline_path, HEADER, every - set(stale))
+        print(f"check_references: pruned {len(stale)} stale baseline entries")
+        return 1 if new else 0
     per_kind = Counter(d.kind for d in diffs)
     units = {(r, u) for r in regions for u in built_units(root, r)}
     print(f"check_references: {', '.join(regions)}: {len(units)} units compared; "
           + ", ".join(f"{k} {per_kind.get(k, 0)}" for k in KINDS)
           + f" (baseline entries {len(baseline)})")
-    for key in grown:
-        r, u, k = key
-        print(f"  NEW: {r} {u} {k}: {found[key]} found, baseline {baseline.get(key, 0)}")
-        for d in diffs:
-            if (d.region, d.unit, d.kind) == key:
-                print(f"    {d.describe()}")
-    for line in stale:
-        print(f"  STALE: {line} - shrink the baseline with --write-baseline")
-    if grown or stale:
+    described = {d.key(): d for d in diffs}
+    for key in new:
+        print(f"  NEW: {described[key].describe()}")
+    for r, u, k, detail in stale:
+        print(f"  STALE: [{r}] {u}: {k} at {detail} - delete the line, or run --prune-baseline")
+    if new or stale:
         print("check_references: FAIL")
         return 1
     print("check_references: OK")

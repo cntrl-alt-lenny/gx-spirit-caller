@@ -98,8 +98,9 @@ the ledger. The ones you run yourself:
 |---|---|
 | `configure.py <ver>` | Before building a region, and whenever `.c` files are added |
 | `gate3.py --scope all --log <log>` | The three-region check for any build-path change |
-| `check_references.py --version <ver>` | After the gate: every unit's relocations against the original's |
-| `check_fake_matches.py` | After changing `src/` or `libs/`; CI runs it too |
+| `check_references.py --version <ver>` | Run by the gate; by hand to list differences (`--list`) |
+| `check_fake_matches.py [--version <ver>]` | After changing `src/` or `libs/`; the gate and CI run it |
+| `check_baseline_growth.py --base <ref>` | Whether a baseline gained a line since the merge base; CI runs it |
 | `protected_paths.py --check <path>` | Whether agent settings protect a path |
 | `fastmatch.py`, `cmatch_loop.py` | Checking one unit fast; drafting and scoring a batch of candidates |
 | `progress.py --version <ver>` | The progress number any report quotes |
@@ -114,9 +115,11 @@ the ledger. The ones you run yourself:
 
 ## The checker
 
-The byte-identical ROM is necessary, not sufficient. Three checks sit on top
-of it, each with a baseline of what `main` already has, which may shrink and
-never grow (a change that grows one is a review finding):
+The byte-identical ROM is necessary, not sufficient. Two checks sit on top of
+it, and since round 005 `gate3.py --scope all` runs both, so `GATE PASS` /
+`gate3: GATE EXIT 0` means the ROMs, the references and the lint all passed.
+Each has a baseline of what `main` already has, one line per finding, which may
+shrink and never grow:
 
 - **The gate's own status.** `gate3.py --log <log>` writes the transcript
   itself, so it never needs a pipe (a pipe through `tee` reports `tee`'s
@@ -130,22 +133,35 @@ never grow (a change that grows one is a review finding):
   extra one, or one against a different symbol, offset or type all fail,
   though the ROM is byte-identical. Baseline: `tools/reference_baseline.txt`;
   `--list` prints every difference. It needs a build, so CI cannot run it.
-- **The fake-match lint,** `tools/check_fake_matches.py`, lexical, in CI's
-  `unittest` job. It fails data directives (`dcd`, `.word`, `.incbin`, ...)
-  in C, `__declspec(section)` / `__attribute__((section))`, data inside a
+- **The fake-match lint,** `tools/check_fake_matches.py`, in CI's `unittest`
+  job (source only) and in the gate (with `--version`, source and built
+  objects). It fails a data directive in an `asm` body however it is spelled,
+  `__declspec(section)` / `__attribute__((section))`, data inside a
   `#pragma section` region, a `.text` unit whose source defines no function,
-  GCC register pins, `do { ... } while (0)` in a function body, and `volatile`
-  scalar locals. The `asm` function escape hatch with real mnemonics is
-  honest asm-C and passes; hardcoded addresses are the reference check's job.
+  GCC register pins, `do { ... } while (0)` (any zero spelling) in a function
+  body, and `volatile` locals (also a volatile pointer, or through a typedef or
+  macro). Macro and typedef aliases are collected tree-wide. The object check
+  (`data-in-text`) flags a data word in a code section that no pc-relative load
+  or relocation reaches, which catches the directive whatever its spelling,
+  token pasting included. The `asm` escape hatch with real mnemonics is honest
+  asm-C and passes; hardcoded addresses are the reference check's job.
   Baseline: `tools/fake_match_baseline.txt`.
+- **Baselines only shrink.** A line is one finding (format 2,
+  `tools/baseline_file.py`), so fixing one and breaking another in the same
+  unit fails. `--prune-baseline` deletes stale lines and records nothing.
+  `--write-baseline` records today's findings and is for the first fill only:
+  `tools/check_baseline_growth.py --base origin/main`, a step of the `unittest`
+  job, fails a pull request whose baseline gains a line against the merge base.
 
 Agents cannot edit the paths in `tools/protected_paths.py` (checksums,
-`orig/`, ROMs, generated files, downloaded tools and the settings
-themselves): Claude Code through `permissions.deny` rules in
-`.claude/settings.json`, Codex through a `PreToolUse` hook on `apply_patch` in
-`.codex/hooks.json`. Neither can stop a program the agent runs from writing
-(the build must write `build/`), a session reads its settings only at start,
-and the Codex hook loads only in a project Codex trusts.
+`orig/`, ROMs, generated files, downloaded tools, the two baselines and the
+settings themselves), also inside `.worktrees/<seat>/`: Claude Code through
+`permissions.deny` rules in `.claude/settings.json`, Codex through a
+`PreToolUse` hook on `apply_patch` in `.codex/hooks.json` (never observed inside
+Codex). Neither can stop a program the agent runs from writing (the build must
+write `build/`), a session reads its settings only at start, a worktree cut
+from a commit without these files has none, and the Codex hook loads only in a
+project Codex trusts.
 
 ## Project layout
 

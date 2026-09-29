@@ -151,7 +151,7 @@ class TestMain(unittest.TestCase):
         root = self._tree(good, make_elf([(0x1c, ABS32, "data_02100004")]))
         code, out = self._main("--version", "eur", "--root", str(root))
         self.assertEqual(code, 1)
-        self.assertIn("NEW: eur src/main/func_02000000.c wrong-target", out)
+        self.assertIn("NEW: [eur] src/main/func_02000000.c: wrong-target", out)
         self.assertIn("original ABS32 data_02100000+0x0, built ABS32 data_02100004+0x0", out)
 
         self.assertEqual(self._main("--version", "eur", "--root", str(root), "--write-baseline")[0], 0)
@@ -160,7 +160,47 @@ class TestMain(unittest.TestCase):
         (root / "build/eur/src/main/func_02000000.o").write_bytes(good)
         code, out = self._main("--version", "eur", "--root", str(root))
         self.assertEqual(code, 1)
-        self.assertIn("STALE: eur src/main/func_02000000.c wrong-target", out)
+        self.assertIn("STALE: [eur] src/main/func_02000000.c: wrong-target", out)
+
+    def test_swapping_one_difference_for_another_in_the_same_unit_fails(self):
+        good = make_elf([(0x1c, ABS32, "data_02100000"), (0x4, PC24, "func_02000800")])
+        first = make_elf([(0x1c, ABS32, "data_02100004"), (0x4, PC24, "func_02000800")])
+        second = make_elf([(0x1c, ABS32, "data_02100000"), (0x4, PC24, "func_02000804")])
+        root = self._tree(good, first)
+        self.assertEqual(self._main("--version", "eur", "--root", str(root), "--write-baseline")[0], 0)
+        self.assertEqual(self._main("--version", "eur", "--root", str(root))[0], 0)
+        # Fix the ABS32 one, break the PC24 one: same unit, same kind, same count.
+        (root / "build/eur/src/main/func_02000000.o").write_bytes(second)
+        code, out = self._main("--version", "eur", "--root", str(root))
+        self.assertEqual(code, 1)
+        self.assertIn("NEW: [eur] src/main/func_02000000.c: wrong-target at .text+0x4", out)
+        self.assertIn("STALE: [eur]", out)
+
+    def test_prune_removes_stale_entries_and_never_adds(self):
+        good = make_elf([(0x1c, ABS32, "data_02100000")])
+        root = self._tree(good, make_elf([(0x1c, ABS32, "data_02100004")]))
+        self._main("--version", "eur", "--root", str(root), "--write-baseline")
+        baseline = root / "tools/reference_baseline.txt"
+        (root / "build/eur/src/main/func_02000000.o").write_bytes(good)  # fixed
+        code, _ = self._main("--version", "eur", "--root", str(root), "--prune-baseline")
+        self.assertEqual(code, 0)
+        self.assertEqual([ln for ln in baseline.read_text(encoding="utf-8").splitlines()
+                          if not ln.startswith("#")], [])
+        # A new difference is not recorded by prune, and still fails.
+        (root / "build/eur/src/main/func_02000000.o").write_bytes(
+            make_elf([(0x1c, ABS32, "data_02100008")]))
+        before = baseline.read_text(encoding="utf-8")
+        self.assertEqual(self._main("--version", "eur", "--root", str(root), "--prune-baseline")[0], 1)
+        self.assertEqual(baseline.read_text(encoding="utf-8"), before)
+
+    def test_format_one_baseline_is_refused(self):
+        root = self._tree(make_elf([]), make_elf([]))
+        (root / "tools").mkdir()
+        (root / "tools/reference_baseline.txt").write_text(
+            "eur\tsrc/main/func_02000000.c\twrong-target\t1\n", encoding="utf-8")
+        with contextlib.redirect_stderr(io.StringIO()):
+            code, _ = self._main("--version", "eur", "--root", str(root))
+        self.assertEqual(code, 2)
 
     def test_unbuilt_region_is_an_input_error(self):
         root = self._tree(make_elf([]), make_elf([]))

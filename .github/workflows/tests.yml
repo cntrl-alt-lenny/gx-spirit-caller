@@ -63,6 +63,17 @@ jobs:
         # real C; tolerates only tools/fake_match_baseline.txt, never growth.
         run: python tools/check_fake_matches.py
 
+      - name: Baselines only shrink (round 005)
+        # `--write-baseline` records whatever a check finds today, so on its
+        # own it launders a new finding. Compare each baseline with the pull
+        # request's merge base and fail on any entry it ADDS. Removing an
+        # entry (a fixed finding) always passes. On a push to main there is
+        # no base to compare with.
+        if: github.event_name == 'pull_request'
+        env:
+          BASE_REF: ${{ github.base_ref }}
+        run: python tools/check_baseline_growth.py --base "origin/$BASE_REF"
+
   configure-windows:
     # Windows-only smoke gate added with brief 058 / PR #393.
     #

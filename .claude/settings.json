@@ -24,7 +24,31 @@
       "Edit(/tools/_dl/**)",
       "Edit(/.claude/settings.json)",
       "Edit(/.codex/hooks.json)",
-      "Edit(/tools/protected_paths.py)"
+      "Edit(/tools/protected_paths.py)",
+      "Edit(/tools/reference_baseline.txt)",
+      "Edit(/tools/fake_match_baseline.txt)",
+      "Edit(/.worktrees/*/orig/**)",
+      "Edit(/.worktrees/*/build/**)",
+      "Edit(/.worktrees/*/extract/**)",
+      "Edit(/.worktrees/*/build.ninja)",
+      "Edit(/.worktrees/*/objdiff.json)",
+      "Edit(/.worktrees/*/.ninja_log)",
+      "Edit(/.worktrees/*/.ninja_lock)",
+      "Edit(/.worktrees/*/config/*/arm9/config.yaml)",
+      "Edit(/.worktrees/*/dsd)",
+      "Edit(/.worktrees/*/dsd.exe)",
+      "Edit(/.worktrees/*/objdiff-cli)",
+      "Edit(/.worktrees/*/objdiff-cli.exe)",
+      "Edit(/.worktrees/*/wibo)",
+      "Edit(/.worktrees/*/ninja.exe)",
+      "Edit(/.worktrees/*/tools/mwccarm/**)",
+      "Edit(/.worktrees/*/tools/arm-none-eabi/**)",
+      "Edit(/.worktrees/*/tools/_dl/**)",
+      "Edit(/.worktrees/*/.claude/settings.json)",
+      "Edit(/.worktrees/*/.codex/hooks.json)",
+      "Edit(/.worktrees/*/tools/protected_paths.py)",
+      "Edit(/.worktrees/*/tools/reference_baseline.txt)",
+      "Edit(/.worktrees/*/tools/fake_match_baseline.txt)"
     ]
   }
 }

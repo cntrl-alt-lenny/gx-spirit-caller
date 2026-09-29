@@ -29,7 +29,11 @@ Per-region sequence (the canonical CLAUDE.md re-verify command):
     [--clean: clean generated outputs; preserve downloaded tools]
     ninja sha1
 
-Then once: `pytest -q tests` (a hard gate). `--invariants`
+Then once: `tools/check_references.py` for the regions just built and
+`tools/check_fake_matches.py` (source lint, plus its check of the built objects),
+both hard gates (round 005: the factory acts on one verdict, so a separate
+evidence step it could skip is not a check); then `pytest -q tests` (a hard
+gate). `--invariants`
 additionally runs tools/check_match_invariants.py as an ADVISORY report (it
 never gates — see run_tests).
 
@@ -335,18 +339,45 @@ def run_tests(invariants: bool) -> bool:
     return tests_ok
 
 
+def run_checkers(regions: list[str], *, source_lint: bool) -> dict[str, int]:
+    """Run the reference check and the fake-match lint; return name -> exit code.
+
+    The reference check needs the built regions. The lint always reads the
+    source and, with built regions, the built objects too. Exit 0 is a pass,
+    1 a finding, anything else (2: missing inputs) is an infrastructure error.
+    """
+    codes: dict[str, int] = {}
+    if regions:
+        cmd = [PY, "tools/check_references.py"]
+        for ver in regions:
+            cmd += ["--version", ver]
+        codes["references"] = run(cmd).returncode
+        print(f"[references] exit {codes['references']}", flush=True)
+    if source_lint:
+        cmd = [PY, "tools/check_fake_matches.py"]
+        for ver in regions:
+            cmd += ["--version", ver]
+        codes["fake-matches"] = run(cmd).returncode
+        print(f"[fake-matches] exit {codes['fake-matches']}", flush=True)
+    return codes
+
+
 def verdict(*, failed: list[str], checks_run: int, tests_ok: bool,
-            infrastructure: bool = False) -> tuple[str, int]:
+            infrastructure: bool = False,
+            checkers: dict[str, int] | None = None) -> tuple[str, int]:
     """Return the gate label and exit code from observable checks.
 
     A zero-check invocation is not a successful gate: it is a caller error
-    that must be surfaced distinctly from a real build or test failure.
+    that must be surfaced distinctly from a real build or test failure. A
+    checker exiting 1 is a finding (FAIL); any other non-zero exit is an
+    infrastructure error, never a pass.
     """
+    checkers = checkers or {}
     if checks_run == 0:
         return "VACUOUS", 2
-    if infrastructure:
+    if infrastructure or any(code not in (0, 1) for code in checkers.values()):
         return "INFRASTRUCTURE", 2
-    if failed or not tests_ok:
+    if failed or not tests_ok or any(code == 1 for code in checkers.values()):
         return "FAIL", 1
     return "PASS", 0
 
@@ -516,6 +547,16 @@ def _gate(ap: argparse.ArgumentParser, args: argparse.Namespace) -> int:
               if not result.ok]
     infrastructure = any(result.infrastructure for result in region_results)
 
+    # The reference check and the lint decide the verdict with the ROMs. They
+    # read only what the regions above built; a failed build has nothing to read.
+    checkers: dict[str, int] = {}
+    if regions and not failed:
+        print(f"\n{'=' * 20} reference check + fake-match lint {'=' * 20}", flush=True)
+        checkers = run_checkers(regions, source_lint=True)
+    elif not regions:
+        print(f"\n{'=' * 20} fake-match lint {'=' * 20}", flush=True)
+        checkers = run_checkers([], source_lint=True)
+
     tests_ok = True
     tests_ran = False
     if not args.no_tests and scope in ("all", "tests"):
@@ -537,15 +578,19 @@ def _gate(ap: argparse.ArgumentParser, args: argparse.Namespace) -> int:
 
     label, exit_code = verdict(
         failed=failed,
-        checks_run=len(regions) + int(tests_ran),
+        checks_run=len(regions) + int(tests_ran) + len(checkers),
         tests_ok=tests_ok,
         infrastructure=infrastructure,
+        checkers=checkers,
     )
     print(f"\n{'=' * 20} GATE {label} {'=' * 20}", flush=True)
     if failed and infrastructure:
         print(f"  infrastructure error in: {', '.join(failed)}", flush=True)
     elif failed:
         print(f"  diverging region(s): {', '.join(failed)}", flush=True)
+    for name, code in checkers.items():
+        if code != 0:
+            print(f"  {name} check did not pass (exit {code})", flush=True)
     if not tests_ok:
         print("  invariants/tests failed", flush=True)
     return exit_code

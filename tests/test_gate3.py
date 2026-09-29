@@ -302,5 +302,123 @@ class TestDsdBinaryProbe(unittest.TestCase):
         self.assertIsNotNone(self._probe(Path(gate3.ROOT)),
                              "this checkout must expose a dsd binary under either spelling")
 
+
+class TestCheckersDecideTheVerdict(unittest.TestCase):
+    """Round 005: the reference check and the fake-match lint are part of the
+    gate's verdict, not a separate evidence step a caller can skip."""
+
+    def test_verdict_counts_the_checkers(self):
+        ok = {"references": 0, "fake-matches": 0}
+        self.assertEqual(gate3.verdict(failed=[], checks_run=3, tests_ok=True, checkers=ok),
+                         ("PASS", 0))
+        for name in ok:
+            with self.subTest(name=name, code=1):
+                self.assertEqual(gate3.verdict(failed=[], checks_run=3, tests_ok=True,
+                                               checkers={**ok, name: 1}), ("FAIL", 1))
+            with self.subTest(name=name, code=2):
+                self.assertEqual(gate3.verdict(failed=[], checks_run=3, tests_ok=True,
+                                               checkers={**ok, name: 2}), ("INFRASTRUCTURE", 2))
+
+    def _gate(self, codes, scope="all"):
+        """Run a synthetic gate whose regions pass and whose checkers exit `codes`."""
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tools").mkdir()
+            (root / "tools" / "configure.py").write_text("# fixture\n")
+            calls = []
+
+            def fake_run(cmd):
+                calls.append(cmd)
+                for name, code in codes.items():
+                    if cmd[1:2] == [f"tools/check_{name}.py"]:
+                        return gate3.CommandResult(code)
+                return gate3.CommandResult(0)
+
+            def passing_region(ver, clean):
+                return gate3.RegionResult(True, pass_line=f"[{ver}] SHA1 PASS")
+
+            stdout = io.StringIO()
+            with patch.object(gate3, "ROOT", root), \
+                    patch.object(gate3, "STATE_PATH", root / "build" / "gate3-state.json"), \
+                    patch.object(gate3, "current_commit_sha", return_value=None), \
+                    patch.object(gate3, "gate_region", side_effect=passing_region), \
+                    patch.object(gate3, "check_dsd_binary", return_value=True), \
+                    patch.object(gate3, "run", side_effect=fake_run), \
+                    contextlib.redirect_stdout(stdout), contextlib.redirect_stderr(io.StringIO()):
+                code = gate3.main(["--scope", scope, "--no-tests"])
+        return code, stdout.getvalue(), calls
+
+    def test_both_checkers_run_for_every_built_region(self):
+        code, output, calls = self._gate({})
+        self.assertEqual(code, 0, output)
+        refs = [c for c in calls if c[1:2] == ["tools/check_references.py"]]
+        lint = [c for c in calls if c[1:2] == ["tools/check_fake_matches.py"]]
+        every = ["--version", "eur", "--version", "usa", "--version", "jpn"]
+        self.assertEqual(refs[0][2:], every)
+        self.assertEqual(lint[0][2:], every)
+        self.assertIn("GATE PASS", output)
+        self.assertEqual(output.splitlines()[-1], "gate3: GATE EXIT 0")
+
+    def test_a_failing_reference_check_fails_the_gate(self):
+        code, output, _ = self._gate({"references": 1})
+        self.assertEqual(code, 1)
+        self.assertIn("GATE FAIL", output)
+        self.assertIn("references check did not pass (exit 1)", output)
+        self.assertEqual(output.splitlines()[-1], "gate3: GATE EXIT 1")
+
+    def test_a_failing_lint_fails_the_gate(self):
+        code, output, _ = self._gate({"fake_matches": 1})
+        self.assertEqual(code, 1)
+        self.assertIn("fake-matches check did not pass (exit 1)", output)
+        self.assertEqual(output.splitlines()[-1], "gate3: GATE EXIT 1")
+
+    def test_a_checker_with_no_verdict_is_infrastructure_not_a_pass(self):
+        code, output, _ = self._gate({"references": 2})
+        self.assertEqual(code, 2)
+        self.assertIn("GATE INFRASTRUCTURE", output)
+
+    def test_single_region_runs_the_checkers_for_that_region_only(self):
+        _, _, calls = self._gate({}, scope="eur")
+        refs = [c for c in calls if c[1:2] == ["tools/check_references.py"]]
+        self.assertEqual(refs[0][2:], ["--version", "eur"])
+
+    def test_tests_scope_still_runs_the_source_lint(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tools").mkdir()
+            (root / "tools" / "configure.py").write_text("# fixture\n")
+            calls = []
+
+            def fake_run(cmd):
+                calls.append(cmd)
+                return gate3.CommandResult(1 if "tools/check_fake_matches.py" in cmd else 0)
+
+            with patch.object(gate3, "ROOT", root), patch.object(gate3, "run", side_effect=fake_run), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                code = gate3.main(["--scope", "tests"])
+        self.assertEqual(code, 1)
+        self.assertTrue(any("tools/check_fake_matches.py" in c for c in calls))
+        self.assertFalse(any("tools/check_references.py" in c for c in calls))
+
+    def test_a_failed_region_skips_the_checkers(self):
+        with tempfile.TemporaryDirectory() as directory:
+            root = Path(directory)
+            (root / "tools").mkdir()
+            (root / "tools" / "configure.py").write_text("# fixture\n")
+            calls = []
+
+            def record(cmd):
+                calls.append(cmd)
+                return gate3.CommandResult(0)
+
+            with patch.object(gate3, "ROOT", root), patch.object(gate3, "check_dsd_binary", return_value=True), \
+                    patch.object(gate3, "gate_region", return_value=gate3.RegionResult(False)), \
+                    patch.object(gate3, "run", side_effect=record), \
+                    contextlib.redirect_stdout(io.StringIO()):
+                code = gate3.main(["--scope", "eur", "--no-tests"])
+        self.assertEqual(code, 1)
+        self.assertFalse(any("check_references" in " ".join(c) for c in calls))
+
+
 if __name__ == "__main__":
     unittest.main()

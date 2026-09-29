@@ -1,7 +1,8 @@
-# Fake-match lint baseline: violations on main that CI tolerates.
-# Written only by `tools/check_fake_matches.py --write-baseline`.
-# rule<TAB>path<TAB>count. It may shrink; a change that grows it is a review finding.
-do-while-zero	src/jpn/overlay000/func_ov000_021ac77c.c	1
-do-while-zero	src/overlay000/func_ov000_021ac85c.c	1
-do-while-zero	src/usa/overlay000/func_ov000_021ac77c.c	1
-volatile-local	src/main/func_02096040.legacy.c	1
+# Fake-match lint baseline: findings on main that CI tolerates, one per line.
+# rule<TAB>path<TAB>ordinal<TAB>text. It may only shrink: `--prune-baseline` removes
+# stale lines, and tools/check_baseline_growth.py fails CI on any added line.
+# format: 2
+do-while-zero	src/jpn/overlay000/func_ov000_021ac77c.c	1	do { Fill32(0, p, 0xa0); p->f_98 = p->f_98 | 0x4000000; p->f_98 = ((p->f_98 & (~0xf80000)) | 0x88000
+do-while-zero	src/overlay000/func_ov000_021ac85c.c	1	do { Fill32(0, p, 0xa0); p->f_98 = p->f_98 | 0x4000000; p->f_98 = ((p->f_98 & (~0xf80000)) | 0x88000
+do-while-zero	src/usa/overlay000/func_ov000_021ac77c.c	1	do { Fill32(0, p, 0xa0); p->f_98 = p->f_98 | 0x4000000; p->f_98 = ((p->f_98 & (~0xf80000)) | 0x88000
+volatile-local	src/main/func_02096040.legacy.c	1	volatile Obj02096040 tmp;
