@@ -1,0 +1,713 @@
+diff --git a/.github/workflows/tests.yml b/.github/workflows/tests.yml
+index 31be20a89..53eeec9f5 100644
+--- a/.github/workflows/tests.yml
++++ b/.github/workflows/tests.yml
+@@ -9,18 +9,18 @@ name: Tests
+ # and classifies correctly. If this fails, the analyzer workflow would
+ # be dropping garbage into PR comments.
+ 
+-# UNFILTERED on pull_request since 2026-08-22 (owner decision, round 0822b):
++# UNFILTERED on PR events since 2026-08-22 (owner decision, round 0822b):
+ # `unittest` is now a REQUIRED status check in the `main-protection` ruleset,
+ # and tools/check_ci_contract.py forbids a required check whose workflow is
+ # paths-filtered — a filtered-out workflow never reports a conclusion, so the
+ # PR blocks forever (the PR #1365 deadlock). Running on every PR (~1 min on a
+ # public repo) is the price of the gate; do NOT re-add a `paths:` filter to
+-# `pull_request` without first removing `unittest` from
++# PR events without first removing `unittest` from
+ # .github/required-checks.txt AND the live ruleset (two-sided edit; see that
+ # file's header). This also supersedes the old load-bearing `.github/**`
+ # paths-list rationale — the suite now runs on every PR unconditionally.
+ on:
+-  pull_request:
++  pull_request_target:
+   push:
+     branches: [main]
+     paths:
+@@ -33,11 +33,34 @@ permissions:
+ 
+ jobs:
+   unittest:
++    defaults:
++      run:
++        working-directory: proposed
+     runs-on: ubuntu-latest
+     timeout-minutes: 15
+     steps:
++      # This checkout and decision use base code even if the PR deletes them.
+       - uses: actions/checkout@v4
+         with:
++          ref: ${{ github.event.pull_request.base.sha || github.sha }}
++          path: trusted
++          persist-credentials: false
++          fetch-depth: 0
++
++      - name: Trusted factory shipment policy (round 008)
++        if: github.event_name == 'pull_request_target'
++        working-directory: trusted
++        env:
++          PR_NUMBER: ${{ github.event.number }}
++        run: |
++          git fetch origin "refs/pull/$PR_NUMBER/head"
++          python tools/check_factory.py --event "$GITHUB_EVENT_PATH"
++
++      - uses: actions/checkout@v4
++        with:
++          ref: ${{ github.event.pull_request.head.sha || github.sha }}
++          path: proposed
++          persist-credentials: false
+           # test_ship_coverage_history_is_not_vacuous derives rounds from
+           # round-labelled commits, so this job needs the history it asserts
+           # over — same reason drift-check pins it.
+@@ -46,8 +69,6 @@ jobs:
+       - uses: actions/setup-python@v5
+         with:
+           python-version: '3.11'
+-          cache: 'pip'
+-          cache-dependency-path: tools/requirements.txt
+ 
+       - name: Check unittest import + collection parity
+         run: python tools/check_test_imports.py
+@@ -69,12 +90,15 @@ jobs:
+         # request's merge base and fail on any entry it ADDS. Removing an
+         # entry (a fixed finding) always passes. On a push to main there is
+         # no base to compare with.
+-        if: github.event_name == 'pull_request'
++        if: github.event_name == 'pull_request_target'
+         env:
+           BASE_REF: ${{ github.base_ref }}
+         run: python tools/check_baseline_growth.py --base "origin/$BASE_REF"
+ 
+   configure-windows:
++    defaults:
++      run:
++        working-directory: proposed
+     # Windows-only smoke gate added with brief 058 / PR #393.
+     #
+     # Why: Ninja on Windows calls CreateProcess directly (no shell),
+@@ -94,12 +118,14 @@ jobs:
+     timeout-minutes: 15
+     steps:
+       - uses: actions/checkout@v4
++        with:
++          ref: ${{ github.event.pull_request.head.sha || github.sha }}
++          path: proposed
++          persist-credentials: false
+ 
+       - uses: actions/setup-python@v5
+         with:
+           python-version: '3.11'
+-          cache: 'pip'
+-          cache-dependency-path: tools/requirements.txt
+ 
+       - name: Install Python deps
+         run: pip install -r tools/requirements.txt
+diff --git a/tests/test_check_factory.py b/tests/test_check_factory.py
+new file mode 100644
+index 000000000..3845b1f33
+--- /dev/null
++++ b/tests/test_check_factory.py
+@@ -0,0 +1,66 @@
++"""Execute the actual base-tree CLI against proposed commits, including removal."""
++import json
++import os
++import shutil
++import subprocess
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parents[1]
++
++
++class TestTrustedFactory(unittest.TestCase):
++    def test_base_decision_survives_proposed_attacks(self):
++        with tempfile.TemporaryDirectory() as directory:
++            root = Path(directory)
++            env = dict(os.environ, GIT_AUTHOR_NAME='Test', GIT_AUTHOR_EMAIL='test' + chr(64) + 'example.invalid',
++                       GIT_COMMITTER_NAME='Test', GIT_COMMITTER_EMAIL='test' + chr(64) + 'example.invalid')
++
++            def git(*args):
++                return subprocess.check_output(['git', *args], cwd=root, env=env,
++                                               stderr=subprocess.PIPE).decode().strip()
++
++            git('init', '-q')
++            (root / 'tools').mkdir()
++            shutil.copyfile(ROOT / 'tools/check_factory.py', root / 'tools/check_factory.py')
++            (root / '.github/workflows').mkdir(parents=True)
++            (root / '.github/workflows/tests.yml').write_text('trusted workflow\n')
++            git('add', '.')
++            git('commit', '-qm', 'trusted policy')
++            base = git('rev-parse', 'HEAD')
++            attacks = {
++                'match': ('src/main/f.c', 'void f(void) {}\n'),
++                'checker': ('tools/gate3.py', 'raise SystemExit(0)\n'),
++                'guard': ('tools/check_factory.py', 'raise SystemExit(0)\n'),
++                'workflow': ('.github/workflows/tests.yml', 'weakened\n'),
++                'imports': ('tools/baseline_file.py', 'weakened\n'),
++                'config': ('tools/requirements.txt', 'weakened\n'),
++                'paths': ('tools/protected_paths.py', 'PATTERNS = ()\n'),
++                'settings': ('.codex/hooks.json', '{}\n'),
++                'baseline': ('tools/fake_match_baseline.txt', 'laundered\n'),
++                'delete-guard': ('tools/check_factory.py', None),
++                'delete-workflow': ('.github/workflows/tests.yml', None),
++            }
++            for label, (name, content) in attacks.items():
++                with self.subTest(attack=label):
++                    git('checkout', '-q', '--detach', base)
++                    path = root / name
++                    if content is None:
++                        path.unlink()
++                    else:
++                        path.parent.mkdir(parents=True, exist_ok=True)
++                        path.write_text(content)
++                    git('add', '-A')
++                    git('commit', '-qm', label)
++                    head = git('rev-parse', 'HEAD')
++                    git('checkout', '-q', '--detach', base)
++                    event = root / 'event.json'
++                    for branch, expected in [('factory/batch', int(label != 'match')),
++                                             ('worker/reviewed', 0)]:
++                        event.write_text(json.dumps({'pull_request': {'base': {'sha': base},
++                                                                    'head': {'sha': head, 'ref': branch}}}))
++                        result = subprocess.run([sys.executable, 'tools/check_factory.py', '--event', str(event)],
++                                                cwd=root, capture_output=True, text=True)
++                        self.assertEqual(result.returncode, expected, result.stdout + result.stderr)
+diff --git a/tests/test_gate3.py b/tests/test_gate3.py
+index b31e507c1..a67341606 100644
+--- a/tests/test_gate3.py
++++ b/tests/test_gate3.py
+@@ -422,3 +422,18 @@ class TestCheckersDecideTheVerdict(unittest.TestCase):
+ 
+ if __name__ == "__main__":
+     unittest.main()
++
++
++class TestFailedEdgeAttribution(unittest.TestCase):
++    def test_successful_compile_then_rom_mismatch_is_content_failure(self):
++        output = ('[1/2] wine tools/mwccarm/2.0/sp1p5/mwccarm.exe -c x.c\n'
++                  '[2/2] sha1sum -c gx-spirit-caller_eur.sha1\n'
++                  'FAILED: sha1\nsha1sum -c gx-spirit-caller_eur.sha1\n'
++                  'gx-spirit-caller_eur.nds: FAILED\n')
++        self.assertFalse(gate3.is_infrastructure_failure(['ninja', 'sha1'], output, 1))
++
++    def test_checksum_failure_and_failed_tool_edge_remain_infrastructure(self):
++        output = ('FAILED: sha1\nsha1sum -c x.sha1\nx.nds: FAILED\n'
++                  '[2/2] unrelated command\nFAILED: x.o\n'
++                  'wine tools/mwccarm/2.0/sp1p5/mwccarm.exe -c x.c\ncompiler failed\n')
++        self.assertTrue(gate3.is_infrastructure_failure(['ninja', 'sha1'], output, 1))
+diff --git a/tests/test_semantic_fake_matches.py b/tests/test_semantic_fake_matches.py
+new file mode 100644
+index 000000000..4080f3917
+--- /dev/null
++++ b/tests/test_semantic_fake_matches.py
+@@ -0,0 +1,97 @@
++"""Round 008 compiler-valid misses, syntax controls, and adversarial attempts."""
++from __future__ import annotations
++
++import contextlib
++import io
++import sys
++import tempfile
++import unittest
++from pathlib import Path
++
++sys.path.insert(0, str(Path(__file__).resolve().parents[1] / 'tools'))
++import check_fake_matches as cfm  # noqa: E402
++
++CONDITIONS = ('(int)0', '1-1', '-0', r"'\0'", 'NULL', '0.0', '0 && x',
++              '((void)0,0)', 'sizeof(char)-1', '0 == 1', 'ZERO')
++DECLARATIONS = (
++    'void f(void){for(volatile int i=0;i<1;i++) {}}',
++    'typedef int * volatile VPV; void f(void){VPV p;}',
++    '#define DECL(t,n) volatile t n\nvoid f(void){DECL(int,x);}',
++    'void f(void){int a=0,* volatile p=&a;}',
++)
++
++
++class TestSemanticLint(unittest.TestCase):
++    def tree(self, source, headers=None):
++        temp = tempfile.TemporaryDirectory()
++        self.addCleanup(temp.cleanup)
++        root = Path(temp.name)
++        (root / 'src').mkdir()
++        # A legacy filename is scanned even when not in delinks (inactive TU).
++        (root / 'src/probe.legacy.c').write_text(source)
++        for name, text in (headers or {}).items():
++            path = root / name
++            path.parent.mkdir(parents=True, exist_ok=True)
++            path.write_text(text)
++        return root
++
++    def findings(self, source, headers=None):
++        return {f.rule for f in cfm.scan_tree(self.tree(source, headers))}
++
++    def test_constant_false_expressions(self):
++        for condition in CONDITIONS:
++            with self.subTest(condition=condition):
++                source = ('#define NULL ((void*)0)\nenum { ZERO=0 };\n'
++                          f'void f(int x){{do{{}}while({condition});}}')
++                self.assertIn('do-while-zero', self.findings(source))
++
++    def test_volatile_declaration_semantics(self):
++        for source in DECLARATIONS:
++            with self.subTest(source=source):
++                self.assertIn('volatile-local', self.findings(source))
++
++    def test_invalid_syntax_is_a_nonzero_diagnostic(self):
++        root = self.tree('void f(int c){while(c) volatile int x=c;}')
++        out = io.StringIO()
++        with contextlib.redirect_stderr(out):
++            self.assertEqual(cfm.main(['--root', str(root)]), 2)
++        self.assertIn('INPUT ERROR', out.getvalue())
++
++    def test_braced_detection_control(self):
++        self.assertIn('volatile-local', self.findings('void f(int c){while(c){volatile int x=c;}}'))
++
++    def test_adversarial_attempts_and_inactive_branch(self):
++        for source, rule in (
++            ('#define CAT(a,b) a##b\nvoid f(void){CAT(vola,tile) int x;}', 'volatile-local'),
++            ('typedef volatile int V;typedef V W;void f(void){W x;}', 'volatile-local'),
++            ('#define Z(x) ((x)-(x))\nvoid f(void){do{}while(Z(123));}', 'do-while-zero'),
++            ('/* é */ void f(void){do{}while(0);}', 'do-while-zero'),
++            ('void f(void){do{do{}while(0);}while(1);}', 'do-while-zero'),
++            ('#if 0\nvoid f(void){do{}while((int)0);}\n#endif', 'do-while-zero'),
++            ('#if 1\nvoid f(void){}\n#else\nvoid f(void){volatile int x;}\n#endif', 'volatile-local'),
++            ('#define A asm\nvoid f(void){volatile int x;}', 'volatile-local'),
++        ):
++            with self.subTest(source=source):
++                self.assertIn(rule, self.findings(source))
++
++    def test_headers_expand_conditions_types_and_declarations(self):
++        self.assertEqual(self.findings('#include "x.h"\nvoid f(void){D(int,x);do{}while(Z);}',
++                                     {'include/x.h': '#define D(t,n) volatile t n\n#define Z (1-1)\n'}),
++                         {'volatile-local', 'do-while-zero'})
++
++    def test_honest_loops_pointers_and_statement_macros(self):
++        self.assertEqual(self.findings(
++            '#define SAFE(x) do{(x)=0;}while(0)\n'
++            'typedef volatile int V; extern volatile int g;\n'
++            'void f(int n,V *p){V *q=p;extern volatile int other;'
++            'SAFE(n);do{}while(n);do{}while(1);*q=g+other;}'), set())
++
++    def test_missing_header_fails_closed(self):
++        root = self.tree('#include "missing.h"\nvoid f(void){}')
++        with contextlib.redirect_stderr(io.StringIO()):
++            self.assertEqual(cfm.main(['--root', str(root)]), 2)
++
++    def test_syntax_adapter_keyword_macro_fails_closed(self):
++        root = self.tree('#define asm volatile\nasm int f(void){volatile int x;return x;}')
++        with contextlib.redirect_stderr(io.StringIO()):
++            self.assertEqual(cfm.main(['--root', str(root)]), 2)
+diff --git a/tools/check_ci_contract.py b/tools/check_ci_contract.py
+index 2adf7acc4..09f6a1a75 100644
+--- a/tools/check_ci_contract.py
++++ b/tools/check_ci_contract.py
+@@ -117,9 +117,14 @@ def _pr_filters(doc: dict) -> tuple[bool, list[str]]:
+     catch, so it is spelled out explicitly here.
+     """
+     trig = _trigger_block(doc)
+-    if not trig or "pull_request" not in trig:
++    events = [e for e in ("pull_request", "pull_request_target") if trig and e in trig]
++    if not events:
+         return False, []
+-    body = trig["pull_request"]
++    # An unconditional eligible PR trigger suffices; otherwise union filters.
++    bodies = [trig[e] for e in events]
++    if any(not isinstance(b, dict) or not any(k in b for k in BLOCKING_FILTERS) for b in bodies):
++        return True, []
++    body = {k: v for b in bodies for k, v in b.items()}
+     if not isinstance(body, dict):    # None / empty -> unconditional
+         return True, []
+     return True, [k for k in BLOCKING_FILTERS if k in body]
+diff --git a/tools/check_factory.py b/tools/check_factory.py
+new file mode 100644
+index 000000000..165ceaa95
+--- /dev/null
++++ b/tools/check_factory.py
+@@ -0,0 +1,71 @@
++#!/usr/bin/env python3
++"""Base-tree factory policy. Run only from the trusted PR base checkout.
++
++The workflow supplies GITHUB_EVENT_PATH, never proposed configuration. This
++stdlib-only program reads head bytes with git; it never imports or executes
++anything from that tree. All paths outside the minimal shipment set are denied.
++"""
++from __future__ import annotations
++
++import argparse
++import json
++import re
++import subprocess
++from pathlib import Path
++
++ROOT = Path(__file__).resolve().parent.parent
++
++
++def git(root: Path, *args: str) -> bytes:
++    return subprocess.check_output(['git', *args], cwd=root, stderr=subprocess.PIPE)
++
++
++def allowed(path: str) -> bool:
++    return bool(re.fullmatch(r'src/(?:[A-Za-z0-9_.-]+/)*[A-Za-z0-9_.-]+\.(?:c|cpp|s)', path)
++                or re.fullmatch(r'config/(?:eur|usa|jpn)/arm9/(?:overlays/ov[0-9]+/)?delinks\.txt', path)
++                or path == 'docs/ledger/attempts.tsv')
++
++
++def decide(event: dict, root: Path) -> int:
++    pr = event['pull_request']
++    base, head, branch = pr['base']['sha'], pr['head']['sha'], pr['head']['ref']
++    if not all(isinstance(s, str) and re.fullmatch(r'[0-9a-f]{40}', s) for s in (base, head)):
++        raise ValueError('event requires literal base and head SHAs')
++    if not isinstance(branch, str) or not branch:
++        raise ValueError('event requires head branch')
++    if git(root, 'rev-parse', 'HEAD').decode().strip() != base:
++        raise ValueError('policy must execute at the event base SHA')
++    # Even a non-factory decision requires real event metadata and base code.
++    if not branch.startswith('factory/'):
++        print('check_factory: OK - reviewed branch, factory restriction does not apply')
++        return 0
++    ancestor = git(root, 'merge-base', base, head).decode().strip()
++    paths = git(root, 'diff', '--no-renames', '--name-only', '-z', ancestor, head).split(b'\0')
++    denied = []
++    for raw in filter(None, paths):
++        path = raw.decode('utf-8', errors='strict')
++        # Git mode 120000 is a symlink; 160000 is a submodule. Neither may
++        # turn an allowed filename into another file or executable dependency.
++        entry = git(root, 'ls-tree', head, '--', path)
++        ordinary = not entry or entry.startswith(b'100644 blob ')
++        if not allowed(path) or not ordinary:
++            denied.append(path)
++    for path in denied:
++        print(f'check_factory: DENIED {path!r}')
++    print(f'check_factory: {"FAIL" if denied else "OK"} - {len(denied)} forbidden change(s)')
++    return int(bool(denied))
++
++
++def main(argv: list[str] | None = None) -> int:
++    ap = argparse.ArgumentParser(description=__doc__)
++    ap.add_argument('--event', required=True, type=Path)
++    args = ap.parse_args(argv)
++    try:
++        return decide(json.loads(args.event.read_text(encoding='utf-8')), ROOT)
++    except (ValueError, KeyError, TypeError, OSError, subprocess.SubprocessError) as exc:
++        print(f'check_factory: INPUT ERROR - {exc}')
++        return 2
++
++
++if __name__ == '__main__':
++    raise SystemExit(main())
+diff --git a/tools/check_fake_matches.py b/tools/check_fake_matches.py
+index 76806552e..54e8918b7 100644
+--- a/tools/check_fake_matches.py
++++ b/tools/check_fake_matches.py
+@@ -439,6 +439,8 @@ def tree_aliases(root: Path) -> Aliases:
+ 
+ def scan_tree(root: Path) -> list[Finding]:
+     aliases = tree_aliases(root)
++    from semantic_fake_matches import Analyzer
++    analyzer = Analyzer(root)
+     findings: list[Finding] = []
+     for top in SOURCE_DIRS:
+         base = root / top
+@@ -446,7 +448,11 @@ def scan_tree(root: Path) -> list[Finding]:
+             continue
+         for path in sorted(p for p in base.rglob("*") if p.suffix in SUFFIXES and p.is_file()):
+             rel = path.relative_to(root).as_posix()
+-            findings.extend(scan_source(rel, _read(path), aliases))
++            source = _read(path)
++            findings.extend(f for f in scan_source(rel, source, aliases)
++                            if f.rule not in ("do-while-zero", "volatile-local"))
++            findings.extend(Finding(rule, rel, line, _snippet(source, line))
++                            for rule, line in analyzer.scan(rel, source))
+     for source, _where in sorted(text_units(root).items()):
+         path = root / source
+         if path.is_file() and not defines_function(_read(path)):
+@@ -613,7 +619,12 @@ def main(argv: list[str] | None = None) -> int:
+         return 2
+     baseline_path = args.baseline or root / BASELINE
+     regions = tuple(dict.fromkeys(args.version or ()))
+-    findings = scan_tree(root)
++    from semantic_fake_matches import AnalysisError
++    try:
++        findings = scan_tree(root)
++    except (AnalysisError, UnicodeError) as exc:
++        print(f"check_fake_matches: INPUT ERROR - {exc}", file=sys.stderr)
++        return 2
+     if regions:
+         object_findings, problems = scan_objects(root, regions)
+         for p in problems:
+diff --git a/tools/gate3.py b/tools/gate3.py
+index 69a77f8f1..191ab967f 100644
+--- a/tools/gate3.py
++++ b/tools/gate3.py
+@@ -63,6 +63,7 @@ Exit codes:
+ from __future__ import annotations
+ 
+ import argparse
++import re
+ from dataclasses import dataclass
+ import json
+ import subprocess
+@@ -198,8 +199,18 @@ def is_infrastructure_failure(cmd: list[str], output: str, returncode: int) -> b
+     del cmd  # The output carries the tool invocation and its diagnostic.
+     if returncode == 0:
+         return False
++    # Only the failed Ninja edge carries attribution. Earlier successful
++    # compiler command echoes must not reclassify a later checksum failure.
++    blocks = re.split(r"(?m)^FAILED: ", output)[1:]
++    if blocks:
++        diagnostics = [re.split(r"(?m)^\[\d+/\d+\] ", block, maxsplit=1)[0]
++                       for block in blocks]
++        return any(any(marker in block.lower() for marker in TOOLCHAIN_MARKERS)
++                   for block in diagnostics)
+     lowered = output.lower()
+-    return any(marker in lowered for marker in TOOLCHAIN_MARKERS)
++    return any(marker in lowered for marker in TOOLCHAIN_MARKERS
++               if marker not in ("mwccarm.exe", "mwldarm.exe", "mwasmarm.exe",
++                                 "wibo", "download_tool.py"))
+ 
+ 
+ def check_dsd_binary() -> bool:
+diff --git a/tools/requirements.txt b/tools/requirements.txt
+index 8ba839e62..e55909ad8 100644
+--- a/tools/requirements.txt
++++ b/tools/requirements.txt
+@@ -8,3 +8,6 @@ pyperclip
+ # make that gate confidently wrong, which is the exact failure class it exists
+ # to remove. Added 2026-07-26; the first and so far only yaml consumer here.
+ PyYAML
++
++# ARM C/C++ semantic lint: includes the native library on macOS/Linux/Windows.
++libclang==18.1.1
+diff --git a/tools/semantic_fake_matches.py b/tools/semantic_fake_matches.py
+new file mode 100644
+index 000000000..382be7e74
+--- /dev/null
++++ b/tools/semantic_fake_matches.py
+@@ -0,0 +1,224 @@
++"""Compiler AST analysis for do-while-zero and volatile-local.
++
++libclang 18 targets ARMv5TE, signed char, int enums, freestanding C/C++.
++Metrowerks assembly bodies and placement attributes are blanked preserving
++lines; the separate lexical/object rules still inspect the original bytes.
++Syntax/type errors and missing dependencies fail closed. Each preprocessor
++arm in a source unit is also parsed (including inactive sources); excessive
++configuration combinations fail closed instead of silently truncating them.
++"""
++from __future__ import annotations
++
++from ctypes import c_double, c_int, c_longlong, c_void_p
++from itertools import product
++from pathlib import Path
++import re
++
++from progress import _strip_c_comments_and_literals
++
++
++class AnalysisError(ValueError):
++    pass
++
++
++def _blank(chars: list[str], a: int, b: int) -> None:
++    for i in range(a, b):
++        if chars[i] != '\n':
++            chars[i] = ' '
++
++
++def adapt(source: str) -> str:
++    """Only erase foreign asm syntax and placement attributes, never C bodies."""
++    from check_fake_matches import _blank_preprocessor, _function_body_spans
++    clean = _strip_c_comments_and_literals(source)
++    if re.search(r"(?m)^\s*#\s*define\s+(?:asm|__declspec)\b", clean):
++        raise AnalysisError("macro redefines a syntax-adapter keyword")
++    clean = _blank_preprocessor(clean)
++    out = list(source)
++    for a, b in _function_body_spans(clean):
++        # A top-level asm function has an asm keyword in its declaration.
++        declaration = clean[max(clean.rfind(';', 0, a), clean.rfind('}', 0, a)) + 1:a]
++        if re.fullmatch(r'\s*asm\s+[^;{}]+', declaration):
++            start = list(re.finditer(r'\basm\b', clean[:a]))[-1].start()
++            _blank(out, start, start + 3)
++            _blank(out, a + 1, b - 1)
++    for m in re.finditer(r'\b(?:asm|__declspec)\s*[{(]', clean):
++        start = m.end() - 1
++        closing = '}' if clean[start] == '{' else ')'
++        opening = clean[start]
++        depth = 1
++        end = start + 1
++        while end < len(clean) and depth:
++            depth += (clean[end] == opening) - (clean[end] == closing)
++            end += 1
++        if depth:
++            raise AnalysisError('unterminated asm or placement attribute')
++        # GNU asm("...") is valid C syntax. Only mwcc block asm is erased.
++        if m.group().startswith('asm') and opening == '(':
++            continue
++        _blank(out, m.start(), end)
++        if opening == '{':
++            out[m.start()] = ';'
++    return ''.join(out)
++
++
++def variants(source: str) -> list[str]:
++    """Original configuration plus all source conditional-arm combinations."""
++    clean = _strip_c_comments_and_literals(source)
++    directives = list(re.finditer(r'(?m)^[ \t]*#[ \t]*(if|ifdef|ifndef|elif|else|endif)\b[^\n]*', clean))
++    groups: list[list] = []
++    stack: list[int] = []
++    owners = {}
++    for m in directives:
++        kind = m.group(1)
++        if kind in ('if', 'ifdef', 'ifndef'):
++            stack.append(len(groups))
++            groups.append([m])
++        elif kind in ('elif', 'else'):
++            if not stack:
++                raise AnalysisError('unbalanced preprocessor conditional')
++            groups[stack[-1]].append(m)
++        elif not stack:
++            raise AnalysisError('unbalanced preprocessor conditional')
++        else:
++            stack.pop()
++        if kind != 'endif':
++            owners[m.start()] = stack[-1]
++    if stack:
++        raise AnalysisError('unbalanced preprocessor conditional')
++    combinations = 1
++    for g in groups:
++        combinations *= len(g)
++    if combinations > 64:
++        raise AnalysisError('more than 64 conditional configurations; analysis refused')
++    results = [source]
++    for choices in product(*(range(len(g)) for g in groups)):
++        chars = list(source)
++        for m in directives:
++            kind = m.group(1)
++            if kind in ('else', 'endif'):
++                continue
++            group = groups[owners[m.start()]]
++            enabled = group.index(m) == choices[owners[m.start()]]
++            replacement = ('#if ' if kind != 'elif' else '#elif ') + str(int(enabled))
++            # Preserve offsets and line numbers for diagnostics and baseline keys.
++            chars[m.start():m.end()] = list(replacement.ljust(m.end() - m.start()))
++        result = ''.join(chars)
++        if result not in results:
++            results.append(result)
++    return results
++
++
++class Analyzer:
++    def __init__(self, root: Path):
++        try:
++            from clang import cindex as c
++            self.c = c
++            self.index = c.Index.create()
++            lib = c.conf.lib
++            for name, args, result in (
++                ('clang_Cursor_Evaluate', [c.Cursor], c_void_p),
++                ('clang_EvalResult_getKind', [c_void_p], c_int),
++                ('clang_EvalResult_getAsLongLong', [c_void_p], c_longlong),
++                ('clang_EvalResult_getAsDouble', [c_void_p], c_double),
++                ('clang_EvalResult_dispose', [c_void_p], None),
++            ):
++                fn = getattr(lib, name)
++                fn.argtypes, fn.restype = args, result
++            self.lib = lib
++        except Exception as exc:
++            raise AnalysisError(f'libclang unavailable: {exc}') from exc
++        self.root = root.resolve()
++        includes = [self.root / 'include'] + sorted((self.root / 'libs').glob('*/include'))
++        self.args = ['-target', 'armv5te-none-eabi', '-ffreestanding', '-fdeclspec',
++                     '-fsigned-char', '-Wno-everything'] + ['-I' + str(p) for p in includes]
++        self.headers = []
++        for top in ('include', 'src', 'libs'):
++            for p in sorted((self.root / top).rglob('*')):
++                if p.suffix in ('.h', '.hpp', '.inc') and p.is_file():
++                    text = p.read_text(encoding='utf-8', errors='strict')
++                    self.headers.append((str(p), adapt(text)))
++
++    def parse(self, path: Path, source: str):
++        region = 'JPN' if 'jpn' in path.parts else 'USA' if 'usa' in path.parts else 'EUR'
++        cpp = path.suffix == '.cpp'
++        args = self.args + ['-x', 'c++' if cpp else 'c', '-std=gnu++98' if cpp else '-std=gnu99',
++                            '-D' + region]
++        try:
++            tu = self.index.parse(str(path), args=args, unsaved_files=self.headers + [(str(path), source)])
++        except Exception as exc:
++            raise AnalysisError(f'{path.relative_to(self.root)}: parser failed: {exc}') from exc
++        errors = [f'{d.location.line}:{d.location.column}: {d.spelling}' for d in tu.diagnostics
++                  if d.severity >= self.c.Diagnostic.Error]
++        if errors:
++            raise AnalysisError(f'{path.relative_to(self.root)}: ' + '; '.join(errors))
++        return tu
++
++    def constant_false(self, expr) -> bool:
++        result = self.lib.clang_Cursor_Evaluate(expr)
++        if not result:
++            # A well-typed expression with no compile-time value is a real
++            # runtime condition, not an input or parser error.
++            return False
++        try:
++            kind = self.lib.clang_EvalResult_getKind(result)
++            if kind == 1:
++                return self.lib.clang_EvalResult_getAsLongLong(result) == 0
++            if kind == 2:
++                return self.lib.clang_EvalResult_getAsDouble(result) == 0.0
++            raise AnalysisError(f'unsupported constant evaluation kind {kind}')
++        finally:
++            self.lib.clang_EvalResult_dispose(result)
++
++    def scan(self, rel: str, source: str) -> list[tuple[str, int]]:
++        path = self.root / rel
++        results = set()
++        for variant in variants(source):
++            prepared = adapt(variant)
++            tu = self.parse(path, prepared)
++            # Convert conditions to boolean in their original scope. Clang's
++            # evaluator otherwise cannot expose a null pointer value (NULL).
++            edits = []
++            for node in tu.cursor.walk_preorder():
++                if node.kind == self.c.CursorKind.DO_STMT and node.location.file \
++                        and Path(node.location.file.name) == path:
++                    # Statement macro wrappers remain exempt, as before. A
++                    # macro used only for the condition is NOT exempt.
++                    if prepared.encode('utf-8')[node.extent.start.offset:node.extent.start.offset + 2] != b'do':
++                        continue
++                    expr = list(node.get_children())[-1]
++                    a, b = expr.extent.start.offset, expr.extent.end.offset
++                    if not expr.extent.start.file or Path(expr.extent.start.file.name) != path or b <= a:
++                        raise AnalysisError(f'{rel}: cannot locate do-while condition')
++                    edits.extend([(a, '!!('), (b, ')')])
++            for offset, text in sorted(edits, reverse=True):
++                data = prepared.encode('utf-8')
++                prepared = (data[:offset] + text.encode('utf-8') + data[offset:]).decode('utf-8')
++            if edits:
++                tu = self.parse(path, prepared)
++            for node in tu.cursor.walk_preorder():
++                if not node.location.file or Path(node.location.file.name) != path:
++                    continue
++                if node.kind == self.c.CursorKind.DO_STMT:
++                    if prepared.encode('utf-8')[node.extent.start.offset:node.extent.start.offset + 2] != b'do':
++                        continue
++                    expr = list(node.get_children())[-1]
++                    if self.constant_false(expr):
++                        results.add(('do-while-zero', expr.location.line))
++                elif node.kind == self.c.CursorKind.VAR_DECL:
++                    # Parameters, file-scope objects, fields, and extern
++                    # references are not local objects. Arrays inherit their
++                    # element's qualification; pointer pointees do not.
++                    parent = node.semantic_parent
++                    if parent.kind not in (self.c.CursorKind.FUNCTION_DECL, self.c.CursorKind.CXX_METHOD,
++                                           self.c.CursorKind.LAMBDA_EXPR):
++                        continue
++                    if node.storage_class == self.c.StorageClass.EXTERN:
++                        continue
++                    type_ = node.type.get_canonical()
++                    while type_.kind in (self.c.TypeKind.CONSTANTARRAY, self.c.TypeKind.INCOMPLETEARRAY,
++                                         self.c.TypeKind.VARIABLEARRAY):
++                        type_ = type_.element_type.get_canonical()
++                    if type_.is_volatile_qualified():
++                        results.add(('volatile-local', node.extent.start.line))
++        return sorted(results, key=lambda r: (r[1], r[0]))
