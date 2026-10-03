@@ -59,11 +59,15 @@ predates round C. One lead, not a finding: `is_infrastructure_failure()`
 matches toolchain names such as `mwccarm.exe` anywhere in the output of
 `ninja sha1`, which may appear whenever anything was recompiled.
 
-**Where to work.** On the owner's Windows 11 desktop, in
+**Where to work.** On the owner's Mac, in
 `.worktrees/worker-007` inside the primary checkout (`git worktree add`),
-baseroms hard-linked with `python tools/link_baseroms.py
+baseroms hard-linked with `python3.13 tools/link_baseroms.py
 .worktrees/worker-007` from the primary checkout. Use `python` for project
-scripts. Downloaded tools arrive on the first build.
+scripts on Windows and `python3.13` on macOS; the framework's `fw.py` may
+use `python3`. Downloaded tools arrive on the first build. The Verifier
+works in `.worktrees/verifier-007` with its own hard-linked baseroms.
+The owner moved this round's work to macOS; the final gate is required on
+macOS. Windows behaviour not exercised here must be reported as not verified.
 
 ## Scope and non-goals
 
@@ -103,13 +107,13 @@ framework files.
 3. A scratch change that alters ROM bytes ends the gate with `SHA1 FAIL`,
    `GATE FAIL` and `gate3: GATE EXIT 1`; a genuine toolchain failure still
    ends `GATE EXIT 2`.
-4. On the final commit the three-ROM gate passes on Windows with
+4. On the final commit the three-ROM gate passes on macOS with
    `gate3: GATE EXIT 0`, and `unittest`, `pytest`, `ruff check .`,
    `check_ci_contract.py` and `fw.py check` are clean.
 
 ## Required evidence
 
-1. The gate log check from `AGENTS.md` in its PowerShell form, verbatim, on
+1. The gate log check from `AGENTS.md` in its macOS shell form, verbatim, on
    the final commit, naming it.
 2. Item 1: the derived allowed set and protected set with how each was
    derived, the CI job and step, and the three local runs.
@@ -117,8 +121,8 @@ framework files.
    today's lint and the new lint's output.
 4. Item 3: the cause with the evidence that shows it, and the two gate runs'
    log lines.
-5. `python -m unittest discover -s tests`, `python -m pytest -q tests`,
-   `ruff check .`, `python tools/check_ci_contract.py`,
-   `python tools/fw.py check`, and the word count of `AGENTS.md`.
+5. `python3.13 -m unittest discover -s tests`, `python3.13 -m pytest -q tests`,
+   `ruff check .`, `python3.13 tools/check_ci_contract.py`,
+   `python3 tools/fw.py check`, and the word count of `AGENTS.md`.
 6. Every source file or symbol the checks flag on the final tree, listed,
    not fixed.
