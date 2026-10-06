@@ -2420,3 +2420,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02007104	main	160	legacy_sp3	strstr	parked	57.5	reg-alloc	PROVISIONAL:register-allocation	batch-08	130
 0x02007104	main	160	legacy	strstr	parked	38.1	reg-alloc	PROVISIONAL:register-allocation	batch-08	130
 0x020091f4	main	88	default	small-fn	shipped	100	n/a		batch-08	1
+0x02009758	main	76	default	small-fn	shipped	100	n/a		batch-08	1

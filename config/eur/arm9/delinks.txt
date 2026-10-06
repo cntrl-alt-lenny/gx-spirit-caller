@@ -1193,7 +1193,7 @@ src/main/func_0200974c.c:
 
 
 
-src/main/func_02009758.s:
+src/main/func_02009758.c:
     complete
     .text start:0x02009758 end:0x020097a4
 
