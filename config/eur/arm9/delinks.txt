@@ -14244,7 +14244,7 @@ src/main/func_0207e594.s:
 src/main/func_0207e638.legacy.c:
     complete
     .text start:0x0207e638 end:0x0207e664
-src/main/func_0207e664.s:
+src/main/func_0207e664.legacy_sp3.c:
     complete
     .text start:0x0207e664 end:0x0207e6ac
 
