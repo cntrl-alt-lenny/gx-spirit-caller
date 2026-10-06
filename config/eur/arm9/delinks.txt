@@ -2733,7 +2733,7 @@ src/main/func_02019160.c:
 
 
 
-src/main/func_02019184.s:
+src/main/func_02019184.c:
     complete
     .text start:0x02019184 end:0x020191cc
 
