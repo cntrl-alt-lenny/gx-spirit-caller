@@ -10622,7 +10622,7 @@ src/main/func_020602c4.s:
     complete
     .text start:0x020602c4 end:0x020603cc
 
-src/main/func_020603cc.s:
+src/main/func_020603cc.legacy_sp3.c:
     complete
     .text start:0x020603cc end:0x020604a4
 

@@ -2039,3 +2039,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206292c	main	140	default	send-cmd-e-tag	parked	60.0	load-scheduling-interleave	P-36	batch-03	2
 0x0206292c	main	140	legacy_sp3	send-cmd-e-tag	parked	60.0	load-scheduling-interleave	P-36	batch-03	2
 0x020628b0	main	76	legacy_sp3	send-hdr-h	parked	31.6	load-scheduling-interleave	P-36	batch-03	2
+0x020603cc	main	216	legacy_sp3	http-header-parse	shipped	100	n/a		batch-03	3
