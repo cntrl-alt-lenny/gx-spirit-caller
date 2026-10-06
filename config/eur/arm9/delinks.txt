@@ -11380,7 +11380,7 @@ src/main/func_02066010.s:
     complete
     .text start:0x02066010 end:0x02066224
 
-src/main/func_02066224.s:
+src/main/func_02066224.legacy_sp3.c:
     complete
     .text start:0x02066224 end:0x0206627c
 
