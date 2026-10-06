@@ -8228,7 +8228,7 @@ src/main/func_02042068.s:
     complete
     .text start:0x02042068 end:0x02042190
 
-src/main/func_02042190.s:
+src/main/func_02042190.legacy_sp3.c:
     complete
     .text start:0x02042190 end:0x020421d8
 
