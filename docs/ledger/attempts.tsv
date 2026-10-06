@@ -1886,3 +1886,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0221b3d8	ov002	280	default	per-player-row-lookup-switch	parked	17.14	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	3
 0x0222a3e0	ov002	312	default	per-player-row-lookup	parked	17.95	unknown	UNCLASSIFIED:unknown	cm-257-320-drain-5	2
 0x0203058c	main	76	default	switch-classify	shipped	100	n/a		batch-01	2
+0x020312a0	main	184	default	membership-switch	shipped	100	n/a		batch-01	1
