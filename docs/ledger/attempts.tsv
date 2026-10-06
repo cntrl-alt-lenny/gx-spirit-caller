@@ -2385,3 +2385,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02001bc8	main	208	default	rgb555-blend-table	shipped	100	n/a		batch-08	6
 0x02003a4c	main	116	default	dispatch-two-way	shipped	100	n/a		batch-08	1
 0x02003d98	main	256	default	switch-dispatch-call	shipped	100	n/a		batch-08	1
+0x02003e98	main	132	default	dispatch-two-way-8arg	shipped	100	n/a		batch-08	1
