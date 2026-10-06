@@ -11977,7 +11977,7 @@ src/main/func_02068d50.c:
     complete
     .text start:0x02068d50 end:0x02068d98
 
-src/main/func_02068d98.s:
+src/main/func_02068d98.legacy_sp3.c:
     complete
     .text start:0x02068d98 end:0x02068df0
 
