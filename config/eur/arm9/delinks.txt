@@ -1754,7 +1754,7 @@ src/main/func_0200f854.s:
     complete
     .text start:0x0200f854 end:0x0200fa90
 
-src/main/func_0200fa90.s:
+src/main/func_0200fa90.c:
     complete
     .text start:0x0200fa90 end:0x0200faf8
 
