@@ -7329,7 +7329,7 @@ src/main/func_020387c0.c:
     complete
     .text start:0x020387c0 end:0x02038810
 
-src/main/func_02038810.s:
+src/main/func_02038810.c:
     complete
     .text start:0x02038810 end:0x020388f0
 
