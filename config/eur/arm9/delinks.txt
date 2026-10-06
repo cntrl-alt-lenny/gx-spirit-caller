@@ -12816,7 +12816,7 @@ src/main/func_02070980.legacy.c:
     complete
     .text start:0x02070980 end:0x02070a38
 
-src/main/func_02070a38.s:
+src/main/func_02070a38.legacy.c:
     complete
     .text start:0x02070a38 end:0x02070ac0
 

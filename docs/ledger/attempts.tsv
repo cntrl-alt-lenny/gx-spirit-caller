@@ -1990,3 +1990,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207084c	main	224	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	1
 0x0207084c	main	224	legacy	unknown	parked	66.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	2
 0x02070a38	main	136	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02070a38	main	136	legacy	unknown	shipped	100	n/a		batch-06	
