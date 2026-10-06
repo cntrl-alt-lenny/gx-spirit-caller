@@ -2431,3 +2431,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200a3b8	main	84	default	flag-sweep	shipped	100	n/a		batch-08	6
 0x0200a40c	main	72	default	flag-scan	shipped	100	n/a		batch-08	10
 0x0200a928	main	108	default	snapshot-compare-copy	shipped	100	n/a		batch-08	5
+0x0200c23c	main	72	default	small-fn	shipped	100	n/a		batch-08	1
