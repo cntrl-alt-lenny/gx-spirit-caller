@@ -9483,7 +9483,7 @@ src/main/func_02052818.legacy_sp3.c:
     complete
     .text start:0x02052818 end:0x02052870
 
-src/main/func_02052870.s:
+src/main/func_02052870.legacy_sp3.c:
     complete
     .text start:0x02052870 end:0x020528e4
 

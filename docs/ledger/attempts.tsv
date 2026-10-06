@@ -1994,3 +1994,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02052098	main	200	legacy_sp3	session-message-dispatch	shipped	100	n/a		batch-05	1
 0x02052398	main	140	default	session-slot-reset	parked	65.7	address-fold	PROVISIONAL:address-fold	batch-05	1
 0x02052398	main	140	legacy_sp3	session-slot-reset	shipped	100	n/a		batch-05	1
+0x02052870	main	116	default	peer-mask-filter-loop	parked	44.8	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02052870	main	116	legacy	peer-mask-filter-loop	parked	93.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02052870	main	116	legacy_sp3	peer-mask-filter-loop	shipped	100	n/a		batch-05	1
