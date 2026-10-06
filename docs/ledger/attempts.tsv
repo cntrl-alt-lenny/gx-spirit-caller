@@ -2069,3 +2069,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207d3ac	main	132	legacy_sp3	unknown	parked	33.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
 0x0207d458	main	60	default	unknown	parked	53.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
 0x0207d458	main	60	legacy_sp3	unknown	parked	60.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x0207dc5c	main	76	default	unknown	parked	5.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
