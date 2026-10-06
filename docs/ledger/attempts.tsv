@@ -1987,3 +1987,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203aae8	main	176	legacy_sp3	refcount-release-loop	parked	14.6	unknown	UNCLASSIFIED:unknown	batch-02	1
 0x0203b6b4	main	192	legacy_sp3	block-commit-copy	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-02	1
 0x0207084c	main	224	default	unknown	parked	0	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-06	
+0x0207084c	main	224	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	1
+0x0207084c	main	224	legacy	unknown	parked	66.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	2
