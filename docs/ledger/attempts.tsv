@@ -1940,3 +1940,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020387c0	main	80	default	group-reset-loop	shipped	100	n/a		batch-02	3
 0x02038810	main	224	default	group-anim-mask	shipped	100	n/a		batch-02	4
 0x02038908	main	80	default	rng-step-volatile	shipped	100	n/a		batch-02	3
+0x02038d70	main	60	default	slot-scan-next	shipped	100	n/a		batch-02	3
