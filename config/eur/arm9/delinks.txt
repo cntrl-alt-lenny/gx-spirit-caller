@@ -9491,7 +9491,7 @@ src/main/func_020528e4.c:
     complete
     .text start:0x020528e4 end:0x02052974
 
-src/main/func_02052974.s:
+src/main/func_02052974.legacy_sp3.c:
     complete
     .text start:0x02052974 end:0x020529e8
 
