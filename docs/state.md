@@ -26,6 +26,23 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
 - **E** The factory: an unattended `cmatch_loop.py` runner and a one-week pilot,
   measured against the baseline under Historical anchors.
 
+## Light-workflow trial (owner decision, 2026-10-06)
+
+From 2026-10-06 to 2026-10-20, matching runs as batches (one Worker, a
+Verifier at the batch boundary, one approval per batch) under the override in
+`AGENTS.md`, aiming at verified progress with less owner coordination. The
+factory rounds wait meanwhile. Evaluated at the end on:
+
+1. **Verified progress:** newly matched EUR functions and natural-C bytes, by
+   `python tools/progress.py --version eur` at the trial-start anchor and at
+   the end. It counts `.text` from `delinks.txt` (not objdiff-verified), so
+   each batch also lists its functions; only merged, gate-passed work counts.
+2. **Owner burden:** prompts the owner relayed, per batch and per matched
+   function, counted by Brain.
+3. **Safety:** no merged batch without a passing three-region gate and
+   review; no lost match, symbol or baseline entry.
+4. **Failures kept:** every attempted but unshipped function has a ledger row.
+
 ## Owner decisions (2026-09-23)
 
 1. **A script drives the matching; the ROM rebuild is the reviewer.** A
@@ -71,6 +88,10 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
   `.githooks/pre-push` as a seed and `"hooks": true` (framework issue 25), but
   the 3.1.0 adopter reports the file `gone` and does not re-create it. The stale
   manifest entry is framework feedback, not ours to edit.
+- **Checker rounds 007 and 008 paused for the trial:** both stopped
+  without a production change; Brain's review and a draft round 009 are on the
+  round 008 branches, kept on GitHub. Resume after the trial if the owner
+  chooses.
 - **Tool defect reported 2026-09-08, not re-checked:** `m2ctx.py` needing a
   `gcc` the Windows PC lacks. Re-verify in rounds C and E.
 
@@ -94,3 +115,6 @@ The redesign is five reviewed rounds, each guarded by the three-ROM check:
   16.79% (400,530 B) at `555c2aeac`, the last `main` commit of 19 August, to
   17.38% (414,738 B) at `722d7b385`, the last of 1 September, which is 0.59
   points (14,208 B) in 13 days.
+- 2026-10-06, trial start: EUR natural-C is 17.38% (414,738 B) at
+  `5a660035d` by `python tools/progress.py --version eur`, unchanged since
+  1 September.

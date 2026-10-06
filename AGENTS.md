@@ -13,6 +13,27 @@ Merge rule: owner-approves
 Brain shows the owner the merge card for a reviewed round and merges only after
 the owner says yes to that merge. A passing gate is necessary, not sufficient. Only the owner changes this rule.
 
+## Temporary override: light-workflow trial, 2026-10-06 to 2026-10-20
+
+The owner's instruction, for matching work in this project only; it lapses at
+the end date unless the owner extends it. Criteria are in
+[`docs/state.md`](docs/state.md). For a matching batch:
+
+- Brain gives one Worker a short prompt: objective, boundaries, acceptance
+  checks. No round folder, brief or `fw.py start`/`report` is required. The
+  Worker uses `.worktrees/worker-<batch>` on branch `worker/<batch>`, attempts
+  several functions, commits small, runs the checks, repairs failures, and
+  ends each session with a summary in `docs/batches/<batch>.md` and its reply:
+  functions matched, checks run with results, limitations, blockers.
+- At the batch boundary a Verifier reviews the delivered commit, the real diff
+  and the evidence, writing `docs/batches/<batch>-review.md`. The Worker fixes
+  findings in the same batch; review applies to the resulting commit. A new
+  brief is needed only if the objective or assumptions change materially.
+- Unchanged: the merge rule (one approval request per reviewed batch), seats
+  never merge, the Invariants, the Evidence table (the three-region gate for
+  any build-path change; tests never prove the ROM), protected paths,
+  baselines that only shrink, and every failed attempt recorded in the ledger.
+
 ## What this project is
 
 A matching decompilation of *Yu-Gi-Oh! GX Spirit Caller* for the Nintendo DS:
