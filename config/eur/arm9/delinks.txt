@@ -16400,7 +16400,7 @@ src/main/func_020901cc.s:
     complete
     .text start:0x020901cc end:0x02090330
 
-src/main/func_02090330.legacy.c:
+src/main/func_02090330.s:
     complete
     .text start:0x02090330 end:0x020903b0
 

@@ -2096,3 +2096,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209423c	main	116	legacy_sp3	unknown	parked	41.38	structural	PROVISIONAL:structural	batch-07	
 0x020945f4	main	148	legacy_sp3	unknown	parked	15.79	structural	PROVISIONAL:structural	batch-07	
 0x02093014	main	112	legacy_sp3	unknown	parked	92.86	address-fold	PROVISIONAL:address-fold	batch-07	
+0x02090330	main	128	legacy	resolved-object-100-link-undefined-field-symbols	parked	unknown	structural	PROVISIONAL:structural	batch-07	
