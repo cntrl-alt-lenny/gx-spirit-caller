@@ -16610,7 +16610,7 @@ src/main/func_02090af0.c:
     .text start:0x02090af0 end:0x02090b00
 
 
-src/main/func_02090b00.s:
+src/main/func_02090b00.legacy.c:
     complete
     .text start:0x02090b00 end:0x02090b54
 
