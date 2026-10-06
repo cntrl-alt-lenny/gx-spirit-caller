@@ -2008,3 +2008,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206133c	main	156	default	buf-erase-range	shipped	100	n/a		batch-03	1
 0x02061e88	main	152	default	refcount-callback-0arg	shipped	100	n/a		batch-03	1
 0x020621dc	main	164	default	timeout-check	shipped	100	n/a		batch-03	1
+0x020601d0	main	244	legacy_sp3	http-status-check	shipped	100	n/a		batch-03	2
