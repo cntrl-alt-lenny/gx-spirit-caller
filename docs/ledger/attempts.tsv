@@ -2393,3 +2393,13 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02005240	main	88	default	bitfield-flag-call	shipped	100	n/a		batch-08	1
 0x020054f0	main	100	default	stack-buf-call-return	shipped	100	n/a		batch-08	1
 0x02005554	main	96	default	stack-buf-call-return	shipped	100	n/a		batch-08	1
+0x020054a4	main	76	default	stack-buf-call-return	parked	55.0	store-coalescing	PROVISIONAL:memory-order/fusion	batch-08	6
+0x020054a4	main	76	legacy_sp3	stack-buf-call-return	parked	33.3	store-coalescing	PROVISIONAL:memory-order/fusion	batch-08	6
+0x020054a4	main	76	legacy	stack-buf-call-return	parked	31.8	store-coalescing	PROVISIONAL:memory-order/fusion	batch-08	6
+0x020055b4	main	240	default	bitfield-counter-callback	parked	1.7	constant-materialization	PROVISIONAL:constant-materialization	batch-08	5
+0x020055b4	main	240	legacy_sp3	bitfield-counter-callback	parked	1.7	constant-materialization	PROVISIONAL:constant-materialization	batch-08	5
+0x020055b4	main	240	legacy	bitfield-counter-callback	parked	1.7	constant-materialization	PROVISIONAL:constant-materialization	batch-08	5
+0x020059b0	main	176	default	binary-search-callback	parked	50.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	30
+0x020059b0	main	176	legacy_sp3	binary-search-callback	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	batch-08	30
+0x020059b0	main	176	legacy	binary-search-callback	parked	2.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	30
+0x02005ca0	main	108	default	switch-pool-init	shipped	100	n/a		batch-08	1
