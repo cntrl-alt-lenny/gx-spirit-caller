@@ -6447,7 +6447,7 @@ src/main/func_0203320c.c:
 src/main/func_02033278.c:
     complete
     .text start:0x02033278 end:0x020332a4
-src/main/func_020332a4.s:
+src/main/func_020332a4.c:
     complete
     .text start:0x020332a4 end:0x02033308
 
