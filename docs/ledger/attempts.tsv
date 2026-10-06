@@ -2449,3 +2449,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201f874	main	224	legacy_sp3	mask-pick-and-register	parked	0.0	control-flow-structural-mismatch	PROVISIONAL:control-flow-structural-mismatch	batch-09	1
 0x0201f874	main	224	legacy	mask-pick-and-register	parked	0.0	control-flow-structural-mismatch	PROVISIONAL:control-flow-structural-mismatch	batch-09	1
 0x02018be8	main	244	default	system-init-bitfields	shipped	100	n/a		batch-09	4
+0x0201a84c	main	212	default	mode-flag-collector	shipped	100	n/a		batch-09	2
