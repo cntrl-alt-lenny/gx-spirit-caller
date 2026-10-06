@@ -2010,3 +2010,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02041ea0	main	100	legacy_sp3	locked-flag-signal	shipped	100	n/a		batch-04	1
 0x02042190	main	72	default	locked-field-write	parked	27.8	address-fold	PROVISIONAL:address-fold	batch-04	1
 0x02042190	main	72	legacy_sp3	locked-field-write	shipped	100	n/a		batch-04	1
+0x0204152c	main	156	default	buffer-append-format	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
+0x0204152c	main	156	legacy_sp3	buffer-append-format	shipped	100	n/a		batch-04	2
