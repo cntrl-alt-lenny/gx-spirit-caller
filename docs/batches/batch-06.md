@@ -177,3 +177,40 @@ the pre-batch ledger prefix is byte-identical. No baseline lines were pruned.
 - Byte-identical builds and static checks are the delivered evidence. No
   gameplay test, USA/JPN port, rename or owner acceptance is claimed. Review
   and the owner-approved merge remain separate steps.
+
+## Fixes after review
+
+Merged `origin/main` first (no conflicts). Checks ran on the commit before
+this report; this report commit changes only this file.
+
+1. `func_02078d88`: appended a final `legacy shipped 100` row with
+   `record_shipped.py`; the file stays `func_02078d88.legacy.c`.
+2. `func_02072444`: `git mv` of `.legacy.c` to `.c`, changed only its path line
+   in `config/eur/arm9/delinks.txt`. Default tier:
+   `[eur] func_02072444 (func_02072444.c, cc=2.0): 100.0%  OK`. Shipped row
+   appended (tier default).
+3. `func_0207e664.legacy_sp3.c`: `Bank.names` and `Bank.extra` are now plain
+   `int`. `100.0%  OK` at sp3.
+4. `func_0207fd60` (68 B): per-file declaration
+   `int func_0207fd48(int *a, void *b)`. Default tier 0.0% (no padding slot),
+   `.legacy.c` 88.9% (18 words against 17), `.legacy_sp3.c` 100.0% OK. Both
+   failed tiers parked with `park_one.py` (park class `frame-shape`, already
+   in the map) and the `.s` restored; then shipped at `legacy_sp3` (`.s`
+   removed, delinks path line set to `.legacy_sp3.c`).
+
+Checks (exit codes, real output):
+
+- `fastmatch.py eur` on the four changed C files: exit 0, each `100.0%  OK`.
+- `check_delink_dupes.py`: exit 0, `OK (81 delinks.txt, no duplicate .text addresses)`.
+- `validate_attempts.py`: exit 0, `"errors": 0`.
+- `check_fake_matches.py`: exit 0, `OK`.
+- `python -m pytest -q tests`: `1329 passed, 16 skipped, 132 subtests passed`.
+- `gate3.py --scope all --log .../gate-batch-06-fix.log`: exit 0; log lines
+  `[eur] SHA1 PASS`, `[usa] SHA1 PASS`, `[jpn] SHA1 PASS`,
+  `1330 passed, 15 skipped, 132 subtests passed`, `GATE PASS`,
+  `gate3: GATE EXIT 0`.
+- `progress.py --version eur`: `Natural-C: 452786 / 2385948 bytes (18.98%)`.
+  452,786 - 448,234 = 4,552 B = 4,484 B + 68 B (`func_0207fd60`), so the gain
+  equals the batch's shipped sizes.
+
+Not done: `func_02074e4c` and `func_0207708c` left alone as instructed.
