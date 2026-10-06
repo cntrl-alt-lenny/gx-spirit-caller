@@ -2056,3 +2056,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02049038	main	164	legacy_sp3	default-arg-forward	shipped	100	n/a		batch-04	1
 0x02049120	main	108	default	key-index-search	parked	14.8	P-31-if-conversion	P-31	batch-04	1
 0x02049120	main	108	legacy_sp3	key-index-search	shipped	100	n/a		batch-04	1
+0x02048fac	main	140	default	select-info-callbacks	parked	17.1	P-31-if-conversion	P-31	batch-04	2
+0x02048fac	main	140	legacy_sp3	select-info-callbacks	shipped	100	n/a		batch-04	2

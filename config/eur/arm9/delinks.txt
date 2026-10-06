@@ -8845,7 +8845,7 @@ src/main/func_02048f98.c:
     complete
     .text start:0x02048f98 end:0x02048fac
 
-src/main/func_02048fac.s:
+src/main/func_02048fac.legacy_sp3.c:
     complete
     .text start:0x02048fac end:0x02049038
 
