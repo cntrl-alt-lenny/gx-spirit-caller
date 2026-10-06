@@ -2557,7 +2557,7 @@ src/main/func_02018e88.c:
     complete
     .text start:0x02018e88 end:0x02018ecc
 
-src/main/func_02018ecc.s:
+src/main/func_02018ecc.c:
     complete
     .text start:0x02018ecc end:0x02018f2c
 
