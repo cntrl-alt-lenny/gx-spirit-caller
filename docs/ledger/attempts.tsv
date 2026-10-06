@@ -2416,3 +2416,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201aabc	main	56	default	bitfield-set-bit	shipped	100	n/a		batch-09	1
 0x0201af80	main	92	default	table-entry-search	shipped	100	n/a		batch-09	5
 0x0201b648	main	72	default	bitfield-clear-loop	shipped	100	n/a		batch-09	3
+0x0201bf80	main	52	default	cross-overlay-call-wrapper	parked	92.3	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201bf80	main	52	legacy_sp3	cross-overlay-call-wrapper	parked	92.3	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201bf80	main	52	legacy	cross-overlay-call-wrapper	parked	78.6	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1bc	main	36	default	cross-overlay-call-wrapper	parked	88.9	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1bc	main	36	legacy_sp3	cross-overlay-call-wrapper	parked	88.9	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1bc	main	36	legacy	cross-overlay-call-wrapper	parked	70.0	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1e0	main	68	default	cross-overlay-call-wrapper	parked	94.1	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1e0	main	68	legacy_sp3	cross-overlay-call-wrapper	parked	0.0	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1e0	main	68	legacy	cross-overlay-call-wrapper	parked	0.0	C-32-cross-overlay-bl	C-32	batch-09	1
