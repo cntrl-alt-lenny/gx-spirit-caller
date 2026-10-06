@@ -1979,3 +1979,10 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203f6cc	main	76	legacy_sp3	decode-verify-copy	shipped	100	n/a		batch-02	1
 0x0203f30c	main	112	legacy	base64-char-decode-sub-add-immediate-fold	parked	25.0	unknown	UNCLASSIFIED:unknown	batch-02	3
 0x0203c89c	main	100	legacy_sp3	level-update-max	shipped	100	n/a		batch-02	2
+0x0203244c	main	116	legacy_sp3	ring-buffer-pop	parked	62.1	address-fold	PROVISIONAL:address-fold	batch-02	1
+0x0203671c	main	192	legacy_sp3	entry-reset-init	parked	72.9	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-02	1
+0x0203724c	main	220	legacy_sp3	select-active-entry	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-02	1
+0x020384e8	main	172	legacy_sp3	offset-table-sum	parked	41.9	P-20-family	P-20	batch-02	1
+0x02038e58	main	228	legacy_sp3	archive-read-clamp	parked	56.1	P-31-if-conversion	P-31	batch-02	2
+0x0203aae8	main	176	legacy_sp3	refcount-release-loop	parked	14.6	unknown	UNCLASSIFIED:unknown	batch-02	1
+0x0203b6b4	main	192	legacy_sp3	block-commit-copy	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-02	1
