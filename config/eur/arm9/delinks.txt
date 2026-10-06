@@ -6054,7 +6054,7 @@ src/main/func_020320c8.c:
     complete
     .text start:0x020320c8 end:0x020320f8
 
-src/main/func_020320f8.s:
+src/main/func_020320f8.c:
     complete
     .text start:0x020320f8 end:0x020321b0
 
