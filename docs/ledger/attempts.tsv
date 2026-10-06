@@ -2428,3 +2428,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201b504	main	204	default	list-apply-bitfields	parked	68.6	P-30-whole-function-register-rotation	P-30	batch-09	8
 0x0201b504	main	204	legacy_sp3	list-apply-bitfields	parked	29.4	P-30-whole-function-register-rotation	P-30	batch-09	2
 0x0201b504	main	204	legacy	list-apply-bitfields	parked	29.4	P-30-whole-function-register-rotation	P-30	batch-09	2
+0x0201ddac	main	136	default	size-class-flags	shipped	100	n/a		batch-09	1

@@ -3805,7 +3805,7 @@ src/main/func_0201da1c.s:
     complete
     .text start:0x0201da1c end:0x0201ddac
 
-src/main/func_0201ddac.s:
+src/main/func_0201ddac.c:
     complete
     .text start:0x0201ddac end:0x0201de34
 
