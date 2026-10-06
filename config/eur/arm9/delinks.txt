@@ -12759,7 +12759,7 @@ src/main/func_0206fa48.s:
     complete
     .text start:0x0206fa48 end:0x0206fb64
 
-src/main/func_0206fb64.s:
+src/main/func_0206fb64.legacy.c:
     complete
     .text start:0x0206fb64 end:0x0206fc2c
 
