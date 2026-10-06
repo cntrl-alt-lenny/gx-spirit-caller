@@ -2044,3 +2044,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02045678	main	204	default	state-poll-result	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
 0x02045678	main	204	legacy_sp3	state-poll-result	shipped	100	n/a		batch-04	2
 0x02046fc4	main	168	default	session-start	shipped	100	n/a		batch-04	1
+0x02046770	main	116	default	slot-lookup-activate	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
+0x02046770	main	116	legacy_sp3	slot-lookup-activate	shipped	100	n/a		batch-04	1
