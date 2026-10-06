@@ -737,7 +737,7 @@ src/main/func_020054f0.c:
     complete
     .text start:0x020054f0 end:0x02005554
 
-src/main/func_02005554.s:
+src/main/func_02005554.c:
     complete
     .text start:0x02005554 end:0x020055b4
 
