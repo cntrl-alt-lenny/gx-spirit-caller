@@ -1996,3 +1996,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020903d4	main	128	legacy	unknown	parked	15.6	address-fold	PROVISIONAL:address-fold	batch-07	
 0x02090690	main	76	default	unknown	parked	31.6	frame-epilogue	PROVISIONAL:unmapped	batch-07	
 0x02090690	main	76	legacy	unknown	parked	63.2	structural	PROVISIONAL:structural	batch-07	
+0x020906dc	main	76	default	unknown	parked	42.1	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020906dc	main	76	legacy	unknown	parked	79.0	structural	PROVISIONAL:structural	batch-07	
