@@ -9828,7 +9828,7 @@ src/main/func_02053b38.legacy_sp3.c:
     complete
     .text start:0x02053b38 end:0x02053ba4
 
-src/main/func_02053ba4.s:
+src/main/func_02053ba4.legacy_sp3.c:
     complete
     .text start:0x02053ba4 end:0x02053bfc
 
