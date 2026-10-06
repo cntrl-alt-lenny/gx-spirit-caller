@@ -2427,3 +2427,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02009f50	main	196	default	slot-decay-random	shipped	100	n/a		batch-08	4
 0x0200a204	main	104	default	small-fn	shipped	100	n/a		batch-08	1
 0x0200a26c	main	136	default	small-fn	shipped	100	n/a		batch-08	1
+0x0200a2f4	main	140	default	ring-lookup	shipped	100	n/a		batch-08	4

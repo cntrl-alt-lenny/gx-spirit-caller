@@ -1246,7 +1246,7 @@ src/main/func_0200a204.c:
 src/main/func_0200a26c.c:
     complete
     .text start:0x0200a26c end:0x0200a2f4
-src/main/func_0200a2f4.s:
+src/main/func_0200a2f4.c:
     complete
     .text start:0x0200a2f4 end:0x0200a380
 
