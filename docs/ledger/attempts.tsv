@@ -1935,3 +1935,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020380dc	main	140	default	entry-set-pan	shipped	100	n/a		batch-02	1
 0x020381bc	main	144	default	entry-set-params	shipped	100	n/a		batch-02	1
 0x020385f8	main	124	default	anim-step	shipped	100	n/a		batch-02	2
+0x020384e8	main	172	default	offset-table-sum	parked	53.5	P-20-family	P-20	batch-02	5
