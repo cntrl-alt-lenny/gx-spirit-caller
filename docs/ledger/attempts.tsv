@@ -2099,3 +2099,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206803c	main	144	legacy_sp3	queue-record	shipped	100	n/a		batch-03	2
 0x020684c8	main	176	legacy_sp3	record-new	shipped	100	n/a		batch-03	2
 0x02068b54	main	64	legacy_sp3	record-add-pair	shipped	100	n/a		batch-03	2
+0x02068890	main	108	default	strtok	parked	11.1	load-scheduling-residual	PROVISIONAL:load-scheduling-residual	batch-03	2
