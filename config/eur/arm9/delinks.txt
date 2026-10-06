@@ -9027,7 +9027,7 @@ src/main/func_0204a4f0.s:
     complete
     .text start:0x0204a4f0 end:0x0204a8bc
 
-src/main/func_0204a8bc.s:
+src/main/func_0204a8bc.legacy_sp3.c:
     complete
     .text start:0x0204a8bc end:0x0204a960
 
