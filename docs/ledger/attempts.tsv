@@ -2009,3 +2009,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02053114	main	68	legacy	crc32-verify-block	parked	72.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
 0x02053114	main	68	legacy_sp3	crc32-verify-block	parked	94.1	P-20-cmp-operand-r0-r1-swap	P-20	batch-05	2
 0x02053114	main	68	default	crc32-verify-block	shipped	100	n/a		batch-05	6
+0x020534d4	main	112	default	id-checksum-verify	parked	60.7	constant-zero-register-materialization-not-reproduced	PROVISIONAL:constant-materialization	batch-05	1
+0x020534d4	main	112	legacy	id-checksum-verify	parked	33.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x020534d4	main	112	legacy_sp3	id-checksum-verify	shipped	100	n/a		batch-05	5

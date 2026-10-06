@@ -9659,7 +9659,7 @@ src/main/func_020534b4.c:
     complete
     .text start:0x020534b4 end:0x020534d4
 
-src/main/func_020534d4.s:
+src/main/func_020534d4.legacy_sp3.c:
     complete
     .text start:0x020534d4 end:0x02053544
 
