@@ -717,7 +717,7 @@ src/main/func_02005210.legacy_sp3.c:
     complete
     .text start:0x02005210 end:0x02005240
 
-src/main/func_02005240.s:
+src/main/func_02005240.c:
     complete
     .text start:0x02005240 end:0x02005298
 

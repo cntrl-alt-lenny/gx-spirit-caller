@@ -2390,3 +2390,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02005188	main	68	default	bitfield-field-call	shipped	100	n/a		batch-08	1
 0x020051cc	main	68	default	bitfield-field-call	shipped	100	n/a		batch-08	1
 0x02005088	main	256	default	flag-sweep-calls	shipped	100	n/a		batch-08	1
+0x02005240	main	88	default	bitfield-flag-call	shipped	100	n/a		batch-08	1
