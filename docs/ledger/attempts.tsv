@@ -1919,3 +1919,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02033ac0	main	160	default	outparam-lookup-mask	parked	15.0	fold-predication-alloc	PROVISIONAL:predication/branch	batch-01	5
 0x020341b0	main	136	default	chunk-walk-dispatch	shipped	100	n/a		batch-01	1
 0x02034270	main	128	default	bitset-set-clear	shipped	100	n/a		batch-01	1
+0x02034a84	main	168	default	handle-encode	shipped	100	n/a		batch-01	1
