@@ -11892,7 +11892,7 @@ src/main/func_02068b94.c:
     complete
     .text start:0x02068b94 end:0x02068bb8
 
-src/main/func_02068bb8.s:
+src/main/func_02068bb8.legacy_sp3.c:
     complete
     .text start:0x02068bb8 end:0x02068c08
 
