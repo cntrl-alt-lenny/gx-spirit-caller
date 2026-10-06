@@ -2031,3 +2031,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02077b98	main	112	legacy	unknown	shipped	100	n/a		batch-06	
 0x0207845c	main	60	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
 0x0207845c	main	60	legacy	unknown	shipped	100	n/a		batch-06	
+0x02078ccc	main	100	default	unknown	parked	4.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
