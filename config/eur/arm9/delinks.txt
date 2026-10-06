@@ -885,7 +885,7 @@ src/main/func_02006228.c:
     complete
     .text start:0x02006228 end:0x02006264
 
-src/main/func_02006264.s:
+src/main/func_02006264.c:
     complete
     .text start:0x02006264 end:0x020062cc
 

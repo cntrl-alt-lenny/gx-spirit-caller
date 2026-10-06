@@ -2408,3 +2408,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02005a60	main	216	legacy_sp3	sorted-array-dedupe	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	3
 0x02005a60	main	216	legacy	sorted-array-dedupe	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	3
 0x02005e20	main	192	default	pool-free-list	shipped	100	n/a		batch-08	2
+0x02005dac	main	116	default	pool-alloc	parked	3.5	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x02005dac	main	116	legacy_sp3	pool-alloc	parked	3.5	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x02005dac	main	116	legacy	pool-alloc	parked	16.7	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x02006264	main	104	default	distance-check	shipped	100	n/a		batch-08	3
