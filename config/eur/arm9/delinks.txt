@@ -6624,7 +6624,7 @@ src/main/func_02033770.c:
     complete
     .text start:0x02033770 end:0x020337b8
 
-src/main/func_020337b8.s:
+src/main/func_020337b8.c:
     complete
     .text start:0x020337b8 end:0x020337fc
 
