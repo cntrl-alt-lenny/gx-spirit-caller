@@ -1977,3 +1977,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203ed80	main	84	legacy_sp3	be32-byteswap	shipped	100	n/a		batch-02	1
 0x0203f590	main	256	legacy_sp3	xor-permute-decode	shipped	100	n/a		batch-02	3
 0x0203f6cc	main	76	legacy_sp3	decode-verify-copy	shipped	100	n/a		batch-02	1
+0x0203f30c	main	112	legacy	base64-char-decode-sub-add-immediate-fold	parked	25.0	unknown	UNCLASSIFIED:unknown	batch-02	3
