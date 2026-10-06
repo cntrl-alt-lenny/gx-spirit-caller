@@ -2118,3 +2118,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206afec	main	92	default	put-word-advance	parked	8.7	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x0206b1f8	main	96	default	string-hash-mod	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x0206b5e8	main	92	default	free-list	parked	4.3	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x0206b1f8	main	96	legacy_sp3	string-hash-mod	parked	29.2	P-31-if-conversion	P-31	batch-03	6
+0x0206afec	main	92	legacy_sp3	put-word-advance	parked	8.7	load-scheduling-interleave	P-36	batch-03	2
