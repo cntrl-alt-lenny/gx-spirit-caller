@@ -2260,3 +2260,109 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204fc38	main	100	legacy_sp3	id-search-select	parked	0.0	structural	PROVISIONAL:structural	batch-04	1
 0x0204fc38	main	100	default	id-search-select	shipped	100	n/a		batch-04	2
 0x02049270	main	96	legacy_sp3	name-match-subscribe	parked	n/a	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-04	1
+0x02050140	main	140	default	parse-int-list	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02050140	main	140	legacy	parse-int-list	parked	94.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02050140	main	140	legacy_sp3	parse-int-list	shipped	100	n/a		batch-05	1
+0x02052098	main	200	default	session-message-dispatch	parked	60.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02052098	main	200	legacy	session-message-dispatch	parked	32.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02052098	main	200	legacy_sp3	session-message-dispatch	shipped	100	n/a		batch-05	1
+0x02052398	main	140	default	session-slot-reset	parked	65.7	address-fold	PROVISIONAL:address-fold	batch-05	1
+0x02052398	main	140	legacy_sp3	session-slot-reset	shipped	100	n/a		batch-05	1
+0x02052870	main	116	default	peer-mask-filter-loop	parked	44.8	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02052870	main	116	legacy	peer-mask-filter-loop	parked	93.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02052870	main	116	legacy_sp3	peer-mask-filter-loop	shipped	100	n/a		batch-05	1
+0x02052974	main	116	default	peer-mask-filter-loop	parked	44.8	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02052974	main	116	legacy	peer-mask-filter-loop	parked	93.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02052974	main	116	legacy_sp3	peer-mask-filter-loop	shipped	100	n/a		batch-05	1
+0x02053a64	main	80	default	net-open-call	parked	80.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02053a64	main	80	legacy	net-open-call	parked	57.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02053a64	main	80	legacy_sp3	net-open-call	shipped	100	n/a		batch-05	1
+0x0205340c	main	124	default	u64-base32-encode	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	5
+0x0205340c	main	124	legacy	u64-base32-encode	parked	81.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	5
+0x0205340c	main	124	legacy_sp3	u64-base32-encode	shipped	100	n/a		batch-05	10
+0x02053114	main	68	legacy	crc32-verify-block	parked	72.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02053114	main	68	legacy_sp3	crc32-verify-block	parked	94.1	P-20-cmp-operand-r0-r1-swap	P-20	batch-05	2
+0x02053114	main	68	default	crc32-verify-block	shipped	100	n/a		batch-05	6
+0x020534d4	main	112	default	id-checksum-verify	parked	60.7	constant-zero-register-materialization-not-reproduced	PROVISIONAL:constant-materialization	batch-05	1
+0x020534d4	main	112	legacy	id-checksum-verify	parked	33.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x020534d4	main	112	legacy_sp3	id-checksum-verify	shipped	100	n/a		batch-05	5
+0x020538b0	main	188	default	packet-header-parse	parked	61.7	instr-selection	PROVISIONAL:instruction-selection	batch-05	2
+0x020538b0	main	188	legacy	packet-header-parse	parked	11.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	2
+0x020538b0	main	188	legacy_sp3	packet-header-parse	shipped	100	n/a		batch-05	6
+0x02053ab4	main	132	default	sockaddr-resolve	parked	6.1	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	2
+0x02053ab4	main	132	legacy_sp3	sockaddr-resolve	shipped	100	n/a		batch-05	3
+0x02053b38	main	108	default	binary-search-callback	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02053b38	main	108	legacy_sp3	binary-search-callback	shipped	100	n/a		batch-05	1
+0x02053ba4	main	88	default	linear-search-callback	parked	68.2	P-20-family	P-20	batch-05	3
+0x02053ba4	main	88	legacy_sp3	linear-search-callback	shipped	100	n/a		batch-05	3
+0x02053c34	main	116	default	vector-find-last-callback	shipped	100	n/a		batch-05	1
+0x02053ca8	main	104	default	vector-foreach-reverse	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02053ca8	main	104	legacy_sp3	vector-foreach-reverse	shipped	100	n/a		batch-05	1
+0x020542b8	main	92	default	vector-grow	parked	21.7	load-fusion	PROVISIONAL:memory-order/fusion	batch-05	1
+0x020542b8	main	92	legacy_sp3	vector-grow	shipped	100	n/a		batch-05	1
+0x02054338	main	128	default	set-find-callback	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02054338	main	128	legacy_sp3	set-find-callback	shipped	100	n/a		batch-05	1
+0x020543b8	main	116	default	set-foreach-callback	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x020543b8	main	116	legacy_sp3	set-foreach-callback	shipped	100	n/a		batch-05	1
+0x02054dfc	main	88	default	sockaddr-copy-connect	parked	37.5	P-36-store-postindex-fusion	P-36	batch-05	1
+0x02054dfc	main	88	legacy_sp3	sockaddr-copy-connect	shipped	100	n/a		batch-05	1
+0x02054ec0	main	132	default	private-ipv4-check	parked	81.8	P-31-if-conversion	P-31	batch-05	2
+0x02054ec0	main	132	legacy_sp3	private-ipv4-check	shipped	100	n/a		batch-05	2
+0x02054f44	main	140	default	hostent-init-local	parked	45.7	reg-alloc	PROVISIONAL:register-allocation	batch-05	2
+0x02054f44	main	140	legacy_sp3	hostent-init-local	shipped	100	n/a		batch-05	2
+0x02055030	main	248	default	poll-select-flags	parked	95.2	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-05	2
+0x02055030	main	248	legacy_sp3	poll-select-flags	shipped	100	n/a		batch-05	2
+0x02055128	main	72	default	getsockopt-int-wrapper	parked	55.6	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	batch-05	1
+0x02055128	main	72	legacy_sp3	getsockopt-int-wrapper	shipped	100	n/a		batch-05	1
+0x02055170	main	72	default	getsockopt-int-wrapper	parked	77.8	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	batch-05	1
+0x02055170	main	72	legacy_sp3	getsockopt-int-wrapper	shipped	100	n/a		batch-05	1
+0x020551b8	main	76	default	setsockopt-int-wrapper	parked	5.3	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x020551b8	main	76	legacy_sp3	setsockopt-int-wrapper	shipped	100	n/a		batch-05	1
+0x02055204	main	76	default	setsockopt-int-wrapper	parked	5.3	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02055204	main	76	legacy_sp3	setsockopt-int-wrapper	shipped	100	n/a		batch-05	1
+0x0205538c	main	148	default	conn-state-guard-dispatch	parked	2.7	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x0205538c	main	148	legacy_sp3	conn-state-guard-dispatch	shipped	100	n/a		batch-05	1
+0x02055c70	main	232	default	conn-request-guard-cb	parked	5.2	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02055c70	main	232	legacy_sp3	conn-request-guard-cb	shipped	100	n/a		batch-05	1
+0x02055d58	main	208	default	conn-request-guard-cb	parked	1.9	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02055d58	main	208	legacy_sp3	conn-request-guard-cb	shipped	100	n/a		batch-05	1
+0x02056a58	main	224	default	entry-release-refcount	parked	1.8	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02056a58	main	224	legacy_sp3	entry-release-refcount	shipped	100	n/a		batch-05	1
+0x02056b38	main	252	default	node-lookup-or-create	parked	17.5	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02056b38	main	252	legacy_sp3	node-lookup-or-create	shipped	100	n/a		batch-05	1
+0x02056c34	main	232	default	session-append-fields	parked	70.7	frame-shape	PROVISIONAL:frame/epilogue	batch-05	2
+0x02056c34	main	232	legacy_sp3	session-append-fields	parked	22.4	new-repeated-addr-cse-vs-target-recompute	PROVISIONAL:pool/address-cse	batch-05	4
+0x02056c34	main	232	legacy	session-append-fields	parked	3.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02057f3c	main	252	default	socket-connect-status	parked	25.4	P-20-family	P-20	batch-05	1
+0x02057f3c	main	252	legacy_sp3	socket-connect-status	shipped	100	n/a		batch-05	2
+0x020581a8	main	156	default	strbuf-append-char	parked	20.5	ldm-fusion-residual	PROVISIONAL:ldm-fusion-residual	batch-05	1
+0x020581a8	main	156	legacy_sp3	strbuf-append-char	shipped	100	n/a		batch-05	1
+0x02058244	main	240	default	list-remove-matching	parked	8.3	P-20-family	P-20	batch-05	1
+0x02058244	main	240	legacy_sp3	list-remove-matching	shipped	100	n/a		batch-05	1
+0x02058528	main	172	default	list-append-node	parked	37.2	frame-shape	PROVISIONAL:frame/epilogue	batch-05	2
+0x02058528	main	172	legacy_sp3	list-append-node	shipped	100	n/a		batch-05	2
+0x0205888c	main	200	default	entry-free-buffers	parked	76.0	P-31-if-conversion	P-31	batch-05	1
+0x0205888c	main	200	legacy_sp3	entry-free-buffers	shipped	100	n/a		batch-05	1
+0x02059d1c	main	116	default	random-string-fill	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02059d1c	main	116	legacy_sp3	random-string-fill	shipped	100	n/a		batch-05	1
+0x0205aecc	main	196	default	session-flush-pending	shipped	100	n/a		batch-05	1
+0x0205bd58	main	96	default	list-unlink-item	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x0205bd58	main	96	legacy_sp3	list-unlink-item	shipped	100	n/a		batch-05	1
+0x0205c258	main	232	default	http-set-body	shipped	100	n/a		batch-05	1
+0x0205c6e4	main	100	default	conn-lookup-send	parked	59.3	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x0205c6e4	main	100	legacy_sp3	conn-lookup-send	shipped	100	n/a		batch-05	1
+0x0205ce40	main	208	default	queue-drain-send	parked	11.3	register-set-mismatch	PROVISIONAL:register-set-mismatch	batch-05	1
+0x0205ce40	main	208	legacy_sp3	queue-drain-send	shipped	100	n/a		batch-05	1
+0x0205d560	main	64	default	set-foreach-adapter	shipped	100	n/a		batch-05	2
+0x0205d5c8	main	76	default	set-lookup-pair	shipped	100	n/a		batch-05	2
+0x0205d6f8	main	236	default	pool-lookup-or-insert	parked	3.4	reg-alloc	PROVISIONAL:register-allocation	batch-05	2
+0x0205d6f8	main	236	legacy_sp3	pool-lookup-or-insert	shipped	100	n/a		batch-05	2
+0x0205d944	main	92	default	set-create-callbacks	parked	13.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x0205d944	main	92	legacy_sp3	set-create-callbacks	shipped	100	n/a		batch-05	1
+0x0205fa30	main	148	default	request-submit-chain	parked	16.2	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x0205fa30	main	148	legacy_sp3	request-submit-chain	shipped	100	n/a		batch-05	1
+0x0205fac4	main	196	default	stream-alloc-init	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x0205fac4	main	196	legacy_sp3	stream-alloc-init	shipped	100	n/a		batch-05	1
+0x0205fd94	main	132	default	version-string-parse	parked	57.6	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	3
+0x0205fd94	main	132	legacy_sp3	version-string-parse	shipped	100	n/a		batch-05	3
+0x0205c258	main	232	default	http-set-body	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-05	2
