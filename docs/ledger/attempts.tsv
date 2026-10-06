@@ -2014,3 +2014,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02061b60	main	252	legacy_sp3	refcount-callback-3arg	shipped	100	n/a		batch-03	2
 0x02061c5c	main	256	legacy_sp3	refcount-callback-3arg-store	shipped	100	n/a		batch-03	2
 0x02062280	main	72	legacy_sp3	send-packet	shipped	100	n/a		batch-03	2
+0x02062320	main	108	legacy_sp3	state-advance-copy	shipped	100	n/a		batch-03	2
