@@ -14272,7 +14272,7 @@ src/main/func_0207e738.c:
     complete
     .text start:0x0207e738 end:0x0207e748
 
-src/main/func_0207e748.s:
+src/main/func_0207e748.legacy_sp3.c:
     complete
     .text start:0x0207e748 end:0x0207e790
 
