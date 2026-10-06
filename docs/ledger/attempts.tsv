@@ -2381,3 +2381,15 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020116ec	main	96	legacy	rotation-matrix-z	parked	16.0	register-choice	PROVISIONAL:register-choice	batch-09	1
 0x02011a94	main	88	default	threshold-bracket-lookup	shipped	100	n/a		batch-09	1
 0x02011b9c	main	208	default	packed-list-unpack	shipped	100	n/a		batch-09	2
+0x02012454	main	80	default	table-record-copy-in	parked	50.0	P-20-r4r5-swap	P-20	batch-09	6
+0x02012454	main	80	legacy_sp3	table-record-copy-in	parked	0.0	P-20-r4r5-swap	P-20	batch-09	1
+0x02012454	main	80	legacy	table-record-copy-in	parked	0.0	P-20-r4r5-swap	P-20	batch-09	1
+0x020124a4	main	80	default	table-record-copy-out	parked	85.0	P-20-scratch-register	P-20	batch-09	5
+0x020124a4	main	80	legacy_sp3	table-record-copy-out	parked	0.0	P-20-scratch-register	P-20	batch-09	1
+0x020124a4	main	80	legacy	table-record-copy-out	parked	0.0	P-20-scratch-register	P-20	batch-09	1
+0x020124f4	main	108	default	sysinit-store-block	parked	77.8	P-30-parameter-register-rotation	P-30	batch-09	4
+0x020124f4	main	108	legacy_sp3	sysinit-store-block	parked	0.0	P-30-parameter-register-rotation	P-30	batch-09	1
+0x020124f4	main	108	legacy	sysinit-store-block	parked	0.0	P-30-parameter-register-rotation	P-30	batch-09	1
+0x020125ac	main	112	default	sysinit-store-block	parked	71.4	P-30-parameter-register-rotation	P-30	batch-09	4
+0x020125ac	main	112	legacy_sp3	sysinit-store-block	parked	3.3	P-30-parameter-register-rotation	P-30	batch-09	1
+0x020125ac	main	112	legacy	sysinit-store-block	parked	3.2	P-30-parameter-register-rotation	P-30	batch-09	1
