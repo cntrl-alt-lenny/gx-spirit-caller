@@ -2049,3 +2049,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206371c	main	236	default	ack-range-resend	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x02064208	main	148	default	send-or-queue	parked	8.1	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x02063188	main	256	legacy_sp3	conn-timeout-check	shipped	100	n/a		batch-03	2
+0x02063548	main	216	legacy_sp3	msg-kind-dispatch	shipped	100	n/a		batch-03	2
