@@ -10172,7 +10172,7 @@ src/main/func_02055c04.s:
     complete
     .text start:0x02055c04 end:0x02055c70
 
-src/main/func_02055c70.s:
+src/main/func_02055c70.legacy_sp3.c:
     complete
     .text start:0x02055c70 end:0x02055d58
 

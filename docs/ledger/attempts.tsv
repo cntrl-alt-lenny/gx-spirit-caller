@@ -2048,3 +2048,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02055204	main	76	legacy_sp3	setsockopt-int-wrapper	shipped	100	n/a		batch-05	1
 0x0205538c	main	148	default	conn-state-guard-dispatch	parked	2.7	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
 0x0205538c	main	148	legacy_sp3	conn-state-guard-dispatch	shipped	100	n/a		batch-05	1
+0x02055c70	main	232	default	conn-request-guard-cb	parked	5.2	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02055c70	main	232	legacy_sp3	conn-request-guard-cb	shipped	100	n/a		batch-05	1
