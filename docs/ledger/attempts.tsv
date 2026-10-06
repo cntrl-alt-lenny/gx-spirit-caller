@@ -2052,3 +2052,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02055c70	main	232	legacy_sp3	conn-request-guard-cb	shipped	100	n/a		batch-05	1
 0x02055d58	main	208	default	conn-request-guard-cb	parked	1.9	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
 0x02055d58	main	208	legacy_sp3	conn-request-guard-cb	shipped	100	n/a		batch-05	1
+0x02056a58	main	224	default	entry-release-refcount	parked	1.8	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02056a58	main	224	legacy_sp3	entry-release-refcount	shipped	100	n/a		batch-05	1
