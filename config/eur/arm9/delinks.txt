@@ -9594,7 +9594,7 @@ src/main/func_020530e4.c:
     complete
     .text start:0x020530e4 end:0x02053114
 
-src/main/func_02053114.s:
+src/main/func_02053114.c:
     complete
     .text start:0x02053114 end:0x02053158
 
