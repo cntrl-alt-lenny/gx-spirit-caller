@@ -1,6 +1,6 @@
 extern int OS_DisableIrq(void);
 extern void OS_RestoreIrq(int state);
-extern void func_02091a8c(int v);
+extern void func_02091a8c(void *q);
 extern unsigned int data_0219eef4;
 extern volatile unsigned int data_0219eefc;
 extern void * volatile data_0219ef20;
