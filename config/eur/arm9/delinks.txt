@@ -16519,7 +16519,7 @@ src/main/func_020906dc.s:
     complete
     .text start:0x020906dc end:0x02090728
 
-src/main/func_02090728.s:
+src/main/func_02090728.legacy.c:
     complete
     .text start:0x02090728 end:0x020907b4
 
