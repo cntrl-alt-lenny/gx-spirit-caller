@@ -2425,3 +2425,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201c1e0	main	68	default	cross-overlay-call-wrapper	parked	94.1	C-32-cross-overlay-bl	C-32	batch-09	1
 0x0201c1e0	main	68	legacy_sp3	cross-overlay-call-wrapper	parked	0.0	C-32-cross-overlay-bl	C-32	batch-09	1
 0x0201c1e0	main	68	legacy	cross-overlay-call-wrapper	parked	0.0	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201b504	main	204	default	list-apply-bitfields	parked	68.6	P-30-whole-function-register-rotation	P-30	batch-09	8
+0x0201b504	main	204	legacy_sp3	list-apply-bitfields	parked	29.4	P-30-whole-function-register-rotation	P-30	batch-09	2
+0x0201b504	main	204	legacy	list-apply-bitfields	parked	29.4	P-30-whole-function-register-rotation	P-30	batch-09	2
