@@ -6828,7 +6828,7 @@ src/main/func_020341a4.c:
 
 
 
-src/main/func_020341b0.s:
+src/main/func_020341b0.c:
     complete
     .text start:0x020341b0 end:0x02034238
 
