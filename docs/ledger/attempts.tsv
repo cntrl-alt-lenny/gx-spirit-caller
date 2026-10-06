@@ -2006,3 +2006,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02040de8	main	84	legacy_sp3	keyvalue-lookup	shipped	100	n/a		batch-04	2
 0x02041dbc	main	92	default	timer-init-fields	parked	56.5	address-fold	PROVISIONAL:address-fold	batch-04	1
 0x02041dbc	main	92	legacy_sp3	timer-init-fields	shipped	100	n/a		batch-04	1
+0x02041ea0	main	100	default	locked-flag-signal	parked	68.0	address-fold	PROVISIONAL:address-fold	batch-04	1
+0x02041ea0	main	100	legacy_sp3	locked-flag-signal	shipped	100	n/a		batch-04	1
