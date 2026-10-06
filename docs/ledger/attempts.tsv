@@ -2081,3 +2081,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205ce40	main	208	legacy_sp3	queue-drain-send	shipped	100	n/a		batch-05	1
 0x0205d560	main	64	default	set-foreach-adapter	shipped	100	n/a		batch-05	2
 0x0205d5c8	main	76	default	set-lookup-pair	shipped	100	n/a		batch-05	2
+0x0205d6f8	main	236	default	pool-lookup-or-insert	parked	3.4	reg-alloc	PROVISIONAL:register-allocation	batch-05	2
+0x0205d6f8	main	236	legacy_sp3	pool-lookup-or-insert	shipped	100	n/a		batch-05	2
