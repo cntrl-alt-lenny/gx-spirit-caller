@@ -7522,7 +7522,7 @@ src/main/func_0203ad44.s:
     complete
     .text start:0x0203ad44 end:0x0203aeec
 
-src/main/func_0203aeec.s:
+src/main/func_0203aeec.c:
     complete
     .text start:0x0203aeec end:0x0203af44
 
