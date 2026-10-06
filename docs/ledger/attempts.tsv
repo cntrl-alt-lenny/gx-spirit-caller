@@ -2026,3 +2026,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02060b84	main	140	default	entry-find-triple	parked	45.7	P-31-if-conversion	P-31	batch-03	1
 0x02060c10	main	128	default	find-final-marker	parked	3.1	P-31-if-conversion	P-31	batch-03	1
 0x020613d8	main	140	default	buf-append	parked	5.7	P-31-if-conversion	P-31	batch-03	1
+0x02060b84	main	140	legacy_sp3	entry-find-triple	shipped	100	n/a		batch-03	2
