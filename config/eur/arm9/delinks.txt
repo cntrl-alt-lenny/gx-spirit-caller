@@ -16634,7 +16634,7 @@ libs/nitro/OS_SPrintf.legacy.c:
     complete
     .text start:0x02091554 end:0x02091584
 
-src/main/func_02091584.s:
+src/main/func_02091584.legacy.c:
     complete
     .text start:0x02091584 end:0x020915e4
 
