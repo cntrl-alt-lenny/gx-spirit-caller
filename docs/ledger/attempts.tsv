@@ -2073,3 +2073,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204aa0c	main	232	legacy_sp3	error-code-dispatch	shipped	100	n/a		batch-04	2
 0x0204aaf4	main	148	default	error-code-report	parked	83.8	sibling-constant-arithmetic-reuse	PROVISIONAL:sibling-constant-arithmetic-reuse	batch-04	1
 0x0204aaf4	main	148	legacy_sp3	error-code-report	shipped	100	n/a		batch-04	1
+0x0204b034	main	116	default	timer-reset-ticks	parked	13.8	P-31-if-conversion	P-31	batch-04	1
+0x0204b034	main	116	legacy_sp3	timer-reset-ticks	shipped	100	n/a		batch-04	1

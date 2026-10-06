@@ -9055,7 +9055,7 @@ src/main/func_0204abfc.s:
     complete
     .text start:0x0204abfc end:0x0204b034
 
-src/main/func_0204b034.s:
+src/main/func_0204b034.legacy_sp3.c:
     complete
     .text start:0x0204b034 end:0x0204b0a8
 
