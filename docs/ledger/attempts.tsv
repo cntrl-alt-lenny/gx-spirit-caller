@@ -2082,3 +2082,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204f9cc	main	88	legacy_sp3	bitcount-store	shipped	100	n/a		batch-04	1
 0x0204fc38	main	100	legacy_sp3	id-search-select	parked	0.0	structural	PROVISIONAL:structural	batch-04	1
 0x0204fc38	main	100	default	id-search-select	shipped	100	n/a		batch-04	2
+0x02049270	main	96	legacy_sp3	name-match-subscribe	parked	n/a	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-04	1
