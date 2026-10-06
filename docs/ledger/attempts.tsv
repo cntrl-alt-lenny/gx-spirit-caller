@@ -2053,3 +2053,8 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206371c	main	236	legacy_sp3	ack-range-resend	shipped	100	n/a		batch-03	2
 0x02064208	main	148	legacy_sp3	send-or-queue	shipped	100	n/a		batch-03	2
 0x02063664	main	172	legacy_sp3	ping-reply	parked	46.5	address-fold	PROVISIONAL:address-fold	batch-03	3
+0x02064db0	main	76	default	str-default-len	parked	20.0	P-31-reverse-wants-predication-got-branch	P-31	batch-03	1
+0x02064f84	main	200	default	addr-port-format	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x020652b8	main	232	default	peer-reply	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x020653a0	main	208	default	peer-result	parked	1.9	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x0206553c	main	84	default	list-release-all	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
