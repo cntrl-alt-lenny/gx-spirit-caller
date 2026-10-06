@@ -6620,7 +6620,7 @@ src/main/func_02033718.c:
     complete
     .text start:0x02033718 end:0x02033770
 
-src/main/func_02033770.s:
+src/main/func_02033770.c:
     complete
     .text start:0x02033770 end:0x020337b8
 
