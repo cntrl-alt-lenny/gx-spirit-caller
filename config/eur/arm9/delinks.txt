@@ -832,7 +832,7 @@ src/main/func_02005dac.s:
     complete
     .text start:0x02005dac end:0x02005e20
 
-src/main/func_02005e20.s:
+src/main/func_02005e20.c:
     complete
     .text start:0x02005e20 end:0x02005ee0
 
