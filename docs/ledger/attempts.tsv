@@ -2086,3 +2086,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02066d44	main	188	legacy_sp3	peer-addr-update	shipped	100	n/a		batch-03	4
 0x02067294	main	96	default	sbuf-append	parked	83.3	load-scheduling-residual	PROVISIONAL:load-scheduling-residual	batch-03	1
 0x02067c58	main	144	default	expire-queue	parked	69.4	P-20-regalloc-plus-imm-fold	P-20	batch-03	1
+0x02067294	main	96	legacy_sp3	sbuf-append	shipped	100	n/a		batch-03	2
