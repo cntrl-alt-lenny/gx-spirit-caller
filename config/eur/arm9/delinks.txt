@@ -11349,7 +11349,7 @@ src/main/func_02065d4c.s:
     complete
     .text start:0x02065d4c end:0x02065dc0
 
-src/main/func_02065dc0.s:
+src/main/func_02065dc0.legacy_sp3.c:
     complete
     .text start:0x02065dc0 end:0x02065e14
 
