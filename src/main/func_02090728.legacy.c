@@ -1,6 +1,7 @@
 extern void (*OSi_IrqCallbackTable[])(int);
 extern unsigned char data_021a6354[];
-void (*func_02090728(unsigned int mask))(int) {
+typedef void (*Func02090728Cb)(int);
+Func02090728Cb func_02090728(unsigned int mask) {
     int index = 0;
     void (**entry)(int) = OSi_IrqCallbackTable;
     do {
