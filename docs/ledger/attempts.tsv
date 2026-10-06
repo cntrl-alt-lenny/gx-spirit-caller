@@ -2376,3 +2376,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02000d4c	main	80	legacy_sp3	entry-table-pop	parked	0.0	load-scheduling-interleave	P-36	batch-08	4
 0x02000d4c	main	80	legacy	entry-table-pop	parked	0.0	load-scheduling-interleave	P-36	batch-08	4
 0x02000ef8	main	140	default	state-switch-dispatch	shipped	100	n/a		batch-08	3
+0x02000f84	main	68	default	state-increment-reset	shipped	100	n/a		batch-08	1
