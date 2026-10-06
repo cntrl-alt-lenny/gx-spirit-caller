@@ -7919,7 +7919,7 @@ src/main/func_0203e400.legacy_sp3.c:
     complete
     .text start:0x0203e400 end:0x0203e460
 
-src/main/func_0203e460.s:
+src/main/func_0203e460.legacy_sp3.c:
     complete
     .text start:0x0203e460 end:0x0203e540
 
