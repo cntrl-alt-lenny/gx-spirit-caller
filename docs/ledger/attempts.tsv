@@ -1973,3 +1973,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203e870	main	72	legacy_sp3	retry-bump	shipped	100	n/a		batch-02	1
 0x0203e95c	main	80	legacy_sp3	tick-reset-start	shipped	100	n/a		batch-02	1
 0x0203eaa8	main	108	legacy_sp3	nth-set-bit	shipped	100	n/a		batch-02	4
+0x0203eb14	main	52	legacy_sp3	mask-set-bit	shipped	100	n/a		batch-02	1
