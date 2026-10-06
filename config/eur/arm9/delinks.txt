@@ -7025,7 +7025,7 @@ src/main/func_020354bc.s:
     complete
     .text start:0x020354bc end:0x020358cc
 
-src/main/func_020358cc.s:
+src/main/func_020358cc.c:
     complete
     .text start:0x020358cc end:0x02035954
 
