@@ -5,7 +5,8 @@ typedef struct { char pad[8]; node_t *head; } list_t;
 extern list_t data_021a63d0;
 extern int OS_DisableIrq(void);
 extern void OS_RestoreIrq(int state);
-extern void func_020919d8(void *p);
+typedef struct { char _pad[0x64]; unsigned int flag; } ctx_020919d8_t;
+extern void func_020919d8(ctx_020919d8_t *ctx);
 void func_020745fc(int now)
 {
     int i;
