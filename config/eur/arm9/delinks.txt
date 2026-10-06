@@ -1658,7 +1658,7 @@ src/main/func_0200c74c.c:
     complete
     .text start:0x0200c74c end:0x0200c79c
 
-src/main/func_0200c79c.s:
+src/main/func_0200c79c.c:
     complete
     .text start:0x0200c79c end:0x0200c824
 
