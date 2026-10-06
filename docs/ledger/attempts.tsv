@@ -2058,3 +2058,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020652b8	main	232	default	peer-reply	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x020653a0	main	208	default	peer-result	parked	1.9	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x0206553c	main	84	default	list-release-all	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x02064db0	main	76	legacy_sp3	str-default-len	shipped	100	n/a		batch-03	4
