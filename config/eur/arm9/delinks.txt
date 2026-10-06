@@ -12603,7 +12603,7 @@ src/main/func_0206e670.c:
     complete
     .text start:0x0206e670 end:0x0206e690
 
-src/main/func_0206e690.s:
+src/main/func_0206e690.legacy.c:
     complete
     .text start:0x0206e690 end:0x0206e720
 
