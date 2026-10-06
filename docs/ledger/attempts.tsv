@@ -1904,3 +1904,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02033718	main	88	default	flag-clear-register-handlers	shipped	100	n/a		batch-01	1
 0x02033770	main	72	default	flag-clear-register-handlers	shipped	100	n/a		batch-01	1
 0x020337b8	main	68	default	flag-clear-register-handlers	shipped	100	n/a		batch-01	1
+0x02033864	main	68	default	flag-toggle-query	shipped	100	n/a		batch-01	1
