@@ -1944,3 +1944,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02038ddc	main	124	default	slot-find-or-alloc	shipped	100	n/a		batch-02	3
 0x02039990	main	76	default	lookup-pair-bitfield	shipped	100	n/a		batch-02	2
 0x0203a780	main	204	default	item-list-dispatch	shipped	100	n/a		batch-02	3
+0x0203aae8	main	176	default	refcount-release-loop	parked	97.8	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-02	5
+0x02038e58	main	228	default	archive-read-clamp	parked	43.1	load-scheduling-residual	PROVISIONAL:load-scheduling-residual	batch-02	4
