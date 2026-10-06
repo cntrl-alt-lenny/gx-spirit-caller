@@ -2028,3 +2028,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02077b5c	main	60	default	unknown	parked	73.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
 0x02077b5c	main	60	legacy	unknown	parked	73.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
 0x02077b98	main	112	default	unknown	parked	7.1	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02077b98	main	112	legacy	unknown	shipped	100	n/a		batch-06	
