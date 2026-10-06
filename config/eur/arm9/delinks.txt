@@ -14463,7 +14463,7 @@ src/main/func_0207fd48.c:
     complete
     .text start:0x0207fd48 end:0x0207fd60
 
-src/main/func_0207fd60.s:
+src/main/func_0207fd60.legacy_sp3.c:
     complete
     .text start:0x0207fd60 end:0x0207fda4
 

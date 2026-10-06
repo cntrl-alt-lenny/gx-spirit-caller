@@ -2482,3 +2482,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205c258	main	232	default	http-set-body	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-05	2
 0x02078d88	main	68	legacy	unknown	shipped	100	n/a		batch-06	
 0x02072444	main	132	default	unknown	shipped	100	n/a		batch-06	
+0x0207fd60	main	68	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207fd60	main	68	legacy	unknown	parked	88.9	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207fd60	main	68	legacy_sp3	unknown	shipped	100	n/a		batch-06	
