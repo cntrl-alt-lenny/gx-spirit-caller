@@ -2034,3 +2034,8 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02060958	main	228	legacy_sp3	msg-field-dispatch	parked	71.9	P-20-family	P-20	batch-03	3
 0x02060520	main	228	default	key-loop-dispatch	parked	16.4	P-36-store-postindex-fusion	P-36	batch-03	2
 0x02060520	main	228	legacy_sp3	key-loop-dispatch	parked	70.2	P-36-call-adjacent-scheduling	P-36	batch-03	3
+0x020629b8	main	104	legacy_sp3	send-cmd-d-tag	parked	69.2	load-scheduling-interleave	P-36	batch-03	3
+0x020629b8	main	104	default	send-cmd-d-tag	parked	38.5	load-scheduling-interleave	P-36	batch-03	3
+0x0206292c	main	140	default	send-cmd-e-tag	parked	60.0	load-scheduling-interleave	P-36	batch-03	2
+0x0206292c	main	140	legacy_sp3	send-cmd-e-tag	parked	60.0	load-scheduling-interleave	P-36	batch-03	2
+0x020628b0	main	76	legacy_sp3	send-hdr-h	parked	31.6	load-scheduling-interleave	P-36	batch-03	2
