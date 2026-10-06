@@ -2069,3 +2069,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204a8bc	main	164	legacy_sp3	error-code-report	shipped	100	n/a		batch-04	1
 0x02049684	main	140	default	fetch-name-apply	parked	77.1	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
 0x02049684	main	140	legacy_sp3	fetch-name-apply	shipped	100	n/a		batch-04	1
+0x0204aa0c	main	232	default	error-code-dispatch	parked	69.0	sibling-constant-arithmetic-reuse	PROVISIONAL:sibling-constant-arithmetic-reuse	batch-04	1
+0x0204aa0c	main	232	legacy_sp3	error-code-dispatch	shipped	100	n/a		batch-04	2
