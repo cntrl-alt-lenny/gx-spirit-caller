@@ -2367,3 +2367,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205fd94	main	132	legacy_sp3	version-string-parse	shipped	100	n/a		batch-05	3
 0x0205c258	main	232	default	http-set-body	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-05	2
 0x02010a98	main	112	default	ring-buffer-clear-key	shipped	100	n/a		batch-09	1
+0x02010eb8	main	204	default	struct-matrix-copy	shipped	100	n/a		batch-09	1
