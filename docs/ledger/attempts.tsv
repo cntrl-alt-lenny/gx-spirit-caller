@@ -1966,3 +1966,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203d1c0	main	152	legacy_sp3	name-match-peers	parked	71.0	P-20-family	P-20	batch-02	4
 0x0203def0	main	152	legacy_sp3	peer-ready-count	shipped	100	n/a		batch-02	2
 0x0203e198	main	108	legacy_sp3	append-default-item	shipped	100	n/a		batch-02	3
+0x0203e204	main	80	legacy_sp3	default-name-check	shipped	100	n/a		batch-02	2
