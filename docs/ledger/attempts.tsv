@@ -2022,3 +2022,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02076c5c	main	100	default	unknown	parked	48.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
 0x02076c5c	main	100	legacy	unknown	shipped	100	n/a		batch-06	
 0x02077018	main	116	default	unknown	parked	10.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02077018	main	116	legacy	unknown	parked	83.9	structural	PROVISIONAL:structural	batch-06	
