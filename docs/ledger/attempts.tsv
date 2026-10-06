@@ -2086,3 +2086,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207e664	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
 0x0207e664	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
 0x0207e6f0	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e6f0	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
