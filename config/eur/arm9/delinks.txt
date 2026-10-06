@@ -12200,7 +12200,7 @@ src/main/func_0206b6fc.legacy_sp3.c:
     complete
     .text start:0x0206b6fc end:0x0206b778
 
-src/main/func_0206b778.s:
+src/main/func_0206b778.legacy_sp3.c:
     complete
     .text start:0x0206b778 end:0x0206b7d8
 
