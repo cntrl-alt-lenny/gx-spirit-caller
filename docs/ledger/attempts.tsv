@@ -2435,3 +2435,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200bff4	main	132	default	slot-claim	shipped	100	n/a		batch-08	1
 0x0200b250	main	164	default	entry-convert-loop	shipped	100	n/a		batch-08	2
 0x0200c79c	main	136	default	flag-setter	shipped	100	n/a		batch-08	1
+0x0200c594	main	200	default	list-scan-trigger	shipped	100	n/a		batch-08	3

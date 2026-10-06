@@ -1638,7 +1638,7 @@ src/main/func_0200c558.c:
     .text start:0x0200c558 end:0x0200c594
 
 
-src/main/func_0200c594.s:
+src/main/func_0200c594.c:
     complete
     .text start:0x0200c594 end:0x0200c65c
 
