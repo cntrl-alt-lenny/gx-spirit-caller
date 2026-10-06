@@ -10299,7 +10299,7 @@ src/main/func_020580a0.s:
     complete
     .text start:0x020580a0 end:0x020581a8
 
-src/main/func_020581a8.s:
+src/main/func_020581a8.legacy_sp3.c:
     complete
     .text start:0x020581a8 end:0x02058244
 
