@@ -1894,3 +1894,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02031ebc	main	132	default	list-unlink	shipped	100	n/a		batch-01	2
 0x02031f9c	main	84	default	list-expire-loop	shipped	100	n/a		batch-01	1
 0x020320f8	main	184	default	list-push-front	shipped	100	n/a		batch-01	2
+0x0203276c	main	84	default	array-iterate-call	shipped	100	n/a		batch-01	1
