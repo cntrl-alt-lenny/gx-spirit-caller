@@ -2075,3 +2075,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205bd58	main	96	default	list-unlink-item	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
 0x0205bd58	main	96	legacy_sp3	list-unlink-item	shipped	100	n/a		batch-05	1
 0x0205c258	main	232	default	http-set-body	shipped	100	n/a		batch-05	1
+0x0205c6e4	main	100	default	conn-lookup-send	parked	59.3	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x0205c6e4	main	100	legacy_sp3	conn-lookup-send	shipped	100	n/a		batch-05	1
