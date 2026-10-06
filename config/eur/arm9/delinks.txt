@@ -14179,7 +14179,7 @@ src/main/func_0207e0a8.s:
     complete
     .text start:0x0207e0a8 end:0x0207e124
 
-src/main/func_0207e124.s:
+src/main/func_0207e124.legacy_sp3.c:
     complete
     .text start:0x0207e124 end:0x0207e1c4
 
