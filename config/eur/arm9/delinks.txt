@@ -7578,7 +7578,7 @@ src/main/func_0203baa0.c:
     complete
     .text start:0x0203baa0 end:0x0203bad0
 
-src/main/func_0203bad0.s:
+src/main/func_0203bad0.c:
     complete
     .text start:0x0203bad0 end:0x0203bbac
 

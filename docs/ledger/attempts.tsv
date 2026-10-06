@@ -1950,3 +1950,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203b2f4	main	196	default	ima-adpcm-decode	shipped	100	n/a		batch-02	2
 0x0203b880	main	124	default	select-min-cost	shipped	100	n/a		batch-02	3
 0x0203b6b4	main	192	default	block-commit-copy	parked	70.8	P-20-family	P-20	batch-02	4
+0x0203bad0	main	220	default	slot-reserve-loop	shipped	100	n/a		batch-02	5
