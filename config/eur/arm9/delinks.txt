@@ -10580,7 +10580,7 @@ src/main/func_0205f844.s:
     complete
     .text start:0x0205f844 end:0x0205fa30
 
-src/main/func_0205fa30.s:
+src/main/func_0205fa30.legacy_sp3.c:
     complete
     .text start:0x0205fa30 end:0x0205fac4
 
