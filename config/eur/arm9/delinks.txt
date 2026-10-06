@@ -13738,7 +13738,7 @@ src/main/func_0207c280.s:
     complete
     .text start:0x0207c280 end:0x0207c3b0
 
-src/main/func_0207c3b0.s:
+src/main/func_0207c3b0.legacy.c:
     complete
     .text start:0x0207c3b0 end:0x0207c484
 
