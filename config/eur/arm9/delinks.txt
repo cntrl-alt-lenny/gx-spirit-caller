@@ -2618,7 +2618,7 @@ src/main/func_02018fa0.c:
 
 
 
-src/main/func_02018fbc.s:
+src/main/func_02018fbc.c:
     complete
     .text start:0x02018fbc end:0x02019034
 
