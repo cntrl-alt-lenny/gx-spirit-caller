@@ -2406,3 +2406,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02019a58	main	116	legacy_sp3	lcg-bracket-roll	parked	3.3	P-30-whole-function-register-rotation	P-30	batch-09	1
 0x02019a58	main	116	legacy	lcg-bracket-roll	parked	3.2	P-30-whole-function-register-rotation	P-30	batch-09	1
 0x02019ea4	main	240	default	id-class-switch	shipped	100	n/a		batch-09	1
+0x0201a044	main	116	default	scaled-stat-formula	parked	51.7	load-scheduling-interleave	P-36	batch-09	8
+0x0201a044	main	116	legacy_sp3	scaled-stat-formula	parked	17.2	load-scheduling-interleave	P-36	batch-09	1
+0x0201a044	main	116	legacy	scaled-stat-formula	parked	17.2	load-scheduling-interleave	P-36	batch-09	1
+0x0201a32c	main	92	default	saturating-bitfield-counters	shipped	100	n/a		batch-09	3
