@@ -6222,7 +6222,7 @@ src/main/func_02032ac4.c:
     complete
     .text start:0x02032ac4 end:0x02032b30
 
-src/main/func_02032b30.s:
+src/main/func_02032b30.c:
     complete
     .text start:0x02032b30 end:0x02032bfc
 

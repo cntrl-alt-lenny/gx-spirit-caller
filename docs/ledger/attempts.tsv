@@ -1909,3 +1909,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020332a4	main	100	default	u16-string-copy	shipped	100	n/a		batch-01	2
 0x020334cc	main	112	default	lazy-handle-open	shipped	100	n/a		batch-01	2
 0x020336cc	main	76	default	register-handlers	shipped	100	n/a		batch-01	2
+0x02032b30	main	204	default	flag-update-callback-bool	shipped	100	n/a		batch-01	4
