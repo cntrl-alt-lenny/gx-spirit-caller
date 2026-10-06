@@ -2030,3 +2030,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02045618	main	96	default	state-wait-clear	shipped	100	n/a		batch-04	1
 0x02044c60	main	88	default	id-fetch-valid	parked	45.5	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
 0x02044c60	main	88	legacy_sp3	id-fetch-valid	shipped	100	n/a		batch-04	1
+0x02044ea8	main	68	default	id-fetch-check	parked	64.7	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
+0x02044ea8	main	68	legacy_sp3	id-fetch-check	shipped	100	n/a		batch-04	1
