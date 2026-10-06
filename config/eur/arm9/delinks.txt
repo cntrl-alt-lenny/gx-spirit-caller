@@ -8149,7 +8149,7 @@ src/main/func_02041248.s:
     complete
     .text start:0x02041248 end:0x020413b0
 
-src/main/func_020413b0.s:
+src/main/func_020413b0.legacy_sp3.c:
     complete
     .text start:0x020413b0 end:0x02041470
 
