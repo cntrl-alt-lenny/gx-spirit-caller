@@ -2153,3 +2153,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206e690	main	144	default	inet-ntop	parked	8.3	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
 0x0206e1e8	main	60	legacy	set-pair-config	shipped	100	n/a		batch-03	2
 0x0206e690	main	144	legacy	inet-ntop	shipped	100	n/a		batch-03	2
+0x0206dad8	main	228	legacy	socket-shutdown	shipped	100	n/a		batch-03	5
