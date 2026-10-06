@@ -2437,3 +2437,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200c79c	main	136	default	flag-setter	shipped	100	n/a		batch-08	1
 0x0200c594	main	200	default	list-scan-trigger	shipped	100	n/a		batch-08	3
 0x0200ed48	main	112	default	free-slot-find	shipped	100	n/a		batch-08	8
+0x0200edb8	main	240	default	object-init	parked	90.0	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x0200edb8	main	240	legacy_sp3	object-init	parked	25.4	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x0200edb8	main	240	legacy	object-init	parked	13.8	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x0200f044	main	248	default	bitfield-mode-setter	shipped	100	n/a		batch-08	3
