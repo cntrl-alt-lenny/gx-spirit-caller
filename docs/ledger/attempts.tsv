@@ -2059,3 +2059,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02048fac	main	140	default	select-info-callbacks	parked	17.1	P-31-if-conversion	P-31	batch-04	2
 0x02048fac	main	140	legacy_sp3	select-info-callbacks	shipped	100	n/a		batch-04	2
 0x020491ec	main	132	default	info-request-callback	shipped	100	n/a		batch-04	1
+0x02049270	main	96	default	name-match-subscribe	parked	29.2	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
+0x02049270	main	96	legacy_sp3	name-match-subscribe	shipped	100	n/a		batch-04	1
