@@ -8704,7 +8704,7 @@ src/main/func_02046f24.legacy_sp3.c:
     complete
     .text start:0x02046f24 end:0x02046fc4
 
-src/main/func_02046fc4.s:
+src/main/func_02046fc4.c:
     complete
     .text start:0x02046fc4 end:0x0204706c
 
