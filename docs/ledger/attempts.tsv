@@ -2439,3 +2439,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201ef90	main	256	legacy_sp3	request-dispatch-ten-args	parked	15.4	P-20-r0-vs-r1	P-20	batch-09	1
 0x0201ef90	main	256	legacy	request-dispatch-ten-args	parked	14.9	P-20-r0-vs-r1	P-20	batch-09	1
 0x0201f138	main	100	default	state-change-notify	shipped	100	n/a		batch-09	1
+0x0201ff2c	main	108	default	six-arg-call-status-check	parked	7.1	P-2-stm-fusion	P-2	batch-09	5
+0x0201ff2c	main	108	legacy_sp3	six-arg-call-status-check	parked	3.7	P-2-stm-fusion	P-2	batch-09	1
+0x0201ff2c	main	108	legacy	six-arg-call-status-check	parked	3.7	P-2-stm-fusion	P-2	batch-09	1
+0x0201f4d4	main	148	default	state-gate-then-six-arg-call	parked	56.8	P-2-stm-fusion	P-2	batch-09	6
+0x0201f4d4	main	148	legacy_sp3	state-gate-then-six-arg-call	parked	2.7	P-2-stm-fusion	P-2	batch-09	1
+0x0201f4d4	main	148	legacy	state-gate-then-six-arg-call	parked	10.8	P-2-stm-fusion	P-2	batch-09	1
