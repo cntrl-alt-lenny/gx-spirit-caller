@@ -513,7 +513,7 @@ src/main/func_02001ba4.c:
     .text start:0x02001ba4 end:0x02001bc8
 
 
-src/main/func_02001bc8.s:
+src/main/func_02001bc8.c:
     complete
     .text start:0x02001bc8 end:0x02001c98
 

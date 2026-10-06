@@ -2382,3 +2382,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020018d4	main	168	default	mask-nested-loop-sprintf	shipped	100	n/a		batch-08	1
 0x02001a34	main	228	default	mask-loop-task-post	shipped	100	n/a		batch-08	1
 0x020037d0	main	240	default	switch-dispatch-call	shipped	100	n/a		batch-08	2
+0x02001bc8	main	208	default	rgb555-blend-table	shipped	100	n/a		batch-08	6
