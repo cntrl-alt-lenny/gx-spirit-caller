@@ -2063,3 +2063,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02049270	main	96	legacy_sp3	name-match-subscribe	shipped	100	n/a		batch-04	1
 0x020492d0	main	76	default	entry-subscribe	parked	68.4	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
 0x020492d0	main	76	legacy_sp3	entry-subscribe	shipped	100	n/a		batch-04	1
+0x02049554	main	224	legacy_sp3	state-init-fields	parked	41.4	structural	PROVISIONAL:structural	batch-04	1
+0x02049554	main	224	default	state-init-fields	shipped	100	n/a		batch-04	2
