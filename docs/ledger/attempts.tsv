@@ -1956,3 +1956,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203c730	main	160	default	peer-compare-loop	parked	10.0	address-fold	PROVISIONAL:address-fold	batch-02	3
 0x0203c89c	main	100	default	level-update-max	parked	64.0	P-31-if-conversion	P-31	batch-02	5
 0x0203cc58	main	224	legacy_sp3	state-dispatch	shipped	100	n/a		batch-02	1
+0x0203cff8	main	128	legacy_sp3	peer-update-copy	shipped	100	n/a		batch-02	3
