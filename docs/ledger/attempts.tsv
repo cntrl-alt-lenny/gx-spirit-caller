@@ -1900,3 +1900,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02031c1c	main	112	default	u64-flags-queue-insert	parked	78.6	P-20-dual-register-swap	P-20	batch-01	6
 0x02032998	main	68	default	subobj-queue-callback	parked	76.5	P-20-dual-register-swap	P-20	batch-01	4
 0x020326d4	main	80	default	subobj-alloc-memset	parked	70.0	address-fold	PROVISIONAL:address-fold	batch-01	4
+0x02032c78	main	80	default	flag-update-callback	shipped	100	n/a		batch-01	1
