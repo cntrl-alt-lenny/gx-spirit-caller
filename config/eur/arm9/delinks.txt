@@ -1229,7 +1229,7 @@ src/main/func_02009e9c.c:
     complete
     .text start:0x02009e9c end:0x02009f50
 
-src/main/func_02009f50.s:
+src/main/func_02009f50.c:
     complete
     .text start:0x02009f50 end:0x0200a014
 
