@@ -2078,3 +2078,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204b370	main	96	default	slot-table-release	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
 0x0204b370	main	96	legacy_sp3	slot-table-release	shipped	100	n/a		batch-04	1
 0x0204f040	main	104	default	match-filter-format	shipped	100	n/a		batch-04	1
+0x0204f9cc	main	88	default	bitcount-store	parked	13.6	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-04	1
+0x0204f9cc	main	88	legacy_sp3	bitcount-store	shipped	100	n/a		batch-04	1
