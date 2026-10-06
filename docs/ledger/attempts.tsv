@@ -2027,3 +2027,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02044424	main	140	default	page-copy-verify-loop	parked	31.4	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
 0x02044424	main	140	legacy_sp3	page-copy-verify-loop	shipped	100	n/a		batch-04	2
 0x02044e58	main	80	default	id-shift-update	shipped	100	n/a		batch-04	1
+0x02045618	main	96	default	state-wait-clear	shipped	100	n/a		batch-04	1
