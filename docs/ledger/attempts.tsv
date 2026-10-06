@@ -1889,3 +1889,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020312a0	main	184	default	membership-switch	shipped	100	n/a		batch-01	1
 0x020319a0	main	208	default	handler-table-dispatch	shipped	100	n/a		batch-01	2
 0x02031ab0	main	76	default	sorted-list-insert	shipped	100	n/a		batch-01	1
+0x02031ba0	main	124	default	list-unlink-callback	shipped	100	n/a		batch-01	1
