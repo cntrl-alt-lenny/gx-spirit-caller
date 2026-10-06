@@ -2056,3 +2056,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209423c	main	116	legacy	unknown	parked	79.3	structural	PROVISIONAL:structural	batch-07	
 0x020942b0	main	200	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
 0x020942b0	main	200	legacy	unknown	parked	9.8	structural	PROVISIONAL:structural	batch-07	
+0x020945f4	main	148	default	unknown	parked	62.2	structural	PROVISIONAL:structural	batch-07	
+0x020945f4	main	148	legacy	unknown	parked	48.6	structural	PROVISIONAL:structural	batch-07	
