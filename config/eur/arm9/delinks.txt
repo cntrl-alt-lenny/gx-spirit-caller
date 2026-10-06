@@ -6496,7 +6496,7 @@ src/main/func_020334c0.c:
 
 
 
-src/main/func_020334cc.s:
+src/main/func_020334cc.c:
     complete
     .text start:0x020334cc end:0x0203353c
 
