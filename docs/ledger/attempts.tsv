@@ -2403,3 +2403,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020059b0	main	176	legacy_sp3	binary-search-callback	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	batch-08	30
 0x020059b0	main	176	legacy	binary-search-callback	parked	2.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	30
 0x02005ca0	main	108	default	switch-pool-init	shipped	100	n/a		batch-08	1
+0x02005b74	main	136	default	switch-pool-init	shipped	100	n/a		batch-08	1

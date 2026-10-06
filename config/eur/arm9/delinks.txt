@@ -804,7 +804,7 @@ src/main/func_02005b38.c:
     complete
     .text start:0x02005b38 end:0x02005b74
 
-src/main/func_02005b74.s:
+src/main/func_02005b74.c:
     complete
     .text start:0x02005b74 end:0x02005bfc
 
