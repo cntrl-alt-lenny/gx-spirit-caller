@@ -8133,7 +8133,7 @@ src/main/func_02040d94.c:
     complete
     .text start:0x02040d94 end:0x02040de8
 
-src/main/func_02040de8.s:
+src/main/func_02040de8.legacy_sp3.c:
     complete
     .text start:0x02040de8 end:0x02040e3c
 
