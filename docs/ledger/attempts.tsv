@@ -1986,75 +1986,75 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02038e58	main	228	legacy_sp3	archive-read-clamp	parked	56.1	P-31-if-conversion	P-31	batch-02	2
 0x0203aae8	main	176	legacy_sp3	refcount-release-loop	parked	14.6	unknown	UNCLASSIFIED:unknown	batch-02	1
 0x0203b6b4	main	192	legacy_sp3	block-commit-copy	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-02	1
-0x020900a0	main	116	default	unknown	parked	17.2	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020900a0	main	116	default	unknown	parked	17.2	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020900a0	main	116	legacy	unknown	shipped	100	n/a		batch-07	
-0x0209015c	main	112	default	unknown	parked	0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x0209015c	main	112	default	unknown	parked	0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x0209015c	main	112	legacy	unknown	shipped	100	n/a		batch-07	
-0x02090330	main	128	default	unknown	parked	0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02090330	main	128	default	unknown	parked	0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02090330	main	128	legacy	unknown	shipped	100	n/a		batch-07	
 0x020903d4	main	128	default	unknown	parked	21.9	address-fold	PROVISIONAL:address-fold	batch-07	
 0x020903d4	main	128	legacy	unknown	parked	15.6	address-fold	PROVISIONAL:address-fold	batch-07	
-0x02090690	main	76	default	unknown	parked	31.6	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02090690	main	76	default	unknown	parked	31.6	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02090690	main	76	legacy	unknown	parked	63.2	structural	PROVISIONAL:structural	batch-07	
-0x020906dc	main	76	default	unknown	parked	42.1	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020906dc	main	76	default	unknown	parked	42.1	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020906dc	main	76	legacy	unknown	parked	79.0	structural	PROVISIONAL:structural	batch-07	
 0x02090690	main	76	legacy	unknown	parked	63.2	register-allocation-scheduling	PROVISIONAL:register-allocation+scheduling	batch-07	
 0x020906dc	main	76	legacy	unknown	parked	79	scheduling-order	P-36	batch-07	
 0x02090728	main	140	default	unknown	parked	62.9	structural	PROVISIONAL:structural	batch-07	
 0x02090728	main	140	legacy	unknown	parked	65.7	structural	PROVISIONAL:structural	batch-07	
-0x020907b4	main	144	default	unknown	parked	11.1	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020907b4	main	144	default	unknown	parked	11.1	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020907b4	main	144	legacy	unknown	parked	0.0	structural	PROVISIONAL:structural	batch-07	
-0x02090b00	main	84	default	unknown	parked	33.3	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02090b00	main	84	default	unknown	parked	33.3	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02090b00	main	84	legacy	unknown	shipped	100	n/a		batch-07	
-0x02090b54	main	240	default	unknown	parked	1.7	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02090b54	main	240	default	unknown	parked	1.7	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02090b54	main	240	legacy	unknown	parked	24.6	structural	PROVISIONAL:structural	batch-07	
-0x02091584	main	96	default	unknown	parked	8.3	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02091584	main	96	default	unknown	parked	8.3	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02091584	main	96	legacy	unknown	shipped	100	n/a		batch-07	
-0x02091c88	main	112	default	unknown	parked	32.1	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02091c88	main	112	default	unknown	parked	32.1	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02091c88	main	112	legacy	unknown	parked	20.7	structural	PROVISIONAL:structural	batch-07	
-0x02091f88	main	236	default	unknown	parked	3.4	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02091f88	main	236	default	unknown	parked	3.4	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02091f88	main	236	legacy	unknown	parked	0.0	structural	PROVISIONAL:structural	batch-07	
 0x0209226c	main	108	default	unknown	parked	17.9	structural	PROVISIONAL:structural	batch-07	
 0x0209226c	main	108	legacy	unknown	parked	17.9	structural	PROVISIONAL:structural	batch-07	
-0x020929ac	main	136	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020929ac	main	136	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020929ac	main	136	legacy	unknown	parked	97.1	structural	PROVISIONAL:structural	batch-07	
-0x02092a5c	main	236	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02092a5c	main	236	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02092a5c	main	236	legacy	unknown	shipped	100	n/a		batch-07	
 0x02093014	main	112	default	unknown	parked	34.5	structural	PROVISIONAL:structural	batch-07	
 0x02093014	main	112	legacy	unknown	parked	92.9	structural	PROVISIONAL:structural	batch-07	
-0x020930b0	main	176	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020930b0	main	176	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020930b0	main	176	legacy	unknown	parked	0.0	structural	PROVISIONAL:structural	batch-07	
-0x02093160	main	136	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093160	main	136	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093160	main	136	legacy	unknown	parked	91.2	structural	PROVISIONAL:structural	batch-07	
-0x020931f8	main	156	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020931f8	main	156	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020931f8	main	156	legacy	unknown	parked	94.9	structural	PROVISIONAL:structural	batch-07	
-0x02093684	main	156	default	unknown	parked	10.3	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093684	main	156	default	unknown	parked	10.3	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093684	main	156	legacy	unknown	parked	28.2	structural	PROVISIONAL:structural	batch-07	
-0x02093720	main	112	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093720	main	112	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093720	main	112	legacy	unknown	shipped	100	n/a		batch-07	
-0x0209393c	main	104	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x0209393c	main	104	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x0209393c	main	104	legacy	unknown	shipped	100	n/a		batch-07	
-0x020939a4	main	124	default	unknown	parked	83.9	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020939a4	main	124	default	unknown	parked	83.9	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020939a4	main	124	legacy	unknown	shipped	100	n/a		batch-07	
-0x02093a44	main	136	default	unknown	parked	61.8	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093a44	main	136	default	unknown	parked	61.8	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093a44	main	136	legacy	unknown	parked	85.3	structural	PROVISIONAL:structural	batch-07	
-0x02093b00	main	240	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093b00	main	240	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093b00	main	240	legacy	unknown	parked	1.7	structural	PROVISIONAL:structural	batch-07	
-0x02093c90	main	180	default	unknown	parked	2.2	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093c90	main	180	default	unknown	parked	2.2	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093c90	main	180	legacy	unknown	parked	25.9	structural	PROVISIONAL:structural	batch-07	
-0x02093d44	main	132	default	unknown	parked	54.5	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093d44	main	132	default	unknown	parked	54.5	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093d44	main	132	legacy	unknown	parked	54.5	structural	PROVISIONAL:structural	batch-07	
-0x02093ee0	main	216	default	unknown	parked	13.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093ee0	main	216	default	unknown	parked	13.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093ee0	main	216	legacy	unknown	shipped	100	n/a		batch-07	
-0x02093fb8	main	120	default	unknown	parked	16.7	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02093fb8	main	120	default	unknown	parked	16.7	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02093fb8	main	120	legacy	unknown	parked	40.0	structural	PROVISIONAL:structural	batch-07	
-0x02094030	main	124	default	unknown	parked	29.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x02094030	main	124	default	unknown	parked	29.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x02094030	main	124	legacy	unknown	parked	41.9	structural	PROVISIONAL:structural	batch-07	
-0x020940ac	main	144	default	unknown	parked	13.9	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020940ac	main	144	default	unknown	parked	13.9	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020940ac	main	144	legacy	unknown	parked	25.0	structural	PROVISIONAL:structural	batch-07	
-0x0209423c	main	116	default	unknown	parked	6.9	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x0209423c	main	116	default	unknown	parked	6.9	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x0209423c	main	116	legacy	unknown	parked	79.3	structural	PROVISIONAL:structural	batch-07	
-0x020942b0	main	200	default	unknown	parked	0.0	frame-epilogue	PROVISIONAL:unmapped	batch-07	
+0x020942b0	main	200	default	unknown	parked	0.0	frame-shape	PROVISIONAL:unmapped	batch-07	
 0x020942b0	main	200	legacy	unknown	parked	9.8	structural	PROVISIONAL:structural	batch-07	
 0x020945f4	main	148	default	unknown	parked	62.2	structural	PROVISIONAL:structural	batch-07	
 0x020945f4	main	148	legacy	unknown	parked	48.6	structural	PROVISIONAL:structural	batch-07	
