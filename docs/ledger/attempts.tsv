@@ -2369,3 +2369,13 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02010a98	main	112	default	ring-buffer-clear-key	shipped	100	n/a		batch-09	1
 0x02010eb8	main	204	default	struct-matrix-copy	shipped	100	n/a		batch-09	1
 0x02011178	main	108	default	struct-copy-guard	shipped	100	n/a		batch-09	1
+0x02011620	main	104	default	matrix-rotate-x	parked	0.0	P-2-stm-fusion	P-2	batch-09	2
+0x02011620	main	104	legacy_sp3	matrix-rotate-x	parked	7.1	frame-shape	PROVISIONAL:frame/epilogue	batch-09	2
+0x02011620	main	104	default	matrix-rotate-x	parked	11.5	P-36-instruction-scheduling	P-36	batch-09	8
+0x02011620	main	104	legacy	matrix-rotate-x	parked	0.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-09	1
+0x02011688	main	100	default	rotation-matrix-y	parked	72.0	register-choice	PROVISIONAL:register-choice	batch-09	6
+0x02011688	main	100	legacy_sp3	rotation-matrix-y	parked	72.0	register-choice	PROVISIONAL:register-choice	batch-09	1
+0x02011688	main	100	legacy	rotation-matrix-y	parked	72.0	register-choice	PROVISIONAL:register-choice	batch-09	1
+0x020116ec	main	96	default	rotation-matrix-z	parked	70.8	register-choice	PROVISIONAL:register-choice	batch-09	5
+0x020116ec	main	96	legacy_sp3	rotation-matrix-z	parked	16.0	register-choice	PROVISIONAL:register-choice	batch-09	1
+0x020116ec	main	96	legacy	rotation-matrix-z	parked	16.0	register-choice	PROVISIONAL:register-choice	batch-09	1
