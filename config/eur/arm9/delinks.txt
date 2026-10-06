@@ -657,7 +657,7 @@ src/main/func_02003c68.s:
     complete
     .text start:0x02003c68 end:0x02003d98
 
-src/main/func_02003d98.s:
+src/main/func_02003d98.c:
     complete
     .text start:0x02003d98 end:0x02003e98
 
