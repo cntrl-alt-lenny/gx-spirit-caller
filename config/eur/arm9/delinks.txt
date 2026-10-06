@@ -6728,7 +6728,7 @@ src/main/func_02033f28.c:
     complete
     .text start:0x02033f28 end:0x02033f40
 
-src/main/func_02033f40.s:
+src/main/func_02033f40.c:
     complete
     .text start:0x02033f40 end:0x02033fb0
 

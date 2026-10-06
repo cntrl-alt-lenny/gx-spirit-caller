@@ -1913,3 +1913,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02032d70	main	200	default	tick-interval-subobj-base	parked	4.0	address-fold	PROVISIONAL:address-fold	batch-01	4
 0x020339d4	main	116	default	bitmask-filter-loop	shipped	100	n/a		batch-01	1
 0x02033d78	main	112	default	array-state-step	shipped	100	n/a		batch-01	1
+0x02033f40	main	112	default	range-membership	shipped	100	n/a		batch-01	1
