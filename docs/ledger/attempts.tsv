@@ -2000,3 +2000,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02052974	main	116	default	peer-mask-filter-loop	parked	44.8	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
 0x02052974	main	116	legacy	peer-mask-filter-loop	parked	93.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
 0x02052974	main	116	legacy_sp3	peer-mask-filter-loop	shipped	100	n/a		batch-05	1
+0x02053a64	main	80	default	net-open-call	parked	80.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02053a64	main	80	legacy	net-open-call	parked	57.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02053a64	main	80	legacy_sp3	net-open-call	shipped	100	n/a		batch-05	1
