@@ -3140,7 +3140,7 @@ src/main/func_0201aaa0.c:
 
 
 
-src/main/func_0201aabc.s:
+src/main/func_0201aabc.c:
     complete
     .text start:0x0201aabc end:0x0201aaf4
 
