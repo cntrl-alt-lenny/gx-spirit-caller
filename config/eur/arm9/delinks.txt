@@ -1762,7 +1762,7 @@ src/main/List_Unlink.c:
     complete
     .text start:0x0200faf8 end:0x0200fb18
 
-src/main/func_0200fb18.s:
+src/main/func_0200fb18.c:
     complete
     .text start:0x0200fb18 end:0x0200fbd4
 
