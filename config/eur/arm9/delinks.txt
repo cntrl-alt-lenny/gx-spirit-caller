@@ -7724,7 +7724,7 @@ src/main/func_0203c888.c:
 
 
 
-src/main/func_0203c89c.s:
+src/main/func_0203c89c.legacy_sp3.c:
     complete
     .text start:0x0203c89c end:0x0203c900
 
