@@ -461,6 +461,7 @@ eur	src/main/func_020548f4.s	wrong-target	.text+0x128 original ABS32 data_020bed
 eur	src/main/func_020548f4.s	wrong-target	.text+0x12c original ABS32 data_020bed54+0x0 built ABS32 data_020bece4+0x70
 eur	src/main/func_020548f4.s	wrong-target	.text+0x130 original ABS32 data_020bed58+0x0 built ABS32 data_020bece4+0x74
 eur	src/main/func_02055f84.s	wrong-target	.text+0x64 original ABS32 data_020ffd40+0x0 built ABS32 data_020ffd3c+0x4
+eur	src/main/func_0205c258.s	wrong-target	.text+0xe4 original ABS32 data_02100b74+0x0 built ABS32 data_02100b70+0x4
 eur	src/main/func_0205fe18.c	wrong-target	.text+0xa0 original ABS32 data_021011d4+0x0 built ABS32 data_021011d0+0x4
 eur	src/main/func_02060520.s	wrong-target	.text+0xd8 original ABS32 data_020bed5c+0x0 built ABS32 data_020bece4+0x78
 eur	src/main/func_02060a3c.legacy_sp3.c	wrong-target	.text+0x8c original ABS32 data_021013dc+0x0 built ABS32 data_021013d8+0x4
