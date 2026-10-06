@@ -2393,3 +2393,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020125ac	main	112	default	sysinit-store-block	parked	71.4	P-30-parameter-register-rotation	P-30	batch-09	4
 0x020125ac	main	112	legacy_sp3	sysinit-store-block	parked	3.3	P-30-parameter-register-rotation	P-30	batch-09	1
 0x020125ac	main	112	legacy	sysinit-store-block	parked	3.2	P-30-parameter-register-rotation	P-30	batch-09	1
+0x02017afc	main	228	default	state-machine-dispatch	shipped	100	n/a		batch-09	4

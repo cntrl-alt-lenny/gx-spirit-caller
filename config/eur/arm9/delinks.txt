@@ -2284,7 +2284,7 @@ src/main/func_02017a98.c:
     complete
     .text start:0x02017a98 end:0x02017afc
 
-src/main/func_02017afc.s:
+src/main/func_02017afc.c:
     complete
     .text start:0x02017afc end:0x02017be0
 
