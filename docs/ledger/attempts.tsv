@@ -2131,3 +2131,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206b88c	main	112	legacy_sp3	sort-cmp-string	parked	42.9	P-36-pool-load-hoist	P-36	batch-03	2
 0x0206b8fc	main	112	legacy_sp3	sort-cmp-string-nocase	parked	42.9	P-36-pool-load-hoist	P-36	batch-03	2
 0x0206b778	main	96	legacy_sp3	find-index-by-key	shipped	100	n/a		batch-03	2
+0x0206baec	main	124	legacy	snapshot-config	shipped	100	n/a		batch-03	2
