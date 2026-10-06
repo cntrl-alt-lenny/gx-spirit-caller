@@ -1213,7 +1213,7 @@ src/main/func_02009968.s:
     complete
     .text start:0x02009968 end:0x02009a68
 
-src/main/func_02009a68.s:
+src/main/func_02009a68.c:
     complete
     .text start:0x02009a68 end:0x02009ab0
 
