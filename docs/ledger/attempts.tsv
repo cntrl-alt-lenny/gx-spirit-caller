@@ -2022,3 +2022,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02062d88	main	112	legacy_sp3	send-cmd-1-name	shipped	100	n/a		batch-03	2
 0x02062df8	main	116	legacy_sp3	send-cmd-0-data	shipped	100	n/a		batch-03	2
 0x02062834	main	124	legacy_sp3	resend-elem	shipped	100	n/a		batch-03	2
+0x02062eec	main	212	legacy_sp3	packet-begin	shipped	100	n/a		batch-03	2
