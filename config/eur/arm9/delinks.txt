@@ -10490,7 +10490,7 @@ src/main/func_0205cbb8.s:
     complete
     .text start:0x0205cbb8 end:0x0205ce40
 
-src/main/func_0205ce40.s:
+src/main/func_0205ce40.legacy_sp3.c:
     complete
     .text start:0x0205ce40 end:0x0205cf10
 

@@ -2077,3 +2077,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205c258	main	232	default	http-set-body	shipped	100	n/a		batch-05	1
 0x0205c6e4	main	100	default	conn-lookup-send	parked	59.3	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
 0x0205c6e4	main	100	legacy_sp3	conn-lookup-send	shipped	100	n/a		batch-05	1
+0x0205ce40	main	208	default	queue-drain-send	parked	11.3	register-set-mismatch	PROVISIONAL:register-set-mismatch	batch-05	1
+0x0205ce40	main	208	legacy_sp3	queue-drain-send	shipped	100	n/a		batch-05	1
