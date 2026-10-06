@@ -2132,3 +2132,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206b8fc	main	112	legacy_sp3	sort-cmp-string-nocase	parked	42.9	P-36-pool-load-hoist	P-36	batch-03	2
 0x0206b778	main	96	legacy_sp3	find-index-by-key	shipped	100	n/a		batch-03	2
 0x0206baec	main	124	legacy	snapshot-config	shipped	100	n/a		batch-03	2
+0x0206c074	main	156	default	socket-table-init	parked	38.5	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
+0x0206c52c	main	240	default	socket-connect	parked	11.7	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
+0x0206c9b0	main	156	default	socket-bind-port	parked	0.0	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
