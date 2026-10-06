@@ -2090,3 +2090,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02067c58	main	144	legacy_sp3	expire-queue	shipped	100	n/a		batch-03	2
 0x02067024	main	208	legacy_sp3	base64-encode	parked	75.0	P-36-instruction-scheduling	P-36	batch-03	4
 0x02067024	main	208	default	base64-encode	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x020688fc	main	96	default	name-blacklist-check	shipped	100	n/a		batch-03	1
