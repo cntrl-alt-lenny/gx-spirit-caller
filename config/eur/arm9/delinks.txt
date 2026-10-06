@@ -10042,7 +10042,7 @@ src/main/func_02054db8.s:
     complete
     .text start:0x02054db8 end:0x02054dfc
 
-src/main/func_02054dfc.s:
+src/main/func_02054dfc.legacy_sp3.c:
     complete
     .text start:0x02054dfc end:0x02054e54
 

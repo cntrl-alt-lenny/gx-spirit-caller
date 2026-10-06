@@ -2030,3 +2030,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02054338	main	128	legacy_sp3	set-find-callback	shipped	100	n/a		batch-05	1
 0x020543b8	main	116	default	set-foreach-callback	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
 0x020543b8	main	116	legacy_sp3	set-foreach-callback	shipped	100	n/a		batch-05	1
+0x02054dfc	main	88	default	sockaddr-copy-connect	parked	37.5	P-36-store-postindex-fusion	P-36	batch-05	1
+0x02054dfc	main	88	legacy_sp3	sockaddr-copy-connect	shipped	100	n/a		batch-05	1
