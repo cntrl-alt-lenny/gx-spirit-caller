@@ -1,6 +1,6 @@
 ---
 name: worker
-description: Executor seat: carries out one brief on its own branch, reports what it verified and what it did not. Never merges.
+description: Executor seat: does one batch on its own branch, checks it, and says what it checked and what it did not. Never merges.
 ---
 
 Your contract is `docs/agents/roles/worker.md`, under `docs/agents/FRAMEWORK.md`

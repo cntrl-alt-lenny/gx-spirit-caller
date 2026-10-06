@@ -3,15 +3,15 @@
   "files": {
     ".claude/agents/brain.md": {
       "kind": "copy",
-      "sha256": "33f6ec7cb33f2c66a2689c716153af950d680699d518dac96c1ddce6aabd2c91"
+      "sha256": "9e9938d5f220bf68968750e70747429f8aece07c8223fc599c691a288bb33ec6"
     },
     ".claude/agents/verifier.md": {
       "kind": "copy",
-      "sha256": "86d3ae5fafbf965d35adc38353ff69bf2a156a34df3703eb8d18056667056840"
+      "sha256": "119139f8b67fae99ca432448bfcfe7ae5095720c9c8720c66df15da426809618"
     },
     ".claude/agents/worker.md": {
       "kind": "copy",
-      "sha256": "a4bd118f5a139f8d96ae26943ea0523abb96e96387659a5c39dcdad7c4573a80"
+      "sha256": "0c59737e1a3866abb4e6133ddd7569b93b0b53967f375ca7fa817ce5f0e702dc"
     },
     ".claude/commands/status.md": {
       "kind": "copy",
@@ -31,19 +31,22 @@
     },
     "docs/agents/FRAMEWORK.md": {
       "kind": "copy",
-      "sha256": "ddb93e8847e1254f4845d1194cc5b1198dc519a0d8de374fa7308e8eb7ae08e8"
+      "sha256": "5937586f09154cf77e9e42facafd0d447354acb36438d5a2d146bcf008d0bceb"
     },
     "docs/agents/roles/brain.md": {
       "kind": "copy",
-      "sha256": "446e4fc0f3f85818d25f86ee2e2662c5806d334dd166106ca5db72cf8a3c4373"
+      "sha256": "051fc1d9b4aec73d29c9737e9099beab27eb8aa7a02fc2840430aaae78b34d7a"
     },
     "docs/agents/roles/verifier.md": {
       "kind": "copy",
-      "sha256": "30870db8d4782650b408ca01dc68f0ff178386c5e3a79f8004592098f25e2fef"
+      "sha256": "7dc20515468a15aa876685965fe89235fdb91109b8c896780fdcc53387805130"
     },
     "docs/agents/roles/worker.md": {
       "kind": "copy",
-      "sha256": "d88c7c7da81ec70f13d66c8d9bfd025b4a6d4aa6aa7b6fa03598c7e2a8192381"
+      "sha256": "9ef7bdf710a772a6a4c9e3b4396874b1a1dc6e52f94dce86d737ee482fad3abc"
+    },
+    "docs/batches/README.md": {
+      "kind": "seed"
     },
     "docs/rounds/README.md": {
       "kind": "seed"
@@ -53,15 +56,15 @@
     },
     "tests/test_framework.py": {
       "kind": "copy",
-      "sha256": "6df59bd81a49ba7bf378ddf2f94a0ca7d7831bf70901dff55b8ccfa1e6ff626b"
+      "sha256": "e31c4f3838bdcde4adbfaa444ca298c7e27426b53c2ed8c3d3068618cb56088c"
     },
     "tools/fw.py": {
       "kind": "copy",
-      "sha256": "13c8ee81784a2e83b86fee4ac369ed7273c123e5b9f9852e7b2600b9cc3c9e19"
+      "sha256": "f0662eb91c2f44602ef047b26d1339276e69a20091ba81692591f383393e5d61"
     }
   },
   "framework": {
-    "release": "3.1.0",
+    "release": "4.0.0",
     "repository": "https://github.com/cntrl-alt-lenny/agentic-framework"
   },
   "options": {

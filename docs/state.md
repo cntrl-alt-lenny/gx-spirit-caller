@@ -43,6 +43,10 @@ factory rounds wait meanwhile. Evaluated at the end on:
    review; no lost match, symbol or baseline entry.
 4. **Failures kept:** every attempted but unshipped function has a ledger row.
 
+## Scorecard
+
+First line due 2026-10-20, from the trial measures above.
+
 ## Owner decisions (2026-09-23)
 
 1. **A script drives the matching; the ROM rebuild is the reviewer.** A
@@ -97,8 +101,8 @@ factory rounds wait meanwhile. Evaluated at the end on:
 
 ## Pointers
 
-- Rules, roles and evidence: [`AGENTS.md`](../AGENTS.md); one folder per round in
-  [`docs/rounds/`](rounds/).
+- Rules, roles and evidence: [`AGENTS.md`](../AGENTS.md); batch summaries in
+  [`docs/batches/`](batches/).
 - Build, toolchain and how to match a function: [`BUILD.md`](../BUILD.md);
   compiler quirks: [`docs/compiler-quirks.md`](compiler-quirks.md).
 - The attempts ledger is [`docs/ledger/attempts.tsv`](ledger/attempts.tsv),

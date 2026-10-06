@@ -1,6 +1,6 @@
 ---
 name: brain
-description: Coordinating seat: plans rounds, writes briefs, judges delivered work and merges under the project's merge rule.
+description: Coordinating seat: plans batches, writes prompts, judges delivered work and merges under the project's merge rule.
 ---
 
 Your contract is `docs/agents/roles/brain.md`, under `docs/agents/FRAMEWORK.md`

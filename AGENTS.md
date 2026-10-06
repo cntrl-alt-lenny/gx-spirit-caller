@@ -3,33 +3,35 @@
 Instructions for every AI agent in this repository, whatever tool it runs in.
 Tool-specific files (`CLAUDE.md`) only point here.
 
-This project runs the agentic framework, release 3.1.0: read
+This project runs the agentic framework, release 4.0.0: read
 [`docs/agents/FRAMEWORK.md`](docs/agents/FRAMEWORK.md) and your role card in
 [`docs/agents/roles/`](docs/agents/roles/). This file adds the project's own
 rules, which take precedence over the framework's.
 
 Merge rule: owner-approves
 
-Brain shows the owner the merge card for a reviewed round and merges only after
+Brain shows the owner the merge card for a reviewed batch and merges only after
 the owner says yes to that merge. A passing gate is necessary, not sufficient. Only the owner changes this rule.
 
-## Temporary override: light-workflow trial, 2026-10-06 to 2026-10-20
+## How batches run here
 
-The owner's instruction, for matching work in this project only; it lapses at
-the end date unless the owner extends it. Criteria are in
-[`docs/state.md`](docs/state.md). For a matching batch:
+The light workflow the owner trialled from 2026-10-06 is now the framework's
+default (4.0); the trial's measures are in [`docs/state.md`](docs/state.md).
+For a matching batch:
 
 - Brain gives one Worker a short prompt: objective, boundaries, acceptance
-  checks. No round folder, brief or `fw.py start`/`report` is required. The
-  Worker uses `.worktrees/worker-<batch>` on branch `worker/<batch>`, attempts
+  checks. The Worker uses `.worktrees/worker-<batch>` on branch `worker/<batch>`, attempts
   several functions, commits small, runs the checks, repairs failures, and
   ends each session with a summary in `docs/batches/<batch>.md` and its reply:
   functions matched, checks run with results, limitations, blockers.
-- At the batch boundary a Verifier reviews the delivered commit, the real diff
+- Every matching batch takes the Checked path, as in the trial: at the batch
+  boundary a Verifier reviews the delivered commit, the real diff
   and the evidence, writing `docs/batches/<batch>-review.md`. The Worker fixes
   findings in the same batch; review applies to the resulting commit. A new
-  brief is needed only if the objective or assumptions change materially.
-- Unchanged: the merge rule (one approval request per reviewed batch), seats
+  prompt is needed only if the objective or assumptions change materially.
+- Tooling or docs off the build path are Normal (no Verifier); notes,
+  `docs/state.md` and framework updates are Small.
+- Always: the merge rule (one approval request per reviewed batch), seats
   never merge, the Invariants, the Evidence table (the three-region gate for
   any build-path change; tests never prove the ROM), protected paths,
   baselines that only shrink, and every failed attempt recorded in the ledger.
@@ -41,7 +43,7 @@ C source that rebuilds a byte-identical ROM, verified by SHA-1, for three
 regions: EUR (`AYXP`), USA (`AYXE`) and JPN (`AYXJ`). Each owner-supplied dump
 lives at `orig/baserom_<region>.nds` and is never committed or redistributed.
 The direction is a lean "matching factory" (a script drives the matching, the
-three-ROM rebuild reviews it); decisions and the round plan are in [`docs/state.md`](docs/state.md). Toolchain, layout and build
+three-ROM rebuild reviews it); decisions and the plan are in [`docs/state.md`](docs/state.md). Toolchain, layout and build
 steps are in [`BUILD.md`](BUILD.md).
 
 ## Roles
@@ -49,18 +51,18 @@ steps are in [`BUILD.md`](BUILD.md).
 | Role | Does | Runs from |
 |---|---|---|
 | Owner | Decides what is built and why; approves each merge; can veto anything | conversation |
-| Brain | Plans, writes briefs, reviews returned work at an exact commit, re-derives one claim, merges after the owner's yes | the primary checkout, on `brain/<round-id>` branches |
-| Worker | Carries out one brief, reports, never merges or accepts its own work | its own worktree (below), on `worker/<round-id>` |
-| Verifier | Reviews one exact commit blind, writes findings, never writes production code or merges | its own worktree (below), on `verifier/<round-id>` |
+| Brain | Plans, writes prompts, reviews returned work at an exact commit, re-derives one claim, merges after the owner's yes | the primary checkout, on `brain/<topic>` branches |
+| Worker | Carries out one batch, writes its summary, never merges or accepts its own work | its own worktree (below), on `worker/<batch>` |
+| Verifier | Reviews one exact commit blind, writes findings, never writes production code or merges | its own worktree (below), on `verifier/<batch>` |
 
 The old specialist executor names and per-role path table are retired: a
-Worker's scope is its brief. A Worker starts from the brief in fresh context;
-a session carrying over an earlier round is not independent. Any capable tool
+Worker's scope is its prompt. A Worker starts from the prompt in fresh context;
+a session carrying over an earlier batch is not independent. Any capable tool
 may hold any seat.
-Every seat starts with its `fw.py` command. Two seats never share a checkout. Adding or retiring a role is the owner's decision.
+Every seat starts with `python3 tools/fw.py status`. Two seats never share a checkout. Adding or retiring a role is the owner's decision.
 
 **Where seats work.** A Worker or Verifier works in the framework's
-`.worktrees/<role>-<number>`, made from the primary checkout with `git worktree
+`.worktrees/<role>-<batch>`, made from the primary checkout with `git worktree
 add`, with the baseroms hard-linked by `python tools/link_baseroms.py
 <worktree>` run from the primary checkout. Never a clone beside the project (a
 cloud session may clone in its workspace).
@@ -81,9 +83,9 @@ cloud session may clone in its workspace).
   `extract/`, `build/` and downloaded tool binaries.
 - **Framework files are not edited:** `docs/agents/`, `tools/fw.py`,
   `tests/test_framework.py`, `.claude/agents/` and `.claude/commands/status.md`
-  are copies. Update them only with the framework's adopter, as its own round.
+  are copies. Update them only with the framework's adopter, on a `brain/` branch.
 - **No personal paths or email addresses** in `AGENTS.md`, `CLAUDE.md`,
-  `docs/state.md`, `docs/agents/` or `docs/rounds/` (`fw.py check` enforces it).
+  `docs/state.md`, `docs/agents/`, `docs/batches/` or `docs/rounds/` (`fw.py check` enforces it).
 - **`docs/state.md` holds decisions, never live status** or full commit ids
   outside its `## Historical anchors`.
 
@@ -96,7 +98,7 @@ cloud session may clone in its workspace).
 - A checkout needs all three baseroms in its own `orig/` to run the gate (a
   worktree gets them as above; a cloud clone needs them copied in). Re-run `tools/configure.py <region>` whenever new `.c` files
   land in `src/`.
-- Success for a matching brief is the named functions passing the three-region
+- Success for a matching batch is the named functions passing the three-region
   gate with objdiff at 100%, never "a percentage went up"; do not pick functions
   by what maximizes a metric.
 - Any progress number quoted comes from `python3.13 tools/progress.py
@@ -105,7 +107,7 @@ cloud session may clone in its workspace).
   name the metric.
 - **Seats never ask the owner a technical question.** The owner is not
   technical, so their "yes" to one checks nothing. A Worker or Verifier that
-  needs a decision outside its brief or batch stops and reports `BLOCKED` with
+  needs a decision outside its prompt stops and reports `BLOCKED` with
   the question; Brain decides it, or turns it into a plain choice about
   outcome and risk. Brain treats a technical change described as
   owner-approved as unreviewed until Brain has checked it.
@@ -122,7 +124,7 @@ cloud session may clone in its workspace).
 ## Evidence
 
 Run what is relevant to what you changed and paste the real output with its
-exit status (framework rule 7). CI is the backstop, not the primary evidence.
+exit status (framework rule 3). CI is the backstop, not the primary evidence.
 
 | Changed | Required evidence |
 |---|---|
@@ -131,7 +133,7 @@ exit status (framework rule 7). CI is the backstop, not the primary evidence.
 | `src/` or `config/` | `python3.13 tools/check_match_invariants.py --version eur` reports no errors (exit 2 means errors), and `python3.13 tools/check_fake_matches.py` prints `OK`. The two baselines in `tools/` may only shrink (`--prune-baseline`). |
 | Symbol renames | The build-path row, plus the output of `tools/rename_symbol.py --cascade` showing the rename reached every region. |
 | `tools/` or `docs/` only, off the build path | `python3.13 -m pytest -q tests`, `python3.13 -m unittest discover -s tests` and `ruff check .`, all clean. |
-| `AGENTS.md`, `CLAUDE.md`, `docs/state.md`, `docs/agents/`, `docs/rounds/` | `python3 tools/fw.py check` with 0 errors and 0 warnings. |
+| `AGENTS.md`, `CLAUDE.md`, `docs/state.md`, `docs/agents/`, `docs/batches/` | `python3 tools/fw.py check` with 0 errors and 0 warnings. |
 | A newly added test | Show it red on a known-bad input before trusting it green. |
 
 The log check, in the form for the shell you are in (copy it verbatim; `<log>`
@@ -168,8 +170,8 @@ the agents keep, not locks GitHub checks; never call either server-enforced.
 
 ## Where to look
 
-- Standing decisions, the round plan and what is parked: [`docs/state.md`](docs/state.md)
-- Rounds, one folder each (brief and reports): [`docs/rounds/`](docs/rounds/)
+- Standing decisions, the plan and what is parked: [`docs/state.md`](docs/state.md)
+- Batch summaries and reviews: [`docs/batches/`](docs/batches/); 3.x rounds: [`docs/rounds/`](docs/rounds/)
 - Build, toolchain, conventions and bootstrap: [`BUILD.md`](BUILD.md),
   [`docs/machine-setup.md`](docs/machine-setup.md)
 - How matching is done, and the tools you run: [`BUILD.md`](BUILD.md); what
