@@ -2041,3 +2041,10 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020628b0	main	76	legacy_sp3	send-hdr-h	parked	31.6	load-scheduling-interleave	P-36	batch-03	2
 0x020603cc	main	216	legacy_sp3	http-header-parse	shipped	100	n/a		batch-03	3
 0x02062164	main	120	legacy_sp3	list-timeout-scan	shipped	100	n/a		batch-03	4
+0x02063dc8	main	68	legacy_sp3	close-conn-flag	parked	88.2	P-31-if-conversion-mirrored	P-31	batch-03	2
+0x02063dc8	main	68	default	close-conn-flag	parked	88.2	P-31-if-conversion-mirrored	P-31	batch-03	7
+0x02063188	main	256	default	conn-timeout-check	parked	78.1	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x02063548	main	216	default	msg-kind-dispatch	parked	1.9	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x02063664	main	172	default	ping-reply	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x0206371c	main	236	default	ack-range-resend	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x02064208	main	148	default	send-or-queue	parked	8.1	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
