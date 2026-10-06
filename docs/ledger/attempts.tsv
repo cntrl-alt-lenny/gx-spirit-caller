@@ -2379,3 +2379,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020116ec	main	96	default	rotation-matrix-z	parked	70.8	register-choice	PROVISIONAL:register-choice	batch-09	5
 0x020116ec	main	96	legacy_sp3	rotation-matrix-z	parked	16.0	register-choice	PROVISIONAL:register-choice	batch-09	1
 0x020116ec	main	96	legacy	rotation-matrix-z	parked	16.0	register-choice	PROVISIONAL:register-choice	batch-09	1
+0x02011a94	main	88	default	threshold-bracket-lookup	shipped	100	n/a		batch-09	1
