@@ -9840,7 +9840,7 @@ src/main/func_02053c34.c:
     complete
     .text start:0x02053c34 end:0x02053ca8
 
-src/main/func_02053ca8.s:
+src/main/func_02053ca8.legacy_sp3.c:
     complete
     .text start:0x02053ca8 end:0x02053d10
 

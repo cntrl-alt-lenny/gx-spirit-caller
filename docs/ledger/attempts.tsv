@@ -2022,3 +2022,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02053ba4	main	88	default	linear-search-callback	parked	68.2	P-20-family	P-20	batch-05	3
 0x02053ba4	main	88	legacy_sp3	linear-search-callback	shipped	100	n/a		batch-05	3
 0x02053c34	main	116	default	vector-find-last-callback	shipped	100	n/a		batch-05	1
+0x02053ca8	main	104	default	vector-foreach-reverse	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02053ca8	main	104	legacy_sp3	vector-foreach-reverse	shipped	100	n/a		batch-05	1
