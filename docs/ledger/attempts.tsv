@@ -2445,3 +2445,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201f4d4	main	148	default	state-gate-then-six-arg-call	parked	56.8	P-2-stm-fusion	P-2	batch-09	6
 0x0201f4d4	main	148	legacy_sp3	state-gate-then-six-arg-call	parked	2.7	P-2-stm-fusion	P-2	batch-09	1
 0x0201f4d4	main	148	legacy	state-gate-then-six-arg-call	parked	10.8	P-2-stm-fusion	P-2	batch-09	1
+0x0201f874	main	224	default	mask-pick-and-register	parked	94.6	control-flow-structural-mismatch	PROVISIONAL:control-flow-structural-mismatch	batch-09	10
+0x0201f874	main	224	legacy_sp3	mask-pick-and-register	parked	0.0	control-flow-structural-mismatch	PROVISIONAL:control-flow-structural-mismatch	batch-09	1
+0x0201f874	main	224	legacy	mask-pick-and-register	parked	0.0	control-flow-structural-mismatch	PROVISIONAL:control-flow-structural-mismatch	batch-09	1
