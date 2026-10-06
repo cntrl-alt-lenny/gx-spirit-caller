@@ -2050,3 +2050,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02046498	main	164	legacy_sp3	error-code-report	shipped	100	n/a		batch-04	1
 0x02046694	main	96	default	byte-list-index-lookup	parked	16.7	frame-shape	PROVISIONAL:frame/epilogue	batch-04	4
 0x02046694	main	96	legacy_sp3	byte-list-index-lookup	parked	33.3	P-20-family	P-20	batch-04	6
+0x02048bc0	main	104	default	entry-clear-notify	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
+0x02048bc0	main	104	legacy_sp3	entry-clear-notify	shipped	100	n/a		batch-04	1
