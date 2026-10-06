@@ -2973,7 +2973,7 @@ src/main/func_02019ce0.s:
     complete
     .text start:0x02019ce0 end:0x02019ea4
 
-src/main/func_02019ea4.s:
+src/main/func_02019ea4.c:
     complete
     .text start:0x02019ea4 end:0x02019f94
 

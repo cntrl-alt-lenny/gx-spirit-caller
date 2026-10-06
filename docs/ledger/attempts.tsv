@@ -2402,3 +2402,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02019494	main	148	default	table-or-offset-lookup	shipped	100	n/a		batch-09	2
 0x02019538	main	92	default	saturating-byte-add	shipped	100	n/a		batch-09	2
 0x02019858	main	64	default	charparam-score	shipped	100	n/a		batch-09	2
+0x02019a58	main	116	default	lcg-bracket-roll	parked	13.8	P-30-whole-function-register-rotation	P-30	batch-09	6
+0x02019a58	main	116	legacy_sp3	lcg-bracket-roll	parked	3.3	P-30-whole-function-register-rotation	P-30	batch-09	1
+0x02019a58	main	116	legacy	lcg-bracket-roll	parked	3.2	P-30-whole-function-register-rotation	P-30	batch-09	1
+0x02019ea4	main	240	default	id-class-switch	shipped	100	n/a		batch-09	1
