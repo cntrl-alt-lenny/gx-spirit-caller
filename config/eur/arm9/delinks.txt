@@ -3365,7 +3365,7 @@ src/main/func_0201b630.c:
 
 
 
-src/main/func_0201b648.s:
+src/main/func_0201b648.c:
     complete
     .text start:0x0201b648 end:0x0201b690
 
