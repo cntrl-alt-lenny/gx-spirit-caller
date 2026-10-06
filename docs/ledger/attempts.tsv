@@ -2006,3 +2006,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207391c	main	96	default	unknown	parked	12.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
 0x0207391c	main	96	legacy	unknown	shipped	100	n/a		batch-06	
 0x0207397c	main	224	default	unknown	parked	5.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207397c	main	224	legacy	unknown	shipped	100	n/a		batch-06	
