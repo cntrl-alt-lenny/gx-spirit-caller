@@ -2010,3 +2010,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020621dc	main	164	default	timeout-check	shipped	100	n/a		batch-03	1
 0x020601d0	main	244	legacy_sp3	http-status-check	shipped	100	n/a		batch-03	2
 0x02061578	main	248	legacy_sp3	refcount-callback-4arg	shipped	100	n/a		batch-03	2
+0x02061a8c	main	212	legacy_sp3	refcount-callback-1arg	shipped	100	n/a		batch-03	2
