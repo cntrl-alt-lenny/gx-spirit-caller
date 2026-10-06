@@ -2036,3 +2036,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02054ec0	main	132	legacy_sp3	private-ipv4-check	shipped	100	n/a		batch-05	2
 0x02054f44	main	140	default	hostent-init-local	parked	45.7	reg-alloc	PROVISIONAL:register-allocation	batch-05	2
 0x02054f44	main	140	legacy_sp3	hostent-init-local	shipped	100	n/a		batch-05	2
+0x02055030	main	248	default	poll-select-flags	parked	95.2	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-05	2
+0x02055030	main	248	legacy_sp3	poll-select-flags	shipped	100	n/a		batch-05	2
