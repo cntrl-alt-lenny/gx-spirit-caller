@@ -151,3 +151,36 @@ truthfully supplied from the available session metadata.
 
 Batch 02's summary and review were read; no tier retries went unrecorded and
 no non-default tier was selected without evidence.
+
+## Message 2: authorized library-path workaround, still blocked
+
+Brain identified the macOS downloader's missing libzstd dependency and
+instructed this Worker to use the existing library through
+`DYLD_LIBRARY_PATH`, with no tool changes or software installation. Brain
+explicitly required stopping if the known-match check failed.
+
+At `b07d9f4870ce7bfd7bac98d98418f35804092e99`:
+
+```text
+$ ls /opt/homebrew/lib/libzstd.1.dylib /usr/local/lib/libzstd.1.dylib
+/opt/homebrew/lib/libzstd.1.dylib
+ls: /usr/local/lib/libzstd.1.dylib: No such file or directory
+```
+
+Exit 1: the Homebrew library exists; the alternate location does not.
+
+```text
+$ DYLD_LIBRARY_PATH=/opt/homebrew/lib python3.13 tools/fastmatch.py eur src/main/func_02032b30.c
+[eur] func_02032b30.c: COMPILE ERROR
+  ninja: error: build.ninja:107985: multiple rules generate build/eur/src/main/func_0207084c.o
+```
+
+Exit 2. The known-match prerequisite did not pass, so the library-path
+workaround remains unverified. The generated build graph retained the previous
+draft's C rule after the function was parked back to assembly. No generated
+files were hand-edited, no new matching attempt was made, and the tool-anomaly
+ledger row remains unchanged. No gate was run.
+
+Brain decision needed: authorize re-running `python3.13 tools/configure.py eur`
+to regenerate the graph after the parked draft, then retry the known-match
+check with the authorized library-path environment.
