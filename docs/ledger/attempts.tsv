@@ -1970,3 +1970,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203e2f0	main	228	legacy_sp3	link-state-switch	shipped	100	n/a		batch-02	2
 0x0203e400	main	96	legacy_sp3	link-step-dispatch	shipped	100	n/a		batch-02	1
 0x0203e460	main	224	legacy_sp3	pick-free-slot	shipped	100	n/a		batch-02	3
+0x0203e870	main	72	legacy_sp3	retry-bump	shipped	100	n/a		batch-02	1
