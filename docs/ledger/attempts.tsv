@@ -1992,3 +1992,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020402ec	main	80	default	locked-field-read	parked	50.0	address-fold	PROVISIONAL:address-fold	batch-04	1
 0x020402ec	main	80	legacy	locked-field-read	parked	18.2	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-04	1
 0x020402ec	main	80	legacy_sp3	locked-field-read	shipped	100	n/a		batch-04	1
+0x02040cc0	main	148	default	pair-array-free-loop	parked	2.7	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
+0x02040cc0	main	148	legacy	pair-array-free-loop	parked	23.1	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-04	1
+0x02040cc0	main	148	legacy_sp3	pair-array-free-loop	shipped	100	n/a		batch-04	1
