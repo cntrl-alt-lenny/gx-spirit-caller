@@ -10283,7 +10283,7 @@ src/main/func_02057e60.legacy.c:
     complete
     .text start:0x02057e60 end:0x02057f3c
 
-src/main/func_02057f3c.s:
+src/main/func_02057f3c.legacy_sp3.c:
     complete
     .text start:0x02057f3c end:0x02058038
 

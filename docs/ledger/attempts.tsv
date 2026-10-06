@@ -2059,3 +2059,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02056c34	main	232	default	session-append-fields	parked	70.7	frame-shape	PROVISIONAL:frame/epilogue	batch-05	2
 0x02056c34	main	232	legacy_sp3	session-append-fields	parked	22.4	new-repeated-addr-cse-vs-target-recompute	PROVISIONAL:pool/address-cse	batch-05	4
 0x02056c34	main	232	legacy	session-append-fields	parked	3.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02057f3c	main	252	default	socket-connect-status	parked	25.4	P-20-family	P-20	batch-05	1
+0x02057f3c	main	252	legacy_sp3	socket-connect-status	shipped	100	n/a		batch-05	2
