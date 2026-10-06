@@ -2102,3 +2102,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02068890	main	108	default	strtok	parked	11.1	load-scheduling-residual	PROVISIONAL:load-scheduling-residual	batch-03	2
 0x02068890	main	108	legacy_sp3	strtok	shipped	100	n/a		batch-03	2
 0x02068d50	main	72	default	connect-by-name	shipped	100	n/a		batch-03	1
+0x02068bb8	main	80	default	release-table	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x02068d98	main	88	default	connect-by-name-ex	parked	81.8	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x0206904c	main	176	default	request-event	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
