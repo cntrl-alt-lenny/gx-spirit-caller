@@ -2388,3 +2388,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02003e98	main	132	default	dispatch-two-way-8arg	shipped	100	n/a		batch-08	1
 0x02004ef4	main	100	default	conditional-tailcall-wrapper	shipped	100	n/a		batch-08	1
 0x02005188	main	68	default	bitfield-field-call	shipped	100	n/a		batch-08	1
+0x020051cc	main	68	default	bitfield-field-call	shipped	100	n/a		batch-08	1

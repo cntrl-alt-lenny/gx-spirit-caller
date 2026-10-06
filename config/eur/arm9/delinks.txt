@@ -709,7 +709,7 @@ src/main/func_02005188.c:
     complete
     .text start:0x02005188 end:0x020051cc
 
-src/main/func_020051cc.s:
+src/main/func_020051cc.c:
     complete
     .text start:0x020051cc end:0x02005210
 
