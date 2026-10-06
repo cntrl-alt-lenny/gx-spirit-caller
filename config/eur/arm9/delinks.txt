@@ -701,7 +701,7 @@ src/main/func_02004fe8.c:
     complete
     .text start:0x02004fe8 end:0x02005088
 
-src/main/func_02005088.s:
+src/main/func_02005088.c:
     complete
     .text start:0x02005088 end:0x02005188
 
