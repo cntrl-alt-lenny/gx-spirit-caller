@@ -3973,7 +3973,7 @@ src/main/func_0201f11c.c:
     complete
     .text start:0x0201f11c end:0x0201f138
 
-src/main/func_0201f138.s:
+src/main/func_0201f138.c:
     complete
     .text start:0x0201f138 end:0x0201f19c
 
