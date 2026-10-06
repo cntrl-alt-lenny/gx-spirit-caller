@@ -2014,3 +2014,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204152c	main	156	legacy_sp3	buffer-append-format	shipped	100	n/a		batch-04	2
 0x02043168	main	140	default	thread-restart	parked	42.9	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
 0x02043168	main	140	legacy_sp3	thread-restart	shipped	100	n/a		batch-04	1
+0x0204320c	main	68	default	locked-field-read	parked	41.2	address-fold	PROVISIONAL:address-fold	batch-04	1
+0x0204320c	main	68	legacy_sp3	locked-field-read	shipped	100	n/a		batch-04	1
