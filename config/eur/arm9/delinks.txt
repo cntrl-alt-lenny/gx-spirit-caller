@@ -1225,7 +1225,7 @@ src/main/func_02009dec.s:
     complete
     .text start:0x02009dec end:0x02009e9c
 
-src/main/func_02009e9c.s:
+src/main/func_02009e9c.c:
     complete
     .text start:0x02009e9c end:0x02009f50
 
