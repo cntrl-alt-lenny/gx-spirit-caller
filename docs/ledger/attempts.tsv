@@ -2154,3 +2154,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206e1e8	main	60	legacy	set-pair-config	shipped	100	n/a		batch-03	2
 0x0206e690	main	144	legacy	inet-ntop	shipped	100	n/a		batch-03	2
 0x0206dad8	main	228	legacy	socket-shutdown	shipped	100	n/a		batch-03	5
+0x0206e5a8	main	200	legacy	socket-poll	shipped	100	n/a		batch-03	4
