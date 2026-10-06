@@ -12653,7 +12653,7 @@ src/main/func_0206ea84.c:
 
 
 
-src/main/func_0206ea90.s:
+src/main/func_0206ea90.legacy.c:
     complete
     .text start:0x0206ea90 end:0x0206eb08
 

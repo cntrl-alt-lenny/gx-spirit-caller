@@ -2160,3 +2160,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206ee40	main	96	default	connect-sockaddr	parked	91.7	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
 0x0206fb64	main	200	default	dhcp-request-build	parked	2.0	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
 0x0206ee40	main	96	legacy	connect-sockaddr	shipped	100	n/a		batch-03	2
+0x0206ea90	main	120	legacy	set-pair-from-net	shipped	100	n/a		batch-03	2
