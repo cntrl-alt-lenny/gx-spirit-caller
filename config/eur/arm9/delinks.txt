@@ -492,7 +492,7 @@ src/main/func_02001540.s:
     complete
     .text start:0x02001540 end:0x020018d4
 
-src/main/func_020018d4.s:
+src/main/func_020018d4.c:
     complete
     .text start:0x020018d4 end:0x0200197c
 

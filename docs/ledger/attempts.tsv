@@ -2379,3 +2379,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02000f84	main	68	default	state-increment-reset	shipped	100	n/a		batch-08	1
 0x02001b18	main	140	default	mask-loop-sprintf	shipped	100	n/a		batch-08	1
 0x02001448	main	248	default	state-machine-switch	shipped	100	n/a		batch-08	5
+0x020018d4	main	168	default	mask-nested-loop-sprintf	shipped	100	n/a		batch-08	1
