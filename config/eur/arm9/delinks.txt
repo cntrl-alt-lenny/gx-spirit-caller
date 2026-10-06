@@ -11973,7 +11973,7 @@ src/main/func_02068d24.c:
     complete
     .text start:0x02068d24 end:0x02068d50
 
-src/main/func_02068d50.s:
+src/main/func_02068d50.c:
     complete
     .text start:0x02068d50 end:0x02068d98
 
