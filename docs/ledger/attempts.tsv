@@ -2016,3 +2016,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02043168	main	140	legacy_sp3	thread-restart	shipped	100	n/a		batch-04	1
 0x0204320c	main	68	default	locked-field-read	parked	41.2	address-fold	PROVISIONAL:address-fold	batch-04	1
 0x0204320c	main	68	legacy_sp3	locked-field-read	shipped	100	n/a		batch-04	1
+0x020432d0	main	256	default	net-shutdown-free	parked	92.2	P-20-family	P-20	batch-04	1
+0x020432d0	main	256	legacy_sp3	net-shutdown-free	parked	92.2	P-20-family	P-20	batch-04	8
