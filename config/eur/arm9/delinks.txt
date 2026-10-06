@@ -8857,7 +8857,7 @@ src/main/func_020490dc.legacy_sp3.c:
     complete
     .text start:0x020490dc end:0x02049120
 
-src/main/func_02049120.s:
+src/main/func_02049120.legacy_sp3.c:
     complete
     .text start:0x02049120 end:0x0204918c
 
