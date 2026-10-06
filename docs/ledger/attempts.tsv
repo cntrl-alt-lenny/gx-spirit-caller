@@ -2005,3 +2005,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02062d88	main	112	default	send-cmd-1-name	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x02062df8	main	116	default	send-cmd-0-data	parked	72.4	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x02062eec	main	212	default	packet-begin	parked	3.8	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x0206133c	main	156	default	buf-erase-range	shipped	100	n/a		batch-03	1
