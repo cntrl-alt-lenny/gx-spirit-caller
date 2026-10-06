@@ -11068,7 +11068,7 @@ src/main/func_02063034.s:
     complete
     .text start:0x02063034 end:0x02063188
 
-src/main/func_02063188.s:
+src/main/func_02063188.legacy_sp3.c:
     complete
     .text start:0x02063188 end:0x02063288
 
