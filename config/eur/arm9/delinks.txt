@@ -7381,7 +7381,7 @@ src/main/func_02038dac.c:
     complete
     .text start:0x02038dac end:0x02038ddc
 
-src/main/func_02038ddc.s:
+src/main/func_02038ddc.c:
     complete
     .text start:0x02038ddc end:0x02038e58
 
