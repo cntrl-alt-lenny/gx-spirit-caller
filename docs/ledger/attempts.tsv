@@ -2004,3 +2004,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020414b0	main	112	legacy_sp3	buffer-alloc-init	shipped	100	n/a		batch-04	1
 0x02040de8	main	84	default	keyvalue-lookup	parked	50.0	P-31-if-conversion	P-31	batch-04	2
 0x02040de8	main	84	legacy_sp3	keyvalue-lookup	shipped	100	n/a		batch-04	2
+0x02041dbc	main	92	default	timer-init-fields	parked	56.5	address-fold	PROVISIONAL:address-fold	batch-04	1
+0x02041dbc	main	92	legacy_sp3	timer-init-fields	shipped	100	n/a		batch-04	1
