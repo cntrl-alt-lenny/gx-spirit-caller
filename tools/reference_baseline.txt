@@ -442,17 +442,12 @@ eur	src/main/func_0202b9b0.s	wrong-target	.text+0x38 original ABS32 data_020be82
 eur	src/main/func_0202be4c.s	wrong-target	.text+0xa8 original ABS32 data_020c6aa0+0x0 built ABS32 data_020c6a9c+0x4
 eur	src/main/func_020318b8.c	wrong-target	.text+0x70 original ABS32 data_0219adb8+0x0 built ABS32 data_0219adb8_alias+0x0
 eur	src/main/func_0203e0a0.s	wrong-target	.text+0xf4 original ABS32 data_020bec4c+0x0 built ABS32 data_020bec3c+0x10
-eur	src/main/func_0203e198.s	wrong-target	.text+0x68 original ABS32 data_020bec44+0x0 built ABS32 data_020bec3c+0x8
-eur	src/main/func_0203e204.s	wrong-target	.text+0x4c original ABS32 data_020bec44+0x0 built ABS32 data_020bec3c+0x8
 eur	src/main/func_0203e610.s	wrong-target	.text+0x11c original ABS32 data_020bee7c+0x0 built ABS32 data_020bee6c+0x10
 eur	src/main/func_0203e8b8.c	wrong-target	.text+0x9c original ABS32 data_020bee7c+0x0 built ABS32 data_020bee6c+0x10
 eur	src/main/func_0203e8b8.c	wrong-target	.text+0xa0 original ABS32 data_020bee84+0x0 built ABS32 data_020bee6c+0x18
-eur	src/main/func_0203e95c.s	wrong-target	.text+0x48 original ABS32 data_020bee7c+0x0 built ABS32 data_020bee6c+0x10
-eur	src/main/func_0203e95c.s	wrong-target	.text+0x4c original ABS32 data_020bee84+0x0 built ABS32 data_020bee6c+0x18
 eur	src/main/func_0203e9ac.legacy_sp3.c	wrong-target	.text+0xec original ABS32 data_020bee7c+0x0 built ABS32 data_020bee6c+0x10
 eur	src/main/func_0203e9ac.legacy_sp3.c	wrong-target	.text+0xf0 original ABS32 data_020bee84+0x0 built ABS32 data_020bee6c+0x18
 eur	src/main/func_0203f37c.s	wrong-target	.text+0x1c4 original ABS32 data_020becf4+0x0 built ABS32 data_020bece4+0x10
-eur	src/main/func_0203f590.s	wrong-target	.text+0xf4 original ABS32 data_020bed04+0x0 built ABS32 data_020bece4+0x20
 eur	src/main/func_020447d8.legacy_sp3.c	wrong-target	.text+0xfc original ABS32 data_020bed1c+0x0 built ABS32 data_020bece4+0x38
 eur	src/main/func_020450d0.s	wrong-target	.text+0x184 original ABS32 data_020bed28+0x0 built ABS32 data_020bece4+0x44
 eur	src/main/func_020450d0.s	wrong-target	.text+0x188 original ABS32 data_020bed20+0x0 built ABS32 data_020bece4+0x3c

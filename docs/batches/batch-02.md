@@ -99,8 +99,19 @@ Run on 8a44a64dd, the last code commit; this summary is the only change after it
 - `python tools/fastmatch.py eur <file>` shows 100.0% OK for each shipped
   file at the moment it was committed.
 
-The three-region gate runs on the commit that adds this file. Its log-check
-lines are in the handoff reply.
+The first three-region gate, on 6d1a5a951, ended `gate3: GATE EXIT 1`. All
+three regions passed SHA1 and pytest passed, but the reference check failed
+on 5 stale baseline lines. These are old `wrong-target` entries for the `.s`
+versions of func_0203e198, func_0203e204, func_0203e95c (two lines) and
+func_0203f590. The matched C now names the symbols the original relocations
+use (`data_020bec44`, `data_020bee7c`, `data_020bee84` and `data_020bed04`),
+so those findings no longer occur. The brief ruled out baseline changes, so
+I asked the owner. With their approval I ran
+`python tools/check_references.py --version eur --version usa --version jpn
+--prune-baseline`, which printed `pruned 5 stale baseline entries`. The
+diff is exactly 5 deleted lines in `tools/reference_baseline.txt`; nothing
+was added. The gate was then re-run on the commit that adds this text, and
+its log-check lines are in the handoff reply.
 
 ## For the Verifier: things to check
 
@@ -149,7 +160,8 @@ lines are in the handoff reply.
 
 ## Limitations and blockers
 
-- No tool defect blocked any function, and no tools were changed. Every
+- No tool defect blocked any function. The only change under `tools/` is
+  the owner-approved prune of 5 stale lines from `reference_baseline.txt`. Every
   draft was written by hand. Helper scripts in my scratch space automated
   only fastmatch runs, side-by-side disassembly and searches over
   local-declaration orders.
