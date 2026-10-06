@@ -504,7 +504,7 @@ src/main/func_02001a34.s:
     complete
     .text start:0x02001a34 end:0x02001b18
 
-src/main/func_02001b18.s:
+src/main/func_02001b18.c:
     complete
     .text start:0x02001b18 end:0x02001ba4
 
