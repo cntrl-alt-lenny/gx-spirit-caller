@@ -1928,3 +1928,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02037b58	main	140	default	entry-lookup-by-id	shipped	100	n/a		batch-02	3
 0x02037be4	main	112	default	flags-to-kind	shipped	100	n/a		batch-02	1
 0x02037ca0	main	136	default	volume-scale-div	shipped	100	n/a		batch-02	1
+0x0203244c	main	116	default	ring-buffer-pop	parked	62.1	address-fold	PROVISIONAL:address-fold	batch-02	3
+0x0203671c	main	192	default	entry-reset-init	parked	91.7	P-36-literal-store-order	P-36	batch-02	6
+0x0203724c	main	220	default	select-active-entry	parked	38.2	P-20-family	P-20	batch-02	5
