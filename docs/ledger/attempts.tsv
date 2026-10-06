@@ -2145,3 +2145,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206d404	main	188	legacy	round-to-mss	parked	76.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-03	4
 0x0206ceb8	main	88	legacy	socket-send-req	shipped	100	n/a		batch-03	2
 0x0206d0b0	main	152	legacy	socket-send-or-queue	shipped	100	n/a		batch-03	2
+0x0206d360	main	164	legacy	ring-read	shipped	100	n/a		batch-03	2

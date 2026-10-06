@@ -12430,7 +12430,7 @@ src/main/func_0206d1f0.s:
     complete
     .text start:0x0206d1f0 end:0x0206d360
 
-src/main/func_0206d360.s:
+src/main/func_0206d360.legacy.c:
     complete
     .text start:0x0206d360 end:0x0206d404
 
