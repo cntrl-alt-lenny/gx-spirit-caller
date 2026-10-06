@@ -8076,7 +8076,7 @@ src/main/func_02040258.legacy_sp3.c:
     complete
     .text start:0x02040258 end:0x020402ec
 
-src/main/func_020402ec.s:
+src/main/func_020402ec.legacy_sp3.c:
     complete
     .text start:0x020402ec end:0x0204033c
 

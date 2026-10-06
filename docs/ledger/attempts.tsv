@@ -1989,3 +1989,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02040258	main	148	default	settings-copy-clamp	parked	59.5	address-fold	PROVISIONAL:address-fold	batch-04	1
 0x02040258	main	148	legacy	settings-copy-clamp	parked	60.5	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-04	1
 0x02040258	main	148	legacy_sp3	settings-copy-clamp	shipped	100	n/a		batch-04	1
+0x020402ec	main	80	default	locked-field-read	parked	50.0	address-fold	PROVISIONAL:address-fold	batch-04	1
+0x020402ec	main	80	legacy	locked-field-read	parked	18.2	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-04	1
+0x020402ec	main	80	legacy_sp3	locked-field-read	shipped	100	n/a		batch-04	1
