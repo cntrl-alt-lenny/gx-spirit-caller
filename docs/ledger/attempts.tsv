@@ -2065,3 +2065,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206553c	main	84	legacy_sp3	list-release-all	shipped	100	n/a		batch-03	2
 0x02065470	main	204	legacy_sp3	send-arp-reply	parked	49.0	load-scheduling-interleave	P-36	batch-03	2
 0x02065470	main	204	default	send-arp-reply	parked	31.4	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x02065fa8	main	104	default	entry-find-key	shipped	100	n/a		batch-03	1
