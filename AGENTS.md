@@ -103,6 +103,12 @@ cloud session may clone in its workspace).
   --version <region>` at a stated commit. The headline, natural-C, counts
   `.text` only (data and carve work cannot move it), so "EUR is stuck" must
   name the metric.
+- **Seats never ask the owner a technical question.** The owner is not
+  technical, so their "yes" to one checks nothing. A Worker or Verifier that
+  needs a decision outside its brief or batch stops and reports `BLOCKED` with
+  the question; Brain decides it, or turns it into a plain choice about
+  outcome and risk. Brain treats a technical change described as
+  owner-approved as unreviewed until Brain has checked it.
 - Fix the defect class, not the first example. Report a flaw found along the way
   as a defect, never as a quirk of the setup.
 - Use `python3.13` for this project's scripts and tests (macOS ships no plain
