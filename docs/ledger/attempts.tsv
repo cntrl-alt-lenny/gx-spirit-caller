@@ -2097,3 +2097,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02068b54	main	64	default	record-add-pair	parked	75.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x02067f3c	main	256	legacy_sp3	record-complete	shipped	100	n/a		batch-03	2
 0x0206803c	main	144	legacy_sp3	queue-record	shipped	100	n/a		batch-03	2
+0x020684c8	main	176	legacy_sp3	record-new	shipped	100	n/a		batch-03	2
