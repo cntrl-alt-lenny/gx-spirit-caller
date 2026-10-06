@@ -3319,7 +3319,7 @@ src/main/func_0201adb0.s:
     complete
     .text start:0x0201adb0 end:0x0201af80
 
-src/main/func_0201af80.s:
+src/main/func_0201af80.c:
     complete
     .text start:0x0201af80 end:0x0201afdc
 

@@ -2414,3 +2414,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201a134	main	60	legacy_sp3	flag-set-and-lookup	parked	0.0	P-20-register-letter	P-20	batch-09	1
 0x0201a134	main	60	legacy	flag-set-and-lookup	parked	0.0	P-20-register-letter	P-20	batch-09	1
 0x0201aabc	main	56	default	bitfield-set-bit	shipped	100	n/a		batch-09	1
+0x0201af80	main	92	default	table-entry-search	shipped	100	n/a		batch-09	5
