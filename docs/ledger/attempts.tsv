@@ -2155,3 +2155,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206e690	main	144	legacy	inet-ntop	shipped	100	n/a		batch-03	2
 0x0206dad8	main	228	legacy	socket-shutdown	shipped	100	n/a		batch-03	5
 0x0206e5a8	main	200	legacy	socket-poll	shipped	100	n/a		batch-03	4
+0x0206ea90	main	120	default	set-pair-from-net	parked	3.3	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
+0x0206ebe8	main	204	default	gethostbyname	parked	0.0	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
+0x0206ee40	main	96	default	connect-sockaddr	parked	91.7	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
+0x0206fb64	main	200	default	dhcp-request-build	parked	2.0	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-03	1
