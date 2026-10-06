@@ -2366,3 +2366,13 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205fd94	main	132	default	version-string-parse	parked	57.6	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	3
 0x0205fd94	main	132	legacy_sp3	version-string-parse	shipped	100	n/a		batch-05	3
 0x0205c258	main	232	default	http-set-body	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-05	2
+0x02000cc4	main	72	default	entry-table-push	parked	44.4	register-choice	PROVISIONAL:register-choice	batch-08	6
+0x02000cc4	main	72	legacy_sp3	entry-table-push	parked	44.4	register-choice	PROVISIONAL:register-choice	batch-08	1
+0x02000cc4	main	72	legacy	entry-table-push	parked	21.1	register-choice	PROVISIONAL:register-choice	batch-08	1
+0x02000d0c	main	64	default	entry-table-pop	parked	75.0	load-scheduling-interleave	P-36	batch-08	5
+0x02000d0c	main	64	legacy_sp3	entry-table-pop	parked	75.0	load-scheduling-interleave	P-36	batch-08	5
+0x02000d0c	main	64	legacy	entry-table-pop	parked	41.2	load-scheduling-interleave	P-36	batch-08	5
+0x02000d4c	main	80	default	entry-table-pop	parked	20.0	load-scheduling-interleave	P-36	batch-08	4
+0x02000d4c	main	80	legacy_sp3	entry-table-pop	parked	0.0	load-scheduling-interleave	P-36	batch-08	4
+0x02000d4c	main	80	legacy	entry-table-pop	parked	0.0	load-scheduling-interleave	P-36	batch-08	4
+0x02000ef8	main	140	default	state-switch-dispatch	shipped	100	n/a		batch-08	3

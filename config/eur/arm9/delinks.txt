@@ -464,7 +464,7 @@ src/main/func_02000ec8.c:
     complete
     .text start:0x02000ec8 end:0x02000ef8
 
-src/main/func_02000ef8.s:
+src/main/func_02000ef8.c:
     complete
     .text start:0x02000ef8 end:0x02000f84
 
