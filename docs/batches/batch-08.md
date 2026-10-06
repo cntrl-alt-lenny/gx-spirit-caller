@@ -16,7 +16,55 @@ All 47 ship in the default tier (`.c`, mwcc 2.0). None needed a non-default
 tier, so no tier evidence is required. Each matched in 2.0 after C-level
 changes only; I did not compile the 1.2 tiers for these.
 
-@@MATCHED@@
+| Function | Size | Tier | Shape |
+|---|---|---|---|
+| func_02000ef8 | 140 | `.c` | state-switch-dispatch |
+| func_02000f84 | 68 | `.c` | state-increment-reset |
+| func_02001448 | 248 | `.c` | state-machine-switch |
+| func_020018d4 | 168 | `.c` | mask-nested-loop-sprintf |
+| func_02001a34 | 228 | `.c` | mask-loop-task-post |
+| func_02001b18 | 140 | `.c` | mask-loop-sprintf |
+| func_02001bc8 | 208 | `.c` | rgb555-blend-table |
+| func_020037d0 | 240 | `.c` | switch-dispatch-call |
+| func_02003a4c | 116 | `.c` | dispatch-two-way |
+| func_02003d98 | 256 | `.c` | switch-dispatch-call |
+| func_02003e98 | 132 | `.c` | dispatch-two-way-8arg |
+| func_02004ef4 | 100 | `.c` | conditional-tailcall-wrapper |
+| func_02005088 | 256 | `.c` | flag-sweep-calls |
+| func_02005188 | 68 | `.c` | bitfield-field-call |
+| func_020051cc | 68 | `.c` | bitfield-field-call |
+| func_02005240 | 88 | `.c` | bitfield-flag-call |
+| func_020054f0 | 100 | `.c` | stack-buf-call-return |
+| func_02005554 | 96 | `.c` | stack-buf-call-return |
+| func_02005b74 | 136 | `.c` | switch-pool-init |
+| func_02005ca0 | 108 | `.c` | switch-pool-init |
+| func_02005e20 | 192 | `.c` | pool-free-list |
+| func_02006264 | 104 | `.c` | distance-check |
+| func_02006e28 | 200 | `.c` | text-search |
+| func_020091f4 | 88 | `.c` | small-fn |
+| func_02009758 | 76 | `.c` | small-fn |
+| func_02009a68 | 72 | `.c` | small-fn |
+| func_02009e9c | 180 | `.c` | slot-update-loop |
+| func_02009f50 | 196 | `.c` | slot-decay-random |
+| func_0200a19c | 104 | `.c` | const-table-lookup |
+| func_0200a204 | 104 | `.c` | small-fn |
+| func_0200a26c | 136 | `.c` | small-fn |
+| func_0200a2f4 | 140 | `.c` | ring-lookup |
+| func_0200a3b8 | 84 | `.c` | flag-sweep |
+| func_0200a40c | 72 | `.c` | flag-scan |
+| func_0200a928 | 108 | `.c` | snapshot-compare-copy |
+| func_0200b250 | 164 | `.c` | entry-convert-loop |
+| func_0200bff4 | 132 | `.c` | slot-claim |
+| func_0200c23c | 72 | `.c` | small-fn |
+| func_0200c594 | 200 | `.c` | list-scan-trigger |
+| func_0200c79c | 136 | `.c` | flag-setter |
+| func_0200ed48 | 112 | `.c` | free-slot-find |
+| func_0200f044 | 248 | `.c` | bitfield-mode-setter |
+| func_0200fa90 | 104 | `.c` | list-lookup |
+| func_0200fb18 | 188 | `.c` | list-lookup |
+| func_0200fbd4 | 164 | `.c` | list-lookup |
+| func_0200fc78 | 164 | `.c` | list-lookup |
+| func_0200fd1c | 104 | `.c` | list-lookup |
 
 Levers that mattered (for the Verifier, so they are not read as tricks):
 
@@ -45,7 +93,19 @@ Levers that mattered (for the Verifier, so they are not read as tricks):
 
 Best score per tier, from the ledger. Each tier has its own `parked` row.
 
-@@PARKED@@
+| Function | Size | `.c` (2.0) | `.legacy_sp3.c` | `.legacy.c` | Park class | Attempts |
+|---|---|---|---|---|---|---|
+| func_02000cc4 | 72 | 44.4% | 44.4% | 21.1% | register-choice | 6 |
+| func_02000d0c | 64 | 75.0% | 75.0% | 41.2% | load-scheduling-interleave | 5 |
+| func_02000d4c | 80 | 20.0% | 0.0% | 0.0% | load-scheduling-interleave | 4 |
+| func_020054a4 | 76 | 55.0% | 33.3% | 31.8% | store-coalescing | 6 |
+| func_020055b4 | 240 | 1.7% | 1.7% | 1.7% | constant-materialization | 5 |
+| func_020059b0 | 176 | 50.0% | 2.1% | 2.0% | reg-alloc | 30 |
+| func_02005a60 | 216 | 0.0% | 0.0% | 0.0% | reg-alloc | 3 |
+| func_02005dac | 116 | 3.5% | 3.5% | 16.7% | register-choice | 4 |
+| func_02006a38 | 216 | 3.7% | 0.0% | 0.0% | pool-constant-caching-resistance | 2 |
+| func_02007104 | 160 | 87.5% | 57.5% | 38.1% | reg-alloc | 130 |
+| func_0200edb8 | 240 | 90.0% | 25.4% | 13.8% | register-choice | 4 |
 
 Notes:
 
