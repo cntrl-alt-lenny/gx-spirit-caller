@@ -1962,3 +1962,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203c730	main	160	legacy_sp3	peer-compare-loop	parked	90.0	P-20-family	P-20	batch-02	2
 0x0203d258	main	144	legacy_sp3	name-match-list	shipped	100	n/a		batch-02	5
 0x0203d2e8	main	180	legacy_sp3	mode-special-check	shipped	100	n/a		batch-02	1
+0x0203d5b0	main	248	legacy_sp3	info-fill-switch	shipped	100	n/a		batch-02	2
