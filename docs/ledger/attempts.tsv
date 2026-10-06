@@ -2433,3 +2433,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200a928	main	108	default	snapshot-compare-copy	shipped	100	n/a		batch-08	5
 0x0200c23c	main	72	default	small-fn	shipped	100	n/a		batch-08	1
 0x0200bff4	main	132	default	slot-claim	shipped	100	n/a		batch-08	1
+0x0200b250	main	164	default	entry-convert-loop	shipped	100	n/a		batch-08	2

@@ -1533,7 +1533,7 @@ src/main/func_0200b228.c:
     complete
     .text start:0x0200b228 end:0x0200b250
 
-src/main/func_0200b250.s:
+src/main/func_0200b250.c:
     complete
     .text start:0x0200b250 end:0x0200b2f4
 
