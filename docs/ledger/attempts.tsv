@@ -1943,3 +1943,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02038d70	main	60	default	slot-scan-next	shipped	100	n/a		batch-02	3
 0x02038ddc	main	124	default	slot-find-or-alloc	shipped	100	n/a		batch-02	3
 0x02039990	main	76	default	lookup-pair-bitfield	shipped	100	n/a		batch-02	2
+0x0203a780	main	204	default	item-list-dispatch	shipped	100	n/a		batch-02	3

@@ -7473,7 +7473,7 @@ src/main/func_0203a744.c:
     complete
     .text start:0x0203a744 end:0x0203a780
 
-src/main/func_0203a780.s:
+src/main/func_0203a780.c:
     complete
     .text start:0x0203a780 end:0x0203a84c
 
