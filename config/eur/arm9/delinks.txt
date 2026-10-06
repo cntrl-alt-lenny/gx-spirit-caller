@@ -1013,7 +1013,7 @@ src/main/Task_Invoke.c:
 
 
 
-src/main/func_02006e28.s:
+src/main/func_02006e28.c:
     complete
     .text start:0x02006e28 end:0x02006ef0
 

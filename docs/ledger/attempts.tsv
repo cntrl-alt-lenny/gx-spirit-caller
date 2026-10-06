@@ -2412,3 +2412,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02005dac	main	116	legacy_sp3	pool-alloc	parked	3.5	register-choice	PROVISIONAL:register-choice	batch-08	4
 0x02005dac	main	116	legacy	pool-alloc	parked	16.7	register-choice	PROVISIONAL:register-choice	batch-08	4
 0x02006264	main	104	default	distance-check	shipped	100	n/a		batch-08	3
+0x02006a38	main	216	default	overlay-state-swap	parked	3.7	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-08	2
+0x02006a38	main	216	legacy_sp3	overlay-state-swap	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-08	2
+0x02006a38	main	216	legacy	overlay-state-swap	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-08	2
+0x02006e28	main	200	default	text-search	shipped	100	n/a		batch-08	1
