@@ -1959,3 +1959,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203cff8	main	128	legacy_sp3	peer-update-copy	shipped	100	n/a		batch-02	3
 0x0203d078	main	104	legacy_sp3	host-slot-copy	shipped	100	n/a		batch-02	2
 0x0203d0e0	main	224	legacy_sp3	peer-find-by-mac	shipped	100	n/a		batch-02	3
+0x0203c730	main	160	legacy_sp3	peer-compare-loop	parked	90.0	P-20-family	P-20	batch-02	2
