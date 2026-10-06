@@ -12309,7 +12309,7 @@ src/main/func_0206c010.legacy.c:
     complete
     .text start:0x0206c010 end:0x0206c074
 
-src/main/func_0206c074.s:
+src/main/func_0206c074.legacy.c:
     complete
     .text start:0x0206c074 end:0x0206c110
 
