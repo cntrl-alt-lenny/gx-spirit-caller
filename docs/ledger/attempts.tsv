@@ -1931,3 +1931,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203244c	main	116	default	ring-buffer-pop	parked	62.1	address-fold	PROVISIONAL:address-fold	batch-02	3
 0x0203671c	main	192	default	entry-reset-init	parked	91.7	P-36-literal-store-order	P-36	batch-02	6
 0x0203724c	main	220	default	select-active-entry	parked	38.2	P-20-family	P-20	batch-02	5
+0x02037fe4	main	248	default	entry-set-volume-dispatch	shipped	100	n/a		batch-02	2
