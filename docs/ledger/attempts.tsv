@@ -2020,3 +2020,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020432d0	main	256	legacy_sp3	net-shutdown-free	parked	92.2	P-20-family	P-20	batch-04	8
 0x02043a78	main	192	default	u64-field-pack	parked	85.4	P-36-ldm-fusion	P-36	batch-04	1
 0x02043a78	main	192	legacy_sp3	u64-field-pack	parked	89.6	P-36-ldm-fusion	P-36	batch-04	5
+0x02044254	main	124	default	id-mask-compare	parked	58.1	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
+0x02044254	main	124	legacy_sp3	id-mask-compare	shipped	100	n/a		batch-04	1

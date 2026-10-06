@@ -8317,7 +8317,7 @@ src/main/func_02043d3c.s:
 src/main/func_02044228.c:
     complete
     .text start:0x02044228 end:0x02044254
-src/main/func_02044254.s:
+src/main/func_02044254.legacy_sp3.c:
     complete
     .text start:0x02044254 end:0x020442d0
 
