@@ -2513,7 +2513,7 @@ src/main/func_02018bc0.c:
     complete
     .text start:0x02018bc0 end:0x02018be8
 
-src/main/func_02018be8.s:
+src/main/func_02018be8.c:
     complete
     .text start:0x02018be8 end:0x02018cdc
 
