@@ -2114,3 +2114,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020699f4	main	144	legacy_sp3	handle-close-packet	parked	11.1	load-scheduling-interleave	P-36	batch-03	3
 0x020698fc	main	248	legacy_sp3	handle-data-packet	shipped	100	n/a		batch-03	3
 0x02069de4	main	224	legacy_sp3	parse-key-table	shipped	100	n/a		batch-03	3
+0x0206a984	main	172	default	key-mix	parked	2.3	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x0206afec	main	92	default	put-word-advance	parked	8.7	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x0206b1f8	main	96	default	string-hash-mod	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x0206b5e8	main	92	default	free-list	parked	4.3	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
