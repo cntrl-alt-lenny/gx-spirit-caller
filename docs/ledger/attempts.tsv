@@ -2422,3 +2422,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020091f4	main	88	default	small-fn	shipped	100	n/a		batch-08	1
 0x02009758	main	76	default	small-fn	shipped	100	n/a		batch-08	1
 0x02009a68	main	72	default	small-fn	shipped	100	n/a		batch-08	1
+0x0200a19c	main	104	default	const-table-lookup	shipped	100	n/a		batch-08	1
