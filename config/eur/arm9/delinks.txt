@@ -7209,7 +7209,7 @@ src/main/func_02037c54.c:
 
 
 
-src/main/func_02037ca0.s:
+src/main/func_02037ca0.c:
     complete
     .text start:0x02037ca0 end:0x02037d28
 
