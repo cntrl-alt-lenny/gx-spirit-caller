@@ -1948,3 +1948,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02038e58	main	228	default	archive-read-clamp	parked	43.1	load-scheduling-residual	PROVISIONAL:load-scheduling-residual	batch-02	4
 0x0203aeec	main	88	default	slot-lookup	shipped	100	n/a		batch-02	2
 0x0203b2f4	main	196	default	ima-adpcm-decode	shipped	100	n/a		batch-02	2
+0x0203b880	main	124	default	select-min-cost	shipped	100	n/a		batch-02	3

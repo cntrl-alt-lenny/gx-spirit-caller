@@ -7562,7 +7562,7 @@ src/main/func_0203b830.c:
     complete
     .text start:0x0203b830 end:0x0203b880
 
-src/main/func_0203b880.s:
+src/main/func_0203b880.c:
     complete
     .text start:0x0203b880 end:0x0203b8fc
 
