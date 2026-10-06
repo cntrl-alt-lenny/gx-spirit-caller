@@ -10512,7 +10512,7 @@ src/main/func_0205d504.legacy_sp3.c:
 src/main/func_0205d534.c:
     complete
     .text start:0x0205d534 end:0x0205d560
-src/main/func_0205d560.s:
+src/main/func_0205d560.c:
     complete
     .text start:0x0205d560 end:0x0205d5a0
 
