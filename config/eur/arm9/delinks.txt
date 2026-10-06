@@ -6000,7 +6000,7 @@ src/main/func_02031eac.c:
 
 
 
-src/main/func_02031ebc.s:
+src/main/func_02031ebc.c:
     complete
     .text start:0x02031ebc end:0x02031f40
 
