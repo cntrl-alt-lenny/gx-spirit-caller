@@ -8472,7 +8472,7 @@ src/main/func_02045564.c:
 src/main/func_02045570.c:
     complete
     .text start:0x02045570 end:0x0204559c
-src/main/func_0204559c.s:
+src/main/func_0204559c.legacy_sp3.c:
     complete
     .text start:0x0204559c end:0x02045618
 
