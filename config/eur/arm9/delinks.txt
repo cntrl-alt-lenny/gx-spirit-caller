@@ -6612,7 +6612,7 @@ src/main/func_020336b8.c:
 
 
 
-src/main/func_020336cc.s:
+src/main/func_020336cc.c:
     complete
     .text start:0x020336cc end:0x02033718
 

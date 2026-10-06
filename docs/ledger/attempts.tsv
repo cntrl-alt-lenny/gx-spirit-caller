@@ -1908,3 +1908,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020338b8	main	64	default	flag-clear-chain	shipped	100	n/a		batch-01	1
 0x020332a4	main	100	default	u16-string-copy	shipped	100	n/a		batch-01	2
 0x020334cc	main	112	default	lazy-handle-open	shipped	100	n/a		batch-01	2
+0x020336cc	main	76	default	register-handlers	shipped	100	n/a		batch-01	2
