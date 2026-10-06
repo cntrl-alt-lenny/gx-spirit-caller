@@ -17226,7 +17226,7 @@ libs/nitro/func_02093c20.legacy.c:
     complete
     .text start:0x02093c20 end:0x02093c90
 
-src/main/func_02093c90.s:
+src/main/func_02093c90.legacy.c:
     complete
     .text start:0x02093c90 end:0x02093d44
 
