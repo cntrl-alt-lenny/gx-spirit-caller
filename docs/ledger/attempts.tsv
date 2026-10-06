@@ -2016,3 +2016,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02062280	main	72	legacy_sp3	send-packet	shipped	100	n/a		batch-03	2
 0x02062320	main	108	legacy_sp3	state-advance-copy	shipped	100	n/a		batch-03	2
 0x02062aec	main	92	legacy_sp3	send-cmd-7	shipped	100	n/a		batch-03	2
+0x02062b48	main	92	legacy_sp3	send-cmd-6	shipped	100	n/a		batch-03	2
