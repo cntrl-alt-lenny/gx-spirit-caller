@@ -630,7 +630,7 @@ src/main/func_020035e8.s:
     complete
     .text start:0x020035e8 end:0x020037d0
 
-src/main/func_020037d0.s:
+src/main/func_020037d0.c:
     complete
     .text start:0x020037d0 end:0x020038c0
 
