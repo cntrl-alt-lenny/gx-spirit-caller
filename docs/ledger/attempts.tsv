@@ -2400,3 +2400,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02019184	main	72	default	sysrecord-read-byte	shipped	100	n/a		batch-09	4
 0x0201942c	main	104	default	id-range-switch	shipped	100	n/a		batch-09	1
 0x02019494	main	148	default	table-or-offset-lookup	shipped	100	n/a		batch-09	2
+0x02019538	main	92	default	saturating-byte-add	shipped	100	n/a		batch-09	2
