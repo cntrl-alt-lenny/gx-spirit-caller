@@ -1997,3 +1997,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207103c	main	80	legacy	unknown	parked	40	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
 0x02072144	main	240	default	unknown	parked	38.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
 0x02072144	main	240	legacy	unknown	shipped	100	n/a		batch-06	
+0x02072444	main	132	default	unknown	parked	21.2	instruction-selection	PROVISIONAL:instruction-selection	batch-06	
