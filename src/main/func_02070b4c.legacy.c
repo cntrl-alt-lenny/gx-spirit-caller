@@ -1,6 +1,6 @@
 extern int OS_DisableIrq(void);
 extern void OS_RestoreIrq(int state);
-extern void func_02091a8c(int v);
+extern void func_02091a8c(void *q);
 int func_02070b4c(int *out, void *arg1)
 {
     int value;
