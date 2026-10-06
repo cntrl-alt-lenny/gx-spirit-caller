@@ -9917,7 +9917,7 @@ src/main/func_02054314.c:
     complete
     .text start:0x02054314 end:0x02054338
 
-src/main/func_02054338.s:
+src/main/func_02054338.legacy_sp3.c:
     complete
     .text start:0x02054338 end:0x020543b8
 
