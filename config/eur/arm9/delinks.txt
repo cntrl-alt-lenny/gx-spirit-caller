@@ -681,7 +681,7 @@ src/main/func_020048c0.s:
     complete
     .text start:0x020048c0 end:0x02004ef4
 
-src/main/func_02004ef4.s:
+src/main/func_02004ef4.c:
     complete
     .text start:0x02004ef4 end:0x02004f58
 
