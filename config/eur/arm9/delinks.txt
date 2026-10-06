@@ -8504,7 +8504,7 @@ src/main/func_0204593c.c:
     complete
     .text start:0x0204593c end:0x02045954
 
-src/main/func_02045954.s:
+src/main/func_02045954.c:
     complete
     .text start:0x02045954 end:0x020459b4
 
