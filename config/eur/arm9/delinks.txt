@@ -7273,7 +7273,7 @@ src/main/func_020385d8.c:
     complete
     .text start:0x020385d8 end:0x020385f8
 
-src/main/func_020385f8.s:
+src/main/func_020385f8.c:
     complete
     .text start:0x020385f8 end:0x02038674
 
