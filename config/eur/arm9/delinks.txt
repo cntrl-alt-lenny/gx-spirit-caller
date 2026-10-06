@@ -12029,7 +12029,7 @@ src/main/func_02069720.s:
     complete
     .text start:0x02069720 end:0x020698fc
 
-src/main/func_020698fc.s:
+src/main/func_020698fc.legacy_sp3.c:
     complete
     .text start:0x020698fc end:0x020699f4
 
