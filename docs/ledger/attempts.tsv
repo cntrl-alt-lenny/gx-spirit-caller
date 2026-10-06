@@ -2069,3 +2069,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02058528	main	172	legacy_sp3	list-append-node	shipped	100	n/a		batch-05	2
 0x0205888c	main	200	default	entry-free-buffers	parked	76.0	P-31-if-conversion	P-31	batch-05	1
 0x0205888c	main	200	legacy_sp3	entry-free-buffers	shipped	100	n/a		batch-05	1
+0x02059d1c	main	116	default	random-string-fill	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02059d1c	main	116	legacy_sp3	random-string-fill	shipped	100	n/a		batch-05	1
