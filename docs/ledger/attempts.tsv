@@ -2034,3 +2034,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02054dfc	main	88	legacy_sp3	sockaddr-copy-connect	shipped	100	n/a		batch-05	1
 0x02054ec0	main	132	default	private-ipv4-check	parked	81.8	P-31-if-conversion	P-31	batch-05	2
 0x02054ec0	main	132	legacy_sp3	private-ipv4-check	shipped	100	n/a		batch-05	2
+0x02054f44	main	140	default	hostent-init-local	parked	45.7	reg-alloc	PROVISIONAL:register-allocation	batch-05	2
+0x02054f44	main	140	legacy_sp3	hostent-init-local	shipped	100	n/a		batch-05	2
