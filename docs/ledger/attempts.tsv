@@ -1923,3 +1923,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02034bd8	main	92	default	guard-dispatch	shipped	100	n/a		batch-01	2
 0x020358cc	main	136	default	staged-threshold-switch	shipped	100	n/a		batch-01	1
 0x02037328	main	80	default	entry-scan-other	shipped	100	n/a		batch-02	1
+0x020379f8	main	120	default	guarded-start-play	shipped	100	n/a		batch-02	1
