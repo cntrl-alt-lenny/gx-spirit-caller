@@ -2429,3 +2429,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201b504	main	204	legacy_sp3	list-apply-bitfields	parked	29.4	P-30-whole-function-register-rotation	P-30	batch-09	2
 0x0201b504	main	204	legacy	list-apply-bitfields	parked	29.4	P-30-whole-function-register-rotation	P-30	batch-09	2
 0x0201ddac	main	136	default	size-class-flags	shipped	100	n/a		batch-09	1
+0x0201d620	main	148	default	byte-reverse-record-search	parked	18.9	and-shift-pair-collapse	PROVISIONAL:and-shift-pair-collapse	batch-09	8
+0x0201d620	main	148	legacy_sp3	byte-reverse-record-search	parked	10.5	and-shift-pair-collapse	PROVISIONAL:and-shift-pair-collapse	batch-09	1
+0x0201d620	main	148	legacy	byte-reverse-record-search	parked	2.5	and-shift-pair-collapse	PROVISIONAL:and-shift-pair-collapse	batch-09	1
+0x0201e4cc	main	236	default	record-unpack-and-dispatch	parked	96.6	P-20-r0-vs-r1	P-20	batch-09	12
+0x0201e4cc	main	236	legacy_sp3	record-unpack-and-dispatch	parked	0.0	P-20-r0-vs-r1	P-20	batch-09	1
+0x0201e4cc	main	236	legacy	record-unpack-and-dispatch	parked	0.0	P-20-r0-vs-r1	P-20	batch-09	1
+0x0201ef90	main	256	default	request-dispatch-ten-args	parked	96.9	P-20-r0-vs-r1	P-20	batch-09	6
+0x0201ef90	main	256	legacy_sp3	request-dispatch-ten-args	parked	15.4	P-20-r0-vs-r1	P-20	batch-09	1
+0x0201ef90	main	256	legacy	request-dispatch-ten-args	parked	14.9	P-20-r0-vs-r1	P-20	batch-09	1
