@@ -14053,7 +14053,7 @@ src/main/func_0207dbf8.s:
     complete
     .text start:0x0207dbf8 end:0x0207dc5c
 
-src/main/func_0207dc5c.s:
+src/main/func_0207dc5c.legacy_sp3.c:
     complete
     .text start:0x0207dc5c end:0x0207dca8
 
