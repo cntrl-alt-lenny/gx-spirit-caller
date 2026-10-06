@@ -2,12 +2,12 @@ typedef struct {
     int v[18];
 } Table;
 
-extern char data_020b5ab8[];
+extern Table data_020b5ae8;
 extern int func_0201942c(int id);
 extern int func_0202c0c0(int id);
 
 int func_02019494(int id, int alt) {
-    Table t = *(Table *)(data_020b5ab8 + 0x30);
+    Table t = data_020b5ae8;
     int base;
 
     if (func_0201942c(id) != 0) {
