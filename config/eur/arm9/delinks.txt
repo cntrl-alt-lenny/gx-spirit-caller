@@ -9397,7 +9397,7 @@ src/main/func_02051f98.s:
     complete
     .text start:0x02051f98 end:0x02052098
 
-src/main/func_02052098.s:
+src/main/func_02052098.legacy_sp3.c:
     complete
     .text start:0x02052098 end:0x02052160
 

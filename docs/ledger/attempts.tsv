@@ -1989,3 +1989,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02050140	main	140	default	parse-int-list	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
 0x02050140	main	140	legacy	parse-int-list	parked	94.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
 0x02050140	main	140	legacy_sp3	parse-int-list	shipped	100	n/a		batch-05	1
+0x02052098	main	200	default	session-message-dispatch	parked	60.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02052098	main	200	legacy	session-message-dispatch	parked	32.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-05	1
+0x02052098	main	200	legacy_sp3	session-message-dispatch	shipped	100	n/a		batch-05	1
