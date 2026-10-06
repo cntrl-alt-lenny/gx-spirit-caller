@@ -13,6 +13,7 @@ extern int func_02054b9c(int *out);
 extern char data_02100b54[];
 extern char data_02100b64[];
 extern char data_02100b70[];
+extern char data_02100b74[];
 
 int func_0205c258(void *pp, Req *req, char *data, int len) {
     char buf[0x24];
@@ -27,7 +28,7 @@ int func_0205c258(void *pp, Req *req, char *data, int len) {
     if (len == -1) {
         len = func_020aaddc(data);
     }
-    func_020a978c(buf, data_02100b70 + 4, len);
+    func_020a978c(buf, data_02100b74, len);
     r = func_02057d2c((int)pp, (int)req, (int)buf);
     if (r != 0) {
         return r;
