@@ -2000,3 +2000,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02040d94	main	84	default	lookup-copy-terminate	shipped	100	n/a		batch-04	7
 0x020413b0	main	192	default	buffer-grow-realloc	parked	6.2	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
 0x020413b0	main	192	legacy_sp3	buffer-grow-realloc	shipped	100	n/a		batch-04	1
+0x020414b0	main	112	default	buffer-alloc-init	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-04	1
+0x020414b0	main	112	legacy_sp3	buffer-alloc-init	shipped	100	n/a		batch-04	1
