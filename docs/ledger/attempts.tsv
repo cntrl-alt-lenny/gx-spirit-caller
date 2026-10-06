@@ -2066,3 +2066,33 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02093a44	main	136	legacy	unknown	shipped	100	n/a		batch-07	
 0x02093c90	main	180	legacy	unknown	shipped	100	n/a		batch-07	
 0x02093d44	main	132	legacy	unknown	shipped	100	n/a		batch-07	
+0x020929ac	main	136	legacy_sp3	unknown	parked	26.47	structural	PROVISIONAL:structural	batch-07	
+0x020931f8	main	156	legacy_sp3	unknown	parked	15.38	structural	PROVISIONAL:structural	batch-07	
+0x02093014	main	112	legacy_sp3	unknown	parked	92.86	structural	PROVISIONAL:structural	batch-07	
+0x02093160	main	136	legacy_sp3	unknown	parked	55.88	structural	PROVISIONAL:structural	batch-07	
+0x020903d4	main	128	legacy_sp3	unknown	parked	0.0	structural	PROVISIONAL:structural	batch-07	
+0x02090690	main	76	legacy_sp3	unknown	parked	31.58	structural	PROVISIONAL:structural	batch-07	
+0x020906dc	main	76	legacy_sp3	unknown	parked	42.11	structural	PROVISIONAL:structural	batch-07	
+0x020907b4	main	144	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x02090b54	main	240	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x02091f88	main	236	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x0209226c	main	108	legacy_sp3	unknown	parked	66.67	structural	PROVISIONAL:structural	batch-07	
+0x020930b0	main	176	legacy_sp3	unknown	parked	2.27	structural	PROVISIONAL:structural	batch-07	
+0x02093684	main	156	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x02093b00	main	240	legacy_sp3	unknown	parked	1.41	structural	PROVISIONAL:structural	batch-07	
+0x02093fb8	main	120	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x02094030	main	124	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x020940ac	main	144	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x0209423c	main	116	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x020942b0	main	200	legacy_sp3	unknown	parked	6.0	structural	PROVISIONAL:structural	batch-07	
+0x020945f4	main	148	legacy_sp3	unknown	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x020907b4	main	144	legacy_sp3	unknown	parked	0.0	structural	PROVISIONAL:structural	batch-07	
+0x02090b54	main	240	legacy_sp3	unknown	parked	75.0	structural	PROVISIONAL:structural	batch-07	
+0x02091f88	main	236	legacy_sp3	unknown	parked	0.0	structural	PROVISIONAL:structural	batch-07	
+0x02093684	main	156	legacy_sp3	unknown	parked	53.85	structural	PROVISIONAL:structural	batch-07	
+0x02093fb8	main	120	legacy_sp3	unknown	parked	41.94	structural	PROVISIONAL:structural	batch-07	
+0x02094030	main	124	legacy_sp3	unknown	parked	53.12	structural	PROVISIONAL:structural	batch-07	
+0x020940ac	main	144	legacy_sp3	unknown	parked	54.05	structural	PROVISIONAL:structural	batch-07	
+0x0209423c	main	116	legacy_sp3	unknown	parked	41.38	structural	PROVISIONAL:structural	batch-07	
+0x020945f4	main	148	legacy_sp3	unknown	parked	15.79	structural	PROVISIONAL:structural	batch-07	
+0x02093014	main	112	legacy_sp3	unknown	parked	92.86	address-fold	PROVISIONAL:address-fold	batch-07	
