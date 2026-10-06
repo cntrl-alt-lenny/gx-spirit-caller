@@ -6712,7 +6712,7 @@ src/main/func_02033d3c.c:
     complete
     .text start:0x02033d3c end:0x02033d78
 
-src/main/func_02033d78.s:
+src/main/func_02033d78.c:
     complete
     .text start:0x02033d78 end:0x02033de8
 
