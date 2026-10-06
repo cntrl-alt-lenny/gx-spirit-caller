@@ -5965,7 +5965,7 @@ src/main/func_02031d80.c:
     complete
     .text start:0x02031d80 end:0x02031d98
 
-src/main/func_02031d98.s:
+src/main/func_02031d98.c:
     complete
     .text start:0x02031d98 end:0x02031e80
 
