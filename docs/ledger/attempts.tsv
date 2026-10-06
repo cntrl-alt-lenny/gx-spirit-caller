@@ -1952,3 +1952,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203b6b4	main	192	default	block-commit-copy	parked	70.8	P-20-family	P-20	batch-02	4
 0x0203bad0	main	220	default	slot-reserve-loop	shipped	100	n/a		batch-02	5
 0x0203c3dc	main	144	default	mutex-min-scan	shipped	100	n/a		batch-02	2
+0x0203c900	main	104	default	select-global-ptr	shipped	100	n/a		batch-02	2
