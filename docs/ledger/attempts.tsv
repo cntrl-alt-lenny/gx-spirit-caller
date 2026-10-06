@@ -2017,3 +2017,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020538b0	main	188	legacy_sp3	packet-header-parse	shipped	100	n/a		batch-05	6
 0x02053ab4	main	132	default	sockaddr-resolve	parked	6.1	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	2
 0x02053ab4	main	132	legacy_sp3	sockaddr-resolve	shipped	100	n/a		batch-05	3
+0x02053b38	main	108	default	binary-search-callback	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	1
+0x02053b38	main	108	legacy_sp3	binary-search-callback	shipped	100	n/a		batch-05	1
