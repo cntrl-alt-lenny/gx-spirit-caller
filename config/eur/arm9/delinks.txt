@@ -8022,7 +8022,7 @@ src/main/func_0203f544.c:
     complete
     .text start:0x0203f544 end:0x0203f590
 
-src/main/func_0203f590.s:
+src/main/func_0203f590.legacy_sp3.c:
     complete
     .text start:0x0203f590 end:0x0203f690
 src/main/func_0203f690.c:
