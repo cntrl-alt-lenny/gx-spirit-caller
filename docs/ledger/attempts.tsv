@@ -2070,3 +2070,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206588c	main	168	default	resolve-hosts	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x02066224	main	88	default	send-hello	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x020665e0	main	112	default	seen-history	parked	42.9	load-scheduling-residual	PROVISIONAL:load-scheduling-residual	batch-03	1
+0x020657c0	main	204	legacy_sp3	conn-open	shipped	100	n/a		batch-03	2
