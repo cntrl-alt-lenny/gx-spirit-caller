@@ -2410,3 +2410,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201a044	main	116	legacy_sp3	scaled-stat-formula	parked	17.2	load-scheduling-interleave	P-36	batch-09	1
 0x0201a044	main	116	legacy	scaled-stat-formula	parked	17.2	load-scheduling-interleave	P-36	batch-09	1
 0x0201a32c	main	92	default	saturating-bitfield-counters	shipped	100	n/a		batch-09	3
+0x0201a134	main	60	default	flag-set-and-lookup	parked	53.3	P-20-register-letter	P-20	batch-09	6
+0x0201a134	main	60	legacy_sp3	flag-set-and-lookup	parked	0.0	P-20-register-letter	P-20	batch-09	1
+0x0201a134	main	60	legacy	flag-set-and-lookup	parked	0.0	P-20-register-letter	P-20	batch-09	1
