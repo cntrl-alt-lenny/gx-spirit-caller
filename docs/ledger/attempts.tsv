@@ -2078,3 +2078,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02065d4c	main	116	legacy_sp3	host-first-nonloop	parked	34.5	epilogue-tail-merge-residual	PROVISIONAL:epilogue-tail-merge-residual	batch-03	5
 0x02065d4c	main	116	default	host-first-nonloop	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x02065dc0	main	84	legacy_sp3	udp-sendto	shipped	100	n/a		batch-03	4
+0x020669c4	main	196	default	parse-three-strings	parked	4.1	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x02066a88	main	96	default	set-three-strings	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
+0x02066d44	main	188	default	peer-addr-update	parked	19.1	P-31-if-conversion	P-31	batch-03	1
