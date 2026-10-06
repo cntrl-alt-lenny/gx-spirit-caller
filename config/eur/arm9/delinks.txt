@@ -16769,7 +16769,7 @@ src/main/func_02091c44.s:
     complete
     .text start:0x02091c44 end:0x02091c88
 
-src/main/func_02091c88.s:
+src/main/func_02091c88.legacy.c:
     complete
     .text start:0x02091c88 end:0x02091cf8
 
