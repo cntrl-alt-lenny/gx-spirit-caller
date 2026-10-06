@@ -1156,7 +1156,7 @@ src/main/func_02008fb8.s:
     complete
     .text start:0x02008fb8 end:0x020091f4
 
-src/main/func_020091f4.s:
+src/main/func_020091f4.c:
     complete
     .text start:0x020091f4 end:0x0200924c
 
