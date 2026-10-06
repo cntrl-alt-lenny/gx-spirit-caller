@@ -2080,3 +2080,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204f040	main	104	default	match-filter-format	shipped	100	n/a		batch-04	1
 0x0204f9cc	main	88	default	bitcount-store	parked	13.6	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-04	1
 0x0204f9cc	main	88	legacy_sp3	bitcount-store	shipped	100	n/a		batch-04	1
+0x0204fc38	main	100	legacy_sp3	id-search-select	parked	0.0	structural	PROVISIONAL:structural	batch-04	1
+0x0204fc38	main	100	default	id-search-select	shipped	100	n/a		batch-04	2
