@@ -2803,3 +2803,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020972d4	main	144	default	mutex-try-lock	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x020972d4	main	144	legacy_sp3	mutex-try-lock	parked	94.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x020972d4	main	144	legacy	mutex-try-lock	shipped	100	n/a		batch-12	
+0x02097528	main	200	default	mutex-unlock-all-waiters	parked	48.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097528	main	200	legacy_sp3	mutex-unlock-all-waiters	parked	92.0	reg-alloc	PROVISIONAL:register-allocation	batch-12	
+0x02097528	main	200	legacy	mutex-unlock-all-waiters	parked	96.0	call-arg-scheduling-residual	PROVISIONAL:call-arg-scheduling-residual	batch-12	
