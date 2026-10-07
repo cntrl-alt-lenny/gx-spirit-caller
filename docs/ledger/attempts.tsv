@@ -2871,3 +2871,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207f05c	main	220	legacy_sp3	unknown	parked	16.4	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
 0x0207f510	main	256	legacy_sp3	mode-dispatch	shipped	100	n/a		batch-14	
 0x0207ff84	main	116	legacy_sp3	text-height	shipped	100	n/a		batch-14	
+0x0207feec	main	152	legacy_sp3	text-measure	shipped	100	n/a		batch-14	
