@@ -2958,3 +2958,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209f470	main	164	default	params-init-flagged	parked	19.1	P-36-pipeline-interleaving	P-36	batch-12	
 0x0209f470	main	164	legacy_sp3	params-init-flagged	parked	18.6	P-36-pipeline-interleaving	P-36	batch-12	
 0x0209f470	main	164	legacy	params-init-flagged	parked	18.2	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209f8c8	main	60	default	grid-index-wrap	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209f8c8	main	60	legacy_sp3	grid-index-wrap	parked	86.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209f8c8	main	60	legacy	grid-index-wrap	shipped	100	n/a		batch-12	
