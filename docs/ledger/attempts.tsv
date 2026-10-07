@@ -2949,3 +2949,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209e7f0	main	224	default	event-register-callback	parked	53.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209e7f0	main	224	legacy_sp3	event-register-callback	parked	58.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209e7f0	main	224	legacy	event-register-callback	shipped	100	n/a		batch-12	
+0x0209ecc8	main	256	default	packet-send-validate	parked	12.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209ecc8	main	256	legacy_sp3	packet-send-validate	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209ecc8	main	256	legacy	packet-send-validate	shipped	100	n/a		batch-12	
