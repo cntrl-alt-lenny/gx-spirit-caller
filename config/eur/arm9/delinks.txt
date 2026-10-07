@@ -13433,7 +13433,7 @@ src/main/func_02077d08.legacy.c:
     complete
     .text start:0x02077d08 end:0x02077db0
 
-src/main/func_02077db0.s:
+src/main/func_02077db0.legacy.c:
     complete
     .text start:0x02077db0 end:0x02077e58
 
