@@ -2480,3 +2480,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208d0bc	main	124	default	irq-flag-update	parked	19.35	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
 0x0208d0bc	main	124	legacy_sp3	irq-flag-update	parked	70.97	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
 0x0208d0bc	main	124	legacy	irq-flag-update	shipped	100	n/a		batch-11	
+0x0208d138	main	172	default	irq-flag-update	parked	0.0	register-numbering-permutation-cascade	P-30	batch-11	
+0x0208d138	main	172	legacy_sp3	irq-flag-update	parked	62.79	register-numbering-permutation-cascade	P-30	batch-11	
+0x0208d138	main	172	legacy	irq-flag-update	parked	88.37	register-numbering-permutation-cascade	P-30	batch-11	
+0x0208d138	main	172	default	irq-flag-update	parked	2.33	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208d138	main	172	legacy_sp3	irq-flag-update	parked	74.42	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208d138	main	172	legacy	irq-flag-update	shipped	100	n/a		batch-11	
