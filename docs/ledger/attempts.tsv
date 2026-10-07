@@ -2596,3 +2596,83 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020945f4	main	148	legacy_sp3	unknown	parked	15.79	structural	PROVISIONAL:structural	batch-07	
 0x02093014	main	112	legacy_sp3	unknown	parked	92.86	address-fold	PROVISIONAL:address-fold	batch-07	
 0x02090330	main	128	legacy	resolved-object-100-link-undefined-field-symbols	parked	unknown	structural	PROVISIONAL:structural	batch-07	
+0x02000cc4	main	72	default	entry-table-push	parked	44.4	register-choice	PROVISIONAL:register-choice	batch-08	6
+0x02000cc4	main	72	legacy_sp3	entry-table-push	parked	44.4	register-choice	PROVISIONAL:register-choice	batch-08	1
+0x02000cc4	main	72	legacy	entry-table-push	parked	21.1	register-choice	PROVISIONAL:register-choice	batch-08	1
+0x02000d0c	main	64	default	entry-table-pop	parked	75.0	load-scheduling-interleave	P-36	batch-08	5
+0x02000d0c	main	64	legacy_sp3	entry-table-pop	parked	75.0	load-scheduling-interleave	P-36	batch-08	5
+0x02000d0c	main	64	legacy	entry-table-pop	parked	41.2	load-scheduling-interleave	P-36	batch-08	5
+0x02000d4c	main	80	default	entry-table-pop	parked	20.0	load-scheduling-interleave	P-36	batch-08	4
+0x02000d4c	main	80	legacy_sp3	entry-table-pop	parked	0.0	load-scheduling-interleave	P-36	batch-08	4
+0x02000d4c	main	80	legacy	entry-table-pop	parked	0.0	load-scheduling-interleave	P-36	batch-08	4
+0x02000ef8	main	140	default	state-switch-dispatch	shipped	100	n/a		batch-08	3
+0x02000f84	main	68	default	state-increment-reset	shipped	100	n/a		batch-08	1
+0x02001b18	main	140	default	mask-loop-sprintf	shipped	100	n/a		batch-08	1
+0x02001448	main	248	default	state-machine-switch	shipped	100	n/a		batch-08	5
+0x020018d4	main	168	default	mask-nested-loop-sprintf	shipped	100	n/a		batch-08	1
+0x02001a34	main	228	default	mask-loop-task-post	shipped	100	n/a		batch-08	1
+0x020037d0	main	240	default	switch-dispatch-call	shipped	100	n/a		batch-08	2
+0x02001bc8	main	208	default	rgb555-blend-table	shipped	100	n/a		batch-08	6
+0x02003a4c	main	116	default	dispatch-two-way	shipped	100	n/a		batch-08	1
+0x02003d98	main	256	default	switch-dispatch-call	shipped	100	n/a		batch-08	1
+0x02003e98	main	132	default	dispatch-two-way-8arg	shipped	100	n/a		batch-08	1
+0x02004ef4	main	100	default	conditional-tailcall-wrapper	shipped	100	n/a		batch-08	1
+0x02005188	main	68	default	bitfield-field-call	shipped	100	n/a		batch-08	1
+0x020051cc	main	68	default	bitfield-field-call	shipped	100	n/a		batch-08	1
+0x02005088	main	256	default	flag-sweep-calls	shipped	100	n/a		batch-08	1
+0x02005240	main	88	default	bitfield-flag-call	shipped	100	n/a		batch-08	1
+0x020054f0	main	100	default	stack-buf-call-return	shipped	100	n/a		batch-08	1
+0x02005554	main	96	default	stack-buf-call-return	shipped	100	n/a		batch-08	1
+0x020054a4	main	76	default	stack-buf-call-return	parked	55.0	store-coalescing	PROVISIONAL:memory-order/fusion	batch-08	6
+0x020054a4	main	76	legacy_sp3	stack-buf-call-return	parked	33.3	store-coalescing	PROVISIONAL:memory-order/fusion	batch-08	6
+0x020054a4	main	76	legacy	stack-buf-call-return	parked	31.8	store-coalescing	PROVISIONAL:memory-order/fusion	batch-08	6
+0x020055b4	main	240	default	bitfield-counter-callback	parked	1.7	constant-materialization	PROVISIONAL:constant-materialization	batch-08	5
+0x020055b4	main	240	legacy_sp3	bitfield-counter-callback	parked	1.7	constant-materialization	PROVISIONAL:constant-materialization	batch-08	5
+0x020055b4	main	240	legacy	bitfield-counter-callback	parked	1.7	constant-materialization	PROVISIONAL:constant-materialization	batch-08	5
+0x020059b0	main	176	default	binary-search-callback	parked	50.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	30
+0x020059b0	main	176	legacy_sp3	binary-search-callback	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	batch-08	30
+0x020059b0	main	176	legacy	binary-search-callback	parked	2.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	30
+0x02005ca0	main	108	default	switch-pool-init	shipped	100	n/a		batch-08	1
+0x02005b74	main	136	default	switch-pool-init	shipped	100	n/a		batch-08	1
+0x02005a60	main	216	default	sorted-array-dedupe	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	3
+0x02005a60	main	216	legacy_sp3	sorted-array-dedupe	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	3
+0x02005a60	main	216	legacy	sorted-array-dedupe	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	batch-08	3
+0x02005e20	main	192	default	pool-free-list	shipped	100	n/a		batch-08	2
+0x02005dac	main	116	default	pool-alloc	parked	3.5	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x02005dac	main	116	legacy_sp3	pool-alloc	parked	3.5	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x02005dac	main	116	legacy	pool-alloc	parked	16.7	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x02006264	main	104	default	distance-check	shipped	100	n/a		batch-08	3
+0x02006a38	main	216	default	overlay-state-swap	parked	3.7	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-08	2
+0x02006a38	main	216	legacy_sp3	overlay-state-swap	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-08	2
+0x02006a38	main	216	legacy	overlay-state-swap	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-08	2
+0x02006e28	main	200	default	text-search	shipped	100	n/a		batch-08	1
+0x02007104	main	160	default	strstr	parked	87.5	reg-alloc	PROVISIONAL:register-allocation	batch-08	130
+0x02007104	main	160	legacy_sp3	strstr	parked	57.5	reg-alloc	PROVISIONAL:register-allocation	batch-08	130
+0x02007104	main	160	legacy	strstr	parked	38.1	reg-alloc	PROVISIONAL:register-allocation	batch-08	130
+0x020091f4	main	88	default	small-fn	shipped	100	n/a		batch-08	1
+0x02009758	main	76	default	small-fn	shipped	100	n/a		batch-08	1
+0x02009a68	main	72	default	small-fn	shipped	100	n/a		batch-08	1
+0x0200a19c	main	104	default	const-table-lookup	shipped	100	n/a		batch-08	1
+0x02009e9c	main	180	default	slot-update-loop	shipped	100	n/a		batch-08	6
+0x02009f50	main	196	default	slot-decay-random	shipped	100	n/a		batch-08	4
+0x0200a204	main	104	default	small-fn	shipped	100	n/a		batch-08	1
+0x0200a26c	main	136	default	small-fn	shipped	100	n/a		batch-08	1
+0x0200a2f4	main	140	default	ring-lookup	shipped	100	n/a		batch-08	4
+0x0200a3b8	main	84	default	flag-sweep	shipped	100	n/a		batch-08	6
+0x0200a40c	main	72	default	flag-scan	shipped	100	n/a		batch-08	10
+0x0200a928	main	108	default	snapshot-compare-copy	shipped	100	n/a		batch-08	5
+0x0200c23c	main	72	default	small-fn	shipped	100	n/a		batch-08	1
+0x0200bff4	main	132	default	slot-claim	shipped	100	n/a		batch-08	1
+0x0200b250	main	164	default	entry-convert-loop	shipped	100	n/a		batch-08	2
+0x0200c79c	main	136	default	flag-setter	shipped	100	n/a		batch-08	1
+0x0200c594	main	200	default	list-scan-trigger	shipped	100	n/a		batch-08	3
+0x0200ed48	main	112	default	free-slot-find	shipped	100	n/a		batch-08	8
+0x0200edb8	main	240	default	object-init	parked	90.0	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x0200edb8	main	240	legacy_sp3	object-init	parked	25.4	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x0200edb8	main	240	legacy	object-init	parked	13.8	register-choice	PROVISIONAL:register-choice	batch-08	4
+0x0200f044	main	248	default	bitfield-mode-setter	shipped	100	n/a		batch-08	3
+0x0200fa90	main	104	default	list-lookup	shipped	100	n/a		batch-08	2
+0x0200fb18	main	188	default	list-lookup	shipped	100	n/a		batch-08	2
+0x0200fbd4	main	164	default	list-lookup	shipped	100	n/a		batch-08	2
+0x0200fc78	main	164	default	list-lookup	shipped	100	n/a		batch-08	1
+0x0200fd1c	main	104	default	list-lookup	shipped	100	n/a		batch-08	2
