@@ -18133,7 +18133,7 @@ src/main/func_0209a2b0.s:
     complete
     .text start:0x0209a2b0 end:0x0209a3f8
 
-src/main/func_0209a3f8.s:
+src/main/func_0209a3f8.legacy.c:
     complete
     .text start:0x0209a3f8 end:0x0209a4a4
 

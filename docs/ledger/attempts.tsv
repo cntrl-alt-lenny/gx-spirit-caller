@@ -2858,3 +2858,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02099be8	main	60	legacy_sp3	math-regs-restore	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
 0x02099be8	main	60	legacy	math-regs-restore	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
 0x020975f0	main	120	default	device-init-fields	shipped	100	n/a		batch-12	
+0x0209a3f8	main	172	default	shared-mem-header-check	parked	9.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209a3f8	main	172	legacy_sp3	shared-mem-header-check	parked	79.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209a3f8	main	172	legacy	shared-mem-header-check	shipped	100	n/a		batch-12	
