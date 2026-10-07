@@ -2399,3 +2399,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02082138	main	96	default	matrix-scale-setup	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-11	
 0x02082138	main	96	legacy_sp3	matrix-scale-setup	shipped	100	n/a		batch-11	
 0x020827ec	main	112	default	vec3-add-scaled	shipped	100	n/a		batch-11	
+0x02082f64	main	104	default	effect-spawn-vec3	parked	7.14	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-11	
+0x02082f64	main	104	legacy_sp3	effect-spawn-vec3	shipped	100	n/a		batch-11	
