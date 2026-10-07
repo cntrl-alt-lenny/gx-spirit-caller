@@ -19109,7 +19109,7 @@ src/main/func_020a3b20.s:
     complete
     .text start:0x020a3b20 end:0x020a3d34
 
-src/main/func_020a3d34.s:
+src/main/func_020a3d34.legacy.c:
     complete
     .text start:0x020a3d34 end:0x020a3e34
 
