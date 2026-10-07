@@ -2417,3 +2417,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02029458	main	104	default	slot-release-single	shipped	100	n/a		batch-10	1
 0x02029624	main	148	default	request-build-submit	shipped	100	n/a		batch-10	1
 0x020298f8	main	204	default	slot-teardown-loops	shipped	100	n/a		batch-10	1
+0x02029c30	main	80	default	mask-set-clear	shipped	100	n/a		batch-10	1
