@@ -2797,3 +2797,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02096f64	main	160	default	read-record-struct-copy	parked	25.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02096f64	main	160	legacy_sp3	read-record-struct-copy	parked	90.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02096f64	main	160	legacy	read-record-struct-copy	shipped	100	n/a		batch-12	
+0x02097154	main	100	default	strnicmp-loop	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02097154	main	100	legacy_sp3	strnicmp-loop	parked	60.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097154	main	100	legacy	strnicmp-loop	shipped	100	n/a		batch-12	
