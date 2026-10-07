@@ -2768,3 +2768,85 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020124f4	main	108	default	sysinit-store-block	parked	77.8	P-30-parameter-register-rotation	P-30	batch-09	1
 0x020125ac	main	112	default	sysinit-store-block	parked	71.4	P-30-parameter-register-rotation	P-30	batch-09	1
 0x0201a134	main	60	default	flag-set-and-lookup	parked	80.0	P-36-instruction-scheduling	P-36	batch-09	12
+0x02020398	main	108	default	msg-dispatch-callback	shipped	100	n/a		batch-10	1
+0x02020814	main	76	legacy_sp3	struct-reset-bool-return	parked	4.8	P-36-cand-cmp-moveq-movne-order	P-36	batch-10	1
+0x02020814	main	76	legacy	struct-reset-bool-return	parked	4.5	P-36-cand-cmp-moveq-movne-order	P-36	batch-10	1
+0x02020814	main	76	default	struct-reset-bool-return	parked	89.5	P-36-cand-cmp-moveq-movne-order	P-36	batch-10	1
+0x020205ec	main	204	default	msg-handler-state-update	shipped	100	n/a		batch-10	1
+0x02021660	main	80	default	table-lookup-nth-match	shipped	100	n/a		batch-10	1
+0x02020738	main	220	default	rng-bitmask-pick	shipped	100	n/a		batch-10	1
+0x02020d00	main	132	default	copy-and-send-command	shipped	100	n/a		batch-10	1
+0x02021a3c	main	236	default	record-dispatch-switch	shipped	100	n/a		batch-10	1
+0x02021c30	main	140	legacy_sp3	pool-scan-alloc-entry	parked	0.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02021c30	main	140	legacy	pool-scan-alloc-entry	parked	2.4	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02021c30	main	140	default	pool-scan-alloc-entry	parked	65.7	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02021bac	main	96	default	pool-scan-callback	shipped	100	n/a		batch-10	1
+0x02022430	main	144	default	flag-mask-compare-chain	shipped	100	n/a		batch-10	1
+0x020224c0	main	76	default	mode-switch-lookup	shipped	100	n/a		batch-10	1
+0x02022540	main	64	default	slot-alloc-scan	shipped	100	n/a		batch-10	1
+0x020225b4	main	84	default	slot-copy-words	shipped	100	n/a		batch-10	1
+0x02022a80	main	116	default	vec3-lerp-div	shipped	100	n/a		batch-10	1
+0x02022af4	main	128	default	vec3-scale-negate	shipped	100	n/a		batch-10	1
+0x02023188	main	140	legacy_sp3	ring-drain-task-invoke	parked	23.7	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02023188	main	140	legacy	ring-drain-task-invoke	parked	23.1	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02023188	main	140	default	ring-drain-task-invoke	parked	31.4	register-numbering-permutation-cascade	P-30	batch-10	1
+0x020234f8	main	124	legacy_sp3	pool-scan-alloc-entry	parked	0.0	C-34	C-34	batch-10	1
+0x020234f8	main	124	legacy	pool-scan-alloc-entry	parked	0.0	C-34	C-34	batch-10	1
+0x020234f8	main	124	default	pool-scan-alloc-entry	parked	25.8	C-34	C-34	batch-10	1
+0x02023e58	main	96	default	slot-release-loop	shipped	100	n/a		batch-10	1
+0x02023eb8	main	112	default	mmio-field-update	shipped	100	n/a		batch-10	1
+0x02023f7c	main	112	default	pool-init-or-grow-alias	shipped	100	n/a		batch-10	1
+0x02024024	main	124	legacy_sp3	pool-scan-alloc-entry	parked	0.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02024024	main	124	legacy	pool-scan-alloc-entry	parked	0.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02024024	main	124	default	pool-scan-alloc-entry	parked	77.4	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02024574	main	116	legacy_sp3	pool-scan-alloc-entry	parked	15.6	C-34	C-34	batch-10	1
+0x02024574	main	116	legacy	pool-scan-alloc-entry	parked	14.7	C-34	C-34	batch-10	1
+0x02024574	main	116	default	pool-scan-alloc-entry	parked	6.9	C-34	C-34	batch-10	1
+0x020244e8	main	116	legacy_sp3	pool-teardown-loop	parked	3.5	C-34	C-34	batch-10	1
+0x020244e8	main	116	legacy	pool-teardown-loop	parked	6.9	C-34	C-34	batch-10	1
+0x020244e8	main	116	default	pool-teardown-loop	parked	3.5	C-34	C-34	batch-10	1
+0x020242d4	main	148	default	gx-fifo-pack-vertices	shipped	100	n/a		batch-10	1
+0x02024368	main	200	default	gx-matrix-table-copy	shipped	100	n/a		batch-10	1
+0x02023f7c	main	112	default	alias-recipe-wrong-target-reference	parked	unknown	C-34	C-34	batch-10	1
+0x02025840	main	64	default	flag-test-bool	shipped	100	n/a		batch-10	1
+0x02025a10	main	112	default	slot-release-loop	shipped	100	n/a		batch-10	1
+0x02025f00	main	208	default	request-build-submit	shipped	100	n/a		batch-10	1
+0x02027048	main	136	default	alias-recipe-wrong-target-reference	parked	unknown	C-34	C-34	batch-10	1
+0x02026d50	main	232	default	slot-release-flags	shipped	100	n/a		batch-10	1
+0x02027e44	main	144	default	request-build-submit	shipped	100	n/a		batch-10	1
+0x02029204	main	136	default	flag-gated-dispatch	shipped	100	n/a		batch-10	1
+0x0202813c	main	252	default	mode-switch-dispatch	shipped	100	n/a		batch-10	1
+0x02029458	main	104	default	slot-release-single	shipped	100	n/a		batch-10	1
+0x02029624	main	148	default	request-build-submit	shipped	100	n/a		batch-10	1
+0x020298f8	main	204	default	slot-teardown-loops	shipped	100	n/a		batch-10	1
+0x02029c30	main	80	default	mask-set-clear	shipped	100	n/a		batch-10	1
+0x020299c4	main	196	default	slot-poll-loop	shipped	100	n/a		batch-10	1
+0x02029b6c	main	196	legacy_sp3	slot-fill-loop-or-single	parked	7.7	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02029b6c	main	196	legacy	slot-fill-loop-or-single	parked	7.5	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02029b6c	main	196	default	slot-fill-loop-or-single	parked	30.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02029a88	main	228	default	slot-update-call-loop	shipped	100	n/a		batch-10	1
+0x0202a998	main	192	default	mmio-window-init	shipped	100	n/a		batch-10	1
+0x0202ab04	main	96	default	slot-release-loop	shipped	100	n/a		batch-10	1
+0x0202aa58	main	172	default	struct-save-fill-restore	shipped	100	n/a		batch-10	1
+0x0202b6e4	main	104	default	id-search-collect	shipped	100	n/a		batch-10	1
+0x0202b1a8	main	236	default	dump-build-strings	shipped	100	n/a		batch-10	1
+0x0202b12c	main	124	legacy_sp3	string-copy-substitute-token	parked	71.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202b12c	main	124	legacy	string-copy-substitute-token	parked	59.4	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202b12c	main	124	default	string-copy-substitute-token	parked	35.5	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202b9b0	main	60	default	pair-table-lookup	shipped	100	n/a		batch-10	1
+0x0202b9ec	main	76	default	nibble-get	shipped	100	n/a		batch-10	1
+0x0202b74c	main	128	default	id-lookup-release	shipped	100	n/a		batch-10	1
+0x0202ba38	main	92	legacy_sp3	nibble-set	parked	78.3	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202ba38	main	92	legacy	nibble-set	parked	32.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202ba38	main	92	default	nibble-set	parked	78.3	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202ce24	main	84	default	state-gated-call	shipped	100	n/a		batch-10	1
+0x0202c948	main	88	default	state-reset-mode	shipped	100	n/a		batch-10	1
+0x0202c270	main	196	default	sprintf-resource-bind	shipped	100	n/a		batch-10	1
+0x0202bb88	main	64	default	clear-flag-array	shipped	100	n/a		batch-10	1
+0x0202d9a0	main	88	default	counter-wrap	shipped	100	n/a		batch-10	1
+0x0202e358	main	212	default	id-set-switch	shipped	100	n/a		batch-10	1
+0x0202d2dc	main	232	default	sprintf-resource-load	shipped	100	n/a		batch-10	1
+0x0202e5ac	main	96	default	id-set-switch	shipped	100	n/a		batch-10	1
+0x0202e60c	main	232	default	id-set-switch	shipped	100	n/a		batch-10	1
+0x0202f164	main	116	default	id-set-switch	shipped	100	n/a		batch-10	1
+0x0202f500	main	120	default	id-set-switch	shipped	100	n/a		batch-10	1
