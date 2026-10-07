@@ -2768,3 +2768,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020124f4	main	108	default	sysinit-store-block	parked	77.8	P-30-parameter-register-rotation	P-30	batch-09	1
 0x020125ac	main	112	default	sysinit-store-block	parked	71.4	P-30-parameter-register-rotation	P-30	batch-09	1
 0x0201a134	main	60	default	flag-set-and-lookup	parked	80.0	P-36-instruction-scheduling	P-36	batch-09	12
+0x020a06b0	main	108	default	unknown	parked	22.22	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a06b0	main	108	legacy_sp3	unknown	parked	33.33	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a06b0	main	108	legacy	unknown	shipped	100	n/a		batch-13	
