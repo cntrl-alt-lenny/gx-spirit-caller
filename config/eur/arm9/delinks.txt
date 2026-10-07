@@ -19776,7 +19776,7 @@ src/main/func_020b10e0.s:
 src/main/func_020b1188.s:
     complete
     .text start:0x020b1188 end:0x020b17ac
-src/main/func_020b17ac.s:
+src/main/func_020b17ac.c:
     complete
     .text start:0x020b17ac end:0x020b1840
 
