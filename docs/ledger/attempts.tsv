@@ -2857,3 +2857,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02099be8	main	60	default	math-regs-restore	parked	6.7	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
 0x02099be8	main	60	legacy_sp3	math-regs-restore	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
 0x02099be8	main	60	legacy	math-regs-restore	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x020975f0	main	120	default	device-init-fields	shipped	100	n/a		batch-12	
