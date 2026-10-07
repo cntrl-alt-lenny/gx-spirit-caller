@@ -2776,3 +2776,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207084c	main	224	legacy_sp3	unknown	parked	3.6	P-36-const-hoist-across-loop	P-36	batch-14	
 0x0207092c	main	84	legacy	guard-call	shipped	100	n/a		batch-14	
 0x0207103c	main	80	legacy	lcg-step	shipped	100	n/a		batch-14	
+0x0207108c	main	176	default	unknown	parked	2.3	P-36-const-hoist-across-loop	P-36	batch-14	
+0x0207108c	main	176	legacy	unknown	parked	52.3	P-36-const-hoist-across-loop	P-36	batch-14	
+0x0207108c	main	176	legacy_sp3	unknown	parked	31.8	P-36-const-hoist-across-loop	P-36	batch-14	
+0x020720b4	main	144	legacy	guard-chain	shipped	100	n/a		batch-14	
