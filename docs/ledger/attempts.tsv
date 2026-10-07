@@ -2811,3 +2811,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02077954	main	132	legacy	string-append	shipped	100	n/a		batch-14	
 0x02077b5c	main	60	legacy	timestamp	shipped	100	n/a		batch-14	
 0x02077a28	main	96	legacy	table-search	shipped	100	n/a		batch-14	
+0x020779d8	main	80	legacy	length-read	shipped	100	n/a		batch-14	
