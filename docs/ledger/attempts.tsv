@@ -2444,3 +2444,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02087f34	main	148	legacy_sp3	queue-entry-register	shipped	100	n/a		batch-11	
 0x020880bc	main	180	default	table-fill-callback	parked	48.89	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-11	
 0x020880bc	main	180	legacy_sp3	table-fill-callback	shipped	100	n/a		batch-11	
+0x02088268	main	108	default	table-iterate-callback	shipped	100	n/a		batch-11	

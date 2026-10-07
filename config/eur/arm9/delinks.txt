@@ -15307,7 +15307,7 @@ src/main/func_0208822c.legacy_sp3.c:
     complete
     .text start:0x0208822c end:0x02088268
 
-src/main/func_02088268.s:
+src/main/func_02088268.c:
     complete
     .text start:0x02088268 end:0x020882d4
 
