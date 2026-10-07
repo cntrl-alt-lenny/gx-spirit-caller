@@ -8,23 +8,21 @@ Reviewed commit: 812860643 on worker/batch-11. The code commit is 37a92acee; 812
 
 **SHOULD FIX 2: func_0208c8cc is parked at 0.0 on all three tiers, but a plain draft matches 100% under legacy** (sp3 65.5, default 0.0). The 0.0 rows are not real scores. Draft below.
 
-**SHOULD FIX 3: 47 in-range candidates were not retried.** The range holds 138 functions of 256 B or less; the batch touched 91. The other 47 were dropped by `wall_aware_headroom.py --exclude-attempted`, which is why the summary says nothing was left to retry. Each has rows for one tier only (36 default only, 10 one non-default, 1 plain). This batch needed a non-default tier for 51 of 69 matches, so a single-tier park is weak evidence. Several score 88-95% (0x02089f60, 0x0208771c, 0x02084dc0, 0x02089418, 0x0208bf3c). The summary does not mention them.
+**SHOULD FIX 3: 47 in-range candidates were never retried.** The range holds 138 functions of 256 B or less; the batch touched 91. `wall_aware_headroom.py --exclude-attempted` dropped the other 47, so the summary's "nothing to retry" is hollow. Each has ledger rows for one tier only (36 default only), yet 51 of this batch's 69 matches needed a non-default tier. Several score 88-95% (0x02089f60, 0x0208771c, 0x02084dc0, 0x02089418, 0x0208bf3c).
 
-**SHOULD FIX 4: the other parks were probed lightly.** I tried 8 of the 22 with one or two drafts each; 2 matched. The Worker should redraft the rest on all three tiers before calling them walls.
+**SHOULD FIX 4: the other parks were probed lightly.** I tried 8 of the 22 with a draft or two; 2 matched. Redraft the rest on all three tiers.
 
-**NOTE 5: the Thumb parks (0x0208b1ac, 0x0208b1c8) were scored with ARM compilers only.** Their 13-21% and 0% say nothing about Thumb. A `#pragma thumb on` draft (the `.thumb.c` convention used in ov004) gave 20.0% and 0.0%, so they probably stay parked, but the ledger rows are vacuous.
+**NOTE 5:** the Thumb parks (0x0208b1ac, 0x0208b1c8) were scored with ARM compilers only. A `#pragma thumb on` draft gave 20.0% and 0.0%; probably still parked, but the ledger rows are vacuous.
 
-**NOTE 6: func_02084e0c `volatile`.** Plain `int` gives 55.0% (default), and the original does reload the flag three times, so the lever is real. Sibling TUs func_02084efc and func_02084fe0 declare the same symbol non-volatile. It is the only volatile in the batch.
+**NOTE 6:** func_02084e0c `volatile` is real (plain int gives 55.0%) but sibling TUs declare the symbol non-volatile. It is the batch's only volatile. No other fake-match tricks (asm, pragma, register pin); MMIO stores are non-volatile and match anyway.
 
-**NOTE 7: tier not evidenced for some files.** func_020827ec, 02085888, 02085a74 and 020865d0 match under all three compilers. func_0208cb88 and 0208ea74 (sp3) also match under legacy. Ten default files also match under sp3. For these the suffix is a choice, not a requirement; every other file's chosen tier is its only 100%.
+**NOTE 7:** func_020827ec, 02085888, 02085a74, 020865d0 match under all three compilers; func_0208cb88 and 0208ea74 (sp3) also match under legacy; ten default files also match under sp3. Their suffix is a choice, not a requirement. Every other file's tier is its only 100%.
 
-**NOTE 8: no fake-match tricks found** (no asm, pragma, register pin or dummy data). Style levers: func_02086e44 (`b = -b;` on one line with another statement), func_020880bc (two statements on a line), func_020882fc (`(f24 << 30) >> 31` where the original reads a signed 1-bit field), and raw MMIO stores without `volatile`, which match because mwcc does not merge them.
+**NOTE 8: callee declarations differing from the definition** all reproduce the original code. Beyond the summary's list: function addresses declared `void(void)` where the callee takes a pointer (func_02088000, func_02088070, func_0208ae34, func_02087640); func_0209a83c and func_0209a824 given a pointer, defined `int`; func_02080114 and func_020800b8 given a `u16` key, defined `u32`.
 
-**NOTE 9: callee declarations that differ from the definition.** All reproduce the original's code. Beyond the summary's list: function addresses declared `void(void)` where the callee takes a pointer (func_02088000 and func_02088070 in 020885a0, func_0208ae34 in 0208afac, func_02087640 in 02087f34); `func_0209a83c` and `func_0209a824` called with a pointer, defined `int arg`; `func_02080114` and `func_020800b8` called with `u16` key, defined `u32`; `func_02087d10` defined `u16 v`, called with int.
+**UNPROVEN CLAIM 9: "gate3 --scope all, exit 0, no SKIP".** The Worker's log is not in the repo and I got no clean three-region run (table below).
 
-**UNPROVEN CLAIM 10: "gate3 --scope all, exit 0, no SKIP".** The Worker's log is not in the repo, and I could not get one clean three-region run (table below).
-
-**UNPROVEN CLAIM 11: 0208df94 and 0208e014 reach 100% with volatile MMIO reads.** My draft with volatile reads scored 15.6%. Volatile on hardware registers is ordinary C, not a trick. If the Worker's draft matches, not shipping 268 B is a mistake; put the draft in the batch.
+**UNPROVEN CLAIM 10: 0208df94 and 0208e014 reach 100% with volatile MMIO reads.** My volatile draft scored 15.6%. Volatile on hardware registers is ordinary C; if the Worker's draft matches, withholding 268 B is wrong.
 
 ## Checks (this worktree, 812860643)
 
@@ -51,7 +49,7 @@ No STALE reference-baseline lines appeared in any log. Run 1 failed on 0-byte de
 The Worker's volatile-MMIO drafts; 14 of the 22 parks beyond a first look; whether the 47 older parks match on other tiers.
 
 ## Verdict
-The 69 conversions are sound: honest C, 100% on their tiers, delinks and ledger prefix correct, gain equal to matched size. The batch is not finished: two parks (0x02088874, 0x0208c8cc, 360 B) match with plain drafts, the Thumb rows are vacuous, and 47 in-range functions were never retried across tiers. Fix those, then rerun a clean gate.
+The 69 conversions are sound: honest C, 100% on their tiers, delinks and ledger prefix correct, gain equal to matched size. The batch is not finished: two parks (0x02088874, 0x0208c8cc, 360 B) match with plain drafts, the Thumb rows are vacuous, and 47 in-range functions were never retried across tiers. Fix those and rerun the gate.
 
 ## Drafts (scratch compiles, outside the repo)
 
