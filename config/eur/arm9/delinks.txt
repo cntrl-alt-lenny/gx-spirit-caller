@@ -17422,7 +17422,7 @@ src/main/func_02094e64.legacy.c:
     complete
     .text start:0x02094e64 end:0x02094e90
 
-src/main/func_02094e90.s:
+src/main/func_02094e90.legacy.c:
     complete
     .text start:0x02094e90 end:0x02094ee8
 
