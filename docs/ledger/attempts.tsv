@@ -2434,3 +2434,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020877c8	main	92	legacy_sp3	sorted-list-insert	shipped	100	n/a		batch-11	
 0x02087824	main	88	default	sorted-list-insert-owner	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-11	
 0x02087824	main	88	legacy_sp3	sorted-list-insert-owner	shipped	100	n/a		batch-11	
+0x0208787c	main	72	default	init-fields-call	shipped	100	n/a		batch-11	
