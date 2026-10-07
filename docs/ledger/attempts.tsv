@@ -2432,3 +2432,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202b12c	main	124	legacy	string-copy-substitute-token	parked	59.4	register-numbering-permutation-cascade	P-30	batch-10	1
 0x0202b12c	main	124	default	string-copy-substitute-token	parked	35.5	register-numbering-permutation-cascade	P-30	batch-10	1
 0x0202b9b0	main	60	default	pair-table-lookup	shipped	100	n/a		batch-10	1
+0x0202b9ec	main	76	default	nibble-get	shipped	100	n/a		batch-10	1
