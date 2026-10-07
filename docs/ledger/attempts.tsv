@@ -2895,3 +2895,16 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020aadf8	main	200	legacy_sp3	unknown	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020aadf8	main	200	legacy	unknown	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020ab0c4	main	108	default	unknown	shipped	100	n/a		batch-13	
+0x020ac37c	main	224	default	unknown	parked	40.68	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020ac37c	main	224	legacy_sp3	unknown	parked	44.07	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020ac37c	main	224	legacy	unknown	parked	43.33	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020acca0	main	152	default	unknown	parked	73.68	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020acca0	main	152	legacy_sp3	unknown	parked	31.58	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020acca0	main	152	legacy	unknown	parked	38.46	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020aed64	main	64	default	unknown	parked	81.25	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020aed64	main	64	legacy_sp3	unknown	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020aed64	main	64	legacy	unknown	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020aedcc	main	112	default	unknown	parked	48.28	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020aedcc	main	112	legacy_sp3	unknown	parked	32.14	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020aedcc	main	112	legacy	unknown	parked	35.71	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020b005c	main	32	default	unknown	shipped	100	n/a		batch-13	
