@@ -4504,7 +4504,7 @@ src/main/func_020222a0.s:
     complete
     .text start:0x020222a0 end:0x02022430
 
-src/main/func_02022430.s:
+src/main/func_02022430.c:
     complete
     .text start:0x02022430 end:0x020224c0
 
