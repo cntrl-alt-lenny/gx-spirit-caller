@@ -2988,3 +2988,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a37e0	main	80	default	unknown	parked	75.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a37e0	main	80	legacy_sp3	unknown	parked	90.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a37e0	main	80	legacy	unknown	shipped	100	n/a		batch-13	
+0x020a3ac0	main	60	default	unknown	parked	73.33	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a3ac0	main	60	legacy_sp3	unknown	parked	73.33	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a3ac0	main	60	legacy	unknown	shipped	100	n/a		batch-13	
