@@ -12840,7 +12840,7 @@ src/main/func_02070c84.legacy.c:
     complete
     .text start:0x02070c84 end:0x02070ce0
 
-src/main/func_02070ce0.s:
+src/main/func_02070ce0.legacy.c:
     complete
     .text start:0x02070ce0 end:0x02070d34
 
