@@ -2952,3 +2952,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209ecc8	main	256	default	packet-send-validate	parked	12.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209ecc8	main	256	legacy_sp3	packet-send-validate	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209ecc8	main	256	legacy	packet-send-validate	shipped	100	n/a		batch-12	
+0x0209f404	main	108	default	params-init-forward	parked	92.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209f404	main	108	legacy_sp3	params-init-forward	parked	92.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209f404	main	108	legacy	params-init-forward	shipped	100	n/a		batch-12	
