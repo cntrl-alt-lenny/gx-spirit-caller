@@ -4740,7 +4740,7 @@ src/main/func_02026b38.s:
     complete
     .text start:0x02026b38 end:0x02026d50
 
-src/main/func_02026d50.s:
+src/main/func_02026d50.c:
     complete
     .text start:0x02026d50 end:0x02026e38
 
