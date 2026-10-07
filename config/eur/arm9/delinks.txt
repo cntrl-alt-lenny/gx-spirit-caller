@@ -19230,7 +19230,7 @@ src/main/func_020a5db0.legacy.c:
     complete
     .text start:0x020a5db0 end:0x020a5e04
 
-src/main/func_020a5e04.s:
+src/main/func_020a5e04.legacy.c:
     complete
     .text start:0x020a5e04 end:0x020a5e68
 
