@@ -2964,3 +2964,21 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020905dc	main	72	default	irq-mask-disable	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x020905dc	main	72	legacy_sp3	irq-mask-disable	parked	66.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x020905dc	main	72	legacy	irq-mask-disable	shipped	100	n/a		batch-12	
+0x020928cc	main	28	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928cc	main	28	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928cc	main	28	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928e8	main	28	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928e8	main	28	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928e8	main	28	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092940	main	28	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092940	main	28	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092940	main	28	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092904	main	36	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092904	main	36	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092904	main	36	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x0209286c	main	44	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x0209286c	main	44	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x0209286c	main	44	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092898	main	52	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092898	main	52	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092898	main	52	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
