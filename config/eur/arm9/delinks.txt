@@ -17994,7 +17994,7 @@ src/main/func_020986c0.legacy.c:
 src/main/func_0209870c.legacy.c:
     complete
     .text start:0x0209870c end:0x02098734
-src/main/FS_UnloadOverlay.s:
+src/main/FS_UnloadOverlay.legacy.c:
     complete
     .text start:0x02098734 end:0x02098788
 
