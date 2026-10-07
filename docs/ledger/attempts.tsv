@@ -2846,3 +2846,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207d3ac	main	132	legacy	unknown	parked	0.0	P-30-adjacent-register-choice	P-30	batch-14	
 0x0207d3ac	main	132	legacy_sp3	unknown	parked	0.0	P-30-adjacent-register-choice	P-30	batch-14	
 0x0207d458	main	60	legacy_sp3	list-add	shipped	100	n/a		batch-14	
+0x0207d4dc	main	68	legacy_sp3	range-align	shipped	100	n/a		batch-14	
