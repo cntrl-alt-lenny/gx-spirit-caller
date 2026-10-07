@@ -6,7 +6,7 @@ typedef struct {
     int *head;
     char pad[0x10c - 4];
     int queue[2];
-    volatile unsigned int flags;
+    unsigned int flags;
 } Core;
 
 extern Core data_021a84c0;

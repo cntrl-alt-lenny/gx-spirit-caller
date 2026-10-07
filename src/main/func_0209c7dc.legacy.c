@@ -21,7 +21,7 @@ typedef struct {
     int f104;
     char pad108[0x10c - 0x108];
     int queue[2];
-    volatile unsigned int flags;
+    unsigned int flags;
 } Core;
 
 typedef struct {
