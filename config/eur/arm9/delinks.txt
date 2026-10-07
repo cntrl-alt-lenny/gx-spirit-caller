@@ -18899,7 +18899,7 @@ src/main/func_020a0f38.s:
     complete
     .text start:0x020a0f38 end:0x020a10e8
 
-src/main/func_020a10e8.s:
+src/main/func_020a10e8.legacy.c:
     complete
     .text start:0x020a10e8 end:0x020a112c
 
