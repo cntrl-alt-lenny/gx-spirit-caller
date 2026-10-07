@@ -18537,7 +18537,7 @@ src/main/func_0209d438.s:
     complete
     .text start:0x0209d438 end:0x0209d488
 
-src/main/func_0209d488.s:
+src/main/func_0209d488.legacy.c:
     complete
     .text start:0x0209d488 end:0x0209d4ec
 

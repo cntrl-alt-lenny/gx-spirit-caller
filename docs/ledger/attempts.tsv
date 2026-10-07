@@ -2923,3 +2923,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209d0f8	main	88	legacy	cart-dma-start	shipped	100	n/a		batch-12	
 0x0209d150	main	160	default	cart-command-send	parked	5.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
 0x0209d150	main	160	legacy_sp3	cart-command-send	shipped	100	n/a		batch-12	
+0x0209d488	main	100	default	retry-until-ok	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209d488	main	100	legacy_sp3	retry-until-ok	parked	40.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209d488	main	100	legacy	retry-until-ok	shipped	100	n/a		batch-12	
