@@ -2450,3 +2450,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020885a0	main	128	default	obj-init-vtable	parked	56.25	store-coalescing	PROVISIONAL:memory-order/fusion	batch-11	
 0x020885a0	main	128	legacy_sp3	obj-init-vtable	shipped	100	n/a		batch-11	
 0x02088dd8	main	148	default	thread-init-once	shipped	100	n/a		batch-11	
+0x0208906c	main	120	default	pool-read-clamp	shipped	100	n/a		batch-11	
