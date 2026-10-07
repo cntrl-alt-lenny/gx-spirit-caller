@@ -2814,3 +2814,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020779d8	main	80	legacy	length-read	shipped	100	n/a		batch-14	
 0x02077c08	main	256	legacy	cache-slot	shipped	100	n/a		batch-14	
 0x02077db0	main	168	legacy	cache-lookup	shipped	100	n/a		batch-14	
+0x02077ecc	main	192	legacy	md5-update	shipped	100	n/a		batch-14	
