@@ -17802,7 +17802,7 @@ src/main/func_020975f0.s:
     complete
     .text start:0x020975f0 end:0x02097668
 
-src/main/func_02097668.s:
+src/main/func_02097668.legacy.c:
     complete
     .text start:0x02097668 end:0x02097700
 
