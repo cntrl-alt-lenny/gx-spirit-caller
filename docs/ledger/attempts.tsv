@@ -2876,3 +2876,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209b0f4	main	120	default	slot-command-submit	parked	23.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209b0f4	main	120	legacy_sp3	slot-command-submit	parked	36.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209b0f4	main	120	legacy	slot-command-submit	parked	63.3	P-36-pool-load-hoist	P-36	batch-12	
+0x0209b16c	main	116	default	command-submit-two-part	parked	13.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209b16c	main	116	legacy_sp3	command-submit-two-part	parked	24.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209b16c	main	116	legacy	command-submit-two-part	shipped	100	n/a		batch-12	
