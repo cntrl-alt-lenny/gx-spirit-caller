@@ -2676,3 +2676,95 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200fbd4	main	164	default	list-lookup	shipped	100	n/a		batch-08	2
 0x0200fc78	main	164	default	list-lookup	shipped	100	n/a		batch-08	1
 0x0200fd1c	main	104	default	list-lookup	shipped	100	n/a		batch-08	2
+0x02010a98	main	112	default	ring-buffer-clear-key	shipped	100	n/a		batch-09	1
+0x02010eb8	main	204	default	struct-matrix-copy	shipped	100	n/a		batch-09	1
+0x02011178	main	108	default	struct-copy-guard	shipped	100	n/a		batch-09	1
+0x02011620	main	104	default	matrix-rotate-x	parked	0.0	P-2-stm-fusion	P-2	batch-09	2
+0x02011620	main	104	legacy_sp3	matrix-rotate-x	parked	7.1	frame-shape	PROVISIONAL:frame/epilogue	batch-09	2
+0x02011620	main	104	default	matrix-rotate-x	parked	11.5	P-36-instruction-scheduling	P-36	batch-09	8
+0x02011620	main	104	legacy	matrix-rotate-x	parked	0.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-09	1
+0x02011688	main	100	default	rotation-matrix-y	parked	72.0	register-choice	PROVISIONAL:register-choice	batch-09	6
+0x02011688	main	100	legacy_sp3	rotation-matrix-y	parked	72.0	register-choice	PROVISIONAL:register-choice	batch-09	1
+0x02011688	main	100	legacy	rotation-matrix-y	parked	72.0	register-choice	PROVISIONAL:register-choice	batch-09	1
+0x020116ec	main	96	default	rotation-matrix-z	parked	70.8	register-choice	PROVISIONAL:register-choice	batch-09	5
+0x020116ec	main	96	legacy_sp3	rotation-matrix-z	parked	16.0	register-choice	PROVISIONAL:register-choice	batch-09	1
+0x020116ec	main	96	legacy	rotation-matrix-z	parked	16.0	register-choice	PROVISIONAL:register-choice	batch-09	1
+0x02011a94	main	88	default	threshold-bracket-lookup	shipped	100	n/a		batch-09	1
+0x02011b9c	main	208	default	packed-list-unpack	shipped	100	n/a		batch-09	2
+0x02012454	main	80	default	table-record-copy-in	parked	50.0	P-20-r4r5-swap	P-20	batch-09	6
+0x02012454	main	80	legacy_sp3	table-record-copy-in	parked	0.0	P-20-r4r5-swap	P-20	batch-09	1
+0x02012454	main	80	legacy	table-record-copy-in	parked	0.0	P-20-r4r5-swap	P-20	batch-09	1
+0x020124a4	main	80	default	table-record-copy-out	parked	85.0	P-20-scratch-register	P-20	batch-09	5
+0x020124a4	main	80	legacy_sp3	table-record-copy-out	parked	0.0	P-20-scratch-register	P-20	batch-09	1
+0x020124a4	main	80	legacy	table-record-copy-out	parked	0.0	P-20-scratch-register	P-20	batch-09	1
+0x020124f4	main	108	default	sysinit-store-block	parked	77.8	P-30-parameter-register-rotation	P-30	batch-09	4
+0x020124f4	main	108	legacy_sp3	sysinit-store-block	parked	0.0	P-30-parameter-register-rotation	P-30	batch-09	1
+0x020124f4	main	108	legacy	sysinit-store-block	parked	0.0	P-30-parameter-register-rotation	P-30	batch-09	1
+0x020125ac	main	112	default	sysinit-store-block	parked	71.4	P-30-parameter-register-rotation	P-30	batch-09	4
+0x020125ac	main	112	legacy_sp3	sysinit-store-block	parked	3.3	P-30-parameter-register-rotation	P-30	batch-09	1
+0x020125ac	main	112	legacy	sysinit-store-block	parked	3.2	P-30-parameter-register-rotation	P-30	batch-09	1
+0x02017afc	main	228	default	state-machine-dispatch	shipped	100	n/a		batch-09	4
+0x020139fc	main	60	default	scale-255-clamp	shipped	100	n/a		batch-09	2
+0x02018ecc	main	96	default	sysrecord-read-pair	shipped	100	n/a		batch-09	2
+0x02018fbc	main	120	default	counter-advance-clamp	shipped	100	n/a		batch-09	1
+0x02019184	main	72	default	sysrecord-read-byte	shipped	100	n/a		batch-09	4
+0x0201942c	main	104	default	id-range-switch	shipped	100	n/a		batch-09	1
+0x02019494	main	148	default	table-or-offset-lookup	shipped	100	n/a		batch-09	2
+0x02019538	main	92	default	saturating-byte-add	shipped	100	n/a		batch-09	2
+0x02019858	main	64	default	charparam-score	shipped	100	n/a		batch-09	2
+0x02019a58	main	116	default	lcg-bracket-roll	parked	13.8	P-30-whole-function-register-rotation	P-30	batch-09	6
+0x02019a58	main	116	legacy_sp3	lcg-bracket-roll	parked	3.3	P-30-whole-function-register-rotation	P-30	batch-09	1
+0x02019a58	main	116	legacy	lcg-bracket-roll	parked	3.2	P-30-whole-function-register-rotation	P-30	batch-09	1
+0x02019ea4	main	240	default	id-class-switch	shipped	100	n/a		batch-09	1
+0x0201a044	main	116	default	scaled-stat-formula	parked	51.7	load-scheduling-interleave	P-36	batch-09	8
+0x0201a044	main	116	legacy_sp3	scaled-stat-formula	parked	17.2	load-scheduling-interleave	P-36	batch-09	1
+0x0201a044	main	116	legacy	scaled-stat-formula	parked	17.2	load-scheduling-interleave	P-36	batch-09	1
+0x0201a32c	main	92	default	saturating-bitfield-counters	shipped	100	n/a		batch-09	3
+0x0201a134	main	60	default	flag-set-and-lookup	parked	53.3	P-20-register-letter	P-20	batch-09	6
+0x0201a134	main	60	legacy_sp3	flag-set-and-lookup	parked	0.0	P-20-register-letter	P-20	batch-09	1
+0x0201a134	main	60	legacy	flag-set-and-lookup	parked	0.0	P-20-register-letter	P-20	batch-09	1
+0x0201aabc	main	56	default	bitfield-set-bit	shipped	100	n/a		batch-09	1
+0x0201af80	main	92	default	table-entry-search	shipped	100	n/a		batch-09	5
+0x0201b648	main	72	default	bitfield-clear-loop	shipped	100	n/a		batch-09	3
+0x0201bf80	main	52	default	cross-overlay-call-wrapper	parked	92.3	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201bf80	main	52	legacy_sp3	cross-overlay-call-wrapper	parked	92.3	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201bf80	main	52	legacy	cross-overlay-call-wrapper	parked	78.6	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1bc	main	36	default	cross-overlay-call-wrapper	parked	88.9	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1bc	main	36	legacy_sp3	cross-overlay-call-wrapper	parked	88.9	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1bc	main	36	legacy	cross-overlay-call-wrapper	parked	70.0	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1e0	main	68	default	cross-overlay-call-wrapper	parked	94.1	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1e0	main	68	legacy_sp3	cross-overlay-call-wrapper	parked	0.0	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201c1e0	main	68	legacy	cross-overlay-call-wrapper	parked	0.0	C-32-cross-overlay-bl	C-32	batch-09	1
+0x0201b504	main	204	default	list-apply-bitfields	parked	68.6	P-30-whole-function-register-rotation	P-30	batch-09	8
+0x0201b504	main	204	legacy_sp3	list-apply-bitfields	parked	29.4	P-30-whole-function-register-rotation	P-30	batch-09	2
+0x0201b504	main	204	legacy	list-apply-bitfields	parked	29.4	P-30-whole-function-register-rotation	P-30	batch-09	2
+0x0201ddac	main	136	default	size-class-flags	shipped	100	n/a		batch-09	1
+0x0201d620	main	148	default	byte-reverse-record-search	parked	18.9	and-shift-pair-collapse	PROVISIONAL:and-shift-pair-collapse	batch-09	8
+0x0201d620	main	148	legacy_sp3	byte-reverse-record-search	parked	10.5	and-shift-pair-collapse	PROVISIONAL:and-shift-pair-collapse	batch-09	1
+0x0201d620	main	148	legacy	byte-reverse-record-search	parked	2.5	and-shift-pair-collapse	PROVISIONAL:and-shift-pair-collapse	batch-09	1
+0x0201e4cc	main	236	default	record-unpack-and-dispatch	parked	96.6	P-20-r0-vs-r1	P-20	batch-09	12
+0x0201e4cc	main	236	legacy_sp3	record-unpack-and-dispatch	parked	0.0	P-20-r0-vs-r1	P-20	batch-09	1
+0x0201e4cc	main	236	legacy	record-unpack-and-dispatch	parked	0.0	P-20-r0-vs-r1	P-20	batch-09	1
+0x0201ef90	main	256	default	request-dispatch-ten-args	parked	96.9	P-20-r0-vs-r1	P-20	batch-09	6
+0x0201ef90	main	256	legacy_sp3	request-dispatch-ten-args	parked	15.4	P-20-r0-vs-r1	P-20	batch-09	1
+0x0201ef90	main	256	legacy	request-dispatch-ten-args	parked	14.9	P-20-r0-vs-r1	P-20	batch-09	1
+0x0201f138	main	100	default	state-change-notify	shipped	100	n/a		batch-09	1
+0x0201ff2c	main	108	default	six-arg-call-status-check	parked	7.1	P-2-stm-fusion	P-2	batch-09	5
+0x0201ff2c	main	108	legacy_sp3	six-arg-call-status-check	parked	3.7	P-2-stm-fusion	P-2	batch-09	1
+0x0201ff2c	main	108	legacy	six-arg-call-status-check	parked	3.7	P-2-stm-fusion	P-2	batch-09	1
+0x0201f4d4	main	148	default	state-gate-then-six-arg-call	parked	56.8	P-2-stm-fusion	P-2	batch-09	6
+0x0201f4d4	main	148	legacy_sp3	state-gate-then-six-arg-call	parked	2.7	P-2-stm-fusion	P-2	batch-09	1
+0x0201f4d4	main	148	legacy	state-gate-then-six-arg-call	parked	10.8	P-2-stm-fusion	P-2	batch-09	1
+0x0201f874	main	224	default	mask-pick-and-register	parked	94.6	control-flow-structural-mismatch	PROVISIONAL:control-flow-structural-mismatch	batch-09	10
+0x0201f874	main	224	legacy_sp3	mask-pick-and-register	parked	0.0	control-flow-structural-mismatch	PROVISIONAL:control-flow-structural-mismatch	batch-09	1
+0x0201f874	main	224	legacy	mask-pick-and-register	parked	0.0	control-flow-structural-mismatch	PROVISIONAL:control-flow-structural-mismatch	batch-09	1
+0x02018be8	main	244	default	system-init-bitfields	shipped	100	n/a		batch-09	4
+0x0201a84c	main	212	default	mode-flag-collector	shipped	100	n/a		batch-09	2
+0x0201ef90	main	256	default	unknown	shipped	100	n/a		unknown	
+0x0201d47c	main	56	default	unknown	shipped	100	n/a		unknown	
+0x0201f874	main	224	default	mask-pick-and-register	parked	42.9	P-36-cmp-vs-movs-canonicalization	P-36	batch-09	6
+0x0201e4cc	main	236	default	unknown	shipped	100	n/a		unknown	
+0x02011620	main	104	legacy	matrix-rotate-x	parked	6.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-09	1
+0x020124f4	main	108	default	sysinit-store-block	parked	77.8	P-30-parameter-register-rotation	P-30	batch-09	1
+0x020125ac	main	112	default	sysinit-store-block	parked	71.4	P-30-parameter-register-rotation	P-30	batch-09	1
+0x0201a134	main	60	default	flag-set-and-lookup	parked	80.0	P-36-instruction-scheduling	P-36	batch-09	12
