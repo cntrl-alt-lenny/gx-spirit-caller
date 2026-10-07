@@ -4402,7 +4402,7 @@ src/main/func_02021b38.s:
 
 
 
-src/main/func_02021bac.s:
+src/main/func_02021bac.c:
     complete
     .text start:0x02021bac end:0x02021c0c
 

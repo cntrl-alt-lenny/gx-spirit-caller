@@ -2375,3 +2375,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02020738	main	220	default	rng-bitmask-pick	shipped	100	n/a		batch-10	1
 0x02020d00	main	132	default	copy-and-send-command	shipped	100	n/a		batch-10	1
 0x02021a3c	main	236	default	record-dispatch-switch	shipped	100	n/a		batch-10	1
+0x02021c30	main	140	legacy_sp3	pool-scan-alloc-entry	parked	0.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02021c30	main	140	legacy	pool-scan-alloc-entry	parked	2.4	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02021c30	main	140	default	pool-scan-alloc-entry	parked	65.7	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02021bac	main	96	default	pool-scan-callback	shipped	100	n/a		batch-10	1
