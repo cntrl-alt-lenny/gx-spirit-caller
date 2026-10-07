@@ -4262,7 +4262,7 @@ src/main/func_02020ce0.c:
     complete
     .text start:0x02020ce0 end:0x02020d00
 
-src/main/func_02020d00.s:
+src/main/func_02020d00.c:
     complete
     .text start:0x02020d00 end:0x02020d84
 
