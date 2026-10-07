@@ -2385,3 +2385,10 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020225b4	main	84	default	slot-copy-words	shipped	100	n/a		batch-10	1
 0x02022a80	main	116	default	vec3-lerp-div	shipped	100	n/a		batch-10	1
 0x02022af4	main	128	default	vec3-scale-negate	shipped	100	n/a		batch-10	1
+0x02023188	main	140	legacy_sp3	ring-drain-task-invoke	parked	23.7	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02023188	main	140	legacy	ring-drain-task-invoke	parked	23.1	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02023188	main	140	default	ring-drain-task-invoke	parked	31.4	register-numbering-permutation-cascade	P-30	batch-10	1
+0x020234f8	main	124	legacy_sp3	pool-scan-alloc-entry	parked	0.0	C-34	C-34	batch-10	1
+0x020234f8	main	124	legacy	pool-scan-alloc-entry	parked	0.0	C-34	C-34	batch-10	1
+0x020234f8	main	124	default	pool-scan-alloc-entry	parked	25.8	C-34	C-34	batch-10	1
+0x02023e58	main	96	default	slot-release-loop	shipped	100	n/a		batch-10	1

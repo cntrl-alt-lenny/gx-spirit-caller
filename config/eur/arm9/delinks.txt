@@ -4604,7 +4604,7 @@ src/main/func_02023d88.s:
     complete
     .text start:0x02023d88 end:0x02023e58
 
-src/main/func_02023e58.s:
+src/main/func_02023e58.c:
     complete
     .text start:0x02023e58 end:0x02023eb8
 
