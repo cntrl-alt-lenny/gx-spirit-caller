@@ -19399,7 +19399,7 @@ src/main/func_020a6d48.c:
 
 
 
-src/main/func_020a6d54.s:
+src/main/func_020a6d54.c:
     complete
     .text start:0x020a6d54 end:0x020a6d90
 
