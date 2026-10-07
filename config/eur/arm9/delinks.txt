@@ -5746,7 +5746,7 @@ src/main/func_0202f050.s:
     complete
     .text start:0x0202f050 end:0x0202f164
 
-src/main/func_0202f164.s:
+src/main/func_0202f164.c:
     complete
     .text start:0x0202f164 end:0x0202f1d8
 
