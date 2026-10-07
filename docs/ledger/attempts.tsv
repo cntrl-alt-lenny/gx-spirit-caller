@@ -2770,3 +2770,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201a134	main	60	default	flag-set-and-lookup	parked	80.0	P-36-instruction-scheduling	P-36	batch-09	12
 0x02070278	main	212	legacy	loop	shipped	100	n/a		batch-14	
 0x0207039c	main	148	legacy	guard-chain	shipped	100	n/a		batch-14	
+0x02070430	main	184	legacy	guard-chain	shipped	100	n/a		batch-14	

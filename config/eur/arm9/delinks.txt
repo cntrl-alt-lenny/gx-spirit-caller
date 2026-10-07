@@ -12788,7 +12788,7 @@ src/main/func_0207039c.legacy.c:
     complete
     .text start:0x0207039c end:0x02070430
 
-src/main/func_02070430.s:
+src/main/func_02070430.legacy.c:
     complete
     .text start:0x02070430 end:0x020704e8
 
