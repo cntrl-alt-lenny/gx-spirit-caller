@@ -2946,3 +2946,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209e3ac	main	164	default	id-checksum-digit	parked	19.5	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x0209e3ac	main	164	legacy_sp3	id-checksum-digit	parked	80.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209e3ac	main	164	legacy	id-checksum-digit	shipped	100	n/a		batch-12	
+0x0209e7f0	main	224	default	event-register-callback	parked	53.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e7f0	main	224	legacy_sp3	event-register-callback	parked	58.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e7f0	main	224	legacy	event-register-callback	shipped	100	n/a		batch-12	
