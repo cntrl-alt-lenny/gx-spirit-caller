@@ -2835,3 +2835,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020986c0	main	76	default	callback-register-wrapper	parked	68.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x020986c0	main	76	legacy_sp3	callback-register-wrapper	parked	68.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x020986c0	main	76	legacy	callback-register-wrapper	shipped	100	n/a		batch-12	
+0x020988a8	main	256	default	two-pool-words-same-symbol	parked	6.2	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
+0x020988a8	main	256	legacy_sp3	two-pool-words-same-symbol	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
+0x020988a8	main	256	legacy	two-pool-words-same-symbol	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
