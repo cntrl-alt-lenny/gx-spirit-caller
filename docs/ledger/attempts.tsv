@@ -2823,3 +2823,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02097f20	main	208	legacy	mutex-lock-wait	shipped	100	n/a		batch-12	
 0x02098088	main	124	default	struct-by-value-param-init	parked	54.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02098088	main	124	legacy_sp3	struct-by-value-param-init	shipped	100	n/a		batch-12	
+0x0209815c	main	68	default	path-lookup-bool	parked	88.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209815c	main	68	legacy_sp3	path-lookup-bool	parked	88.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209815c	main	68	legacy	path-lookup-bool	shipped	100	n/a		batch-12	
