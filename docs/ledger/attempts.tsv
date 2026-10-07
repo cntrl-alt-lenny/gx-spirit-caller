@@ -2380,3 +2380,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02021c30	main	140	default	pool-scan-alloc-entry	parked	65.7	register-numbering-permutation-cascade	P-30	batch-10	1
 0x02021bac	main	96	default	pool-scan-callback	shipped	100	n/a		batch-10	1
 0x02022430	main	144	default	flag-mask-compare-chain	shipped	100	n/a		batch-10	1
+0x020224c0	main	76	default	mode-switch-lookup	shipped	100	n/a		batch-10	1
