@@ -15609,7 +15609,7 @@ src/main/func_0208a4ec.legacy_sp3.c:
     complete
     .text start:0x0208a4ec end:0x0208a574
 
-src/main/func_0208a574.s:
+src/main/func_0208a574.legacy_sp3.c:
     complete
     .text start:0x0208a574 end:0x0208a5e4
 
