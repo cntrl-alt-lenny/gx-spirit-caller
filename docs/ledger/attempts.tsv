@@ -2818,3 +2818,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02097e5c	main	72	default	init-record-set-flag	parked	61.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02097e5c	main	72	legacy_sp3	init-record-set-flag	parked	88.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02097e5c	main	72	legacy	init-record-set-flag	shipped	100	n/a		batch-12	
+0x02097f20	main	208	default	mutex-lock-wait	parked	19.2	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02097f20	main	208	legacy_sp3	mutex-lock-wait	parked	80.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097f20	main	208	legacy	mutex-lock-wait	shipped	100	n/a		batch-12	
