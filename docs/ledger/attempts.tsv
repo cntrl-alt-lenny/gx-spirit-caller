@@ -2403,3 +2403,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02082f64	main	104	legacy_sp3	effect-spawn-vec3	shipped	100	n/a		batch-11	
 0x02084840	main	212	default	vm-handler-callback-state	parked	0.0	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-11	
 0x02084840	main	212	legacy_sp3	vm-handler-callback-state	shipped	100	n/a		batch-11	
+0x02084aec	main	220	default	obj-clear-bitsets	shipped	100	n/a		batch-11	

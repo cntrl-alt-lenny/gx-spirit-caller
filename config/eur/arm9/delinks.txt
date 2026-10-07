@@ -14828,7 +14828,7 @@ src/main/func_02084ac4.c:
     complete
     .text start:0x02084ac4 end:0x02084aec
 
-src/main/func_02084aec.s:
+src/main/func_02084aec.c:
     complete
     .text start:0x02084aec end:0x02084bc8
 
