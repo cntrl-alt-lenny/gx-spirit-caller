@@ -2794,3 +2794,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209614c	main	220	default	list-unlink-insert	parked	16.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209614c	main	220	legacy_sp3	list-unlink-insert	parked	20.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209614c	main	220	legacy	list-unlink-insert	shipped	100	n/a		batch-12	
+0x02096f64	main	160	default	read-record-struct-copy	parked	25.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02096f64	main	160	legacy_sp3	read-record-struct-copy	parked	90.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02096f64	main	160	legacy	read-record-struct-copy	shipped	100	n/a		batch-12	
