@@ -2861,3 +2861,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209a3f8	main	172	default	shared-mem-header-check	parked	9.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209a3f8	main	172	legacy_sp3	shared-mem-header-check	parked	79.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209a3f8	main	172	legacy	shared-mem-header-check	shipped	100	n/a		batch-12	
+0x0209a4a4	main	144	default	init-once-wait-ready	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209a4a4	main	144	legacy_sp3	init-once-wait-ready	parked	13.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209a4a4	main	144	legacy	init-once-wait-ready	shipped	100	n/a		batch-12	
