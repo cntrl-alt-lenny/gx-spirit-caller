@@ -2382,3 +2382,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02081598	main	176	legacy_sp3	align-text-offset	shipped	100	n/a		batch-11	
 0x02081648	main	172	default	text-anchor-offset	parked	32.56	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-11	
 0x02081648	main	172	legacy_sp3	text-anchor-offset	shipped	100	n/a		batch-11	
+0x020817f0	main	168	default	callback-string-advance	parked	83.33	P-20-r4-vs-lr	P-20	batch-11	
+0x020817f0	main	168	legacy_sp3	callback-string-advance	shipped	100	n/a		batch-11	
