@@ -2404,3 +2404,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02084840	main	212	default	vm-handler-callback-state	parked	0.0	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-11	
 0x02084840	main	212	legacy_sp3	vm-handler-callback-state	shipped	100	n/a		batch-11	
 0x02084aec	main	220	default	obj-clear-bitsets	shipped	100	n/a		batch-11	
+0x02084bc8	main	112	default	bitset-mark-list	parked	0.0	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-11	
+0x02084bc8	main	112	legacy_sp3	bitset-mark-list	shipped	100	n/a		batch-11	
