@@ -2879,3 +2879,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209b16c	main	116	default	command-submit-two-part	parked	13.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209b16c	main	116	legacy_sp3	command-submit-two-part	parked	24.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209b16c	main	116	legacy	command-submit-two-part	shipped	100	n/a		batch-12	
+0x0209b55c	main	132	default	bcd-to-binary	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209b55c	main	132	legacy_sp3	bcd-to-binary	parked	30.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209b55c	main	132	legacy	bcd-to-binary	shipped	100	n/a		batch-12	
