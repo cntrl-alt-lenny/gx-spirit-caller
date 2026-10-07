@@ -2816,3 +2816,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a34e0	main	252	default	unknown	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a34e0	main	252	legacy_sp3	unknown	parked	96.83	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a34e0	main	252	legacy	unknown	shipped	100	n/a		batch-13	
+0x020a3654	main	96	default	unknown	shipped	100	n/a		batch-13	

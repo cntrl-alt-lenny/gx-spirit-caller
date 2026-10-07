@@ -19047,7 +19047,7 @@ src/main/func_020a3634.c:
     complete
     .text start:0x020a3634 end:0x020a3654
 
-src/main/func_020a3654.s:
+src/main/func_020a3654.c:
     complete
     .text start:0x020a3654 end:0x020a36b4
 
