@@ -2847,3 +2847,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020991a4	main	244	default	sha1-update-block-copy	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x020991a4	main	244	legacy_sp3	sha1-update-block-copy	parked	27.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x020991a4	main	244	legacy	sha1-update-block-copy	shipped	100	n/a		batch-12	
+0x020992d8	main	152	default	sha1-init-descriptor	parked	55.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020992d8	main	152	legacy_sp3	sha1-init-descriptor	parked	73.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020992d8	main	152	legacy	sha1-init-descriptor	shipped	100	n/a		batch-12	
