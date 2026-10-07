@@ -15267,7 +15267,7 @@ src/main/func_02087f24.c:
     .text start:0x02087f24 end:0x02087f34
 
 
-src/main/func_02087f34.s:
+src/main/func_02087f34.legacy_sp3.c:
     complete
     .text start:0x02087f34 end:0x02087fc8
 
