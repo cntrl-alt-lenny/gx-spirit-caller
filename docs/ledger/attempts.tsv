@@ -2787,3 +2787,10 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02073fc8	main	192	legacy	checksum	shipped	100	n/a		batch-14	
 0x020740c4	main	96	legacy	call-sequence	shipped	100	n/a		batch-14	
 0x02074b38	main	88	legacy	window-consume	shipped	100	n/a		batch-14	
+0x02074dcc	main	128	default	unknown	parked	0.0	P-42	P-42	batch-14	
+0x02074dcc	main	128	legacy	unknown	parked	91.4	P-42	P-42	batch-14	
+0x02074dcc	main	128	legacy_sp3	unknown	parked	69.7	P-42	P-42	batch-14	
+0x02074e4c	main	12	default	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02074e4c	main	12	legacy	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02074e4c	main	12	legacy_sp3	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02076ad0	main	164	legacy	packet-parse	shipped	100	n/a		batch-14	
