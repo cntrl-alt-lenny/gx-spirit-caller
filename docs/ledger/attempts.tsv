@@ -2860,3 +2860,13 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207e594	main	164	legacy_sp3	pointer-fixup	shipped	100	n/a		batch-14	
 0x0207e790	main	72	legacy	pointer-fixup	shipped	100	n/a		batch-14	
 0x0207e840	main	96	legacy	cursor-init	shipped	100	n/a		batch-14	
+0x0207ec28	main	64	default	unknown	parked	11.8	P-20-r2r3-swap	P-20	batch-14	
+0x0207ec28	main	64	legacy	unknown	parked	62.5	P-20-r2r3-swap	P-20	batch-14	
+0x0207ec28	main	64	legacy_sp3	unknown	parked	62.5	P-20-r2r3-swap	P-20	batch-14	
+0x0207ef90	main	204	default	unknown	parked	2.0	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207ef90	main	204	legacy	unknown	parked	13.7	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207ef90	main	204	legacy_sp3	unknown	parked	15.7	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207f05c	main	220	default	unknown	parked	0.0	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207f05c	main	220	legacy	unknown	parked	18.2	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207f05c	main	220	legacy_sp3	unknown	parked	16.4	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207f510	main	256	legacy_sp3	mode-dispatch	shipped	100	n/a		batch-14	
