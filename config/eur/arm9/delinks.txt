@@ -3958,7 +3958,7 @@ src/main/func_0201ef3c.c:
     complete
     .text start:0x0201ef3c end:0x0201ef90
 
-src/main/func_0201ef90.s:
+src/main/func_0201ef90.c:
     complete
     .text start:0x0201ef90 end:0x0201f090
 
