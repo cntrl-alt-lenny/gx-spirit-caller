@@ -2835,3 +2835,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207af28	main	120	legacy_sp3	unknown	parked	16.7	T-1-r1-vs-r2-scratch-register-renaming	PROVISIONAL:T-1	batch-14	
 0x0207b0e0	main	92	legacy	callback-event	shipped	100	n/a		batch-14	
 0x0207b18c	main	164	legacy	mod13-search	shipped	100	n/a		batch-14	
+0x0207c484	main	104	legacy	list-search	shipped	100	n/a		batch-14	

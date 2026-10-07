@@ -13742,7 +13742,7 @@ src/main/func_0207c3b0.legacy.c:
     complete
     .text start:0x0207c3b0 end:0x0207c484
 
-src/main/func_0207c484.s:
+src/main/func_0207c484.legacy.c:
     complete
     .text start:0x0207c484 end:0x0207c4ec
 
