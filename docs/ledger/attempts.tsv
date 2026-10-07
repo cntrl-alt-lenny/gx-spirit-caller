@@ -2424,3 +2424,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02029b6c	main	196	default	slot-fill-loop-or-single	parked	30.0	register-numbering-permutation-cascade	P-30	batch-10	1
 0x02029a88	main	228	default	slot-update-call-loop	shipped	100	n/a		batch-10	1
 0x0202a998	main	192	default	mmio-window-init	shipped	100	n/a		batch-10	1
+0x0202ab04	main	96	default	slot-release-loop	shipped	100	n/a		batch-10	1

@@ -4939,7 +4939,7 @@ src/main/func_0202aa58.s:
     complete
     .text start:0x0202aa58 end:0x0202ab04
 
-src/main/func_0202ab04.s:
+src/main/func_0202ab04.c:
     complete
     .text start:0x0202ab04 end:0x0202ab64
 
