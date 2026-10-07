@@ -4540,7 +4540,7 @@ src/main/func_0202290c.s:
     complete
     .text start:0x0202290c end:0x02022a80
 
-src/main/func_02022a80.s:
+src/main/func_02022a80.c:
     complete
     .text start:0x02022a80 end:0x02022af4
 

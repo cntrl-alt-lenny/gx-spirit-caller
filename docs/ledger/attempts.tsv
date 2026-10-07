@@ -2383,3 +2383,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020224c0	main	76	default	mode-switch-lookup	shipped	100	n/a		batch-10	1
 0x02022540	main	64	default	slot-alloc-scan	shipped	100	n/a		batch-10	1
 0x020225b4	main	84	default	slot-copy-words	shipped	100	n/a		batch-10	1
+0x02022a80	main	116	default	vec3-lerp-div	shipped	100	n/a		batch-10	1
