@@ -19553,7 +19553,7 @@ src/main/func_020aabac.c:
     complete
     .text start:0x020aabac end:0x020aac30
 
-src/main/func_020aac30.s:
+src/main/func_020aac30.c:
     complete
     .text start:0x020aac30 end:0x020aac84
 

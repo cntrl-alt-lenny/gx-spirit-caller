@@ -2887,3 +2887,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a7480	main	176	legacy_sp3	unknown	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a7480	main	176	legacy	unknown	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a95a0	main	68	default	unknown	shipped	100	n/a		batch-13	
+0x020a96fc	main	104	default	unknown	parked	88.46	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a96fc	main	104	legacy_sp3	unknown	parked	88.46	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a96fc	main	104	legacy	unknown	parked	41.38	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020aac30	main	84	default	unknown	shipped	100	n/a		batch-13	
