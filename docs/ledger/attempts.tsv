@@ -2404,3 +2404,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020244e8	main	116	legacy	pool-teardown-loop	parked	6.9	C-34	C-34	batch-10	1
 0x020244e8	main	116	default	pool-teardown-loop	parked	3.5	C-34	C-34	batch-10	1
 0x020242d4	main	148	default	gx-fifo-pack-vertices	shipped	100	n/a		batch-10	1
+0x02024368	main	200	default	gx-matrix-table-copy	shipped	100	n/a		batch-10	1
