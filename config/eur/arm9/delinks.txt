@@ -14502,7 +14502,7 @@ src/main/func_0208016c.c:
     complete
     .text start:0x0208016c end:0x020801ac
 
-src/main/func_020801ac.s:
+src/main/func_020801ac.legacy_sp3.c:
     complete
     .text start:0x020801ac end:0x02080280
 

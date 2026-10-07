@@ -2370,3 +2370,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020800b8	main	92	legacy_sp3	table-lookup-loop	shipped	100	n/a		batch-11	3
 0x02080114	main	88	default	table-range-lookup	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-11	
 0x02080114	main	88	legacy_sp3	table-range-lookup	shipped	100	n/a		batch-11	
+0x020801ac	main	212	default	binary-search-table	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-11	
+0x020801ac	main	212	legacy_sp3	binary-search-table	shipped	100	n/a		batch-11	
