@@ -2429,3 +2429,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02086f24	main	232	legacy_sp3	struct-init-rot-neg2	shipped	100	n/a		batch-11	
 0x020873fc	main	72	default	flag-guard	parked	94.44	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-11	
 0x020873fc	main	72	legacy_sp3	flag-guard	shipped	100	n/a		batch-11	
+0x02087640	main	80	default	queue-entry-release	shipped	100	n/a		batch-11	

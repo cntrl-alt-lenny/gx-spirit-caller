@@ -15130,7 +15130,7 @@ src/main/func_020875e0.c:
     complete
     .text start:0x020875e0 end:0x02087640
 
-src/main/func_02087640.s:
+src/main/func_02087640.c:
     complete
     .text start:0x02087640 end:0x02087690
 
