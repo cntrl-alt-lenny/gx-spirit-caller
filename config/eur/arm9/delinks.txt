@@ -19593,7 +19593,7 @@ src/main/Strchr.c:
     complete
     .text start:0x020ab088 end:0x020ab0c4
 
-src/main/func_020ab0c4.s:
+src/main/func_020ab0c4.c:
     complete
     .text start:0x020ab0c4 end:0x020ab130
 
