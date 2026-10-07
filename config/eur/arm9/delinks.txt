@@ -14759,7 +14759,7 @@ src/main/func_02082504.s:
     complete
     .text start:0x02082504 end:0x020827ec
 
-src/main/func_020827ec.s:
+src/main/func_020827ec.c:
     complete
     .text start:0x020827ec end:0x0208285c
 
