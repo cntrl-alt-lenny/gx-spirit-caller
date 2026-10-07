@@ -2918,3 +2918,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209cda4	main	256	default	cart-sector-read-loop	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x0209cda4	main	256	legacy_sp3	cart-sector-read-loop	parked	75.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209cda4	main	256	legacy	cart-sector-read-loop	shipped	100	n/a		batch-12	
+0x0209d0f8	main	88	default	cart-dma-start	parked	54.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209d0f8	main	88	legacy_sp3	cart-dma-start	parked	54.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209d0f8	main	88	legacy	cart-dma-start	shipped	100	n/a		batch-12	
