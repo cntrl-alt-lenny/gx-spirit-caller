@@ -4847,7 +4847,7 @@ src/main/func_0202884c.s:
     complete
     .text start:0x0202884c end:0x02029204
 
-src/main/func_02029204.s:
+src/main/func_02029204.c:
     complete
     .text start:0x02029204 end:0x0202928c
 
