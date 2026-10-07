@@ -46,9 +46,11 @@ Reviewed commit: 812860643 on worker/batch-11. The code commit is 37a92acee; 812
 No STALE reference-baseline lines appeared in any log. Run 1 failed on 0-byte delink objects and run 2 on a missing mwasm output, both on unrelated `.s` files, which looks like a flaky Windows file write rather than the batch; I still have no single clean `--scope all` run.
 
 ## Not checked
+
 The Worker's volatile drafts; 14 parks; the 47 older parks.
 
 ## Verdict
+
 The 69 conversions are sound: honest C, 100% on their tiers, delinks and ledger prefix correct, gain equal to matched size. Not finished: two parks (360 B) match with plain drafts and 47 in-range functions were never retried across tiers. Fix those and rerun the gate.
 
 ## Drafts (scratch compiles, outside the repo)
