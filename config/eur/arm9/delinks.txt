@@ -14530,7 +14530,7 @@ src/main/func_020807b8.c:
     complete
     .text start:0x020807b8 end:0x020807fc
 
-src/main/func_020807fc.s:
+src/main/func_020807fc.legacy_sp3.c:
     complete
     .text start:0x020807fc end:0x020808b8
 
