@@ -2390,3 +2390,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02081b5c	main	124	legacy_sp3	pack-entry-iterate	shipped	100	n/a		batch-11	
 0x02081bd8	main	172	default	pack-entry-resolve	parked	58.14	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-11	
 0x02081bd8	main	172	legacy_sp3	pack-entry-resolve	shipped	100	n/a		batch-11	
+0x02081c84	main	148	default	pack-entry-apply	parked	10.53	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-11	
+0x02081c84	main	148	legacy_sp3	pack-entry-apply	shipped	100	n/a		batch-11	
