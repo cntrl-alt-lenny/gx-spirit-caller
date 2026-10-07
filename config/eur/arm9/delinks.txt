@@ -14175,7 +14175,7 @@ src/main/func_0207df20.s:
     complete
     .text start:0x0207df20 end:0x0207e0a8
 
-src/main/func_0207e0a8.s:
+src/main/func_0207e0a8.legacy_sp3.c:
     complete
     .text start:0x0207e0a8 end:0x0207e124
 

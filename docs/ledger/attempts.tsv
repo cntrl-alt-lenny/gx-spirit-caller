@@ -2856,3 +2856,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207da1c	main	44	default	block-describe	shipped	100	n/a		batch-14	
 0x0207db8c	main	108	legacy_sp3	arena-alloc	shipped	100	n/a		batch-14	
 0x0207dbf8	main	100	legacy_sp3	arena-alloc	shipped	100	n/a		batch-14	
+0x0207e0a8	main	124	legacy_sp3	slot-refresh	shipped	100	n/a		batch-14	
