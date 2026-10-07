@@ -2876,3 +2876,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207d3ac	main	132	default	unknown	parked	42.4	P-30-adjacent-register-choice	P-30	batch-14	
 0x0207d3ac	main	132	legacy	unknown	parked	34.3	P-30-adjacent-register-choice	P-30	batch-14	
 0x0207d3ac	main	132	legacy_sp3	unknown	parked	35.3	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207845c	main	60	legacy	call-pair-matches-fastmatch-but-reference-check-wants-data_021020b5	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-14	
