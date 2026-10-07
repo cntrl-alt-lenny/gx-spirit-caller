@@ -2915,3 +2915,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209cd3c	main	104	default	cart-rom-ctrl-read	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x0209cd3c	main	104	legacy_sp3	cart-rom-ctrl-read	parked	69.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209cd3c	main	104	legacy	cart-rom-ctrl-read	shipped	100	n/a		batch-12	
+0x0209cda4	main	256	default	cart-sector-read-loop	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209cda4	main	256	legacy_sp3	cart-sector-read-loop	parked	75.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209cda4	main	256	legacy	cart-sector-read-loop	shipped	100	n/a		batch-12	
