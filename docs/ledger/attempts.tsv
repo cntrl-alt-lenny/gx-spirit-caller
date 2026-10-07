@@ -2997,3 +2997,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02092fa8	main	108	default	fault-callback-with-cpsr-switch	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
 0x02092fa8	main	108	legacy_sp3	fault-callback-with-cpsr-switch	parked	18.5	asm-int	PROVISIONAL:inline-asm	batch-12	
 0x02092fa8	main	108	legacy	fault-callback-with-cpsr-switch	parked	25.9	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x0209c0dc	main	256	legacy	core-init-thread-start	parked	93.8	P-36-pipeline-interleaving	P-36	batch-12	
