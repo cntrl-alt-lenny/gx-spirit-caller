@@ -4193,7 +4193,7 @@ src/main/func_02020550.c:
     complete
     .text start:0x02020550 end:0x020205ec
 
-src/main/func_020205ec.s:
+src/main/func_020205ec.c:
     complete
     .text start:0x020205ec end:0x020206b8
 
