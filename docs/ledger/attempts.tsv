@@ -2851,3 +2851,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020992d8	main	152	legacy_sp3	sha1-init-descriptor	parked	73.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x020992d8	main	152	legacy	sha1-init-descriptor	shipped	100	n/a		batch-12	
 0x020996c8	main	80	default	sha1-init-state	shipped	100	n/a		batch-12	
+0x02099ba8	main	64	default	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099ba8	main	64	legacy_sp3	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099ba8	main	64	legacy	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
