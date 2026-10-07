@@ -2893,3 +2893,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209bea0	main	120	legacy	datetime-to-seconds	shipped	100	n/a		batch-12	
 0x0209bf34	main	148	default	date-validate-to-days	parked	97.3	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-12	
 0x0209bf34	main	148	legacy_sp3	date-validate-to-days	shipped	100	n/a		batch-12	
+0x0209c034	main	92	default	lock-wait-queue-empty-test	parked	34.8	P-36-poolhoist	P-36	batch-12	
+0x0209c034	main	92	legacy_sp3	lock-wait-queue-empty-test	parked	17.4	P-36-poolhoist	P-36	batch-12	
+0x0209c034	main	92	legacy	lock-wait-queue-empty-test	parked	12.5	P-36-poolhoist	P-36	batch-12	
