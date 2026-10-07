@@ -15597,7 +15597,7 @@ src/main/func_0208a280.c:
     complete
     .text start:0x0208a280 end:0x0208a344
 
-src/main/func_0208a344.s:
+src/main/func_0208a344.legacy_sp3.c:
     complete
     .text start:0x0208a344 end:0x0208a440
 
