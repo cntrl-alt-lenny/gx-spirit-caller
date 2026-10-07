@@ -13580,7 +13580,7 @@ src/main/func_02079bbc.legacy.c:
     complete
     .text start:0x02079bbc end:0x02079c74
 
-src/main/func_02079c74.s:
+src/main/func_02079c74.legacy.c:
     complete
     .text start:0x02079c74 end:0x02079cc0
 
