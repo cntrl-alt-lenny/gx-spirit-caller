@@ -2870,3 +2870,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209ade4	main	120	default	status-flags-query	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x0209ade4	main	120	legacy_sp3	status-flags-query	parked	30.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209ade4	main	120	legacy	status-flags-query	shipped	100	n/a		batch-12	
+0x0209af84	main	144	default	id-select-dispatch	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209af84	main	144	legacy_sp3	id-select-dispatch	parked	69.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209af84	main	144	legacy	id-select-dispatch	shipped	100	n/a		batch-12	
