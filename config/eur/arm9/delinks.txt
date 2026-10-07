@@ -14482,7 +14482,7 @@ src/main/func_0207feec.s:
     complete
     .text start:0x0207feec end:0x0207ff84
 
-src/main/func_0207ff84.s:
+src/main/func_0207ff84.legacy_sp3.c:
     complete
     .text start:0x0207ff84 end:0x0207fff8
 
