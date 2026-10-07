@@ -13094,7 +13094,7 @@ src/main/func_02073e68.legacy.c:
 src/main/func_02073eb0.legacy.c:
     complete
     .text start:0x02073eb0 end:0x02073ed8
-src/main/func_02073ed8.s:
+src/main/func_02073ed8.legacy.c:
     complete
     .text start:0x02073ed8 end:0x02073f28
 
