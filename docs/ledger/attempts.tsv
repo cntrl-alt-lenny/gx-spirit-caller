@@ -3009,3 +3009,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6444	main	208	default	unknown	parked	3.85	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a6444	main	208	legacy_sp3	unknown	parked	9.62	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a6444	main	208	legacy	unknown	shipped	100	n/a		batch-13	
+0x020a6a28	main	108	default	unknown	parked	25.93	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a6a28	main	108	legacy_sp3	unknown	parked	59.26	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a6a28	main	108	legacy	unknown	parked	96.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
