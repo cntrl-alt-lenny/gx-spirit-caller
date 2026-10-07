@@ -1986,120 +1986,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02038e58	main	228	legacy_sp3	archive-read-clamp	parked	56.1	P-31-if-conversion	P-31	batch-02	2
 0x0203aae8	main	176	legacy_sp3	refcount-release-loop	parked	14.6	unknown	UNCLASSIFIED:unknown	batch-02	1
 0x0203b6b4	main	192	legacy_sp3	block-commit-copy	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-02	1
-0x0207084c	main	224	default	unknown	parked	0	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-06	
-0x0207084c	main	224	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	1
-0x0207084c	main	224	legacy	unknown	parked	66.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	2
-0x02070a38	main	136	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02070a38	main	136	legacy	unknown	shipped	100	n/a		batch-06	
-0x02070b4c	main	96	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02070b4c	main	96	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207103c	main	80	default	unknown	parked	5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207103c	main	80	legacy	unknown	parked	40	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x02072144	main	240	default	unknown	parked	38.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02072144	main	240	legacy	unknown	shipped	100	n/a		batch-06	
-0x02072444	main	132	default	unknown	parked	21.2	instruction-selection	PROVISIONAL:instruction-selection	batch-06	
-0x02072444	main	132	legacy	unknown	shipped	100	n/a		batch-06	
-0x020724c8	main	124	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x020724c8	main	124	legacy	unknown	shipped	100	n/a		batch-06	
-0x020736ac	main	140	default	unknown	parked	2.9	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x020736ac	main	140	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207391c	main	96	default	unknown	parked	12.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207391c	main	96	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207397c	main	224	default	unknown	parked	5.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207397c	main	224	legacy	unknown	shipped	100	n/a		batch-06	
-0x02073dcc	main	136	default	unknown	parked	8.8	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02073dcc	main	136	legacy	unknown	shipped	100	n/a		batch-06	
-0x02073f28	main	92	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02073f28	main	92	legacy	unknown	parked	95.7	P-17-commutative-add-operand-order	P-17	batch-06	
-0x02074088	main	60	default	unknown	parked	46.7	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02074088	main	60	legacy	unknown	shipped	100	n/a		batch-06	
-0x020745fc	main	240	default	unknown	parked	18.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x020745fc	main	240	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207475c	main	132	default	unknown	parked	93.9	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207475c	main	132	legacy	unknown	shipped	100	n/a		batch-06	
-0x02075d74	main	128	default	unknown	parked	3.1	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02075d74	main	128	legacy	unknown	shipped	100	n/a		batch-06	
-0x02076c5c	main	100	default	unknown	parked	48.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02076c5c	main	100	legacy	unknown	shipped	100	n/a		batch-06	
-0x02077018	main	116	default	unknown	parked	10.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02077018	main	116	legacy	unknown	parked	83.9	structural	PROVISIONAL:structural	batch-06	
-0x02077a28	main	96	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02077a28	main	96	legacy	unknown	parked	75	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x02077b5c	main	60	default	unknown	parked	73.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02077b5c	main	60	legacy	unknown	parked	73.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x02077b98	main	112	default	unknown	parked	7.1	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02077b98	main	112	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207845c	main	60	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207845c	main	60	legacy	unknown	shipped	100	n/a		batch-06	
-0x02078ccc	main	100	default	unknown	parked	4.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02078ccc	main	100	legacy	unknown	shipped	100	n/a		batch-06	
-0x02078d30	main	88	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02078d30	main	88	legacy	unknown	shipped	100	n/a		batch-06	
-0x02078d88	main	68	default	unknown	parked	82.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02078d88	main	68	legacy	unknown	shipped	100	n/a		batch-06	
-0x02078dcc	main	112	default	unknown	parked	25.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02078dcc	main	112	legacy	unknown	shipped	100	n/a		batch-06	
-0x02078eec	main	28	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02078eec	main	28	legacy	unknown	parked	0.0	structural	PROVISIONAL:structural	batch-06	
-0x02078f50	main	96	default	unknown	parked	91.7	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02078f50	main	96	legacy	unknown	shipped	100	n/a		batch-06	
-0x02079984	main	132	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02079984	main	132	legacy	unknown	shipped	100	n/a		batch-06	
-0x02079b48	main	116	default	unknown	parked	51.7	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02079b48	main	116	legacy	unknown	shipped	100	n/a		batch-06	
-0x02079bbc	main	184	default	unknown	parked	54.4	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02079bbc	main	184	legacy	unknown	shipped	100	n/a		batch-06	
-0x02079cc0	main	112	default	unknown	parked	50.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02079cc0	main	112	legacy	unknown	shipped	100	n/a		batch-06	
-0x02079d30	main	172	default	unknown	parked	55.8	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x02079d30	main	172	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207b13c	main	80	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207b13c	main	80	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207b548	main	176	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207b548	main	176	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207c3b0	main	212	default	unknown	parked	7.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207c3b0	main	212	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207c484	main	104	default	unknown	parked	11.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207c484	main	104	legacy	unknown	parked	23.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x0207c4ec	main	132	default	unknown	parked	9.1	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207c4ec	main	132	legacy	unknown	parked	39.4	structural	PROVISIONAL:structural	batch-06	
-0x0207cff4	main	104	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207cff4	main	104	legacy_sp3	unknown	shipped	100	n/a		batch-06	
-0x0207d3ac	main	132	default	unknown	parked	24.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x0207d3ac	main	132	legacy_sp3	unknown	parked	33.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x0207d458	main	60	default	unknown	parked	53.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x0207d458	main	60	legacy_sp3	unknown	parked	60.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x0207dc5c	main	76	default	unknown	parked	5.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207dc5c	main	76	legacy_sp3	unknown	shipped	100	n/a		batch-06	
-0x0207deb0	main	32	default	unknown	parked	25.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x0207deb0	main	32	legacy	unknown	shipped	100	n/a		batch-06	
-0x0207e0a8	main	124	default	unknown	parked	3.2	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207e0a8	main	124	legacy_sp3	unknown	parked	15.6	structural	PROVISIONAL:structural	batch-06	
-0x0207e124	main	160	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207e124	main	160	legacy_sp3	unknown	shipped	100	n/a		batch-06	
-0x0207e1c4	main	80	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207e1c4	main	80	legacy_sp3	unknown	shipped	100	n/a		batch-06	
-0x0207e54c	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207e54c	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
-0x0207e594	main	164	default	unknown	parked	53.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207e594	main	164	legacy_sp3	unknown	parked	58.1	structural	PROVISIONAL:structural	batch-06	
-0x0207e664	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207e664	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
-0x0207e6f0	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207e6f0	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
-0x0207e748	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207e748	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
-0x0207ef90	main	204	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207ef90	main	204	legacy_sp3	unknown	parked	15.7	structural	PROVISIONAL:structural	batch-06	
-0x0207f05c	main	220	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207f05c	main	220	legacy_sp3	unknown	parked	7.3	structural	PROVISIONAL:structural	batch-06	
-0x0207f510	main	256	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207f510	main	256	legacy_sp3	unknown	parked	45.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
-0x0207ff84	main	116	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
-0x0207ff84	main	116	legacy_sp3	unknown	parked	6.9	structural	PROVISIONAL:structural	batch-06	
-0x02078d88	main	68	default	unknown	parked	82.3	instruction-selection	PROVISIONAL:instruction-selection	batch-06	
-0x02078eec	main	28	default	unknown	parked	0	structural	PROVISIONAL:structural	batch-06	
-0x0207845c	main	60	legacy	objdiff-100-reference-blocked	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-06	
 0x020601d0	main	244	default	http-status-check	parked	73.8	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x020603cc	main	216	default	http-header-parse	parked	14.8	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
 0x02060958	main	228	default	msg-field-dispatch	parked	86.0	frame-shape	PROVISIONAL:frame/epilogue	batch-03	1
@@ -2480,6 +2366,120 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205fd94	main	132	default	version-string-parse	parked	57.6	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-05	3
 0x0205fd94	main	132	legacy_sp3	version-string-parse	shipped	100	n/a		batch-05	3
 0x0205c258	main	232	default	http-set-body	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-05	2
+0x0207084c	main	224	default	unknown	parked	0	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-06	
+0x0207084c	main	224	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	1
+0x0207084c	main	224	legacy	unknown	parked	66.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	2
+0x02070a38	main	136	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02070a38	main	136	legacy	unknown	shipped	100	n/a		batch-06	
+0x02070b4c	main	96	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02070b4c	main	96	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207103c	main	80	default	unknown	parked	5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207103c	main	80	legacy	unknown	parked	40	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x02072144	main	240	default	unknown	parked	38.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02072144	main	240	legacy	unknown	shipped	100	n/a		batch-06	
+0x02072444	main	132	default	unknown	parked	21.2	instruction-selection	PROVISIONAL:instruction-selection	batch-06	
+0x02072444	main	132	legacy	unknown	shipped	100	n/a		batch-06	
+0x020724c8	main	124	default	unknown	parked	0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x020724c8	main	124	legacy	unknown	shipped	100	n/a		batch-06	
+0x020736ac	main	140	default	unknown	parked	2.9	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x020736ac	main	140	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207391c	main	96	default	unknown	parked	12.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207391c	main	96	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207397c	main	224	default	unknown	parked	5.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207397c	main	224	legacy	unknown	shipped	100	n/a		batch-06	
+0x02073dcc	main	136	default	unknown	parked	8.8	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02073dcc	main	136	legacy	unknown	shipped	100	n/a		batch-06	
+0x02073f28	main	92	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02073f28	main	92	legacy	unknown	parked	95.7	P-17-commutative-add-operand-order	P-17	batch-06	
+0x02074088	main	60	default	unknown	parked	46.7	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02074088	main	60	legacy	unknown	shipped	100	n/a		batch-06	
+0x020745fc	main	240	default	unknown	parked	18.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x020745fc	main	240	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207475c	main	132	default	unknown	parked	93.9	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207475c	main	132	legacy	unknown	shipped	100	n/a		batch-06	
+0x02075d74	main	128	default	unknown	parked	3.1	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02075d74	main	128	legacy	unknown	shipped	100	n/a		batch-06	
+0x02076c5c	main	100	default	unknown	parked	48.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02076c5c	main	100	legacy	unknown	shipped	100	n/a		batch-06	
+0x02077018	main	116	default	unknown	parked	10.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02077018	main	116	legacy	unknown	parked	83.9	structural	PROVISIONAL:structural	batch-06	
+0x02077a28	main	96	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02077a28	main	96	legacy	unknown	parked	75	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x02077b5c	main	60	default	unknown	parked	73.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02077b5c	main	60	legacy	unknown	parked	73.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x02077b98	main	112	default	unknown	parked	7.1	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02077b98	main	112	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207845c	main	60	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207845c	main	60	legacy	unknown	shipped	100	n/a		batch-06	
+0x02078ccc	main	100	default	unknown	parked	4.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02078ccc	main	100	legacy	unknown	shipped	100	n/a		batch-06	
+0x02078d30	main	88	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02078d30	main	88	legacy	unknown	shipped	100	n/a		batch-06	
+0x02078d88	main	68	default	unknown	parked	82.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02078d88	main	68	legacy	unknown	shipped	100	n/a		batch-06	
+0x02078dcc	main	112	default	unknown	parked	25.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02078dcc	main	112	legacy	unknown	shipped	100	n/a		batch-06	
+0x02078eec	main	28	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02078eec	main	28	legacy	unknown	parked	0.0	structural	PROVISIONAL:structural	batch-06	
+0x02078f50	main	96	default	unknown	parked	91.7	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02078f50	main	96	legacy	unknown	shipped	100	n/a		batch-06	
+0x02079984	main	132	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02079984	main	132	legacy	unknown	shipped	100	n/a		batch-06	
+0x02079b48	main	116	default	unknown	parked	51.7	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02079b48	main	116	legacy	unknown	shipped	100	n/a		batch-06	
+0x02079bbc	main	184	default	unknown	parked	54.4	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02079bbc	main	184	legacy	unknown	shipped	100	n/a		batch-06	
+0x02079cc0	main	112	default	unknown	parked	50.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02079cc0	main	112	legacy	unknown	shipped	100	n/a		batch-06	
+0x02079d30	main	172	default	unknown	parked	55.8	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x02079d30	main	172	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207b13c	main	80	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207b13c	main	80	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207b548	main	176	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207b548	main	176	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207c3b0	main	212	default	unknown	parked	7.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207c3b0	main	212	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207c484	main	104	default	unknown	parked	11.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207c484	main	104	legacy	unknown	parked	23.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x0207c4ec	main	132	default	unknown	parked	9.1	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207c4ec	main	132	legacy	unknown	parked	39.4	structural	PROVISIONAL:structural	batch-06	
+0x0207cff4	main	104	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207cff4	main	104	legacy_sp3	unknown	shipped	100	n/a		batch-06	
+0x0207d3ac	main	132	default	unknown	parked	24.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x0207d3ac	main	132	legacy_sp3	unknown	parked	33.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x0207d458	main	60	default	unknown	parked	53.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x0207d458	main	60	legacy_sp3	unknown	parked	60.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x0207dc5c	main	76	default	unknown	parked	5.3	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207dc5c	main	76	legacy_sp3	unknown	shipped	100	n/a		batch-06	
+0x0207deb0	main	32	default	unknown	parked	25.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x0207deb0	main	32	legacy	unknown	shipped	100	n/a		batch-06	
+0x0207e0a8	main	124	default	unknown	parked	3.2	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e0a8	main	124	legacy_sp3	unknown	parked	15.6	structural	PROVISIONAL:structural	batch-06	
+0x0207e124	main	160	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e124	main	160	legacy_sp3	unknown	shipped	100	n/a		batch-06	
+0x0207e1c4	main	80	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e1c4	main	80	legacy_sp3	unknown	shipped	100	n/a		batch-06	
+0x0207e54c	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e54c	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
+0x0207e594	main	164	default	unknown	parked	53.5	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e594	main	164	legacy_sp3	unknown	parked	58.1	structural	PROVISIONAL:structural	batch-06	
+0x0207e664	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e664	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
+0x0207e6f0	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e6f0	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
+0x0207e748	main	72	default	unknown	parked	5.6	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207e748	main	72	legacy_sp3	unknown	shipped	100	n/a		batch-06	
+0x0207ef90	main	204	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207ef90	main	204	legacy_sp3	unknown	parked	15.7	structural	PROVISIONAL:structural	batch-06	
+0x0207f05c	main	220	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207f05c	main	220	legacy_sp3	unknown	parked	7.3	structural	PROVISIONAL:structural	batch-06	
+0x0207f510	main	256	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207f510	main	256	legacy_sp3	unknown	parked	45.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-06	
+0x0207ff84	main	116	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
+0x0207ff84	main	116	legacy_sp3	unknown	parked	6.9	structural	PROVISIONAL:structural	batch-06	
+0x02078d88	main	68	default	unknown	parked	82.3	instruction-selection	PROVISIONAL:instruction-selection	batch-06	
+0x02078eec	main	28	default	unknown	parked	0	structural	PROVISIONAL:structural	batch-06	
+0x0207845c	main	60	legacy	objdiff-100-reference-blocked	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-06	
 0x02078d88	main	68	legacy	unknown	shipped	100	n/a		batch-06	
 0x02072444	main	132	default	unknown	shipped	100	n/a		batch-06	
 0x0207fd60	main	68	default	unknown	parked	0.0	frame-shape	PROVISIONAL:frame/epilogue	batch-06	
