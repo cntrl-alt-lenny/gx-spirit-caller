@@ -18590,7 +18590,7 @@ src/main/func_0209d7a4.s:
     complete
     .text start:0x0209d7a4 end:0x0209db88
 
-src/main/func_0209db88.s:
+src/main/func_0209db88.legacy_sp3.c:
     complete
     .text start:0x0209db88 end:0x0209dc30
 
