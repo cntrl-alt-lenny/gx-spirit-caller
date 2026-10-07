@@ -2434,3 +2434,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202b9b0	main	60	default	pair-table-lookup	shipped	100	n/a		batch-10	1
 0x0202b9ec	main	76	default	nibble-get	shipped	100	n/a		batch-10	1
 0x0202b74c	main	128	default	id-lookup-release	shipped	100	n/a		batch-10	1
+0x0202ba38	main	92	legacy_sp3	nibble-set	parked	78.3	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202ba38	main	92	legacy	nibble-set	parked	32.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202ba38	main	92	default	nibble-set	parked	78.3	register-numbering-permutation-cascade	P-30	batch-10	1
+0x0202ce24	main	84	default	state-gated-call	shipped	100	n/a		batch-10	1

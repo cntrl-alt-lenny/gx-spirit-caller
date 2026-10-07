@@ -5553,7 +5553,7 @@ src/main/func_0202cdf8.c:
     complete
     .text start:0x0202cdf8 end:0x0202ce24
 
-src/main/func_0202ce24.s:
+src/main/func_0202ce24.c:
     complete
     .text start:0x0202ce24 end:0x0202ce78
 
