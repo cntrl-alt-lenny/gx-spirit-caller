@@ -2891,3 +2891,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209bea0	main	120	default	datetime-to-seconds	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x0209bea0	main	120	legacy_sp3	datetime-to-seconds	parked	30.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209bea0	main	120	legacy	datetime-to-seconds	shipped	100	n/a		batch-12	
+0x0209bf34	main	148	default	date-validate-to-days	parked	97.3	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-12	
+0x0209bf34	main	148	legacy_sp3	date-validate-to-days	shipped	100	n/a		batch-12	
