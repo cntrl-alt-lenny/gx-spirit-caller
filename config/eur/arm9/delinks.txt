@@ -16220,7 +16220,7 @@ src/main/func_0208e918.s:
     complete
     .text start:0x0208e918 end:0x0208ea74
 
-src/main/func_0208ea74.s:
+src/main/func_0208ea74.legacy_sp3.c:
     complete
     .text start:0x0208ea74 end:0x0208eb40
 
