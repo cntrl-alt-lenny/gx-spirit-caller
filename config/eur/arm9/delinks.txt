@@ -18231,7 +18231,7 @@ src/main/func_0209adb4.legacy.c:
     complete
     .text start:0x0209adb4 end:0x0209ade4
 
-src/main/func_0209ade4.s:
+src/main/func_0209ade4.legacy.c:
     complete
     .text start:0x0209ade4 end:0x0209ae5c
 
