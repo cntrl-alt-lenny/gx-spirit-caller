@@ -4125,7 +4125,7 @@ src/main/func_02020358.c:
     complete
     .text start:0x02020358 end:0x02020398
 
-src/main/func_02020398.s:
+src/main/func_02020398.c:
     complete
     .text start:0x02020398 end:0x02020404
 
