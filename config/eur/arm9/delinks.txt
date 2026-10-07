@@ -15162,7 +15162,7 @@ src/main/func_020878c4.c:
     complete
     .text start:0x020878c4 end:0x02087918
 
-src/main/func_02087918.s:
+src/main/func_02087918.legacy_sp3.c:
     complete
     .text start:0x02087918 end:0x02087954
 
