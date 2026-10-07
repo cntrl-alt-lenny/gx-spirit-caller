@@ -2929,3 +2929,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209d4ec	main	112	default	chip-id-compare-reread	parked	3.6	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	batch-12	
 0x0209d4ec	main	112	legacy_sp3	chip-id-compare-reread	parked	3.6	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	batch-12	
 0x0209d4ec	main	112	legacy	chip-id-compare-reread	parked	3.6	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	batch-12	
+0x0209d5e4	main	128	default	cmd-handler-once	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209d5e4	main	128	legacy_sp3	cmd-handler-once	parked	21.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209d5e4	main	128	legacy	cmd-handler-once	shipped	100	n/a		batch-12	
