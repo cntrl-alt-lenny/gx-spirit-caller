@@ -5782,7 +5782,7 @@ src/main/func_0202f4cc.c:
     complete
     .text start:0x0202f4cc end:0x0202f500
 
-src/main/func_0202f500.s:
+src/main/func_0202f500.c:
     complete
     .text start:0x0202f500 end:0x0202f578
 
