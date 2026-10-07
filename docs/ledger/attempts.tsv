@@ -2882,3 +2882,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209b55c	main	132	default	bcd-to-binary	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x0209b55c	main	132	legacy_sp3	bcd-to-binary	parked	30.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209b55c	main	132	legacy	bcd-to-binary	shipped	100	n/a		batch-12	
+0x0209bcdc	main	136	default	init-once-wait-ready	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209bcdc	main	136	legacy_sp3	init-once-wait-ready	parked	14.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209bcdc	main	136	legacy	init-once-wait-ready	shipped	100	n/a		batch-12	
