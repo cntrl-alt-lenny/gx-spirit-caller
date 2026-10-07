@@ -2791,3 +2791,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02095c48	main	128	legacy	table-init-fill	shipped	100	n/a		batch-12	
 0x02095d6c	main	116	default	clamp-and-bucket-lookup	parked	62.1	constant-materialization	PROVISIONAL:constant-materialization	batch-12	
 0x02095d6c	main	116	legacy_sp3	clamp-and-bucket-lookup	shipped	100	n/a		batch-12	
+0x0209614c	main	220	default	list-unlink-insert	parked	16.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209614c	main	220	legacy_sp3	list-unlink-insert	parked	20.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209614c	main	220	legacy	list-unlink-insert	shipped	100	n/a		batch-12	
