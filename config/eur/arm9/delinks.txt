@@ -17883,7 +17883,7 @@ src/main/func_02098038.s:
     complete
     .text start:0x02098038 end:0x02098088
 
-src/main/func_02098088.s:
+src/main/func_02098088.legacy_sp3.c:
     complete
     .text start:0x02098088 end:0x02098104
 
