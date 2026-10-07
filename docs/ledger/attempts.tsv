@@ -2492,3 +2492,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208d6f4	main	184	default	irq-flag-update-master	parked	2.17	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
 0x0208d6f4	main	184	legacy_sp3	irq-flag-update-master	parked	80.43	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
 0x0208d6f4	main	184	legacy	irq-flag-update-master	shipped	100	n/a		batch-11	
+0x0208e700	main	172	default	gx-fifo-flush	parked	23.26	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208e700	main	172	legacy_sp3	gx-fifo-flush	parked	69.77	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208e700	main	172	legacy	gx-fifo-flush	shipped	100	n/a		batch-11	
