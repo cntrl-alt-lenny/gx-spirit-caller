@@ -4205,7 +4205,7 @@ src/main/func_020206d8.c:
     complete
     .text start:0x020206d8 end:0x02020738
 
-src/main/func_02020738.s:
+src/main/func_02020738.c:
     complete
     .text start:0x02020738 end:0x02020814
 
@@ -4357,7 +4357,7 @@ src/main/func_02021650.c:
 
 
 
-src/main/func_02021660.s:
+src/main/func_02021660.c:
     complete
     .text start:0x02021660 end:0x020216b0
 

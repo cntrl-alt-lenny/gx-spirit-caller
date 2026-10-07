@@ -2371,3 +2371,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02020814	main	76	legacy	struct-reset-bool-return	parked	4.5	P-36-cand-cmp-moveq-movne-order	P-36	batch-10	1
 0x02020814	main	76	default	struct-reset-bool-return	parked	89.5	P-36-cand-cmp-moveq-movne-order	P-36	batch-10	1
 0x020205ec	main	204	default	msg-handler-state-update	shipped	100	n/a		batch-10	1
+0x02021660	main	80	default	table-lookup-nth-match	shipped	100	n/a		batch-10	1
