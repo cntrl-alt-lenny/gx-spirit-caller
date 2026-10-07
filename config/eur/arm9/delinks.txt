@@ -13979,7 +13979,7 @@ src/main/func_0207d4dc.legacy_sp3.c:
     complete
     .text start:0x0207d4dc end:0x0207d520
 
-src/main/func_0207d520.s:
+src/main/func_0207d520.legacy_sp3.c:
     complete
     .text start:0x0207d520 end:0x0207d610
 
