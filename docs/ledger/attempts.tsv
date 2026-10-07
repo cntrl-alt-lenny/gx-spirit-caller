@@ -2454,3 +2454,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201d47c	main	56	default	unknown	shipped	100	n/a		unknown	
 0x0201f874	main	224	default	mask-pick-and-register	parked	42.9	P-36-cmp-vs-movs-canonicalization	P-36	batch-09	6
 0x0201e4cc	main	236	default	unknown	shipped	100	n/a		unknown	
+0x02011620	main	104	legacy	matrix-rotate-x	parked	6.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-09	1
+0x020124f4	main	108	default	sysinit-store-block	parked	77.8	P-30-parameter-register-rotation	P-30	batch-09	1
+0x020125ac	main	112	default	sysinit-store-block	parked	71.4	P-30-parameter-register-rotation	P-30	batch-09	1
+0x0201a134	main	60	default	flag-set-and-lookup	parked	80.0	P-36-instruction-scheduling	P-36	batch-09	12
