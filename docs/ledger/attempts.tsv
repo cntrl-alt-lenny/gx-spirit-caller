@@ -2817,3 +2817,10 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02077ecc	main	192	legacy	md5-update	shipped	100	n/a		batch-14	
 0x0207845c	main	60	legacy	call-pair	shipped	100	n/a		batch-14	
 0x0207850c	main	192	legacy	sha-update	shipped	100	n/a		batch-14	
+0x02078e3c	main	128	default	unknown	parked	0.0	loop-invariant-const-register-order	PROVISIONAL:loop-invariant-const-register-order	batch-14	
+0x02078e3c	main	128	legacy	unknown	parked	24.2	loop-invariant-const-register-order	PROVISIONAL:loop-invariant-const-register-order	batch-14	
+0x02078e3c	main	128	legacy_sp3	unknown	parked	25.0	loop-invariant-const-register-order	PROVISIONAL:loop-invariant-const-register-order	batch-14	
+0x02078eec	main	28	default	unknown	parked	0.0	struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	batch-14	
+0x02078eec	main	28	legacy	unknown	parked	0.0	struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	batch-14	
+0x02078eec	main	28	legacy_sp3	unknown	parked	0.0	struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	batch-14	
+0x02079b0c	main	60	legacy	array-compare	shipped	100	n/a		batch-14	
