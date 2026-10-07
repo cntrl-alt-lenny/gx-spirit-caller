@@ -2955,3 +2955,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209f404	main	108	default	params-init-forward	parked	92.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209f404	main	108	legacy_sp3	params-init-forward	parked	92.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209f404	main	108	legacy	params-init-forward	shipped	100	n/a		batch-12	
+0x0209f470	main	164	default	params-init-flagged	parked	19.1	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209f470	main	164	legacy_sp3	params-init-flagged	parked	18.6	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209f470	main	164	legacy	params-init-flagged	parked	18.2	P-36-pipeline-interleaving	P-36	batch-12	
