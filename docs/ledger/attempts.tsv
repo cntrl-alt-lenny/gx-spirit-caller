@@ -2812,3 +2812,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02097d60	main	100	default	name-pack-lowercase	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x02097d60	main	100	legacy_sp3	name-pack-lowercase	parked	92.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02097d60	main	100	legacy	name-pack-lowercase	shipped	100	n/a		batch-12	
+0x02097dc4	main	84	default	path-lookup-copy-ctl	parked	50.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02097dc4	main	84	legacy_sp3	path-lookup-copy-ctl	parked	81.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097dc4	main	84	legacy	path-lookup-copy-ctl	shipped	100	n/a		batch-12	
