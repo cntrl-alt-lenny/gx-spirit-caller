@@ -2795,3 +2795,16 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02074e4c	main	12	legacy_sp3	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
 0x02076ad0	main	164	legacy	packet-parse	shipped	100	n/a		batch-14	
 0x02076b74	main	216	legacy	packet-parse	shipped	100	n/a		batch-14	
+0x02076d14	main	200	default	unknown	parked	0.0	reg-alloc-preamble-mismatch	PROVISIONAL:register-allocation	batch-14	
+0x02076d14	main	200	legacy	unknown	parked	16.0	reg-alloc-preamble-mismatch	PROVISIONAL:register-allocation	batch-14	
+0x02076d14	main	200	legacy_sp3	unknown	parked	16.0	reg-alloc-preamble-mismatch	PROVISIONAL:register-allocation	batch-14	
+0x02077018	main	116	default	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	legacy	unknown	parked	93.5	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	legacy_sp3	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	default	unknown	parked	17.2	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	legacy_sp3	unknown	parked	17.2	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	legacy	unknown	parked	93.5	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x0207708c	main	8	default	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x0207708c	main	8	legacy	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x0207708c	main	8	legacy_sp3	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x020770bc	main	256	legacy	dispatch	shipped	100	n/a		batch-14	
