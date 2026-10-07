@@ -2849,3 +2849,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207d4dc	main	68	legacy_sp3	range-align	shipped	100	n/a		batch-14	
 0x0207db00	main	68	legacy_sp3	range-align	shipped	100	n/a		batch-14	
 0x0207d520	main	240	legacy_sp3	heap-free-merge	shipped	100	n/a		batch-14	
+0x0207d610	main	188	legacy_sp3	best-fit	shipped	100	n/a		batch-14	
