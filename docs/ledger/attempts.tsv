@@ -2873,3 +2873,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207ff84	main	116	legacy_sp3	text-height	shipped	100	n/a		batch-14	
 0x0207feec	main	152	legacy_sp3	text-measure	shipped	100	n/a		batch-14	
 0x0207fff8	main	192	legacy_sp3	text-width	shipped	100	n/a		batch-14	
+0x0207d3ac	main	132	default	unknown	parked	42.4	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207d3ac	main	132	legacy	unknown	parked	34.3	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207d3ac	main	132	legacy_sp3	unknown	parked	35.3	P-30-adjacent-register-choice	P-30	batch-14	
