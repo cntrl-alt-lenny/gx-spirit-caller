@@ -2800,3 +2800,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02097154	main	100	default	strnicmp-loop	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x02097154	main	100	legacy_sp3	strnicmp-loop	parked	60.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02097154	main	100	legacy	strnicmp-loop	shipped	100	n/a		batch-12	
+0x020972d4	main	144	default	mutex-try-lock	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x020972d4	main	144	legacy_sp3	mutex-try-lock	parked	94.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020972d4	main	144	legacy	mutex-try-lock	shipped	100	n/a		batch-12	
