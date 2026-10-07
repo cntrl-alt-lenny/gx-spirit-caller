@@ -2447,3 +2447,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02088268	main	108	default	table-iterate-callback	shipped	100	n/a		batch-11	
 0x020882fc	main	84	default	flag-test-teardown	shipped	100	n/a		batch-11	
 0x02088540	main	96	default	mask-set-copy	shipped	100	n/a		batch-11	
+0x020885a0	main	128	default	obj-init-vtable	parked	56.25	store-coalescing	PROVISIONAL:memory-order/fusion	batch-11	
+0x020885a0	main	128	legacy_sp3	obj-init-vtable	shipped	100	n/a		batch-11	
