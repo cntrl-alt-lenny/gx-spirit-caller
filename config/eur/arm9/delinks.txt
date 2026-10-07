@@ -3813,7 +3813,7 @@ src/main/func_0201de34.s:
     complete
     .text start:0x0201de34 end:0x0201e4cc
 
-src/main/func_0201e4cc.s:
+src/main/func_0201e4cc.c:
     complete
     .text start:0x0201e4cc end:0x0201e5b8
 
