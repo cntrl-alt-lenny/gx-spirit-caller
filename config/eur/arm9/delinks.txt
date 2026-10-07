@@ -17450,7 +17450,7 @@ src/main/func_02094fe4.legacy.c:
     complete
     .text start:0x02094fe4 end:0x02095030
 
-src/main/func_02095030.s:
+src/main/func_02095030.legacy.c:
     complete
     .text start:0x02095030 end:0x020950a0
 
