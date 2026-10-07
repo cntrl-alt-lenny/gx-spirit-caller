@@ -2394,3 +2394,13 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02023e58	main	96	default	slot-release-loop	shipped	100	n/a		batch-10	1
 0x02023eb8	main	112	default	mmio-field-update	shipped	100	n/a		batch-10	1
 0x02023f7c	main	112	default	pool-init-or-grow-alias	shipped	100	n/a		batch-10	1
+0x02024024	main	124	legacy_sp3	pool-scan-alloc-entry	parked	0.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02024024	main	124	legacy	pool-scan-alloc-entry	parked	0.0	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02024024	main	124	default	pool-scan-alloc-entry	parked	77.4	register-numbering-permutation-cascade	P-30	batch-10	1
+0x02024574	main	116	legacy_sp3	pool-scan-alloc-entry	parked	15.6	C-34	C-34	batch-10	1
+0x02024574	main	116	legacy	pool-scan-alloc-entry	parked	14.7	C-34	C-34	batch-10	1
+0x02024574	main	116	default	pool-scan-alloc-entry	parked	6.9	C-34	C-34	batch-10	1
+0x020244e8	main	116	legacy_sp3	pool-teardown-loop	parked	3.5	C-34	C-34	batch-10	1
+0x020244e8	main	116	legacy	pool-teardown-loop	parked	6.9	C-34	C-34	batch-10	1
+0x020244e8	main	116	default	pool-teardown-loop	parked	3.5	C-34	C-34	batch-10	1
+0x020242d4	main	148	default	gx-fifo-pack-vertices	shipped	100	n/a		batch-10	1

@@ -4640,7 +4640,7 @@ src/main/func_020240bc.s:
     complete
     .text start:0x020240bc end:0x020242d4
 
-src/main/func_020242d4.s:
+src/main/func_020242d4.c:
     complete
     .text start:0x020242d4 end:0x02024368
 src/main/func_02024368.s:
