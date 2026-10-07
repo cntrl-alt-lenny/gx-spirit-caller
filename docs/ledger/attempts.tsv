@@ -2854,3 +2854,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02099ba8	main	64	default	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
 0x02099ba8	main	64	legacy_sp3	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
 0x02099ba8	main	64	legacy	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099be8	main	60	default	math-regs-restore	parked	6.7	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099be8	main	60	legacy_sp3	math-regs-restore	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099be8	main	60	legacy	math-regs-restore	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
