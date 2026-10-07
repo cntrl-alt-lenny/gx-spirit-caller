@@ -2786,3 +2786,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02095030	main	112	default	sound-mask-loop	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x02095030	main	112	legacy_sp3	sound-mask-loop	parked	92.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02095030	main	112	legacy	sound-mask-loop	shipped	100	n/a		batch-12	
+0x02095c48	main	128	default	table-init-fill	parked	53.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02095c48	main	128	legacy_sp3	table-init-fill	parked	93.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02095c48	main	128	legacy	table-init-fill	shipped	100	n/a		batch-12	
