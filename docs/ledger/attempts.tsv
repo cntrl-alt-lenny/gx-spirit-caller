@@ -2471,3 +2471,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208c3e4	main	68	legacy	vec-dot-fx	shipped	100	n/a		batch-11	
 0x0208cb88	main	128	default	state-clear	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-11	
 0x0208cb88	main	128	legacy_sp3	state-clear	shipped	100	n/a		batch-11	
+0x0208cd64	main	228	default	flag-bit-clear-regs	parked	45.61	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208cd64	main	228	legacy_sp3	flag-bit-clear-regs	parked	61.4	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208cd64	main	228	legacy	flag-bit-clear-regs	shipped	100	n/a		batch-11	
