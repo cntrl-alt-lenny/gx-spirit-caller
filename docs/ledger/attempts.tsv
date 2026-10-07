@@ -2903,3 +2903,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209c31c	main	72	default	core-set-thread-arg	parked	0.0	P-36-poolhoist	P-36	batch-12	
 0x0209c31c	main	72	legacy_sp3	core-set-thread-arg	parked	0.0	P-36-poolhoist	P-36	batch-12	
 0x0209c31c	main	72	legacy	core-set-thread-arg	parked	10.0	P-36-poolhoist	P-36	batch-12	
+0x0209c7dc	main	244	default	core-submit-request	parked	6.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c7dc	main	244	legacy_sp3	core-submit-request	parked	62.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c7dc	main	244	legacy	core-submit-request	shipped	100	n/a		batch-12	
