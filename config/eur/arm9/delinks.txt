@@ -5515,7 +5515,7 @@ src/main/func_0202c93c.c:
 
 
 
-src/main/func_0202c948.s:
+src/main/func_0202c948.c:
     complete
     .text start:0x0202c948 end:0x0202c9a0
 
