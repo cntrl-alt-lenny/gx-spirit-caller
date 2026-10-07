@@ -149,3 +149,41 @@ Last code commit: e41c75986. This summary is the only change after it.
   neighbouring matched files already do. No inline asm, no `volatile`, no
   do-while-zero.
 - Only EUR source changed; the gate passes all three regions.
+
+## Fixes after review
+
+Code commit under test: `6a45624b8`.
+
+- (1) func_0201ef90 (256 B): shipped as `.c`, 100%. The helper calls now pass
+  two arguments, as their definitions take. The locals needed the order
+  `x8, x4, t20[9], t0c[5]` (24 orders tried, 6 matched).
+- (2) func_0201d47c (56 B): shipped as `.c`, 100%. Not a wall.
+- (3) func_0201f874: not matched. Reading `data_02191f40` directly scores
+  42.9%: the original has a `movs r0,#0` after `bl func_02093bfc` that no
+  honest spelling produced (passing the value to `func_0209e4f8`, which takes
+  no argument, did get it but is a lie about the callee). Parked,
+  `P-36-cmp-vs-movs-canonicalization`.
+- (4) func_0201e4cc (236 B): shipped as `.c`, 100%, better than the review's
+  "park stands". With `s->f1c` as the second argument and `data` assigned
+  before `pad`, the last diff goes.
+- (5) func_02011620: row appended, legacy 6.9.
+- (6) Audit of the other parks against callee definitions in `src/main`.
+  Retried func_020124f4 (77.8, unchanged; the callee `func_02011aec` is
+  defined `void` but the original uses its result, declared `int` locally),
+  func_020125ac (71.4, unchanged) and func_0201a134 (second argument is the
+  constant 1; 53.3 became 80.0, class `P-36-instruction-scheduling`). The
+  rest call `.s` callees (unknown signatures), or agree with their callee, or
+  are the cross-overlay `bl` cases.
+
+Not done: the `func_02011aec` declaration mismatch is left alone; the
+`movs` in func_0201f874 is unsolved.
+
+| Check | Exit | Real output |
+|---|---|---|
+| fastmatch on the 3 new `.c` | 0 | three lines `100.0%  OK` |
+| `check_delink_dupes.py` | 0 | `OK (81 delinks.txt, no duplicate .text addresses)` |
+| `validate_attempts.py` | 0 | `"rows": 2459`, `"errors": 0` |
+| `check_fake_matches.py` | 0 | `OK` |
+| `pytest -q tests` | 0 | `1330 passed, 15 skipped, 132 subtests passed` |
+| `gate3.py --scope all` | 0 | `13157:[eur] SHA1 PASS`, `13199:[usa] SHA1 PASS`, `13241:[jpn] SHA1 PASS`, `13284:GATE PASS`, `13285:gate3: GATE EXIT 0`; no `SKIP`, no `STALE` |
+| `progress.py --version eur` | 0 | Natural-C 451,730; gain 3,496 B = 2,948 + 256 + 56 + 236 |
