@@ -2780,3 +2780,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a078c	main	200	default	unknown	parked	24.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a078c	main	200	legacy_sp3	unknown	parked	24.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a078c	main	200	legacy	unknown	shipped	100	n/a		batch-13	
+0x020a09c8	main	132	default	unknown	parked	3.03	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a09c8	main	132	legacy_sp3	unknown	parked	33.33	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a09c8	main	132	legacy	unknown	parked	33.33	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a10e8	main	68	default	unknown	parked	5.88	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a10e8	main	68	legacy_sp3	unknown	parked	5.88	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a10e8	main	68	legacy	unknown	parked	5.88	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a112c	main	184	default	unknown	parked	30.43	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a112c	main	184	legacy_sp3	unknown	parked	78.26	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x020a112c	main	184	legacy	unknown	shipped	100	n/a		batch-13	
