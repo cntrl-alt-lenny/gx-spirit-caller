@@ -19734,7 +19734,7 @@ src/main/func_020b03fc.s:
 libs/nitro/func_020b0448.legacy.c:
     complete
     .text start:0x020b0448 end:0x020b044c
-src/main/func_020b044c.s:
+src/main/func_020b044c.c:
     complete
     .text start:0x020b044c end:0x020b048c
 
