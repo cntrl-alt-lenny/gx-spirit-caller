@@ -2463,3 +2463,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208b1e0	main	196	default	matrix-scale33	parked	95.92	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
 0x0208b1e0	main	196	legacy_sp3	matrix-scale33	parked	95.92	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
 0x0208b1e0	main	196	legacy	matrix-scale33	shipped	100	n/a		batch-11	
+0x0208bca4	main	228	default	matrix-trans-apply	parked	0.0	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208bca4	main	228	legacy_sp3	matrix-trans-apply	parked	96.49	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208bca4	main	228	legacy	matrix-trans-apply	shipped	100	n/a		batch-11	

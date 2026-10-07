@@ -15772,7 +15772,7 @@ src/main/func_0208b980.s:
     complete
     .text start:0x0208b980 end:0x0208bca4
 
-src/main/func_0208bca4.s:
+src/main/func_0208bca4.legacy.c:
     complete
     .text start:0x0208bca4 end:0x0208bd88
 
