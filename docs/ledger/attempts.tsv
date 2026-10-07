@@ -2900,3 +2900,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209c0dc	main	256	legacy_sp3	core-init-thread-start	parked	50.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209c0dc	main	256	legacy	core-init-thread-start	parked	87.5	P-36-pipeline-interleaving	P-36	batch-12	
 0x0209c0dc	main	256	legacy	core-init-thread-start	parked	92.2	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209c31c	main	72	default	core-set-thread-arg	parked	0.0	P-36-poolhoist	P-36	batch-12	
+0x0209c31c	main	72	legacy_sp3	core-set-thread-arg	parked	0.0	P-36-poolhoist	P-36	batch-12	
+0x0209c31c	main	72	legacy	core-set-thread-arg	parked	10.0	P-36-poolhoist	P-36	batch-12	
