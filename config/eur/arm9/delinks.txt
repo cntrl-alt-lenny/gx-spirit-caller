@@ -13658,7 +13658,7 @@ src/main/func_0207b038.legacy.c:
     complete
     .text start:0x0207b038 end:0x0207b0e0
 
-src/main/func_0207b0e0.s:
+src/main/func_0207b0e0.legacy.c:
     complete
     .text start:0x0207b0e0 end:0x0207b13c
 

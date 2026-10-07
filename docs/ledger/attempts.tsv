@@ -2827,3 +2827,10 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02079c74	main	76	legacy	negate	shipped	100	n/a		batch-14	
 0x02070ce0	main	84	legacy	guard-chain	shipped	100	n/a		batch-14	
 0x020726e0	main	252	legacy	packet-dispatch	shipped	100	n/a		batch-14	
+0x02078f08	main	72	default	unknown	parked	83.3	P-36-store-postindex-fusion	P-36	batch-14	
+0x02078f08	main	72	legacy	unknown	parked	83.3	P-36-store-postindex-fusion	P-36	batch-14	
+0x02078f08	main	72	legacy_sp3	unknown	parked	83.3	P-36-store-postindex-fusion	P-36	batch-14	
+0x0207af28	main	120	default	unknown	parked	0.0	T-1-r1-vs-r2-scratch-register-renaming	PROVISIONAL:T-1	batch-14	
+0x0207af28	main	120	legacy	unknown	parked	86.7	T-1-r1-vs-r2-scratch-register-renaming	PROVISIONAL:T-1	batch-14	
+0x0207af28	main	120	legacy_sp3	unknown	parked	16.7	T-1-r1-vs-r2-scratch-register-renaming	PROVISIONAL:T-1	batch-14	
+0x0207b0e0	main	92	legacy	callback-event	shipped	100	n/a		batch-14	
