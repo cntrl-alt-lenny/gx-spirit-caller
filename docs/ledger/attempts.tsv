@@ -2500,3 +2500,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208e7ac	main	176	legacy	gx-fifo-flush2	shipped	100	n/a		batch-11	
 0x0208ea74	main	204	default	gx-matrix-load	parked	5.88	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-11	
 0x0208ea74	main	204	legacy_sp3	gx-matrix-load	shipped	100	n/a		batch-11	
+0x0208f458	main	112	default	switch-set-base	parked	0.0	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208f458	main	112	legacy_sp3	switch-set-base	parked	21.43	pop-lr-bx-vs-pop-pc-epilogue	PROVISIONAL:pop-lr-bx-vs-pop-pc-epilogue	batch-11	
+0x0208f458	main	112	legacy	switch-set-base	shipped	100	n/a		batch-11	
