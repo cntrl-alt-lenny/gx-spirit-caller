@@ -13803,7 +13803,7 @@ src/main/func_0207cbbc.legacy.c:
     complete
     .text start:0x0207cbbc end:0x0207cbe0
 
-src/main/func_0207cbe0.s:
+src/main/func_0207cbe0.legacy.c:
     complete
     .text start:0x0207cbe0 end:0x0207cc50
 

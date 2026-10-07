@@ -2840,3 +2840,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207c5b4	main	228	legacy	slot-alloc	shipped	100	n/a		batch-14	
 0x0207c8d8	main	92	legacy	irq-clear	shipped	100	n/a		batch-14	
 0x0207c990	main	76	legacy	ref-claim	shipped	100	n/a		batch-14	
+0x0207cbe0	main	112	legacy	irq-query	shipped	100	n/a		batch-14	
