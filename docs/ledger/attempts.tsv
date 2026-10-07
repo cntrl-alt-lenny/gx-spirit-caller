@@ -2780,3 +2780,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02094e90	main	88	default	sound-pack-fields	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x02094e90	main	88	legacy_sp3	sound-pack-fields	parked	90.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02094e90	main	88	legacy	sound-pack-fields	shipped	100	n/a		batch-12	
+0x02094fe4	main	76	default	sound-pack-fields	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02094fe4	main	76	legacy_sp3	sound-pack-fields	parked	89.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02094fe4	main	76	legacy	sound-pack-fields	shipped	100	n/a		batch-12	
