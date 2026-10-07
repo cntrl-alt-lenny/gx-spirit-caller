@@ -2906,3 +2906,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209c7dc	main	244	default	core-submit-request	parked	6.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209c7dc	main	244	legacy_sp3	core-submit-request	parked	62.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209c7dc	main	244	legacy	core-submit-request	shipped	100	n/a		batch-12	
+0x0209c034	main	92	default	lock-wait-queue-empty-test	parked	8.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c034	main	92	legacy_sp3	lock-wait-queue-empty-test	parked	82.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c034	main	92	legacy	lock-wait-queue-empty-test	shipped	100	n/a		batch-12	
