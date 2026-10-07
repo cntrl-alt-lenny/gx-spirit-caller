@@ -5687,7 +5687,7 @@ src/main/func_0202e5ac.c:
     complete
     .text start:0x0202e5ac end:0x0202e60c
 
-src/main/func_0202e60c.s:
+src/main/func_0202e60c.c:
     complete
     .text start:0x0202e60c end:0x0202e6f4
 
