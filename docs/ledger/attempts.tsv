@@ -2912,3 +2912,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209c31c	main	72	default	core-set-thread-arg	parked	5.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209c31c	main	72	legacy_sp3	core-set-thread-arg	parked	77.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209c31c	main	72	legacy	core-set-thread-arg	shipped	100	n/a		batch-12	
+0x0209cd3c	main	104	default	cart-rom-ctrl-read	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209cd3c	main	104	legacy_sp3	cart-rom-ctrl-read	parked	69.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209cd3c	main	104	legacy	cart-rom-ctrl-read	shipped	100	n/a		batch-12	
