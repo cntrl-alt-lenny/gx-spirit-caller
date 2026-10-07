@@ -14942,7 +14942,7 @@ src/main/func_02085a74.c:
     complete
     .text start:0x02085a74 end:0x02085abc
 
-src/main/func_02085abc.s:
+src/main/func_02085abc.c:
     complete
     .text start:0x02085abc end:0x02085b38
 
