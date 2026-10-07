@@ -2826,3 +2826,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209815c	main	68	default	path-lookup-bool	parked	88.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209815c	main	68	legacy_sp3	path-lookup-bool	parked	88.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209815c	main	68	legacy	path-lookup-bool	shipped	100	n/a		batch-12	
+0x020981a0	main	136	default	ring-buffer-submit	parked	0.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020981a0	main	136	legacy_sp3	ring-buffer-submit	parked	38.2	P-20-register-letter	P-20	batch-12	
+0x020981a0	main	136	legacy	ring-buffer-submit	parked	44.1	P-20-register-letter	P-20	batch-12	
