@@ -2934,3 +2934,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209d5e4	main	128	legacy	cmd-handler-once	shipped	100	n/a		batch-12	
 0x0209db88	main	168	default	variadic-id-match	parked	4.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209db88	main	168	legacy_sp3	variadic-id-match	shipped	100	n/a		batch-12	
+0x0209dde8	main	116	default	queue-pop-checked	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209dde8	main	116	legacy_sp3	queue-pop-checked	parked	27.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209dde8	main	116	legacy	queue-pop-checked	shipped	100	n/a		batch-12	
