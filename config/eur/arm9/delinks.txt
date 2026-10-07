@@ -15732,7 +15732,7 @@ src/main/func_0208b1c8.s:
     complete
     .text start:0x0208b1c8 end:0x0208b1e0
 
-src/main/func_0208b1e0.s:
+src/main/func_0208b1e0.legacy.c:
     complete
     .text start:0x0208b1e0 end:0x0208b2a4
 
