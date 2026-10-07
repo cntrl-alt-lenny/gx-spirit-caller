@@ -2427,3 +2427,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202ab04	main	96	default	slot-release-loop	shipped	100	n/a		batch-10	1
 0x0202aa58	main	172	default	struct-save-fill-restore	shipped	100	n/a		batch-10	1
 0x0202b6e4	main	104	default	id-search-collect	shipped	100	n/a		batch-10	1
+0x0202b1a8	main	236	default	dump-build-strings	shipped	100	n/a		batch-10	1
