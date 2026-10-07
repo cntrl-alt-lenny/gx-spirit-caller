@@ -4712,7 +4712,7 @@ src/main/func_02025a80.s:
     complete
     .text start:0x02025a80 end:0x02025f00
 
-src/main/func_02025f00.s:
+src/main/func_02025f00.c:
     complete
     .text start:0x02025f00 end:0x02025fd0
 
