@@ -2838,3 +2838,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020988a8	main	256	default	two-pool-words-same-symbol	parked	6.2	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
 0x020988a8	main	256	legacy_sp3	two-pool-words-same-symbol	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
 0x020988a8	main	256	legacy	two-pool-words-same-symbol	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
+0x020989a8	main	164	default	digest-compare	parked	53.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020989a8	main	164	legacy_sp3	digest-compare	parked	82.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020989a8	main	164	legacy	digest-compare	shipped	100	n/a		batch-12	
