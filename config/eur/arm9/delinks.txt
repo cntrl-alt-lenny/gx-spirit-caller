@@ -18642,7 +18642,7 @@ src/main/func_0209e0f0.legacy.c:
     complete
     .text start:0x0209e0f0 end:0x0209e124
 
-src/main/func_0209e124.s:
+src/main/func_0209e124.legacy.c:
     complete
     .text start:0x0209e124 end:0x0209e19c
 

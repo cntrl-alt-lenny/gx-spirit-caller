@@ -2937,3 +2937,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209dde8	main	116	default	queue-pop-checked	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
 0x0209dde8	main	116	legacy_sp3	queue-pop-checked	parked	27.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x0209dde8	main	116	legacy	queue-pop-checked	shipped	100	n/a		batch-12	
+0x0209e124	main	120	default	rand-seed-from-rtc	parked	80.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e124	main	120	legacy_sp3	rand-seed-from-rtc	parked	80.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e124	main	120	legacy	rand-seed-from-rtc	shipped	100	n/a		batch-12	
