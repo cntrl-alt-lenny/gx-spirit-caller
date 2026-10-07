@@ -18372,7 +18372,7 @@ src/main/func_0209bdb8.c:
     .text start:0x0209bdb8 end:0x0209bdc8
 
 
-src/main/func_0209bdc8.s:
+src/main/func_0209bdc8.legacy.c:
     complete
     .text start:0x0209bdc8 end:0x0209bea0
 
