@@ -7,10 +7,10 @@ typedef struct {
     short v[16];
 } Obj;
 
-extern Quad data_020be71c[];
+extern Quad data_020be72c;
 
 int func_020242d4(Obj *o) {
-    Quad q = data_020be71c[1];
+    Quad q = data_020be72c;
     int i;
     short *p = o->v;
     for (i = 0; i < 4; i++, p += 4) {
