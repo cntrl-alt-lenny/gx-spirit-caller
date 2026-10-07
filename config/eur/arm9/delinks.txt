@@ -18049,7 +18049,7 @@ src/main/func_020990e0.s:
     complete
     .text start:0x020990e0 end:0x020991a4
 
-src/main/func_020991a4.s:
+src/main/func_020991a4.legacy.c:
     complete
     .text start:0x020991a4 end:0x02099298
 
