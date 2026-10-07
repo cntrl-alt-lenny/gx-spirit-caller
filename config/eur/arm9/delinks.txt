@@ -14982,7 +14982,7 @@ src/main/func_020865ac.c:
     complete
     .text start:0x020865ac end:0x020865d0
 
-src/main/func_020865d0.s:
+src/main/func_020865d0.c:
     complete
     .text start:0x020865d0 end:0x02086620
 
