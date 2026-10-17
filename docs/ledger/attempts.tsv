@@ -3303,3 +3303,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6a28	main	108	default	unknown	parked	25.93	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a6a28	main	108	legacy_sp3	unknown	parked	59.26	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a6a28	main	108	legacy	unknown	parked	96.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
+0x0203467c	main	192	default	PR #2 V1: void * allocation variable; genuine u64 return; register allocation differs from original	parked	77.08	reg-alloc	PROVISIONAL:register-allocation	pr-2-func-0203467c	1
+0x0203467c	main	192	default	PR #2 V2: unsigned int allocation address; genuine u64 return; original r4 and r5:r6 register allocation reproduced	shipped	100	none		pr-2-func-0203467c	1
