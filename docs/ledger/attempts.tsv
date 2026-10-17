@@ -3330,3 +3330,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208b000	main	64	legacy	mmio-leaf	shipped	100	n/a		batch-15	
 0x0208bed8	main	60	legacy	mmio-leaf	shipped	100	n/a		batch-15	
 0x0208c2e0	main	104	legacy	mmio-sqrt-mag	shipped	100	n/a		batch-15	
+0x0208bfc4	main	136	legacy	mmio-sqrt-dist	shipped	100	n/a		batch-15	
