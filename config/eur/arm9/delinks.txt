@@ -3091,7 +3091,7 @@ src/main/func_0201a454.c:
 
 
 
-src/main/func_0201a498.s:
+src/main/func_0201a498.c:
     complete
     .text start:0x0201a498 end:0x0201a4dc
 
