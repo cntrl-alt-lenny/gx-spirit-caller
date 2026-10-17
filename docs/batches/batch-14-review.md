@@ -35,15 +35,12 @@ Reviewed commit `efc640279` on `worker/batch-14` (base `51fde3801`), from
    is `.s`, last ledger row is parked). The reason is correct: I put the C
    with `data_021020b5` into the tree; code and relocation matched, but the
    link fails with `Undefined : "data_021020b5"`. A fix needs a symbol-file
-   change, which is Brain's call. I reverted my test. The parked row is
-   untidy: `pct` is `unknown` and prose sits in the kind column.
+   change, which is Brain's call. I reverted my test.
 4. **NOTE** the volatile in `func_02073a5c` is justified: the original
    reloads the global, and without `volatile` 17 words differ.
-5. **NOTE** small honesty points: `func_0207b18c` comment says "bit is clear"
-   but the loop breaks when it is set; `func_0207cbe0` has an unused `Dummy`
-   struct; `func_0207db8c`/`dbf8` read `((unsigned int *)a)[-1]` (before the
-   struct); `func_02073fc8` returns `unsigned short` but `func_02073f28`
-   declares `unsigned int`.
+5. **NOTE** `func_0207b18c` comment says "bit is clear" but the loop breaks
+   when it is set; `func_0207cbe0` has an unused `Dummy` struct;
+   `func_0207db8c`/`dbf8` read `a[-1]`, before the struct.
 6. **UNPROVEN CLAIM** every shipped function has one row, for the winning tier
    only; the doc says "tiers other than the one shipped" were not checked, so
    "every tier tried has a row" holds only for parked functions.
@@ -74,5 +71,4 @@ Merged-block ROM rebuild; `check_match_invariants.py`; USA/JPN natural-C.
 
 The 53 matches are honest C, link byte-identically in all three regions, and
 the gain equals the matched sizes. Not mergeable as-is on strictness alone:
-fix finding 1 (tier) and decide finding 2. Findings 3 to 7 need no action.
-The tail merges look sound but unbuilt.
+fix finding 1 (tier) and decide finding 2. The tail merges look sound but unbuilt.
