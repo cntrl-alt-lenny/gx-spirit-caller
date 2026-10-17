@@ -3794,3 +3794,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02286a94	ov002	84	default	factory	parked	66.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L4	
 0x02286a94	ov002	84	legacy	factory	parked	77.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L4	
 0x02286a94	ov002	84	legacy_sp3	factory	parked	77.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L4	
+0x02294370	ov002	84	default	factory	shipped	100	n/a		factory-1017-L4	
+0x02294370	ov002	84	legacy	factory	parked	60.9	unknown	UNCLASSIFIED:unknown	factory-1017-L4	
