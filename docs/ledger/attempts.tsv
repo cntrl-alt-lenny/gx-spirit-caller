@@ -3305,3 +3305,236 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6a28	main	108	legacy	unknown	parked	96.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x0203467c	main	192	default	PR #2 V1: void * allocation variable; genuine u64 return; register allocation differs from original	parked	77.08	reg-alloc	PROVISIONAL:register-allocation	pr-2-func-0203467c	1
 0x0203467c	main	192	default	PR #2 V2: unsigned int allocation address; genuine u64 return; original r4 and r5:r6 register allocation reproduced	shipped	100	none		pr-2-func-0203467c	1
+0x020947d0	main	148	default	lz-decompress-swpb	parked	4.9	instruction-selection	PROVISIONAL:instruction-selection	batch-12	
+0x020947d0	main	148	legacy_sp3	lz-decompress-swpb	parked	0	instruction-selection	PROVISIONAL:instruction-selection	batch-12	
+0x020947d0	main	148	legacy	lz-decompress-swpb	parked	0.0	instruction-selection	PROVISIONAL:instruction-selection	batch-12	
+0x02094864	main	140	default	dma-wait-then-start	parked	0.0	instruction-selection	PROVISIONAL:instruction-selection	batch-12	
+0x02094864	main	140	legacy_sp3	dma-wait-then-start	parked	42.9	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02094864	main	140	legacy	dma-wait-then-start	shipped	100	n/a		batch-12	
+0x020948f0	main	256	default	lz-stream-swpb	parked	0.0	instruction-selection	PROVISIONAL:instruction-selection	batch-12	
+0x020948f0	main	256	legacy_sp3	lz-stream-swpb	parked	1.3	instruction-selection	PROVISIONAL:instruction-selection	batch-12	
+0x020948f0	main	256	legacy	lz-stream-swpb	parked	1.3	instruction-selection	PROVISIONAL:instruction-selection	batch-12	
+0x02094e90	main	88	default	sound-pack-fields	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02094e90	main	88	legacy_sp3	sound-pack-fields	parked	90.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02094e90	main	88	legacy	sound-pack-fields	shipped	100	n/a		batch-12	
+0x02094fe4	main	76	default	sound-pack-fields	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02094fe4	main	76	legacy_sp3	sound-pack-fields	parked	89.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02094fe4	main	76	legacy	sound-pack-fields	shipped	100	n/a		batch-12	
+0x02095030	main	112	default	sound-mask-loop	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02095030	main	112	legacy_sp3	sound-mask-loop	parked	92.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02095030	main	112	legacy	sound-mask-loop	shipped	100	n/a		batch-12	
+0x02095c48	main	128	default	table-init-fill	parked	53.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02095c48	main	128	legacy_sp3	table-init-fill	parked	93.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02095c48	main	128	legacy	table-init-fill	shipped	100	n/a		batch-12	
+0x02095d6c	main	116	default	clamp-and-bucket-lookup	parked	62.1	constant-materialization	PROVISIONAL:constant-materialization	batch-12	
+0x02095d6c	main	116	legacy_sp3	clamp-and-bucket-lookup	shipped	100	n/a		batch-12	
+0x0209614c	main	220	default	list-unlink-insert	parked	16.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209614c	main	220	legacy_sp3	list-unlink-insert	parked	20.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209614c	main	220	legacy	list-unlink-insert	shipped	100	n/a		batch-12	
+0x02096f64	main	160	default	read-record-struct-copy	parked	25.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02096f64	main	160	legacy_sp3	read-record-struct-copy	parked	90.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02096f64	main	160	legacy	read-record-struct-copy	shipped	100	n/a		batch-12	
+0x02097154	main	100	default	strnicmp-loop	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02097154	main	100	legacy_sp3	strnicmp-loop	parked	60.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097154	main	100	legacy	strnicmp-loop	shipped	100	n/a		batch-12	
+0x020972d4	main	144	default	mutex-try-lock	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x020972d4	main	144	legacy_sp3	mutex-try-lock	parked	94.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020972d4	main	144	legacy	mutex-try-lock	shipped	100	n/a		batch-12	
+0x02097528	main	200	default	mutex-unlock-all-waiters	parked	48.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097528	main	200	legacy_sp3	mutex-unlock-all-waiters	parked	92.0	reg-alloc	PROVISIONAL:register-allocation	batch-12	
+0x02097528	main	200	legacy	mutex-unlock-all-waiters	parked	96.0	call-arg-scheduling-residual	PROVISIONAL:call-arg-scheduling-residual	batch-12	
+0x02097668	main	152	default	list-node-unlink	parked	10.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097668	main	152	legacy_sp3	list-node-unlink	parked	10.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097668	main	152	legacy	list-node-unlink	shipped	100	n/a		batch-12	
+0x02097d60	main	100	default	name-pack-lowercase	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02097d60	main	100	legacy_sp3	name-pack-lowercase	parked	92.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097d60	main	100	legacy	name-pack-lowercase	shipped	100	n/a		batch-12	
+0x02097dc4	main	84	default	path-lookup-copy-ctl	parked	50.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02097dc4	main	84	legacy_sp3	path-lookup-copy-ctl	parked	81.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097dc4	main	84	legacy	path-lookup-copy-ctl	shipped	100	n/a		batch-12	
+0x02097e5c	main	72	default	init-record-set-flag	parked	61.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097e5c	main	72	legacy_sp3	init-record-set-flag	parked	88.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097e5c	main	72	legacy	init-record-set-flag	shipped	100	n/a		batch-12	
+0x02097f20	main	208	default	mutex-lock-wait	parked	19.2	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02097f20	main	208	legacy_sp3	mutex-lock-wait	parked	80.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02097f20	main	208	legacy	mutex-lock-wait	shipped	100	n/a		batch-12	
+0x02098088	main	124	default	struct-by-value-param-init	parked	54.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02098088	main	124	legacy_sp3	struct-by-value-param-init	shipped	100	n/a		batch-12	
+0x0209815c	main	68	default	path-lookup-bool	parked	88.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209815c	main	68	legacy_sp3	path-lookup-bool	parked	88.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209815c	main	68	legacy	path-lookup-bool	shipped	100	n/a		batch-12	
+0x020981a0	main	136	default	ring-buffer-submit	parked	0.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020981a0	main	136	legacy_sp3	ring-buffer-submit	parked	38.2	P-20-register-letter	P-20	batch-12	
+0x020981a0	main	136	legacy	ring-buffer-submit	parked	44.1	P-20-register-letter	P-20	batch-12	
+0x02098628	main	144	default	command-dispatch-switch	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x02098628	main	144	legacy_sp3	command-dispatch-switch	parked	33.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02098628	main	144	legacy	command-dispatch-switch	shipped	100	n/a		batch-12	
+0x020986c0	main	76	default	callback-register-wrapper	parked	68.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020986c0	main	76	legacy_sp3	callback-register-wrapper	parked	68.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020986c0	main	76	legacy	callback-register-wrapper	shipped	100	n/a		batch-12	
+0x020988a8	main	256	default	two-pool-words-same-symbol	parked	6.2	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
+0x020988a8	main	256	legacy_sp3	two-pool-words-same-symbol	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
+0x020988a8	main	256	legacy	two-pool-words-same-symbol	parked	0.0	pool-constant-caching-resistance	PROVISIONAL:constant-materialization	batch-12	
+0x020989a8	main	164	default	digest-compare	parked	53.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020989a8	main	164	legacy_sp3	digest-compare	parked	82.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020989a8	main	164	legacy	digest-compare	shipped	100	n/a		batch-12	
+0x02098c98	main	68	default	region-flush-clear	parked	5.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02098c98	main	68	legacy_sp3	region-flush-clear	parked	88.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02098c98	main	68	legacy	region-flush-clear	shipped	100	n/a		batch-12	
+0x020991a4	main	244	default	sha1-update-block-copy	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x020991a4	main	244	legacy_sp3	sha1-update-block-copy	parked	27.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020991a4	main	244	legacy	sha1-update-block-copy	shipped	100	n/a		batch-12	
+0x020992d8	main	152	default	sha1-init-descriptor	parked	55.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020992d8	main	152	legacy_sp3	sha1-init-descriptor	parked	73.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020992d8	main	152	legacy	sha1-init-descriptor	shipped	100	n/a		batch-12	
+0x020996c8	main	80	default	sha1-init-state	shipped	100	n/a		batch-12	
+0x02099ba8	main	64	default	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099ba8	main	64	legacy_sp3	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099ba8	main	64	legacy	math-regs-snapshot	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099be8	main	60	default	math-regs-restore	parked	6.7	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099be8	main	60	legacy_sp3	math-regs-restore	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x02099be8	main	60	legacy	math-regs-restore	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x020975f0	main	120	default	device-init-fields	shipped	100	n/a		batch-12	
+0x0209a3f8	main	172	default	shared-mem-header-check	parked	9.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209a3f8	main	172	legacy_sp3	shared-mem-header-check	parked	79.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209a3f8	main	172	legacy	shared-mem-header-check	shipped	100	n/a		batch-12	
+0x0209a4a4	main	144	default	init-once-wait-ready	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209a4a4	main	144	legacy_sp3	init-once-wait-ready	parked	13.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209a4a4	main	144	legacy	init-once-wait-ready	shipped	100	n/a		batch-12	
+0x0209aa84	main	240	default	power-sync-toggle	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209aa84	main	240	legacy_sp3	power-sync-toggle	parked	18.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209aa84	main	240	legacy	power-sync-toggle	shipped	100	n/a		batch-12	
+0x0209ade4	main	120	default	status-flags-query	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209ade4	main	120	legacy_sp3	status-flags-query	parked	30.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209ade4	main	120	legacy	status-flags-query	shipped	100	n/a		batch-12	
+0x0209af84	main	144	default	id-select-dispatch	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209af84	main	144	legacy_sp3	id-select-dispatch	parked	69.4	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209af84	main	144	legacy	id-select-dispatch	shipped	100	n/a		batch-12	
+0x0209b0f4	main	120	default	slot-command-submit	parked	23.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209b0f4	main	120	legacy_sp3	slot-command-submit	parked	36.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209b0f4	main	120	legacy	slot-command-submit	parked	63.3	P-36-pool-load-hoist	P-36	batch-12	
+0x0209b16c	main	116	default	command-submit-two-part	parked	13.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209b16c	main	116	legacy_sp3	command-submit-two-part	parked	24.1	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209b16c	main	116	legacy	command-submit-two-part	shipped	100	n/a		batch-12	
+0x0209b55c	main	132	default	bcd-to-binary	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209b55c	main	132	legacy_sp3	bcd-to-binary	parked	30.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209b55c	main	132	legacy	bcd-to-binary	shipped	100	n/a		batch-12	
+0x0209bcdc	main	136	default	init-once-wait-ready	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209bcdc	main	136	legacy_sp3	init-once-wait-ready	parked	14.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209bcdc	main	136	legacy	init-once-wait-ready	shipped	100	n/a		batch-12	
+0x0209bdc8	main	216	default	day-of-week-zeller	parked	5.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209bdc8	main	216	legacy_sp3	day-of-week-zeller	parked	77.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209bdc8	main	216	legacy	day-of-week-zeller	shipped	100	n/a		batch-12	
+0x0209bea0	main	120	default	datetime-to-seconds	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209bea0	main	120	legacy_sp3	datetime-to-seconds	parked	30.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209bea0	main	120	legacy	datetime-to-seconds	shipped	100	n/a		batch-12	
+0x0209bf34	main	148	default	date-validate-to-days	parked	97.3	ANDS-vs-TST-instruction-choice	PROVISIONAL:ands-vs-tst-instruction-choice	batch-12	
+0x0209bf34	main	148	legacy_sp3	date-validate-to-days	shipped	100	n/a		batch-12	
+0x0209c034	main	92	default	lock-wait-queue-empty-test	parked	34.8	P-36-poolhoist	P-36	batch-12	
+0x0209c034	main	92	legacy_sp3	lock-wait-queue-empty-test	parked	17.4	P-36-poolhoist	P-36	batch-12	
+0x0209c034	main	92	legacy	lock-wait-queue-empty-test	parked	12.5	P-36-poolhoist	P-36	batch-12	
+0x0209c0dc	main	256	default	core-init-thread-start	parked	35.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c0dc	main	256	legacy_sp3	core-init-thread-start	parked	50.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c0dc	main	256	legacy	core-init-thread-start	parked	87.5	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209c0dc	main	256	legacy	core-init-thread-start	parked	92.2	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209c31c	main	72	default	core-set-thread-arg	parked	0.0	P-36-poolhoist	P-36	batch-12	
+0x0209c31c	main	72	legacy_sp3	core-set-thread-arg	parked	0.0	P-36-poolhoist	P-36	batch-12	
+0x0209c31c	main	72	legacy	core-set-thread-arg	parked	10.0	P-36-poolhoist	P-36	batch-12	
+0x0209c7dc	main	244	default	core-submit-request	parked	6.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c7dc	main	244	legacy_sp3	core-submit-request	parked	62.3	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c7dc	main	244	legacy	core-submit-request	shipped	100	n/a		batch-12	
+0x0209c034	main	92	default	lock-wait-queue-empty-test	parked	8.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c034	main	92	legacy_sp3	lock-wait-queue-empty-test	parked	82.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c034	main	92	legacy	lock-wait-queue-empty-test	shipped	100	n/a		batch-12	
+0x0209c31c	main	72	default	core-set-thread-arg	parked	5.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c31c	main	72	legacy_sp3	core-set-thread-arg	parked	77.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209c31c	main	72	legacy	core-set-thread-arg	shipped	100	n/a		batch-12	
+0x0209cd3c	main	104	default	cart-rom-ctrl-read	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209cd3c	main	104	legacy_sp3	cart-rom-ctrl-read	parked	69.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209cd3c	main	104	legacy	cart-rom-ctrl-read	shipped	100	n/a		batch-12	
+0x0209cda4	main	256	default	cart-sector-read-loop	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209cda4	main	256	legacy_sp3	cart-sector-read-loop	parked	75.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209cda4	main	256	legacy	cart-sector-read-loop	shipped	100	n/a		batch-12	
+0x0209d0f8	main	88	default	cart-dma-start	parked	54.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209d0f8	main	88	legacy_sp3	cart-dma-start	parked	54.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209d0f8	main	88	legacy	cart-dma-start	shipped	100	n/a		batch-12	
+0x0209d150	main	160	default	cart-command-send	parked	5.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-12	
+0x0209d150	main	160	legacy_sp3	cart-command-send	shipped	100	n/a		batch-12	
+0x0209d488	main	100	default	retry-until-ok	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209d488	main	100	legacy_sp3	retry-until-ok	parked	40.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209d488	main	100	legacy	retry-until-ok	shipped	100	n/a		batch-12	
+0x0209d4ec	main	112	default	chip-id-compare-reread	parked	3.6	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	batch-12	
+0x0209d4ec	main	112	legacy_sp3	chip-id-compare-reread	parked	3.6	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	batch-12	
+0x0209d4ec	main	112	legacy	chip-id-compare-reread	parked	3.6	stack-slot-assignment-mismatch	PROVISIONAL:stack-slot-assignment-mismatch	batch-12	
+0x0209d5e4	main	128	default	cmd-handler-once	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209d5e4	main	128	legacy_sp3	cmd-handler-once	parked	21.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209d5e4	main	128	legacy	cmd-handler-once	shipped	100	n/a		batch-12	
+0x0209db88	main	168	default	variadic-id-match	parked	4.8	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209db88	main	168	legacy_sp3	variadic-id-match	shipped	100	n/a		batch-12	
+0x0209dde8	main	116	default	queue-pop-checked	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209dde8	main	116	legacy_sp3	queue-pop-checked	parked	27.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209dde8	main	116	legacy	queue-pop-checked	shipped	100	n/a		batch-12	
+0x0209e124	main	120	default	rand-seed-from-rtc	parked	80.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e124	main	120	legacy_sp3	rand-seed-from-rtc	parked	80.0	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e124	main	120	legacy	rand-seed-from-rtc	shipped	100	n/a		batch-12	
+0x0209e308	main	164	default	id-checksum-digit	parked	12.2	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209e308	main	164	legacy_sp3	id-checksum-digit	parked	80.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e308	main	164	legacy	id-checksum-digit	shipped	100	n/a		batch-12	
+0x0209e3ac	main	164	default	id-checksum-digit	parked	19.5	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209e3ac	main	164	legacy_sp3	id-checksum-digit	parked	80.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e3ac	main	164	legacy	id-checksum-digit	shipped	100	n/a		batch-12	
+0x0209e7f0	main	224	default	event-register-callback	parked	53.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e7f0	main	224	legacy_sp3	event-register-callback	parked	58.9	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209e7f0	main	224	legacy	event-register-callback	shipped	100	n/a		batch-12	
+0x0209ecc8	main	256	default	packet-send-validate	parked	12.5	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209ecc8	main	256	legacy_sp3	packet-send-validate	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209ecc8	main	256	legacy	packet-send-validate	shipped	100	n/a		batch-12	
+0x0209f404	main	108	default	params-init-forward	parked	92.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209f404	main	108	legacy_sp3	params-init-forward	parked	92.6	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209f404	main	108	legacy	params-init-forward	shipped	100	n/a		batch-12	
+0x0209f470	main	164	default	params-init-flagged	parked	19.1	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209f470	main	164	legacy_sp3	params-init-flagged	parked	18.6	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209f470	main	164	legacy	params-init-flagged	parked	18.2	P-36-pipeline-interleaving	P-36	batch-12	
+0x0209f8c8	main	60	default	grid-index-wrap	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x0209f8c8	main	60	legacy_sp3	grid-index-wrap	parked	86.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x0209f8c8	main	60	legacy	grid-index-wrap	shipped	100	n/a		batch-12	
+0x020905dc	main	72	default	irq-mask-disable	parked	0.0	push-vs-subsp-alignment-padding	PROVISIONAL:push-vs-subsp-alignment-padding	batch-12	
+0x020905dc	main	72	legacy_sp3	irq-mask-disable	parked	66.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x020905dc	main	72	legacy	irq-mask-disable	shipped	100	n/a		batch-12	
+0x020928cc	main	28	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928cc	main	28	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928cc	main	28	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928e8	main	28	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928e8	main	28	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020928e8	main	28	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092940	main	28	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092940	main	28	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092940	main	28	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092904	main	36	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092904	main	36	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092904	main	36	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x0209286c	main	44	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x0209286c	main	44	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x0209286c	main	44	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092898	main	52	default	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092898	main	52	legacy_sp3	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092898	main	52	legacy	cache-maintenance-mcr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020922d8	main	76	default	context-save-cpsr-banked	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020922d8	main	76	legacy_sp3	context-save-cpsr-banked	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x020922d8	main	76	legacy	context-save-cpsr-banked	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092324	main	68	default	context-restore-spsr-return	parked	5.9	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092324	main	68	legacy_sp3	context-restore-spsr-return	parked	5.9	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092324	main	68	legacy	context-restore-spsr-return	parked	5.9	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092e90	main	116	default	exception-handler-mode-check	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092e90	main	116	legacy_sp3	exception-handler-mode-check	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092e90	main	116	legacy	exception-handler-mode-check	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092f18	main	144	default	exception-context-capture-psr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092f18	main	144	legacy_sp3	exception-context-capture-psr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092f18	main	144	legacy	exception-context-capture-psr	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092fa8	main	108	default	fault-callback-with-cpsr-switch	parked	0.0	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092fa8	main	108	legacy_sp3	fault-callback-with-cpsr-switch	parked	18.5	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x02092fa8	main	108	legacy	fault-callback-with-cpsr-switch	parked	25.9	asm-int	PROVISIONAL:inline-asm	batch-12	
+0x0209c0dc	main	256	legacy	core-init-thread-start	parked	93.8	P-36-pipeline-interleaving	P-36	batch-12	
+0x02098734	main	84	default	overlay-unload	parked	66.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02098734	main	84	legacy_sp3	overlay-unload	parked	66.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
+0x02098734	main	84	legacy	overlay-unload	shipped	100	n/a		batch-12	
