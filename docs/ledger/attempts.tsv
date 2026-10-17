@@ -3899,3 +3899,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0227e88c	ov002	136	legacy_sp3	factory	shipped	100	n/a		factory-1017-L4	
 0x0227e88c	ov002	136	default	factory	parked	61.8	unknown	UNCLASSIFIED:unknown	factory-1017-L4	
 0x0227e88c	ov002	136	legacy	factory	parked	41.7	unknown	UNCLASSIFIED:unknown	factory-1017-L4	
+0x0228887c	ov002	136	default	factory	shipped	100	n/a		factory-1017-L4	
