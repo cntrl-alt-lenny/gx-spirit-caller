@@ -3306,3 +3306,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202b12c	main	124	default	string-copy-substitute-token	parked	83.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0202b12c	main	124	legacy_sp3	string-copy-substitute-token	parked	71.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0202b12c	main	124	legacy	string-copy-substitute-token	parked	59.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02027048	main	136	default	pool-alias-two-externs	shipped	100	n/a		batch-16	
