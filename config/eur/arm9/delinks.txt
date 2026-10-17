@@ -16110,7 +16110,7 @@ src/main/func_0208e014.s:
     complete
     .text start:0x0208e014 end:0x0208e0a0
 
-src/main/func_0208e0a0.s:
+src/main/func_0208e0a0.legacy.c:
     complete
     .text start:0x0208e0a0 end:0x0208e120
 
