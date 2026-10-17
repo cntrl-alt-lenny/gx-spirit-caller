@@ -3914,3 +3914,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c229c	ov002	148	default	factory	shipped	100	n/a		factory-1017-L1	
 0x021c229c	ov002	148	legacy	factory	parked	2.7	unknown	UNCLASSIFIED:unknown	factory-1017-L1	
 0x021c229c	ov002	148	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1017-L1	
+0x021c30bc	ov002	148	default	factory	shipped	100	n/a		factory-1017-L1	
+0x021c30bc	ov002	148	legacy	factory	parked	7.1	unknown	UNCLASSIFIED:unknown	factory-1017-L1	
