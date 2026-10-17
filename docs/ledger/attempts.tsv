@@ -3472,3 +3472,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02024574	main	116	default	pool-or-bitfield	parked	34.5	C-34	C-34	batch-16	
 0x02024574	main	116	legacy_sp3	pool-or-bitfield	parked	15.2	C-34	C-34	batch-16	
 0x02024574	main	116	legacy	pool-or-bitfield	parked	14.3	C-34	C-34	batch-16	
+0x02001e5c	main	40	default	small-dispatch	parked	40.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02001e5c	main	40	legacy_sp3	small-dispatch	parked	8.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02001e5c	main	40	legacy	small-dispatch	parked	8.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02029b6c	main	196	default	small-dispatch	parked	32.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02029b6c	main	196	legacy_sp3	small-dispatch	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02029b6c	main	196	legacy	small-dispatch	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02029c80	main	192	default	small-dispatch	parked	83.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02029c80	main	192	legacy_sp3	small-dispatch	parked	83.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02029c80	main	192	legacy	small-dispatch	parked	79.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
