@@ -3460,3 +3460,15 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02023d88	main	208	legacy_sp3	struct-copy-init	parked	32.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02023d88	main	208	legacy	struct-copy-init	parked	32.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02024024	main	124	default	pool-scan-alloc-entry	shipped	100	n/a		batch-16	
+0x02026e38	main	160	default	pool-or-bitfield	parked	47.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02026e38	main	160	legacy_sp3	pool-or-bitfield	parked	39.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02026e38	main	160	legacy	pool-or-bitfield	parked	39.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020264f0	main	244	default	pool-or-bitfield	parked	16.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020264f0	main	244	legacy_sp3	pool-or-bitfield	parked	9.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020264f0	main	244	legacy	pool-or-bitfield	parked	9.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020244e8	main	116	default	pool-or-bitfield	parked	17.2	C-34	C-34	batch-16	
+0x020244e8	main	116	legacy_sp3	pool-or-bitfield	parked	17.2	C-34	C-34	batch-16	
+0x020244e8	main	116	legacy	pool-or-bitfield	parked	13.3	C-34	C-34	batch-16	
+0x02024574	main	116	default	pool-or-bitfield	parked	34.5	C-34	C-34	batch-16	
+0x02024574	main	116	legacy_sp3	pool-or-bitfield	parked	15.2	C-34	C-34	batch-16	
+0x02024574	main	116	legacy	pool-or-bitfield	parked	14.3	C-34	C-34	batch-16	
