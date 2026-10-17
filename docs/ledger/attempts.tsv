@@ -3830,3 +3830,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02220ba0	ov002	116	default	factory	shipped	100	n/a		factory-1017-L3	
 0x02220ba0	ov002	116	legacy	factory	parked	12.9	unknown	UNCLASSIFIED:unknown	factory-1017-L3	
 0x0224ee48	ov002	100	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1017-L3	
+0x02238684	ov002	116	default	factory	shipped	100	n/a		factory-1017-L3	
+0x02238684	ov002	116	legacy	factory	parked	41.9	unknown	UNCLASSIFIED:unknown	factory-1017-L3	
+0x02238684	ov002	116	legacy_sp3	factory	parked	60	unknown	UNCLASSIFIED:unknown	factory-1017-L3	
