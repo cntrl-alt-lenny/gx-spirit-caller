@@ -3450,3 +3450,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02023188	main	140	default	pool-alias-missing-symbol	parked	2.9	C-34	C-34	batch-16	
 0x02023188	main	140	legacy_sp3	pool-alias-missing-symbol	parked	5.7	C-34	C-34	batch-16	
 0x02023188	main	140	legacy	pool-alias-missing-symbol	parked	2.9	C-34	C-34	batch-16	
+0x02023478	main	128	default	dup-pool-data_0219a8dc	parked	0.0	C-34	C-34	batch-16	
+0x02023478	main	128	legacy_sp3	dup-pool-data_0219a8dc	parked	3.1	C-34	C-34	batch-16	
+0x02023478	main	128	legacy	dup-pool-data_0219a8dc	parked	9.4	C-34	C-34	batch-16	
+0x020234f8	main	124	default	dup-pool-data_0219a8dc	parked	38.7	C-34	C-34	batch-16	
+0x020234f8	main	124	legacy_sp3	dup-pool-data_0219a8dc	parked	14.3	C-34	C-34	batch-16	
+0x020234f8	main	124	legacy	dup-pool-data_0219a8dc	parked	13.5	C-34	C-34	batch-16	
+0x02023d88	main	208	default	struct-copy-init	parked	1.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02023d88	main	208	legacy_sp3	struct-copy-init	parked	32.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02023d88	main	208	legacy	struct-copy-init	parked	32.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
