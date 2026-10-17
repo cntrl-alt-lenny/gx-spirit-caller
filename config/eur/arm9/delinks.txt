@@ -1025,7 +1025,7 @@ src/main/func_020070dc.c:
     complete
     .text start:0x020070dc end:0x02007104
 
-src/main/func_02007104.s:
+src/main/func_02007104.c:
     complete
     .text start:0x02007104 end:0x020071a4
 
