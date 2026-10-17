@@ -3417,3 +3417,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201d620	main	148	legacy_sp3	byte-reverse-record-search	parked	10.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0201d620	main	148	legacy	byte-reverse-record-search	parked	2.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0201ff2c	main	108	default	six-arg-call-status-check	shipped	100	n/a		batch-16	
+0x0201f4d4	main	148	default	state-gate-six-arg-call	parked	15.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201f4d4	main	148	legacy_sp3	state-gate-six-arg-call	parked	43.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201f4d4	main	148	legacy	state-gate-six-arg-call	parked	18.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201f7f0	main	132	default	syswork-position-init	parked	12.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201f7f0	main	132	legacy_sp3	syswork-position-init	parked	12.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201f7f0	main	132	legacy	syswork-position-init	parked	20.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
