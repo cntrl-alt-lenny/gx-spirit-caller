@@ -3376,3 +3376,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020124f4	main	108	legacy	table-record	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0201904c	main	60	default	packed-u16-add	shipped	100	n/a		batch-16	
 0x020138b8	main	196	default	init-screen-call-chain	shipped	100	n/a		batch-16	
+0x020125ac	main	112	default	sysinit-store-block	parked	71.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020125ac	main	112	legacy_sp3	sysinit-store-block	parked	3.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020125ac	main	112	legacy	sysinit-store-block	parked	3.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
