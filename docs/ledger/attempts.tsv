@@ -3459,3 +3459,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02023d88	main	208	default	struct-copy-init	parked	1.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02023d88	main	208	legacy_sp3	struct-copy-init	parked	32.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02023d88	main	208	legacy	struct-copy-init	parked	32.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02024024	main	124	default	pool-scan-alloc-entry	shipped	100	n/a		batch-16	
