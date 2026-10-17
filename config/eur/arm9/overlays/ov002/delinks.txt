@@ -1801,7 +1801,7 @@ src/overlay002/func_ov002_021d15b0.c:
     .text start:0x021d15b0 end:0x021d1618
 
 
-src/overlay002/func_ov002_021d1618.s:
+src/overlay002/func_ov002_021d1618.c:
     complete
     .text start:0x021d1618 end:0x021d1690
 
