@@ -14598,7 +14598,7 @@ src/main/func_02081988.s:
     complete
     .text start:0x02081988 end:0x02081ae0
 
-src/main/func_02081ae0.s:
+src/main/func_02081ae0.legacy_sp3.c:
     complete
     .text start:0x02081ae0 end:0x02081b48
 
