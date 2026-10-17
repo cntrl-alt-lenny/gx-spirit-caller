@@ -3308,3 +3308,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202b12c	main	124	legacy	string-copy-substitute-token	parked	59.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02027048	main	136	default	pool-alias-two-externs	shipped	100	n/a		batch-16	
 0x02023f7c	main	112	default	pool-alias-two-externs	shipped	100	n/a		batch-16	
+0x02000cc4	main	72	default	entry-table	parked	55.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02000cc4	main	72	legacy_sp3	entry-table	parked	55.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02000cc4	main	72	legacy	entry-table	parked	31.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02000d0c	main	64	default	entry-table	parked	87.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02000d0c	main	64	legacy_sp3	entry-table	parked	87.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02000d0c	main	64	legacy	entry-table	parked	52.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02000d4c	main	80	default	entry-table	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02000d4c	main	80	legacy_sp3	entry-table	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02000d4c	main	80	legacy	entry-table	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
