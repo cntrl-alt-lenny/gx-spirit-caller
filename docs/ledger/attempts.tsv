@@ -3310,3 +3310,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02089f60	main	160	legacy_sp3	callee-args	shipped	100	n/a		batch-15	
 0x0208771c	main	116	legacy_sp3	guard-chain	shipped	100	n/a		batch-15	
 0x020879a4	main	88	legacy_sp3	guard-chain	shipped	100	n/a		batch-15	
+0x020805b0	main	92	legacy_sp3	popcount-tile-index	shipped	100	n/a		batch-15	
