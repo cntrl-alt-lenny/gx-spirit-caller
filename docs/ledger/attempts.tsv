@@ -3432,3 +3432,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02020490	main	192	default	state-machine-call	parked	59.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02020490	main	192	legacy_sp3	state-machine-call	parked	18.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02020490	main	192	legacy	state-machine-call	parked	7.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020814	main	76	default	struct-reset-bool-return	parked	89.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020814	main	76	legacy_sp3	struct-reset-bool-return	parked	4.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020814	main	76	legacy	struct-reset-bool-return	parked	4.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
