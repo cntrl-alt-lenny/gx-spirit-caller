@@ -3487,3 +3487,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202ba38	main	92	default	nibble-bit-set	parked	30.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0202ba38	main	92	legacy_sp3	nibble-bit-set	parked	30.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0202ba38	main	92	legacy	nibble-bit-set	parked	54.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202befc	main	148	default	pool-alloc-stream-open	parked	26.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202befc	main	148	legacy_sp3	pool-alloc-stream-open	parked	21.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202befc	main	148	legacy	pool-alloc-stream-open	parked	20.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202be4c	main	176	default	pool-alloc-stream-open	parked	45.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202be4c	main	176	legacy_sp3	pool-alloc-stream-open	parked	47.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202be4c	main	176	legacy	pool-alloc-stream-open	parked	37.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202c0c0	main	236	default	pool-alloc-stream-open	parked	3.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202c0c0	main	236	legacy_sp3	pool-alloc-stream-open	parked	76.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202c0c0	main	236	legacy	pool-alloc-stream-open	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
