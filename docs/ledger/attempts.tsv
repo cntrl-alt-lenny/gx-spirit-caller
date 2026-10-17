@@ -3338,3 +3338,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02006524	main	132	default	system-tick-forwarder	parked	3.0	address-fold	PROVISIONAL:address-fold	batch-16	
 0x02006524	main	132	legacy_sp3	system-tick-forwarder	parked	35.3	address-fold	PROVISIONAL:address-fold	batch-16	
 0x02006524	main	132	legacy	system-tick-forwarder	parked	31.4	address-fold	PROVISIONAL:address-fold	batch-16	
+0x02006a38	main	216	default	overlay-state-swap	shipped	100	n/a		batch-16	
