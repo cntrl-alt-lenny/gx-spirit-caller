@@ -3902,3 +3902,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0224e184	ov002	172	legacy_sp3	factory	parked	2.1	register-numbering-permutation-cascade	P-30	factory-1017-L3	
 0x022530a8	ov002	172	default	factory	shipped	100	n/a		factory-1017-L3	
 0x02253748	ov002	176	default	factory	shipped	100	n/a		factory-1017-L3	
+0x02246f68	ov002	180	default	factory	shipped	100	n/a		factory-1017-L3	
+0x02246f68	ov002	180	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1017-L3	
