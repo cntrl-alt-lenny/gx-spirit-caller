@@ -3883,3 +3883,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02292754	ov002	124	default	factory	shipped	100	n/a		factory-1017-L4	
 0x022945c4	ov002	124	default	factory	shipped	100	n/a		factory-1017-L4	
 0x02294e40	ov002	124	default	factory	shipped	100	n/a		factory-1017-L4	
+0x02286e54	ov002	128	default	factory	parked	87.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L4	
+0x02286e54	ov002	128	legacy	factory	parked	58.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L4	
+0x02286e54	ov002	128	legacy_sp3	factory	parked	87.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L4	
