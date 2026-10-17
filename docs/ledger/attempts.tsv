@@ -3496,3 +3496,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202c0c0	main	236	default	pool-alloc-stream-open	parked	3.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0202c0c0	main	236	legacy_sp3	pool-alloc-stream-open	parked	76.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0202c0c0	main	236	legacy	pool-alloc-stream-open	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201e5b8	main	180	default	fourcc-chunk-scan-loop	parked	53.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201e5b8	main	180	legacy_sp3	fourcc-chunk-scan-loop	parked	4.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201e5b8	main	180	legacy	fourcc-chunk-scan-loop	parked	4.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0200ac60	main	172	default	dup-pool-data_02186a58	parked	0.0	C-34	C-34	batch-16	
+0x0200ac60	main	172	legacy_sp3	dup-pool-data_02186a58	parked	4.3	C-34	C-34	batch-16	
+0x0200ac60	main	172	legacy	dup-pool-data_02186a58	parked	2.0	C-34	C-34	batch-16	
