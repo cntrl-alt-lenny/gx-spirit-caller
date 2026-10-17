@@ -3774,3 +3774,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208fd90	main	96	legacy_sp3	guard-chain	parked	29.17	P-3-constant-materialization	P-3	batch-15	
 0x0208fd90	main	96	legacy	guard-chain	parked	29.17	P-3-constant-materialization	P-3	batch-15	
 0x0208bf3c	main	80	legacy	guard-chain	shipped	100	n/a		batch-15	
+0x022592b8	ov002	52	default	factory	shipped	100	n/a		factory-1017-L3	
+0x022592b8	ov002	52	legacy	factory	parked	15.4	unknown	UNCLASSIFIED:unknown	factory-1017-L3	
