@@ -2008,7 +2008,7 @@ src/main/func_02012560.c:
     complete
     .text start:0x02012560 end:0x020125ac
 
-src/main/func_020125ac.c:
+src/main/func_020125ac.s:
     complete
     .text start:0x020125ac end:0x0201261c
 
