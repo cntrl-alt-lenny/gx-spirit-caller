@@ -2003,7 +2003,7 @@ src/overlay002/func_ov002_021d5a6c.c:
     complete
     .text start:0x021d5a6c end:0x021d5ab4
 
-src/overlay002/func_ov002_021d5ab4.s:
+src/overlay002/func_ov002_021d5ab4.c:
     complete
     .text start:0x021d5ab4 end:0x021d5b28
 
