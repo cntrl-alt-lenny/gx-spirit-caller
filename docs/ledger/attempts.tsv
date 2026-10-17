@@ -3894,3 +3894,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02252c08	ov002	156	legacy	factory	parked	24.4	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
 0x02252c08	ov002	156	legacy_sp3	factory	parked	40	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
 0x0225680c	ov002	156	default	factory	shipped	100	n/a		factory-1017-L3	
+0x0224345c	ov002	172	default	factory	parked	32.6	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
+0x0224345c	ov002	172	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
+0x0224345c	ov002	172	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
