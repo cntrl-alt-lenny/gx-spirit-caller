@@ -3365,3 +3365,12 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02011620	main	104	default	rotation-matrix	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02011620	main	104	legacy_sp3	rotation-matrix	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02011620	main	104	legacy	rotation-matrix	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02012454	main	80	default	table-record	parked	50.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02012454	main	80	legacy_sp3	table-record	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02012454	main	80	legacy	table-record	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020124a4	main	80	default	table-record	parked	85.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020124a4	main	80	legacy_sp3	table-record	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020124a4	main	80	legacy	table-record	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020124f4	main	108	default	table-record	parked	77.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020124f4	main	108	legacy_sp3	table-record	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020124f4	main	108	legacy	table-record	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
