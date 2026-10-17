@@ -794,7 +794,7 @@ src/overlay002/func_ov002_021ba034.c:
     complete
     .text start:0x021ba034 end:0x021ba0b0
 
-src/overlay002/func_ov002_021ba0b0.s:
+src/overlay002/func_ov002_021ba0b0.c:
     complete
     .text start:0x021ba0b0 end:0x021ba104
 
