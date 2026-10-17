@@ -3356,3 +3356,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02010354	main	180	default	allocator-walk	parked	6.7	address-fold	PROVISIONAL:address-fold	batch-16	
 0x02010354	main	180	legacy_sp3	allocator-walk	parked	10.9	address-fold	PROVISIONAL:address-fold	batch-16	
 0x02010354	main	180	legacy	allocator-walk	parked	0.0	address-fold	PROVISIONAL:address-fold	batch-16	
+0x02011688	main	100	default	rotation-matrix	parked	72.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02011688	main	100	legacy_sp3	rotation-matrix	parked	72.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02011688	main	100	legacy	rotation-matrix	parked	72.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020116ec	main	96	default	rotation-matrix	parked	70.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020116ec	main	96	legacy_sp3	rotation-matrix	parked	20.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020116ec	main	96	legacy	rotation-matrix	parked	20.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
