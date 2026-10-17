@@ -4023,7 +4023,7 @@ src/overlay002/func_ov002_02201474.c:
 src/overlay002/func_ov002_02201498.s:
     complete
     .text start:0x02201498 end:0x02201564
-src/overlay002/func_ov002_02201564.s:
+src/overlay002/func_ov002_02201564.c:
     complete
     .text start:0x02201564 end:0x02201614
 src/overlay002/func_ov002_02201614.s:
