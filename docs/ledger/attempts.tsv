@@ -3343,3 +3343,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208f1c4	main	76	legacy	reset-hook	shipped	100	n/a		batch-15	
 0x0208f2a8	main	76	legacy	reset-hook	shipped	100	n/a		batch-15	
 0x0208e890	main	136	legacy	reset-hook	shipped	100	n/a		batch-15	
+0x0208ffec	main	92	legacy	vram-copy	shipped	100	n/a		batch-15	
