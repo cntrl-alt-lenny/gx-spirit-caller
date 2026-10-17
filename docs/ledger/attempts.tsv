@@ -3435,3 +3435,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02020814	main	76	default	struct-reset-bool-return	parked	89.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02020814	main	76	legacy_sp3	struct-reset-bool-return	parked	4.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02020814	main	76	legacy	struct-reset-bool-return	parked	4.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020a24	main	256	default	callback-dispatch	parked	10.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020a24	main	256	legacy_sp3	callback-dispatch	parked	15.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020a24	main	256	legacy	callback-dispatch	parked	15.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020ba0	main	244	default	dispatch-switch	parked	11.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020ba0	main	244	legacy_sp3	dispatch-switch	parked	1.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02020ba0	main	244	legacy	dispatch-switch	parked	1.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
