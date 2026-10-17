@@ -15026,7 +15026,7 @@ src/main/func_02086cc4.legacy_sp3.c:
     complete
     .text start:0x02086cc4 end:0x02086d70
 
-src/main/func_02086d70.legacy_sp3.c:
+src/main/func_02086d70.s:
     complete
     .text start:0x02086d70 end:0x02086e44
 
@@ -15083,7 +15083,7 @@ src/main/func_02087328.c:
     complete
     .text start:0x02087328 end:0x02087348
 
-src/main/func_02087348.s:
+src/main/func_02087348.legacy.c:
     complete
     .text start:0x02087348 end:0x0208738c
 
