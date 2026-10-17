@@ -3340,3 +3340,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208e120	main	140	legacy	bg-size-switch	shipped	100	n/a		batch-15	
 0x0208e5ec	main	48	legacy	mmio-pack-write	shipped	100	n/a		batch-15	
 0x0208e6ac	main	84	legacy	mmio-guard	shipped	100	n/a		batch-15	
+0x0208f1c4	main	76	legacy	reset-hook	shipped	100	n/a		batch-15	
