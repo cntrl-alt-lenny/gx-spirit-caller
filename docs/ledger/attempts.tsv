@@ -3648,3 +3648,129 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207d3ac	main	132	legacy_sp3	unknown	parked	35.3	P-30-adjacent-register-choice	P-30	batch-14	
 0x0207845c	main	60	legacy	call-pair-matches-fastmatch-but-reference-check-wants-data_021020b5	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-14	
 0x0207d520	main	240	default	heap-free-merge	shipped	100	n/a		batch-14	
+0x0208f4c8	main	100	legacy	global-reset-hook	shipped	100	n/a		batch-15	
+0x02088874	main	244	legacy_sp3	callee-args-order	shipped	100	n/a		batch-15	
+0x02081ae0	main	104	legacy_sp3	bitreader-recursive	shipped	100	n/a		batch-15	
+0x0208c8cc	main	116	legacy	display-control-update	shipped	100	n/a		batch-15	
+0x02089f60	main	160	legacy_sp3	callee-args	shipped	100	n/a		batch-15	
+0x0208771c	main	116	legacy_sp3	guard-chain	shipped	100	n/a		batch-15	
+0x020879a4	main	88	legacy_sp3	guard-chain	shipped	100	n/a		batch-15	
+0x020805b0	main	92	legacy_sp3	popcount-tile-index	shipped	100	n/a		batch-15	
+0x02080670	main	184	legacy_sp3	nested-loop-2d-buffer-fill	shipped	100	n/a		batch-15	
+0x0208226c	main	52	legacy_sp3	bitfield-pack	shipped	100	n/a		batch-15	
+0x02081d18	main	180	legacy_sp3	table-walk	shipped	100	n/a		batch-15	
+0x02082fcc	main	224	legacy_sp3	vm-callback-state	shipped	100	n/a		batch-15	
+0x0208428c	main	212	legacy_sp3	vm-callback-state	shipped	100	n/a		batch-15	
+0x02084dc0	main	76	legacy_sp3	vm-loop	shipped	100	n/a		batch-15	
+0x02086848	main	132	legacy_sp3	struct-init-shear-fx	shipped	100	n/a		batch-15	
+0x02085e74	main	212	legacy_sp3	flag-dispatch	shipped	100	n/a		batch-15	
+0x020868cc	main	244	legacy_sp3	rotation-matrix	shipped	100	n/a		batch-15	
+0x02087348	main	68	legacy	bit-alloc-loop	shipped	100	n/a		batch-15	
+0x02087444	main	128	legacy_sp3	bit-signal-handshake	shipped	100	n/a		batch-15	
+0x02089418	main	200	legacy_sp3	offset-table-fixup	shipped	100	n/a		batch-15	
+0x020899c0	main	196	legacy_sp3	record-scan-loop	shipped	100	n/a		batch-15	
+0x0208a728	main	60	legacy_sp3	refcount-dec	shipped	100	n/a		batch-15	
+0x0208a764	main	100	default	bitfield-guarded-teardown	shipped	100	n/a		batch-15	
+0x0208a5e4	main	160	legacy_sp3	nested-scan-loop	shipped	100	n/a		batch-15	
+0x0208b000	main	64	legacy	mmio-leaf	shipped	100	n/a		batch-15	
+0x0208bed8	main	60	legacy	mmio-leaf	shipped	100	n/a		batch-15	
+0x0208c2e0	main	104	legacy	mmio-sqrt-mag	shipped	100	n/a		batch-15	
+0x0208bfc4	main	136	legacy	mmio-sqrt-dist	shipped	100	n/a		batch-15	
+0x0208ddec	main	96	legacy	bg-screen-base	shipped	100	n/a		batch-15	
+0x0208de94	main	88	legacy	bg-screen-base	shipped	100	n/a		batch-15	
+0x0208de4c	main	72	legacy	bg-screen-base	shipped	100	n/a		batch-15	
+0x0208df94	main	128	legacy	bg-size-switch	shipped	100	n/a		batch-15	
+0x0208e0a0	main	128	legacy	bg-size-switch	shipped	100	n/a		batch-15	
+0x0208e014	main	140	legacy	bg-size-switch	shipped	100	n/a		batch-15	
+0x0208e120	main	140	legacy	bg-size-switch	shipped	100	n/a		batch-15	
+0x0208e5ec	main	48	legacy	mmio-pack-write	shipped	100	n/a		batch-15	
+0x0208e6ac	main	84	legacy	mmio-guard	shipped	100	n/a		batch-15	
+0x0208f1c4	main	76	legacy	reset-hook	shipped	100	n/a		batch-15	
+0x0208f2a8	main	76	legacy	reset-hook	shipped	100	n/a		batch-15	
+0x0208e890	main	136	legacy	reset-hook	shipped	100	n/a		batch-15	
+0x0208ffec	main	92	legacy	vram-copy	shipped	100	n/a		batch-15	
+0x02081498	main	256	default	tile-address-clz-loop	parked	1.56	instr-selection	PROVISIONAL:instruction-selection	batch-15	
+0x02081498	main	256	legacy_sp3	tile-address-clz-loop	parked	2.94	instr-selection	PROVISIONAL:instruction-selection	batch-15	
+0x02081498	main	256	legacy	tile-address-clz-loop	parked	2.86	instr-selection	PROVISIONAL:instruction-selection	batch-15	
+0x02082494	main	112	default	linked-list-callback-or	parked	28.57	register-numbering-permutation-cascade	P-30	batch-15	
+0x02082494	main	112	legacy_sp3	linked-list-callback-or	parked	46.43	register-numbering-permutation-cascade	P-30	batch-15	
+0x02082494	main	112	legacy	linked-list-callback-or	parked	41.38	register-numbering-permutation-cascade	P-30	batch-15	
+0x02084218	main	116	default	vm-handler-dispatch	parked	0.0	register-numbering-permutation-cascade	P-30	batch-15	
+0x02084218	main	116	legacy_sp3	vm-handler-dispatch	parked	65.52	register-numbering-permutation-cascade	P-30	batch-15	
+0x02084218	main	116	legacy	vm-handler-dispatch	parked	56.67	register-numbering-permutation-cascade	P-30	batch-15	
+0x02084360	main	128	default	vm-handler-dispatch	parked	43.75	register-numbering-permutation-cascade	P-30	batch-15	
+0x02084360	main	128	legacy_sp3	vm-handler-dispatch	parked	53.12	register-numbering-permutation-cascade	P-30	batch-15	
+0x02084360	main	128	legacy	vm-handler-dispatch	parked	45.45	register-numbering-permutation-cascade	P-30	batch-15	
+0x020858cc	main	192	default	isometric-projection-trig-calls	parked	0.0	P-20-scratch-register	P-20	batch-15	
+0x020858cc	main	192	legacy_sp3	isometric-projection-trig-calls	parked	91.67	P-20-scratch-register	P-20	batch-15	
+0x020858cc	main	192	legacy	isometric-projection-trig-calls	parked	87.76	P-20-scratch-register	P-20	batch-15	
+0x02086d70	main	212	default	rotation-matrix-fx	parked	0.0	P-20-reg-alloc	P-20	batch-15	
+0x02086d70	main	212	legacy_sp3	rotation-matrix-fx	parked	79.25	P-20-reg-alloc	P-20	batch-15	
+0x02086d70	main	212	legacy	rotation-matrix-fx	parked	75.93	P-20-reg-alloc	P-20	batch-15	
+0x02087c34	main	180	default	two-array-init-loops	parked	64.44	P-20-reg-alloc	P-20	batch-15	
+0x02087c34	main	180	legacy_sp3	two-array-init-loops	parked	73.33	P-20-reg-alloc	P-20	batch-15	
+0x02087c34	main	180	legacy	two-array-init-loops	parked	52.17	P-20-reg-alloc	P-20	batch-15	
+0x020886a0	main	256	default	queue-or-callback	parked	0.0	reg-alloc	PROVISIONAL:register-allocation	batch-15	
+0x020886a0	main	256	legacy_sp3	queue-or-callback	parked	75.0	reg-alloc	PROVISIONAL:register-allocation	batch-15	
+0x020886a0	main	256	legacy	queue-or-callback	parked	58.46	reg-alloc	PROVISIONAL:register-allocation	batch-15	
+0x020896cc	main	124	default	init-and-chain	parked	87.1	P-30-scratch-register-choice	P-30	batch-15	
+0x020896cc	main	124	legacy_sp3	init-and-chain	parked	87.1	P-30-scratch-register-choice	P-30	batch-15	
+0x020896cc	main	124	legacy	init-and-chain	parked	20.59	P-30-scratch-register-choice	P-30	batch-15	
+0x02089864	main	188	default	nested-list-drain-dispatch	parked	61.7	reg-alloc	PROVISIONAL:register-allocation	batch-15	
+0x02089864	main	188	legacy_sp3	nested-list-drain-dispatch	parked	74.47	reg-alloc	PROVISIONAL:register-allocation	batch-15	
+0x02089864	main	188	legacy	nested-list-drain-dispatch	parked	70.83	reg-alloc	PROVISIONAL:register-allocation	batch-15	
+0x02089a84	main	224	default	pool-read-register	parked	0.0	register-numbering-permutation-cascade	P-30	batch-15	
+0x02089a84	main	224	legacy_sp3	pool-read-register	parked	22.81	register-numbering-permutation-cascade	P-30	batch-15	
+0x02089a84	main	224	legacy	pool-read-register	parked	16.13	register-numbering-permutation-cascade	P-30	batch-15	
+0x0208aa50	main	72	default	loop	parked	11.11	P-20-lr-reuse-vs-r5-allocation	P-20	batch-15	
+0x0208aa50	main	72	legacy_sp3	loop	parked	11.11	P-20-lr-reuse-vs-r5-allocation	P-20	batch-15	
+0x0208aa50	main	72	legacy	loop	parked	11.11	P-20-lr-reuse-vs-r5-allocation	P-20	batch-15	
+0x0208b1ac	main	28	default	thumb-struct-init	parked	21.43	P-3-constant-materialization	P-3	batch-15	
+0x0208b1ac	main	28	legacy_sp3	thumb-struct-init	parked	13.33	P-3-constant-materialization	P-3	batch-15	
+0x0208b1ac	main	28	legacy	thumb-struct-init	parked	13.33	P-3-constant-materialization	P-3	batch-15	
+0x0208b1c8	main	24	default	thumb-struct-init-stm	parked	0.0	stm-burst-needs-asm	PROVISIONAL:inline-asm	batch-15	
+0x0208b1c8	main	24	legacy_sp3	thumb-struct-init-stm	parked	0.0	stm-burst-needs-asm	PROVISIONAL:inline-asm	batch-15	
+0x0208b1c8	main	24	legacy	thumb-struct-init-stm	parked	0.0	stm-burst-needs-asm	PROVISIONAL:inline-asm	batch-15	
+0x0208be9c	main	60	default	mmio-divider-setup	parked	0.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-15	
+0x0208be9c	main	60	legacy_sp3	mmio-divider-setup	parked	60.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-15	
+0x0208be9c	main	60	legacy	mmio-divider-setup	parked	60.0	mmio-const-materialization	PROVISIONAL:mmio-const-materialization	batch-15	
+0x0208bf3c	main	80	default	guard-chain	parked	0.0	P-36-poolhoist	P-36	batch-15	
+0x0208bf3c	main	80	legacy_sp3	guard-chain	parked	30.0	P-36-poolhoist	P-36	batch-15	
+0x0208bf3c	main	80	legacy	guard-chain	parked	90.0	P-36-poolhoist	P-36	batch-15	
+0x0208c348	main	156	default	vec-cross-fx	parked	0.0	register-numbering-permutation-cascade	P-30	batch-15	
+0x0208c348	main	156	legacy_sp3	vec-cross-fx	parked	66.67	register-numbering-permutation-cascade	P-30	batch-15	
+0x0208c348	main	156	legacy	vec-cross-fx	parked	71.79	register-numbering-permutation-cascade	P-30	batch-15	
+0x0208c844	main	64	default	guard-chain	parked	18.75	CSE-resistant-reverse-direction	PROVISIONAL:pool/address-cse	batch-15	
+0x0208c844	main	64	legacy_sp3	guard-chain	parked	18.75	CSE-resistant-reverse-direction	PROVISIONAL:pool/address-cse	batch-15	
+0x0208c844	main	64	legacy	guard-chain	parked	18.75	CSE-resistant-reverse-direction	PROVISIONAL:pool/address-cse	batch-15	
+0x0208c940	main	76	default	guard-chain	parked	21.05	P-31-if-conversion-mirrored	P-31	batch-15	
+0x0208c940	main	76	legacy_sp3	guard-chain	parked	73.68	P-31-if-conversion-mirrored	P-31	batch-15	
+0x0208c940	main	76	legacy	guard-chain	parked	73.68	P-31-if-conversion-mirrored	P-31	batch-15	
+0x0208cfa4	main	140	default	guard-chain	parked	0.0	P-20-3register-permutation	P-20	batch-15	
+0x0208cfa4	main	140	legacy_sp3	guard-chain	parked	57.14	P-20-3register-permutation	P-20	batch-15	
+0x0208cfa4	main	140	legacy	guard-chain	parked	85.71	P-20-3register-permutation	P-20	batch-15	
+0x0208d030	main	140	default	guard-chain	parked	0.0	P-20-3register-permutation	P-20	batch-15	
+0x0208d030	main	140	legacy_sp3	guard-chain	parked	57.14	P-20-3register-permutation	P-20	batch-15	
+0x0208d030	main	140	legacy	guard-chain	parked	85.71	P-20-3register-permutation	P-20	batch-15	
+0x0208d204	main	184	default	switch-dispatch	parked	10.87	P-20-3register-permutation	P-20	batch-15	
+0x0208d204	main	184	legacy_sp3	switch-dispatch	parked	63.04	P-20-3register-permutation	P-20	batch-15	
+0x0208d204	main	184	legacy	switch-dispatch	parked	84.78	P-20-3register-permutation	P-20	batch-15	
+0x0208df0c	main	52	default	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208df0c	main	52	legacy_sp3	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208df0c	main	52	legacy	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208df60	main	52	default	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208df60	main	52	legacy_sp3	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208df60	main	52	legacy	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208e1cc	main	52	default	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208e1cc	main	52	legacy_sp3	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208e1cc	main	52	legacy	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208e220	main	52	default	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208e220	main	52	legacy_sp3	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208e220	main	52	legacy	mmio-bg-base	parked	53.85	P-36-pipeline-interleaving	P-36	batch-15	
+0x0208fd30	main	96	default	guard-chain	parked	29.17	P-3-constant-materialization	P-3	batch-15	
+0x0208fd30	main	96	legacy_sp3	guard-chain	parked	29.17	P-3-constant-materialization	P-3	batch-15	
+0x0208fd30	main	96	legacy	guard-chain	parked	37.5	P-3-constant-materialization	P-3	batch-15	
+0x0208fd90	main	96	default	guard-chain	parked	29.17	P-3-constant-materialization	P-3	batch-15	
+0x0208fd90	main	96	legacy_sp3	guard-chain	parked	29.17	P-3-constant-materialization	P-3	batch-15	
+0x0208fd90	main	96	legacy	guard-chain	parked	29.17	P-3-constant-materialization	P-3	batch-15	
+0x0208bf3c	main	80	legacy	guard-chain	shipped	100	n/a		batch-15	
