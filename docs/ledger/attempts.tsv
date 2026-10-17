@@ -3394,3 +3394,15 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201a9d0	main	208	legacy_sp3	lcg-printf	parked	5.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0201a9d0	main	208	legacy	lcg-printf	parked	5.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0201a498	main	68	default	bitfield-test-set-notify	shipped	100	n/a		batch-16	
+0x0201bf80	main	52	default	cross-overlay-call-wrapper	parked	92.3	C-32	C-32	batch-16	
+0x0201bf80	main	52	legacy_sp3	cross-overlay-call-wrapper	parked	92.3	C-32	C-32	batch-16	
+0x0201bf80	main	52	legacy	cross-overlay-call-wrapper	parked	78.6	C-32	C-32	batch-16	
+0x0201c1bc	main	36	default	cross-overlay-call-wrapper	parked	88.9	C-32	C-32	batch-16	
+0x0201c1bc	main	36	legacy_sp3	cross-overlay-call-wrapper	parked	88.9	C-32	C-32	batch-16	
+0x0201c1bc	main	36	legacy	cross-overlay-call-wrapper	parked	70.0	C-32	C-32	batch-16	
+0x0201c1e0	main	68	default	cross-overlay-call-wrapper	parked	17.6	C-32	C-32	batch-16	
+0x0201c1e0	main	68	legacy_sp3	cross-overlay-call-wrapper	parked	55.6	C-32	C-32	batch-16	
+0x0201c1e0	main	68	legacy	cross-overlay-call-wrapper	parked	52.6	C-32	C-32	batch-16	
+0x0201c224	main	132	default	cross-overlay-call-wrapper	parked	97.0	C-32	C-32	batch-16	
+0x0201c224	main	132	legacy_sp3	cross-overlay-call-wrapper	parked	0.0	C-32	C-32	batch-16	
+0x0201c224	main	132	legacy	cross-overlay-call-wrapper	parked	0.0	C-32	C-32	batch-16	
