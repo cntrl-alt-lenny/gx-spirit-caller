@@ -3304,3 +3304,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6a28	main	108	legacy_sp3	unknown	parked	59.26	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x020a6a28	main	108	legacy	unknown	parked	96.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-13	
 0x0208f4c8	main	100	legacy	global-reset-hook	shipped	100	n/a		batch-15	
+0x02088874	main	244	legacy_sp3	callee-args-order	shipped	100	n/a		batch-15	
