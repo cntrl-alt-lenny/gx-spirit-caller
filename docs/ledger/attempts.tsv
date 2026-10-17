@@ -3818,3 +3818,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02264558	ov002	92	default	factory	parked	87	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1017-L4	
 0x02264558	ov002	92	legacy	factory	parked	19.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1017-L4	
 0x02264558	ov002	92	legacy_sp3	factory	parked	62.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1017-L4	
+0x0229f2f8	ov002	92	default	factory	shipped	100	n/a		factory-1017-L4	
