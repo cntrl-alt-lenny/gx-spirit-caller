@@ -3379,3 +3379,11 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020125ac	main	112	default	sysinit-store-block	parked	71.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x020125ac	main	112	legacy_sp3	sysinit-store-block	parked	3.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x020125ac	main	112	legacy	sysinit-store-block	parked	3.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020198ec	main	84	default	signed-byte-clamp-plus-lookup	shipped	100	n/a		batch-16	
+0x02019a58	main	116	default	lcg-or-formula	parked	6.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02019a58	main	116	legacy_sp3	lcg-or-formula	parked	17.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02019a58	main	116	legacy	lcg-or-formula	parked	13.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201a044	main	116	default	lcg-or-formula	parked	17.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201a044	main	116	legacy_sp3	lcg-or-formula	parked	17.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0201a044	main	116	legacy	lcg-or-formula	parked	17.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x020198ec	main	84	default	signed-byte-clamp-plus-lookup	shipped	100	n/a		batch-16	
