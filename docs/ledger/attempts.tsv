@@ -3481,3 +3481,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02029c80	main	192	default	small-dispatch	parked	83.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02029c80	main	192	legacy_sp3	small-dispatch	parked	83.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x02029c80	main	192	legacy	small-dispatch	parked	79.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202bc38	main	76	default	nibble-bit-set	parked	52.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202bc38	main	76	legacy_sp3	nibble-bit-set	parked	5.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202bc38	main	76	legacy	nibble-bit-set	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202ba38	main	92	default	nibble-bit-set	parked	30.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202ba38	main	92	legacy_sp3	nibble-bit-set	parked	30.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x0202ba38	main	92	legacy	nibble-bit-set	parked	54.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
