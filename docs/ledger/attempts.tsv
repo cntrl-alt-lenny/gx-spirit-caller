@@ -3318,3 +3318,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208428c	main	212	legacy_sp3	vm-callback-state	shipped	100	n/a		batch-15	
 0x02084dc0	main	76	legacy_sp3	vm-loop	shipped	100	n/a		batch-15	
 0x02086848	main	132	legacy_sp3	struct-init-shear-fx	shipped	100	n/a		batch-15	
+0x02085e74	main	212	legacy_sp3	flag-dispatch	shipped	100	n/a		batch-15	

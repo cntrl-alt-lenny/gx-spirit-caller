@@ -4,10 +4,12 @@ extern int func_02084e0c(int id, char *p, int n);
 
 int func_02085e74(u32 *p)
 {
+    int need;
     char *b = (char *)p;
-    u32 f = *p;
-    int need = 0;
+    u32 f;
     int t;
+    f = *p;
+    need = 0;
     if (!(f & 4)) {
         need = 1;
     }
