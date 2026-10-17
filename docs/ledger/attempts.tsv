@@ -3844,3 +3844,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02256a50	ov002	120	default	factory	shipped	100	n/a		factory-1017-L3	
 0x0222c9fc	ov002	124	default	factory	shipped	100	n/a		factory-1017-L3	
 0x0224ae3c	ov002	124	default	factory	shipped	100	n/a		factory-1017-L3	
+0x02223440	ov002	128	default	factory	shipped	100	n/a		factory-1017-L3	
