@@ -3307,3 +3307,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02088874	main	244	legacy_sp3	callee-args-order	shipped	100	n/a		batch-15	
 0x02081ae0	main	104	legacy_sp3	bitreader-recursive	shipped	100	n/a		batch-15	
 0x0208c8cc	main	116	legacy	display-control-update	shipped	100	n/a		batch-15	
+0x02089f60	main	160	legacy_sp3	callee-args	shipped	100	n/a		batch-15	
