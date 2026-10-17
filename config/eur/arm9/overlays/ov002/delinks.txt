@@ -4079,7 +4079,7 @@ src/overlay002/func_ov002_02201de4.c:
     complete
     .text start:0x02201de4 end:0x02201e38
 
-src/overlay002/func_ov002_02201e38.s:
+src/overlay002/func_ov002_02201e38.c:
     complete
     .text start:0x02201e38 end:0x02201e74
 
