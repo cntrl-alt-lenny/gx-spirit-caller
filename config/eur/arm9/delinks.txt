@@ -1726,7 +1726,7 @@ src/main/func_0200efe0.c:
     complete
     .text start:0x0200efe0 end:0x0200f01c
 
-src/main/func_0200f01c.s:
+src/main/func_0200f01c.c:
     complete
     .text start:0x0200f01c end:0x0200f044
 
