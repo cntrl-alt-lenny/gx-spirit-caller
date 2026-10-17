@@ -3335,3 +3335,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02005dac	main	116	default	pool-alloc	parked	3.5	reg-alloc	PROVISIONAL:register-allocation	batch-16	
 0x02005dac	main	116	legacy_sp3	pool-alloc	parked	3.5	reg-alloc	PROVISIONAL:register-allocation	batch-16	
 0x02005dac	main	116	legacy	pool-alloc	parked	16.7	reg-alloc	PROVISIONAL:register-allocation	batch-16	
+0x02006524	main	132	default	system-tick-forwarder	parked	3.0	address-fold	PROVISIONAL:address-fold	batch-16	
+0x02006524	main	132	legacy_sp3	system-tick-forwarder	parked	35.3	address-fold	PROVISIONAL:address-fold	batch-16	
+0x02006524	main	132	legacy	system-tick-forwarder	parked	31.4	address-fold	PROVISIONAL:address-fold	batch-16	
