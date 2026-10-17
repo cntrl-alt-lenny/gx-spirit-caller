@@ -3334,3 +3334,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208ddec	main	96	legacy	bg-screen-base	shipped	100	n/a		batch-15	
 0x0208de94	main	88	legacy	bg-screen-base	shipped	100	n/a		batch-15	
 0x0208de4c	main	72	legacy	bg-screen-base	shipped	100	n/a		batch-15	
+0x0208df94	main	128	legacy	bg-size-switch	shipped	100	n/a		batch-15	
