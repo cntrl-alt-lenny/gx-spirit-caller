@@ -5630,7 +5630,7 @@ src/overlay002/func_ov002_0220dcdc.c:
     complete
     .text start:0x0220dcdc end:0x0220dd34
 
-src/overlay002/func_ov002_0220dd34.s:
+src/overlay002/func_ov002_0220dd34.c:
     complete
     .text start:0x0220dd34 end:0x0220ddac
 
