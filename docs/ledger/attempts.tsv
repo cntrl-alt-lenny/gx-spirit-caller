@@ -3777,3 +3777,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a1870	ov002	32	default	factory	shipped	100	n/a		factory-1017-L4	
 0x0228deac	ov002	64	default	factory	shipped	100	n/a		factory-1017-L4	
 0x0228deac	ov002	64	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1017-L4	
+0x0227c630	ov002	72	default	factory	shipped	100	n/a		factory-1017-L4	
