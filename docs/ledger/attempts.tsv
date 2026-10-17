@@ -3538,3 +3538,112 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02098734	main	84	default	overlay-unload	parked	66.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02098734	main	84	legacy_sp3	overlay-unload	parked	66.7	epilogue-shape	PROVISIONAL:frame/epilogue	batch-12	
 0x02098734	main	84	legacy	overlay-unload	shipped	100	n/a		batch-12	
+0x02070278	main	212	legacy	loop	shipped	100	n/a		batch-14	
+0x0207039c	main	148	legacy	guard-chain	shipped	100	n/a		batch-14	
+0x02070430	main	184	legacy	guard-chain	shipped	100	n/a		batch-14	
+0x0207084c	main	224	default	unknown	parked	0.0	P-36-const-hoist-across-loop	P-36	batch-14	
+0x0207084c	main	224	legacy	unknown	parked	3.6	P-36-const-hoist-across-loop	P-36	batch-14	
+0x0207084c	main	224	legacy_sp3	unknown	parked	3.6	P-36-const-hoist-across-loop	P-36	batch-14	
+0x0207092c	main	84	legacy	guard-call	shipped	100	n/a		batch-14	
+0x0207103c	main	80	legacy	lcg-step	shipped	100	n/a		batch-14	
+0x0207108c	main	176	default	unknown	parked	2.3	P-36-const-hoist-across-loop	P-36	batch-14	
+0x0207108c	main	176	legacy	unknown	parked	52.3	P-36-const-hoist-across-loop	P-36	batch-14	
+0x0207108c	main	176	legacy_sp3	unknown	parked	31.8	P-36-const-hoist-across-loop	P-36	batch-14	
+0x020720b4	main	144	legacy	guard-chain	shipped	100	n/a		batch-14	
+0x02073738	main	256	legacy	packet-build	shipped	100	n/a		batch-14	
+0x02073a5c	main	100	legacy	guard-chain	shipped	100	n/a		batch-14	
+0x02073ed8	main	80	legacy	ip-compare	shipped	100	n/a		batch-14	
+0x02073f28	main	92	legacy	checksum-verify	shipped	100	n/a		batch-14	
+0x02073fc8	main	192	legacy	checksum	shipped	100	n/a		batch-14	
+0x020740c4	main	96	legacy	call-sequence	shipped	100	n/a		batch-14	
+0x02074b38	main	88	legacy	window-consume	shipped	100	n/a		batch-14	
+0x02074dcc	main	128	default	unknown	parked	0.0	P-42	P-42	batch-14	
+0x02074dcc	main	128	legacy	unknown	parked	91.4	P-42	P-42	batch-14	
+0x02074dcc	main	128	legacy_sp3	unknown	parked	69.7	P-42	P-42	batch-14	
+0x02074e4c	main	12	default	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02074e4c	main	12	legacy	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02074e4c	main	12	legacy_sp3	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02076ad0	main	164	legacy	packet-parse	shipped	100	n/a		batch-14	
+0x02076b74	main	216	legacy	packet-parse	shipped	100	n/a		batch-14	
+0x02076d14	main	200	default	unknown	parked	0.0	reg-alloc-preamble-mismatch	PROVISIONAL:register-allocation	batch-14	
+0x02076d14	main	200	legacy	unknown	parked	16.0	reg-alloc-preamble-mismatch	PROVISIONAL:register-allocation	batch-14	
+0x02076d14	main	200	legacy_sp3	unknown	parked	16.0	reg-alloc-preamble-mismatch	PROVISIONAL:register-allocation	batch-14	
+0x02077018	main	116	default	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	legacy	unknown	parked	93.5	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	legacy_sp3	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	default	unknown	parked	17.2	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	legacy_sp3	unknown	parked	17.2	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x02077018	main	116	legacy	unknown	parked	93.5	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x0207708c	main	8	default	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x0207708c	main	8	legacy	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x0207708c	main	8	legacy_sp3	unknown	parked	0.0	P-38-tentative-void-loop-trailing-epilogue	P-38	batch-14	
+0x020770bc	main	256	legacy	dispatch	shipped	100	n/a		batch-14	
+0x02077954	main	132	legacy	string-append	shipped	100	n/a		batch-14	
+0x02077b5c	main	60	legacy	timestamp	shipped	100	n/a		batch-14	
+0x02077a28	main	96	legacy	table-search	shipped	100	n/a		batch-14	
+0x020779d8	main	80	legacy	length-read	shipped	100	n/a		batch-14	
+0x02077c08	main	256	legacy	cache-slot	shipped	100	n/a		batch-14	
+0x02077db0	main	168	legacy	cache-lookup	shipped	100	n/a		batch-14	
+0x02077ecc	main	192	legacy	md5-update	shipped	100	n/a		batch-14	
+0x0207845c	main	60	legacy	call-pair	shipped	100	n/a		batch-14	
+0x0207850c	main	192	legacy	sha-update	shipped	100	n/a		batch-14	
+0x02078e3c	main	128	default	unknown	parked	0.0	loop-invariant-const-register-order	PROVISIONAL:loop-invariant-const-register-order	batch-14	
+0x02078e3c	main	128	legacy	unknown	parked	24.2	loop-invariant-const-register-order	PROVISIONAL:loop-invariant-const-register-order	batch-14	
+0x02078e3c	main	128	legacy_sp3	unknown	parked	25.0	loop-invariant-const-register-order	PROVISIONAL:loop-invariant-const-register-order	batch-14	
+0x02078eec	main	28	default	unknown	parked	0.0	struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	batch-14	
+0x02078eec	main	28	legacy	unknown	parked	0.0	struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	batch-14	
+0x02078eec	main	28	legacy_sp3	unknown	parked	0.0	struct-by-value-return-abi	PROVISIONAL:struct-by-value-return-abi	batch-14	
+0x02079b0c	main	60	legacy	array-compare	shipped	100	n/a		batch-14	
+0x02079c74	main	76	legacy	negate	shipped	100	n/a		batch-14	
+0x02070ce0	main	84	legacy	guard-chain	shipped	100	n/a		batch-14	
+0x020726e0	main	252	legacy	packet-dispatch	shipped	100	n/a		batch-14	
+0x02078f08	main	72	default	unknown	parked	83.3	P-36-store-postindex-fusion	P-36	batch-14	
+0x02078f08	main	72	legacy	unknown	parked	83.3	P-36-store-postindex-fusion	P-36	batch-14	
+0x02078f08	main	72	legacy_sp3	unknown	parked	83.3	P-36-store-postindex-fusion	P-36	batch-14	
+0x0207af28	main	120	default	unknown	parked	0.0	T-1-r1-vs-r2-scratch-register-renaming	PROVISIONAL:T-1	batch-14	
+0x0207af28	main	120	legacy	unknown	parked	86.7	T-1-r1-vs-r2-scratch-register-renaming	PROVISIONAL:T-1	batch-14	
+0x0207af28	main	120	legacy_sp3	unknown	parked	16.7	T-1-r1-vs-r2-scratch-register-renaming	PROVISIONAL:T-1	batch-14	
+0x0207b0e0	main	92	legacy	callback-event	shipped	100	n/a		batch-14	
+0x0207b18c	main	164	legacy	mod13-search	shipped	100	n/a		batch-14	
+0x0207c484	main	104	legacy	list-search	shipped	100	n/a		batch-14	
+0x0207c4ec	main	132	legacy	list-search	shipped	100	n/a		batch-14	
+0x0207c5b4	main	228	legacy	slot-alloc	shipped	100	n/a		batch-14	
+0x0207c8d8	main	92	legacy	irq-clear	shipped	100	n/a		batch-14	
+0x0207c990	main	76	legacy	ref-claim	shipped	100	n/a		batch-14	
+0x0207cbe0	main	112	legacy	irq-query	shipped	100	n/a		batch-14	
+0x0207cc50	main	88	legacy	irq-query	shipped	100	n/a		batch-14	
+0x0207d3ac	main	132	default	unknown	parked	42.4	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207d3ac	main	132	legacy	unknown	parked	0.0	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207d3ac	main	132	legacy_sp3	unknown	parked	0.0	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207d458	main	60	legacy_sp3	list-add	shipped	100	n/a		batch-14	
+0x0207d4dc	main	68	legacy_sp3	range-align	shipped	100	n/a		batch-14	
+0x0207db00	main	68	legacy_sp3	range-align	shipped	100	n/a		batch-14	
+0x0207d520	main	240	legacy_sp3	heap-free-merge	shipped	100	n/a		batch-14	
+0x0207d610	main	188	legacy_sp3	best-fit	shipped	100	n/a		batch-14	
+0x0207d6cc	main	192	default	unknown	parked	0.0	P-30-scratch-register-choice	P-30	batch-14	
+0x0207d6cc	main	192	legacy	unknown	parked	74.0	P-30-scratch-register-choice	P-30	batch-14	
+0x0207d6cc	main	192	legacy_sp3	unknown	parked	91.7	P-30-scratch-register-choice	P-30	batch-14	
+0x0207da1c	main	44	default	block-describe	shipped	100	n/a		batch-14	
+0x0207db8c	main	108	legacy_sp3	arena-alloc	shipped	100	n/a		batch-14	
+0x0207dbf8	main	100	legacy_sp3	arena-alloc	shipped	100	n/a		batch-14	
+0x0207e0a8	main	124	legacy_sp3	slot-refresh	shipped	100	n/a		batch-14	
+0x0207e594	main	164	legacy_sp3	pointer-fixup	shipped	100	n/a		batch-14	
+0x0207e790	main	72	legacy	pointer-fixup	shipped	100	n/a		batch-14	
+0x0207e840	main	96	legacy	cursor-init	shipped	100	n/a		batch-14	
+0x0207ec28	main	64	default	unknown	parked	11.8	P-20-r2r3-swap	P-20	batch-14	
+0x0207ec28	main	64	legacy	unknown	parked	62.5	P-20-r2r3-swap	P-20	batch-14	
+0x0207ec28	main	64	legacy_sp3	unknown	parked	62.5	P-20-r2r3-swap	P-20	batch-14	
+0x0207ef90	main	204	default	unknown	parked	2.0	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207ef90	main	204	legacy	unknown	parked	13.7	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207ef90	main	204	legacy_sp3	unknown	parked	15.7	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207f05c	main	220	default	unknown	parked	0.0	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207f05c	main	220	legacy	unknown	parked	18.2	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207f05c	main	220	legacy_sp3	unknown	parked	16.4	large-diff-materialized-bool-mismatch	PROVISIONAL:constant-materialization	batch-14	
+0x0207f510	main	256	legacy_sp3	mode-dispatch	shipped	100	n/a		batch-14	
+0x0207ff84	main	116	legacy_sp3	text-height	shipped	100	n/a		batch-14	
+0x0207feec	main	152	legacy_sp3	text-measure	shipped	100	n/a		batch-14	
+0x0207fff8	main	192	legacy_sp3	text-width	shipped	100	n/a		batch-14	
+0x0207d3ac	main	132	default	unknown	parked	42.4	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207d3ac	main	132	legacy	unknown	parked	34.3	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207d3ac	main	132	legacy_sp3	unknown	parked	35.3	P-30-adjacent-register-choice	P-30	batch-14	
+0x0207845c	main	60	legacy	call-pair-matches-fastmatch-but-reference-check-wants-data_021020b5	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	batch-14	
