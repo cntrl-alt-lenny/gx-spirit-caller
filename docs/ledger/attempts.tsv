@@ -3362,3 +3362,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020116ec	main	96	default	rotation-matrix	parked	70.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x020116ec	main	96	legacy_sp3	rotation-matrix	parked	20.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x020116ec	main	96	legacy	rotation-matrix	parked	20.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02011620	main	104	default	rotation-matrix	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02011620	main	104	legacy_sp3	rotation-matrix	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02011620	main	104	legacy	rotation-matrix	parked	0.0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
