@@ -3908,3 +3908,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021f208c	ov002	172	default	factory	shipped	100	n/a		factory-1017-L2	
 0x021f2d38	ov002	176	default	factory	shipped	100	n/a		factory-1017-L2	
 0x02201564	ov002	176	default	factory	shipped	100	n/a		factory-1017-L2	
+0x02202030	ov002	176	default	factory	parked	9.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L2	
+0x02202030	ov002	176	legacy	factory	parked	6.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L2	
