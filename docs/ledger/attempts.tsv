@@ -3925,3 +3925,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021ece34	ov002	148	legacy	factory	parked	2.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L1	
 0x021ece34	ov002	148	legacy_sp3	factory	parked	4.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L1	
 0x021b3314	ov002	156	default	factory	shipped	100	n/a		factory-1017-L1	
+0x021cb270	ov002	156	default	factory	shipped	100	n/a		factory-1017-L1	
