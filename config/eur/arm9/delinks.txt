@@ -15680,7 +15680,7 @@ src/main/func_0208afac.c:
     complete
     .text start:0x0208afac end:0x0208b000
 
-src/main/func_0208b000.s:
+src/main/func_0208b000.legacy.c:
     complete
     .text start:0x0208b000 end:0x0208b040
 

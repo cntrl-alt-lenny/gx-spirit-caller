@@ -3327,3 +3327,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208a728	main	60	legacy_sp3	refcount-dec	shipped	100	n/a		batch-15	
 0x0208a764	main	100	default	bitfield-guarded-teardown	shipped	100	n/a		batch-15	
 0x0208a5e4	main	160	legacy_sp3	nested-scan-loop	shipped	100	n/a		batch-15	
+0x0208b000	main	64	legacy	mmio-leaf	shipped	100	n/a		batch-15	
