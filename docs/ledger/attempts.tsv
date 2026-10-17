@@ -3353,3 +3353,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200edb8	main	240	default	object-init	parked	51.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0200edb8	main	240	legacy_sp3	object-init	parked	48.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
 0x0200edb8	main	240	legacy	object-init	parked	14.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	batch-16	
+0x02010354	main	180	default	allocator-walk	parked	6.7	address-fold	PROVISIONAL:address-fold	batch-16	
+0x02010354	main	180	legacy_sp3	allocator-walk	parked	10.9	address-fold	PROVISIONAL:address-fold	batch-16	
+0x02010354	main	180	legacy	allocator-walk	parked	0.0	address-fold	PROVISIONAL:address-fold	batch-16	
