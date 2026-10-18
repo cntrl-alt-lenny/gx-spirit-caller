@@ -4982,3 +4982,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021dc1cc	ov004	108	legacy	factory	parked	1.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-U1	
 0x021dc1cc	ov004	108	legacy_sp3	factory	parked	1.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-U1	
 0x021ca128	ov004	112	default	factory	shipped	100	n/a		factory-1018-U1	
+0x021ca0a4	ov004	132	default	factory	shipped	100	n/a		factory-1018-U1	
