@@ -16280,7 +16280,7 @@ src/main/func_0208f52c.legacy.c:
     complete
     .text start:0x0208f52c end:0x0208f5ac
 
-src/main/func_0208f5ac.s:
+src/main/func_0208f5ac.legacy.c:
     complete
     .text start:0x0208f5ac end:0x0208f6b0
 
