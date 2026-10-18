@@ -4989,3 +4989,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021dab1c	ov004	164	default	factory	shipped	100	n/a		factory-1018-U1	
 0x021dab1c	ov004	164	legacy	factory	parked	7	unknown	UNCLASSIFIED:unknown	factory-1018-U1	
 0x021dab1c	ov004	164	legacy_sp3	factory	parked	14.6	unknown	UNCLASSIFIED:unknown	factory-1018-U1	
+0x021d05f4	ov004	184	default	factory	parked	8.5	structural	PROVISIONAL:structural	factory-1018-U1	
+0x021d05f4	ov004	184	legacy_sp3	factory	parked	1.5	structural	PROVISIONAL:structural	factory-1018-U1	
