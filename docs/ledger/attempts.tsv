@@ -4046,3 +4046,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021ebb34	ov002	248	default	factory	shipped	100	n/a		factory-1017-L1	
 0x021ebb34	ov002	248	legacy_sp3	factory	parked	33.3	unknown	UNCLASSIFIED:unknown	factory-1017-L1	
 0x021ebb34	ov002	248	legacy	factory	parked	15.9	unknown	UNCLASSIFIED:unknown	factory-1017-L1	
+0x021b1d84	ov002	252	default	factory	parked	34.3	register-numbering-permutation-cascade	P-30	factory-1017-L1	
+0x021b1d84	ov002	252	legacy	factory	parked	1.4	register-numbering-permutation-cascade	P-30	factory-1017-L1	
+0x021b1d84	ov002	252	legacy_sp3	factory	parked	6.8	register-numbering-permutation-cascade	P-30	factory-1017-L1	
