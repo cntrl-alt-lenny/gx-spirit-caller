@@ -3985,3 +3985,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0223cf18	ov002	212	default	factory	parked	55.6	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
 0x0223cf18	ov002	212	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
 0x0223cf18	ov002	212	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
+0x022438e0	ov002	212	default	factory	shipped	100	n/a		factory-1017-L3	
