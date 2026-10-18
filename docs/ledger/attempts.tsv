@@ -4083,3 +4083,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0222831c	ov002	252	default	factory	shipped	100	n/a		factory-1017-L3	
 0x0222831c	ov002	252	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1017-L3	
 0x0222831c	ov002	252	legacy_sp3	factory	parked	1.5	unknown	UNCLASSIFIED:unknown	factory-1017-L3	
+0x0222d9a8	ov002	252	default	factory	parked	46	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L3	
+0x0222d9a8	ov002	252	legacy	factory	parked	14.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L3	
+0x0222d9a8	ov002	252	legacy_sp3	factory	parked	46	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L3	
