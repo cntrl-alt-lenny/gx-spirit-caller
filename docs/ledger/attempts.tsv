@@ -3971,3 +3971,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02211ebc	ov002	204	default	factory	shipped	100	n/a		factory-1017-L2	
 0x02216dd0	ov002	204	default	factory	parked	92.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L2	
 0x02216dd0	ov002	204	legacy	factory	parked	69.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L2	
+0x021f92d0	ov002	208	default	factory	parked	90.4	register-numbering-permutation-cascade	P-30	factory-1017-L2	
+0x021f92d0	ov002	208	legacy	factory	parked	1.9	register-numbering-permutation-cascade	P-30	factory-1017-L2	
+0x021f92d0	ov002	208	legacy_sp3	factory	parked	3.4	register-numbering-permutation-cascade	P-30	factory-1017-L2	
