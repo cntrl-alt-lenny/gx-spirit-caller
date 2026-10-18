@@ -3939,3 +3939,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02251c3c	ov002	196	default	factory	parked	63.3	register-numbering-permutation-cascade	P-30	factory-1017-L3	
 0x02251c3c	ov002	196	legacy	factory	parked	40	register-numbering-permutation-cascade	P-30	factory-1017-L3	
 0x02251c3c	ov002	196	legacy_sp3	factory	parked	6.1	register-numbering-permutation-cascade	P-30	factory-1017-L3	
+0x022537f8	ov002	196	default	factory	parked	49	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
+0x022537f8	ov002	196	legacy	factory	parked	1.8	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
+0x022537f8	ov002	196	legacy_sp3	factory	parked	1.8	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
