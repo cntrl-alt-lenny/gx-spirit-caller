@@ -5006,3 +5006,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d7118	ov004	212	default	factory	parked	60.4	reg-alloc	PROVISIONAL:register-allocation	factory-1018-U1	
 0x021d7118	ov004	212	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1018-U1	
 0x021d7118	ov004	212	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1018-U1	
+0x021d9ef0	ov004	212	default	factory	parked	45.3	frame-shape	PROVISIONAL:frame/epilogue	factory-1018-U1	
+0x021d9ef0	ov004	212	legacy	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1018-U1	
+0x021d9ef0	ov004	212	legacy_sp3	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1018-U1	
