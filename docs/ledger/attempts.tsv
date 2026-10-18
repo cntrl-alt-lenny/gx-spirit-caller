@@ -3936,3 +3936,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0224a120	ov002	196	default	factory	shipped	100	n/a		factory-1017-L3	
 0x0224e018	ov002	196	default	factory	shipped	100	n/a		factory-1017-L3	
 0x0224e018	ov002	196	legacy	factory	parked	1.9	unknown	UNCLASSIFIED:unknown	factory-1017-L3	
+0x02251c3c	ov002	196	default	factory	parked	63.3	register-numbering-permutation-cascade	P-30	factory-1017-L3	
+0x02251c3c	ov002	196	legacy	factory	parked	40	register-numbering-permutation-cascade	P-30	factory-1017-L3	
+0x02251c3c	ov002	196	legacy_sp3	factory	parked	6.1	register-numbering-permutation-cascade	P-30	factory-1017-L3	
