@@ -4955,7 +4955,7 @@ src/main/func_0202abdc.s:
     complete
     .text start:0x0202abdc end:0x0202acec
 
-src/main/func_0202acec.s:
+src/main/func_0202acec.c:
     complete
     .text start:0x0202acec end:0x0202adf8
 
