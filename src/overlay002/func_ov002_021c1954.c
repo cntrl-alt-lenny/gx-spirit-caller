@@ -13,7 +13,7 @@ int func_ov002_021c1954(int self, int arg1) {
         if (func_02031764() != 0) {
             return 1;
         }
-        if (r == 0x17e4 || r == 0x17e4 + 0x42 || r == 0x17e4 + 0x7c) {
+        if (r == 0x17e4 || r == 0x1826 || r == 0x1860) {
             if (func_ov002_021bbd04(self, 3) != 0 || func_ov002_021bbd04(1 - self, 3) != 0) {
                 return 1;
             }

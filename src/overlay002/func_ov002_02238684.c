@@ -20,7 +20,7 @@ int func_ov002_02238684(Obj *obj)
     u32 idx = v & 0xff;
     u16 h = hi;
     if (kind == 0xe) {
-        func_ov002_021d7d0c(obj, idx, data_ov002_022cf16c + (idx & 1) * 0x868 + 0x18 + 0x400 + h * 4);
+        func_ov002_021d7d0c(obj, idx, data_ov002_022cf16c + (idx & 1) * 0x868 + 0x418 + h * 4);
     }
     return 0;
 }

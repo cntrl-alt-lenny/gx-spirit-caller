@@ -17,7 +17,7 @@ int func_ov002_021b99b4(int player, int id)
     i = 0;
     if (i < cnt) {
         char *b = data_ov002_022cf16c + base;
-        Entry *p = (Entry *)(b + 0x18 + 0x400);
+        Entry *p = (Entry *)(b + 0x418);
         do {
             if (id == p->hi * 2 + p->lo) {
                 return i;

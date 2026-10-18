@@ -18,7 +18,7 @@ int func_ov002_021bd3e0(int player, int target)
     i = count = 0;
     if (i < *(unsigned int *)(data_ov002_022cf180 + off)) {
         base = data_ov002_022cf16c + off;
-        p = (Slot *)(base + 0x18 + 0x400);
+        p = (Slot *)(base + 0x418);
         do {
             if (target == func_0202b890(p->id)) {
                 count++;

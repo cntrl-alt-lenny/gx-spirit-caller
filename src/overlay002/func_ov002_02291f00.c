@@ -23,5 +23,5 @@ s32 func_ov002_02291f00(Arg *p)
     if (data_ov002_022cf16c[(1 - side) & 1].hp <= 500) {
         return 1;
     }
-    return data_ov002_022cf16c[side & 1].hp > 0x868 - 0x28c;
+    return data_ov002_022cf16c[side & 1].hp > 0x5dc;
 }

@@ -30,7 +30,7 @@ int func_ov002_0226722c(unsigned int a, int b) {
         i = 0;
         if (*(unsigned int *)(data_ov002_022cf180 + off) > i) {
             row = (Row *)(data_ov002_022cf16c + off);
-            e = (Ent *)((char *)row + 0x18 + 0x400);
+            e = (Ent *)((char *)row + 0x418);
             key = ((a << 31) & 0x80000000) | 0x4e0000 | 0x4000000;
             a = i;
             do {

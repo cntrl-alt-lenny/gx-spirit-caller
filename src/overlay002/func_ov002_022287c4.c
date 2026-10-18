@@ -27,7 +27,7 @@ int func_ov002_022287c4(struct Ov002287Self *self) {
     idx = func_ov002_021b99b4(self->f2_b0, ((unsigned)(self->f_4 << 17)) >> 23);
     if (idx >= 0) {
         if (func_ov002_021c33e4(self->f2_b0, self->f2_b0, idx)) {
-            ptr = data_ov002_022cf16c + (self->f2_b0 & 1) * 0x868 + 0x18 + 0x400 + idx * 4;
+            ptr = data_ov002_022cf16c + (self->f2_b0 & 1) * 0x868 + 0x418 + idx * 4;
             func_ov002_0227adb8(self->f2_b0, ptr, 1, self->f_0 << 16);
         }
     }

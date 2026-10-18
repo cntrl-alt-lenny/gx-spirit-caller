@@ -30,7 +30,7 @@ int func_ov002_0221da74(Card *c) {
         u16 hi = v >> 16;
         if (b1 == 0xe) {
             if (func_ov002_021c33e4(c->bit0, b0, hi) != 0) {
-                func_ov002_0227adb8(c->bit0, (b0 & 1) * 0x868 + (int)data_ov002_022cf16c + 0x18 + 0x400 + (hi << 2), 1, 0);
+                func_ov002_0227adb8(c->bit0, (b0 & 1) * 0x868 + (int)data_ov002_022cf16c + 0x418 + (hi << 2), 1, 0);
             }
         }
     }

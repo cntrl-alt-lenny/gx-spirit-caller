@@ -15,7 +15,7 @@ void func_ov002_02250d14(int player) {
     int off = (p & 1) * 0x868;
     if (*(unsigned int *)((char *)data_ov002_022cf180 + off) > i) {
         base = (char *)data_ov002_022cf16c + off;
-        e = (struct Ov002Ent *)(base + 0x18 + 0x400);
+        e = (struct Ov002Ent *)(base + 0x418);
         do {
             if (func_0202b878(e->id) == 0x16) {
                 func_ov002_02253458(p, 14, i);

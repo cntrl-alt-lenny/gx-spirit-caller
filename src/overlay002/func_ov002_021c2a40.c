@@ -13,7 +13,7 @@ void func_ov002_021c2a40(Slot *s)
 {
     int off = (s->player & 1) * 0x868;
     int *cnt = (int *)(data_ov002_022cf180 + off);
-    char *dst = data_ov002_022cf16c + off + 0x18 + 0x400 + *cnt * 4;
+    char *dst = data_ov002_022cf16c + off + 0x418 + *cnt * 4;
 
     if (s->id == 0) {
         return;

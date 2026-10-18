@@ -35,7 +35,7 @@ void func_ov002_0224e390(int a, int b) {
         p = s->ents;
         do {
             id = p->id;
-            if (func_0202e234(id) != 0 && func_0202b950(id) <= 0x868 - 0x28c
+            if (func_0202e234(id) != 0 && func_0202b950(id) <= 0x5dc
                 && func_0202b878(id) == func_0202b878(b)
                 && func_ov002_021ca440(a, id) != 0
                 && func_ov002_021b3fd8(a, 0xb, 0x12a1, p->hi * 2 + p->lo) == 0) {

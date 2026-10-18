@@ -21,7 +21,7 @@ int func_ov002_022640f4(u32 a)
     while (data_ov002_022d016c.idx < 10) {
         u32 i = data_ov002_022d016c.idx;
         u32 side = a ^ (i / 5);
-        if (data_ov002_022cf16c[side & 1].slots[i % 5].id == 0xda0 + 0x868) {
+        if (data_ov002_022cf16c[side & 1].slots[i % 5].id == 0x1608) {
             func_ov002_021de480(side, i % 5, 0, 0);
             data_ov002_022d016c.idx++;
             return 0;
