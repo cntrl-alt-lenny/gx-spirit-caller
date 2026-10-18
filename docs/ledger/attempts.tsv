@@ -5167,3 +5167,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206ca4c	main	288	legacy	factory	shipped	100	n/a		factory-1018-S3	
 0x0207eb08	main	288	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
 0x0207eb08	main	288	default	factory	parked	9.7	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x02089cd8	main	288	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
