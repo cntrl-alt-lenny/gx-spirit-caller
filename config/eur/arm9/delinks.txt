@@ -8256,7 +8256,7 @@ src/main/func_020432d0.s:
     complete
     .text start:0x020432d0 end:0x020433d0
 
-src/main/func_020433d0.s:
+src/main/func_020433d0.legacy_sp3.c:
     complete
     .text start:0x020433d0 end:0x020434e4
 
