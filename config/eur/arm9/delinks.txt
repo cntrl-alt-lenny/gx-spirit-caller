@@ -12454,7 +12454,7 @@ src/main/func_0206d7c0.legacy.c:
     complete
     .text start:0x0206d7c0 end:0x0206d854
 
-src/main/func_0206d854.s:
+src/main/func_0206d854.legacy.c:
     complete
     .text start:0x0206d854 end:0x0206d96c
 
