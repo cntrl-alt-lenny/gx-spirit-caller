@@ -5018,3 +5018,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d1c80	ov011	104	default	factory	shipped	100	n/a		factory-1018-C1	
 0x021d1c80	ov011	104	legacy_sp3	factory	parked	13.3	unknown	UNCLASSIFIED:unknown	factory-1018-C1	
 0x021d1c80	ov011	104	legacy	factory	parked	12.9	unknown	UNCLASSIFIED:unknown	factory-1018-C1	
+0x021cd190	ov011	108	default	factory	shipped	100	n/a		factory-1018-C1	
+0x021cd190	ov011	108	legacy_sp3	factory	parked	55.6	unknown	UNCLASSIFIED:unknown	factory-1018-C1	
+0x021cd190	ov011	108	legacy	factory	parked	28.6	unknown	UNCLASSIFIED:unknown	factory-1018-C1	
