@@ -4025,3 +4025,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021fd668	ov002	228	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L2	
 0x0220940c	ov002	228	default	factory	shipped	100	n/a		factory-1017-L2	
 0x0220a868	ov002	228	default	factory	shipped	100	n/a		factory-1017-L2	
+0x02214d74	ov002	228	default	factory	parked	84.2	register-numbering-permutation-cascade	P-30	factory-1017-L2	
+0x02214d74	ov002	228	legacy	factory	parked	0	register-numbering-permutation-cascade	P-30	factory-1017-L2	
+0x02214d74	ov002	228	legacy_sp3	factory	parked	0	register-numbering-permutation-cascade	P-30	factory-1017-L2	
