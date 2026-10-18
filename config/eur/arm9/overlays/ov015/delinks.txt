@@ -41,7 +41,7 @@ src/overlay015/Ov015_UpdateScrollTarget.c:
     complete
     .text start:0x021b238c end:0x021b23f4
 
-src/overlay015/func_ov015_021b23f4.s:
+src/overlay015/func_ov015_021b23f4.c:
     complete
     .text start:0x021b23f4 end:0x021b2450
 
