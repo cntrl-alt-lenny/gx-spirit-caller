@@ -4033,3 +4033,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0221da74	ov002	232	default	factory	shipped	100	n/a		factory-1017-L2	
 0x0221da74	ov002	232	legacy	factory	parked	41.7	unknown	UNCLASSIFIED:unknown	factory-1017-L2	
 0x021f2bbc	ov002	236	default	factory	shipped	100	n/a		factory-1017-L2	
+0x021f8a14	ov002	236	default	factory	shipped	100	n/a		factory-1017-L2	
+0x021f8a14	ov002	236	legacy	factory	parked	1.3	unknown	UNCLASSIFIED:unknown	factory-1017-L2	
