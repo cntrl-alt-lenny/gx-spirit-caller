@@ -77,7 +77,7 @@ src/overlay015/ov015_021b2488.c:
 
 
 
-src/overlay015/func_ov015_021b2490.s:
+src/overlay015/func_ov015_021b2490.c:
     complete
     .text start:0x021b2490 end:0x021b24f4
 
