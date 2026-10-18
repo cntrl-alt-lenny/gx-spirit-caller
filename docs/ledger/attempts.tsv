@@ -4072,3 +4072,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0222b0dc	ov002	244	legacy_sp3	factory	parked	26.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1017-L3	
 0x0222c00c	ov002	244	default	factory	shipped	100	n/a		factory-1017-L3	
 0x0222f348	ov002	244	default	factory	shipped	100	n/a		factory-1017-L3	
+0x0223d9dc	ov002	244	default	factory	parked	9.8	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
+0x0223d9dc	ov002	244	legacy	factory	parked	3	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
+0x0223d9dc	ov002	244	legacy_sp3	factory	parked	9.8	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L3	
