@@ -97,7 +97,7 @@ src/overlay005/ov005_021ab260.c:
 
 
 
-src/overlay005/func_ov005_021ab274.s:
+src/overlay005/func_ov005_021ab274.c:
     complete
     .text start:0x021ab274 end:0x021ab2e0
 
