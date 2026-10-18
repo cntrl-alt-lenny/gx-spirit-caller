@@ -406,7 +406,7 @@ src/overlay005/func_ov005_021af750.s:
     complete
     .text start:0x021af750 end:0x021af874
 
-src/overlay005/func_ov005_021af874.s:
+src/overlay005/func_ov005_021af874.c:
     complete
     .text start:0x021af874 end:0x021af8ec
 
