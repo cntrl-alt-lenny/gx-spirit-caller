@@ -5099,3 +5099,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200a7a4	main	268	legacy	factory	parked	6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
 0x0200a7a4	main	268	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
 0x0202acec	main	268	default	factory	shipped	100	n/a		factory-1018-S3	
+0x0204014c	main	268	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
+0x0204014c	main	268	default	factory	parked	88.1	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
