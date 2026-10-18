@@ -8790,7 +8790,7 @@ src/overlay002/func_ov002_0224e374.c:
 
 
 
-src/overlay002/func_ov002_0224e390.s:
+src/overlay002/func_ov002_0224e390.c:
     complete
     .text start:0x0224e390 end:0x0224e490
 src/overlay002/func_ov002_0224e490.s:
