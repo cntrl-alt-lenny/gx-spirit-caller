@@ -8960,7 +8960,7 @@ src/main/func_02049990.s:
 libs/nitro/func_02049d6c.legacy.c:
     complete
     .text start:0x02049d6c end:0x02049d70
-src/main/func_02049d70.s:
+src/main/func_02049d70.legacy_sp3.c:
     complete
     .text start:0x02049d70 end:0x02049e84
 
