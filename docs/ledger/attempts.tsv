@@ -5136,3 +5136,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203df88	main	280	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x02045b1c	main	280	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
 0x02048124	main	280	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
+0x0204e9b8	main	280	default	factory	parked	7.1	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S3	
+0x0204e9b8	main	280	legacy	factory	parked	53.4	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S3	
+0x0204e9b8	main	280	legacy_sp3	factory	parked	70	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S3	
