@@ -392,7 +392,7 @@ src/overlay011/func_ov011_021cd35c.s:
     complete
     .text start:0x021cd35c end:0x021cd574
 
-src/overlay011/func_ov011_021cd574.s:
+src/overlay011/func_ov011_021cd574.c:
     complete
     .text start:0x021cd574 end:0x021cd638
 
