@@ -64,7 +64,7 @@ src/overlay020/func_ov020_021aae48.c:
     complete
     .text start:0x021aae48 end:0x021aae64
 
-src/overlay020/func_ov020_021aae64.s:
+src/overlay020/func_ov020_021aae64.c:
     complete
     .text start:0x021aae64 end:0x021aaeac
 
