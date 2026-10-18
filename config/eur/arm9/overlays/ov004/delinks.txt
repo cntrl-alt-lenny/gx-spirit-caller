@@ -123,7 +123,7 @@ src/overlay004/func_ov004_021cc21c.s:
     complete
     .text start:0x021cc21c end:0x021cc2a4
 
-src/overlay004/func_ov004_021cc2a4.s:
+src/overlay004/func_ov004_021cc2a4.c:
     complete
     .text start:0x021cc2a4 end:0x021cc2f0
 
