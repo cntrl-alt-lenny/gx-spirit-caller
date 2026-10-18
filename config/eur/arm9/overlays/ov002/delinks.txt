@@ -4020,7 +4020,7 @@ src/overlay002/func_ov002_02201474.c:
     complete
     .text start:0x02201474 end:0x02201498
 
-src/overlay002/func_ov002_02201498.s:
+src/overlay002/func_ov002_02201498.c:
     complete
     .text start:0x02201498 end:0x02201564
 src/overlay002/func_ov002_02201564.c:
