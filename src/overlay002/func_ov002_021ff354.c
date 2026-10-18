@@ -36,7 +36,7 @@ extern int func_ov002_021f3ba0(struct F021ff354_Self *self);
 extern int func_ov002_021ff14c(unsigned int bit, int n, unsigned int field9,
                                 unsigned int z0, unsigned int z1);
 
-int func_ov002_021ff354(struct F021ff354_Self *self) {
+int func_ov002_021ff354(struct F021ff354_Self *self, int unused1) {
     if (self->f2.tag6 != 0x23) {
         int n = func_ov002_021f3ba0(self);
         if (func_ov002_021ff14c(self->f2.bit0, n, self->f4.field9, 0, 0) == 0) return 0;

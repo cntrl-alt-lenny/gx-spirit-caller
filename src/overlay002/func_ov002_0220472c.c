@@ -1,7 +1,7 @@
 typedef unsigned short u16;
 struct S0220472c { u16 b0 : 1; u16 pad : 5; u16 k : 6; };
 
-int func_ov002_0220472c(void *self) {
+int func_ov002_0220472c(void *self, int unused1) {
     struct S0220472c *s = (struct S0220472c *)((char *)self + 2);
     int result;
     if (s->k == 0xf) {

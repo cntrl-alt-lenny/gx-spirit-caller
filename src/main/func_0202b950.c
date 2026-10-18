@@ -4,7 +4,7 @@
 
 extern unsigned int *func_0202b31c(void);
 
-int func_0202b950(void) {
+int func_0202b950(int unused0) {
     unsigned int v = *func_0202b31c();
     unsigned int field = (v << 0xa) >> 0x17;
     if (field == 0x1ff) return 0xffff;

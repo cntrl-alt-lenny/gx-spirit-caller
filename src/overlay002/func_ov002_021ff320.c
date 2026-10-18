@@ -10,7 +10,7 @@ struct Func021ff320Self {
 };
 extern int func_ov002_021b3ecc(unsigned int bit, unsigned int field5, int code);
 
-int func_ov002_021ff320(struct Func021ff320Self *self) {
+int func_ov002_021ff320(struct Func021ff320Self *self, int unused1) {
     if (func_ov002_021b3ecc(self->f2.bit0, self->f2.field5, 0xFB6) == 0)
         return 1;
     return 0;

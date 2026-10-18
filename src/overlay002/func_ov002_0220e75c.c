@@ -10,7 +10,7 @@
 extern int func_ov002_02257704(void *self);
 extern void func_ov002_021de408(void *self, int n);
 
-int func_ov002_0220e75c(void *self) {
+int func_ov002_0220e75c(void *self, int unused1) {
     func_ov002_021de408(self, func_ov002_02257704(self));
     return 0;
 }

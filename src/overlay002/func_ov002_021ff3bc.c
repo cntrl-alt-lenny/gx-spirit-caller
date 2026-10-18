@@ -9,7 +9,7 @@ typedef struct {
 extern int func_ov002_021ff2b8(S021ff3bc *, int);
 extern int func_ov002_021ca2b8(int);
 
-int func_ov002_021ff3bc(S021ff3bc *p) {
+int func_ov002_021ff3bc(S021ff3bc *p, int unused1) {
     int xorbit = p->bit0 ^ p->bit14;
     if (func_ov002_021ff2b8(p, xorbit) == 0) {
         return 0;

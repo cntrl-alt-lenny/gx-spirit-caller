@@ -11,7 +11,7 @@ extern int func_ov002_021ca2b8(int);
 extern int func_ov002_0223f6c4(S021ff400 *);
 extern int func_ov002_022536e8(int, unsigned short, int);
 
-int func_ov002_021ff400(S021ff400 *p) {
+int func_ov002_021ff400(S021ff400 *p, int unused1) {
     int xorbit;
     int callresult;
     xorbit = p->bit0 ^ p->bit14;

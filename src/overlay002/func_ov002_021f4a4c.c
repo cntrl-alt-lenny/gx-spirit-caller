@@ -14,7 +14,7 @@ struct F021f4a4c_Self {
 
 extern int func_ov002_021d59cc(unsigned int bit, unsigned int fld, unsigned int lit, unsigned int two, unsigned int z);
 
-int func_ov002_021f4a4c(struct F021f4a4c_Self *self) {
+int func_ov002_021f4a4c(struct F021f4a4c_Self *self, int unused1) {
     func_ov002_021d59cc(self->f2.bit0, self->f2.fld5, 0xfb6, 2, 0);
     return 1;
 }
