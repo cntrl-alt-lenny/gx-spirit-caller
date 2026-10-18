@@ -4994,3 +4994,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d44cc	ov004	184	default	factory	parked	37	reg-alloc	PROVISIONAL:register-allocation	factory-1018-U1	
 0x021d44cc	ov004	184	legacy	factory	parked	26.1	reg-alloc	PROVISIONAL:register-allocation	factory-1018-U1	
 0x021d44cc	ov004	184	legacy_sp3	factory	parked	26.1	reg-alloc	PROVISIONAL:register-allocation	factory-1018-U1	
+0x021d7854	ov004	188	default	factory	shipped	100	n/a		factory-1018-U1	
+0x021d7854	ov004	188	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1018-U1	
+0x021d7854	ov004	188	legacy_sp3	factory	parked	3.2	unknown	UNCLASSIFIED:unknown	factory-1018-U1	
