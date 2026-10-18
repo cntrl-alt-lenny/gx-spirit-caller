@@ -4230,7 +4230,7 @@ src/overlay002/func_ov002_02202f78.s:
 src/overlay002/func_ov002_02203074.s:
     complete
     .text start:0x02203074 end:0x02203198
-src/overlay002/func_ov002_02203198.s:
+src/overlay002/func_ov002_02203198.c:
     complete
     .text start:0x02203198 end:0x02203290
 src/overlay002/func_ov002_02203290.c:
