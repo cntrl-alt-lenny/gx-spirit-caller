@@ -5145,3 +5145,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022227dc	ov002	280	default	factory	parked	91.4	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S1	
 0x022227dc	ov002	280	legacy	factory	parked	41.1	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S1	
 0x022227dc	ov002	280	legacy_sp3	factory	parked	18.6	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S1	
+0x0222e2ec	ov002	280	default	factory	shipped	100	n/a		factory-1018-S1	
