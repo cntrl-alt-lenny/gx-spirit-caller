@@ -4014,3 +4014,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c2c54	ov002	224	default	factory	parked	48.2	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
 0x021c2c54	ov002	224	legacy	factory	parked	3.3	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
 0x021c2c54	ov002	224	legacy_sp3	factory	parked	6.8	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
+0x021d0ccc	ov002	224	default	factory	shipped	100	n/a		factory-1017-L1	
