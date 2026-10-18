@@ -5850,7 +5850,7 @@ src/main/func_020312a0.c:
     complete
     .text start:0x020312a0 end:0x02031358
 
-src/main/func_02031358.s:
+src/main/func_02031358.c:
     complete
     .text start:0x02031358 end:0x02031470
 
