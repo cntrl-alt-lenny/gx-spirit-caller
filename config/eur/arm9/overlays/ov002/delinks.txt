@@ -5802,7 +5802,7 @@ src/overlay002/func_ov002_02211b38.c:
 src/overlay002/func_ov002_02211b64.s:
     complete
     .text start:0x02211b64 end:0x02211ebc
-src/overlay002/func_ov002_02211ebc.s:
+src/overlay002/func_ov002_02211ebc.c:
     complete
     .text start:0x02211ebc end:0x02211f88
 src/overlay002/func_ov002_02211f88.s:
