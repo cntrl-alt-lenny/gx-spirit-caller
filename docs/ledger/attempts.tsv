@@ -4004,3 +4004,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d7b44	ov002	216	default	factory	parked	11.1	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
 0x021d7b44	ov002	216	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
 0x021d7b44	ov002	216	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
+0x021b0a30	ov002	220	default	factory	parked	89.1	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
+0x021b0a30	ov002	220	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
+0x021b0a30	ov002	220	legacy_sp3	factory	parked	6.3	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
