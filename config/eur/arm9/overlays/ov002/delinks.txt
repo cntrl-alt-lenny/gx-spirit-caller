@@ -6219,7 +6219,7 @@ src/overlay002/func_ov002_0221a118.c:
     complete
     .text start:0x0221a118 end:0x0221a140
 
-src/overlay002/func_ov002_0221a140.s:
+src/overlay002/func_ov002_0221a140.c:
     complete
     .text start:0x0221a140 end:0x0221a214
 src/overlay002/func_ov002_0221a214.c:
