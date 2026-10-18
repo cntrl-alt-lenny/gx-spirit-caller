@@ -5155,3 +5155,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a591c	main	280	default	factory	parked	37.1	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x020a95e4	main	280	default	factory	shipped	100	n/a		factory-1018-S3	
 0x020a95e4	main	280	legacy	factory	parked	30	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x0203d9c4	main	284	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
