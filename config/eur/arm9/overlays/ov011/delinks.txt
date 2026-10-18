@@ -883,7 +883,7 @@ src/overlay011/func_ov011_021d1b70.c:
     complete
     .text start:0x021d1b70 end:0x021d1c80
 
-src/overlay011/func_ov011_021d1c80.s:
+src/overlay011/func_ov011_021d1c80.c:
     complete
     .text start:0x021d1c80 end:0x021d1ce8
 
