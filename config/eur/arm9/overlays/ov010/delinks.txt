@@ -581,7 +581,7 @@ src/overlay010/func_ov010_021b7104.c:
     complete
     .text start:0x021b7104 end:0x021b7128
 
-src/overlay010/func_ov010_021b7128.s:
+src/overlay010/func_ov010_021b7128.c:
     complete
     .text start:0x021b7128 end:0x021b718c
 
