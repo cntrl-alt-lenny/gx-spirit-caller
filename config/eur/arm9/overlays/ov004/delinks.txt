@@ -41,7 +41,7 @@ src/overlay004/func_ov004_021ca0a4.s:
     complete
     .text start:0x021ca0a4 end:0x021ca128
 
-src/overlay004/func_ov004_021ca128.s:
+src/overlay004/func_ov004_021ca128.c:
     complete
     .text start:0x021ca128 end:0x021ca198
 
