@@ -220,7 +220,7 @@ src/overlay000/func_ov000_021abe64.s:
     complete
     .text start:0x021abe64 end:0x021abec8
 
-src/overlay000/func_ov000_021abec8.s:
+src/overlay000/func_ov000_021abec8.c:
     complete
     .text start:0x021abec8 end:0x021abf28
 
