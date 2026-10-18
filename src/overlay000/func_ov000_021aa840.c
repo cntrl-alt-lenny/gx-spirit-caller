@@ -7,15 +7,15 @@ struct Obj {
 };
 void func_ov000_021aa840(int x, int y, int z) {
     struct Obj *obj = *(struct Obj **)data_ov000_021c73e0;
-    if (obj->facing == 1) goto reverse;
-    if (obj->facing == 2) goto reverse;
-    if (obj->facing != 3) goto normal;
-reverse:
-    obj->x = -x;
-    obj->y = -y;
-    obj->z = z;
-    return;
-normal:
+    switch (obj->facing) {
+    case 1:
+    case 2:
+    case 3:
+        obj->x = -x;
+        obj->y = -y;
+        obj->z = z;
+        return;
+    }
     obj->x = x;
     obj->y = y;
     obj->z = z;

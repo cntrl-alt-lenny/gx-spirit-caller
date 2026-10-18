@@ -13,8 +13,7 @@ struct State {
 };
 extern struct State data_ov011_021d403c;
 extern int func_ov011_021cd6e0(int row, int col);
-/* The existing definition takes void; this caller supplies four registers. */
-extern int func_ov006_021b3804();
+extern int func_ov006_021b3804(int handle, int a, int b, int c);
 
 void func_ov011_021cd700(void) {
     struct State *s = &data_ov011_021d403c;

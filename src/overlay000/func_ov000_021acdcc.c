@@ -1,7 +1,7 @@
 struct Ov000Motion {
     char pad[0x80];
-    volatile int x;
-    volatile int y;
+    int x;
+    int y;
     int startX;
     int startY;
     int deltaX;

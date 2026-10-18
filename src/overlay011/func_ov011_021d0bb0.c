@@ -1,6 +1,6 @@
-extern void Fill32();
-extern void func_ov011_021cc194();
-extern void func_ov011_021cc27c();
+extern void Fill32(int value, void *dest, int count);
+extern void func_ov011_021cc194(void);
+extern void func_ov011_021cc27c(void);
 extern void func_ov011_021d1434(void *selfv, int mode);
 typedef struct {
     char pad[0x19c];
