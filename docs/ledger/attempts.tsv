@@ -4998,3 +4998,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cd1fc	ov011	108	default	factory	parked	25	reg-alloc	PROVISIONAL:register-allocation	factory-1018-H1	
 0x021cd1fc	ov011	108	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1018-H1	
 0x021cd1fc	ov011	108	legacy_sp3	factory	parked	26.7	reg-alloc	PROVISIONAL:register-allocation	factory-1018-H1	
+0x021cd268	ov011	108	default	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1018-H1	
+0x021cd268	ov011	108	legacy	factory	parked	2.8	reg-alloc	PROVISIONAL:register-allocation	factory-1018-H1	
+0x021cd268	ov011	108	legacy_sp3	factory	parked	2.9	reg-alloc	PROVISIONAL:register-allocation	factory-1018-H1	
