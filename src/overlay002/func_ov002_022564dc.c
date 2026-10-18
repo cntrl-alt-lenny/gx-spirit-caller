@@ -2,7 +2,7 @@ typedef signed int s32;
 extern char data_ov002_022d016c[];
 int func_ov002_021baca8(s32, s32, s32);
 int func_ov002_021c2f24(s32, s32);
-void func_ov002_021de480(s32, s32, s32, s32);
+int func_ov002_021de480(s32, s32, s32, s32);
 
 s32 func_ov002_022564dc(void) {
     s32 a, j, i;

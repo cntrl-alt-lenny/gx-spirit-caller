@@ -22,7 +22,7 @@ extern int data_ov002_022cd744[];
 extern Buf data_ov002_022d016c;
 extern struct { char pad[0xb2]; u16 f; } data_ov002_022d0e6c;
 extern int func_ov002_021b00d0(int a);
-extern void func_ov002_021ae664(int a);
+extern int func_ov002_021ae664(int a);
 extern void func_ov002_021df818(Obj *o, int b, int c);
 extern void func_ov002_0226b22c(int a, int b, int c, int d);
 

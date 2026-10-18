@@ -17,7 +17,7 @@ extern char data_ov002_022cf16c[];
 
 extern int func_ov002_0223df38(Arg *, int, int *);
 extern int func_ov002_021c2084(Arg *, int, int, int);
-extern void func_ov002_021de8fc(Arg *, int, int);
+extern int func_ov002_021de8fc(Arg *, int, int);
 
 int func_ov002_02233504(Arg *arg)
 {

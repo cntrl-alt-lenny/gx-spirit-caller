@@ -4,7 +4,7 @@ extern char data_ov002_022ce288[];
 extern char data_ov002_022d0e6c[];
 extern void func_ov002_021e1870(int a, int b, int c);
 extern void func_ov002_0226b054(int a);
-extern void func_ov002_0226b194(int a, int b, int c);
+extern int func_ov002_0226b194(int a, int b, int c);
 
 int func_ov002_02223f18(struct Ov002Self *self) {
     switch (*(int *)(data_ov002_022ce288 + 0x5a8)) {

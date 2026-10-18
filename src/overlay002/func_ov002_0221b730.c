@@ -22,7 +22,7 @@ typedef struct {
 extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf1a4[];
 extern int data_ov002_022d016c[];
-extern void func_ov002_021d59cc(int side, int idx, u16 f0, u16 flags, int zero);
+extern int func_ov002_021d59cc(int side, int idx, u16 f0, u16 flags, int zero);
 
 int func_ov002_0221b730(Obj *self) {
     int side = self->side;

@@ -37,7 +37,7 @@ struct Side {
 
 extern struct Side data_ov002_022cf16c[];
 extern void func_ov002_021d8904(int a, int b, int c);
-extern void func_ov002_021d63fc(int a, int b, int c, int d);
+extern int func_ov002_021d63fc(int a, int b, int c, int d);
 
 int func_ov002_022368e8(int self, struct Ov002Ent *ent) {
     struct Side *s = data_ov002_022cf16c;

@@ -44,7 +44,7 @@ typedef struct {
 extern T data_ov002_022cf16c[];
 extern U data_ov002_022cf1a4[];
 
-extern void func_ov002_021d59cc(int a, int b, int c, int d, int e);
+extern int func_ov002_021d59cc(int a, int b, int c, int d, int e);
 
 int func_ov002_02220288(S *p) {
     int side = p->side;

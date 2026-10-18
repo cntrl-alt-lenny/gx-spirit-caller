@@ -8,7 +8,7 @@ struct Ctx {
 extern struct Ctx data_ov002_022d016c;
 extern s32 func_ov002_021baca8(s32 a, s32 b, s32 c);
 extern s32 func_ov002_021bb90c(s32 a, s32 b);
-extern void func_ov002_021de480(s32 a, s32 b, s32 c, s32 d);
+extern int func_ov002_021de480(s32 a, s32 b, s32 c, s32 d);
 
 s32 func_ov002_0225585c(void)
 {

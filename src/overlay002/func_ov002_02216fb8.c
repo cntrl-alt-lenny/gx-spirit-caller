@@ -12,7 +12,7 @@ extern char data_ov002_022cf16c[];
 extern int func_ov002_021ba294(int a, int b);
 extern int func_ov002_021d8288(int a, void *b);
 extern void func_ov002_021ae400(int a, int b);
-extern void func_ov002_021e286c(int a);
+extern int func_ov002_021e286c(int a);
 extern void func_ov002_0226b054(int a);
 
 int func_ov002_02216fb8(struct Hdr *arg)

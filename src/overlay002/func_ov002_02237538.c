@@ -23,7 +23,7 @@ extern int func_ov002_02218068(Obj *o);
 extern int func_ov002_021b9ecc(int a, int b);
 extern int func_0202eac8(int a);
 extern int func_ov002_021b90a8(int a, int b);
-extern void func_ov002_021d5a08(Obj *o, int a, int b, int c, int d, int e);
+extern int func_ov002_021d5a08(Obj *o, int a, int b, int c, int d, int e);
 
 int func_ov002_02237538(Obj *o)
 {

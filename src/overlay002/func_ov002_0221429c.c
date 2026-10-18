@@ -17,7 +17,7 @@ struct Slot0221429c {
 };
 
 extern int func_ov002_021c8470(int player, int idx);
-extern void func_ov002_021de408(void *self, int mask);
+extern int func_ov002_021de408(void *self, int mask);
 extern void func_ov002_021df818(void *self, int player, int n);
 extern void func_ov002_021e2d94(int player, int idx, int a, int b);
 

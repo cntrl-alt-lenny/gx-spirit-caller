@@ -19,7 +19,7 @@ struct G178 {
 extern struct G288 data_ov002_022ce288;
 extern struct G178 data_ov002_022cf178[];
 
-extern void func_ov002_021de8fc(struct S7f08 *self, unsigned int mask, int c);
+extern int func_ov002_021de8fc(struct S7f08 *self, unsigned int mask, int c);
 extern void func_ov002_021d7c88(int side, int b);
 
 int func_ov002_021f7f08(struct S7f08 *self) {

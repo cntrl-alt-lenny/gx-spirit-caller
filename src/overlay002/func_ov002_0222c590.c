@@ -14,7 +14,7 @@ struct S {
 extern int func_ov002_021b9ecc(int a, int b);
 extern int func_0202df78(int a, int b);
 extern int func_ov002_021c1e44(void *self, int a, int b);
-extern void func_ov002_021d59cc(int a, int b, int c, int d, int e);
+extern int func_ov002_021d59cc(int a, int b, int c, int d, int e);
 extern void func_ov002_021e276c(int a, int b, int c, int d);
 extern int func_ov002_0220e75c(void *self, int a);
 

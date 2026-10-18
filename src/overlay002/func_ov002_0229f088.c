@@ -1,7 +1,7 @@
 extern char data_ov002_022cbb58[];
 extern struct { char *name; int pad; } data_ov002_022ca3d8[];
 extern int func_02006c0c(void *, int, int);
-extern void func_0201d47c(void *);
+extern int func_0201d47c(void *);
 extern void func_0201e5b8(void *);
 extern void Task_Invoke(int);
 extern void OS_SPrintf(char *, const char *, ...);

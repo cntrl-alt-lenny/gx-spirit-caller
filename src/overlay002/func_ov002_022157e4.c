@@ -1,7 +1,7 @@
 extern char data_ov002_022ce288[];
 extern char data_ov002_022d0e6c[];
 extern int func_ov002_0225764c(int arg0, int j, int i);
-extern void func_ov002_021d5a08(int arg0, int j, int i, int f0, int two, int a);
+extern int func_ov002_021d5a08(int arg0, int j, int i, int f0, int two, int a);
 extern void func_ov002_0226b258(int a, int b);
 
 struct Obj {

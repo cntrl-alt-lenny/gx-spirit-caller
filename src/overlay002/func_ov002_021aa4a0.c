@@ -21,7 +21,7 @@ struct Side {
 extern struct Side data_ov002_022cf1a6[];
 extern struct NodeEntry data_ov002_022d0650[];
 extern int func_ov002_021baca8(int a, int b, int c);
-extern void func_ov002_021de480(int a, int b, int c, int d);
+extern int func_ov002_021de480(int a, int b, int c, int d);
 
 void func_ov002_021aa4a0(unsigned player, int idx, int arg2, int flag) {
     unsigned cur;

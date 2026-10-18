@@ -16,7 +16,7 @@ typedef struct {
 
 extern Obj *func_ov002_022a6324(void *self, int a, int b, int c);
 extern void func_ov002_022a60f4(void *self, int a, int b, int c);
-extern void func_02037208(int a, int b, int c, int d);
+extern int func_02037208(int a, int b, int c, int d);
 
 void func_ov002_022a6480(void *self, Bits *p) {
     Obj *o = func_ov002_022a6324(self, p->a, p->b, p->c);

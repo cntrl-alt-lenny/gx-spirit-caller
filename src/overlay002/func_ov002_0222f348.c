@@ -27,7 +27,7 @@ extern char data_ov002_022cf16c[];
 extern int data_ov002_022cf178[];
 
 extern void func_ov002_021d71e0(int a, int b, int c);
-extern void func_ov002_021e286c(int a);
+extern int func_ov002_021e286c(int a);
 extern void func_ov002_021e104c(int a, int b);
 
 int func_ov002_0222f348(struct F222f348_Self *self) {

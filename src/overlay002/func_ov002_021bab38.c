@@ -9,7 +9,7 @@ extern void func_ov002_021ba1a0(int a0, struct Rec *p);
 extern void func_ov002_021ba1e8(int a0, struct Rec *p);
 extern void func_ov002_021c2a40(struct Rec *p);
 extern void func_ov002_021c2abc(struct Rec *p, int v);
-extern void func_ov002_021c3754(int a0, struct Rec *p);
+extern int func_ov002_021c3754(int a0, struct Rec *p);
 
 void func_ov002_021bab38(int arg0, int kind, int v, struct Rec *p) {
     switch (kind) {

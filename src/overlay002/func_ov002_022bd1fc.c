@@ -1,4 +1,4 @@
-extern void func_02037208(int a, int b, int c, int d);
+extern int func_02037208(int a, int b, int c, int d);
 
 int func_ov002_022bd1fc(char *self) {
     int state = *(int *)(self + 0xc60);

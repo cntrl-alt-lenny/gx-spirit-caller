@@ -6,7 +6,7 @@ extern char data_ov002_022cf1a4[];
 
 extern int func_ov002_0223df38(u16 *p, int a, int b);
 extern int func_ov002_0223de94(u16 *p, int a);
-extern void func_ov002_021d5a08(u16 *p, int a, int b, int c, int d, int e);
+extern int func_ov002_021d5a08(u16 *p, int a, int b, int c, int d, int e);
 
 int func_ov002_0223b228(u16 *p) {
     unsigned int flags = data_ov002_022d016c[0xd0 / 4];

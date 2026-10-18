@@ -1,7 +1,7 @@
 #include "ov002_core.h"
 extern int func_ov002_0223df38(void *self, int flag, int *out);
 extern int func_ov002_021bb068(int cmd);
-extern void func_ov002_021d63fc(void *self, int a, int b, int c);
+extern int func_ov002_021d63fc(void *self, int a, int b, int c);
 
 struct Self022177d4_F4 {
     unsigned short _pad0_1 : 2;

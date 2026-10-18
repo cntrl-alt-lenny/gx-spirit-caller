@@ -9,7 +9,7 @@ struct A {
 extern struct A data_ov002_022ce950;
 extern void func_ov002_0229ade0(int a, int b, int c, int d);
 extern int func_ov002_0229c7f8(int a);
-extern void func_ov002_021b0bdc(int a, int b);
+extern int func_ov002_021b0bdc(int a, int b);
 
 void func_ov002_021d1618(void) {
     int flag = (data_ov002_022ce950.f0 & 0x8000) ? 1 : 0;

@@ -17,7 +17,7 @@ struct Row {
 extern char data_ov002_022cf16c[];
 extern void func_ov002_0220e77c(void);
 extern int func_ov002_021c8470(int player, int i);
-extern void func_ov002_021d90c0(int a, int b, int c);
+extern int func_ov002_021d90c0(int a, int b, int c);
 
 int func_ov002_0221e494(struct St *st)
 {

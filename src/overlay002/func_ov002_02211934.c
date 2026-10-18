@@ -12,7 +12,7 @@ typedef struct {
 
 extern Data data_ov002_022ce288;
 extern void func_ov002_021d479c(u16 a, int b, int c, int d);
-extern void func_ov002_021e286c(int a);
+extern int func_ov002_021e286c(int a);
 
 int func_ov002_02211934(Obj *self) {
     switch (data_ov002_022ce288.state) {

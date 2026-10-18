@@ -14,7 +14,7 @@ extern struct Slot data_ov002_022cf16c[];
 extern struct Slot data_ov002_022cf178[];
 extern void func_ov002_0226af78(int a, int b);
 extern void func_ov002_021d71e0(int a, int b, int c);
-extern void func_ov002_021e286c(int a);
+extern int func_ov002_021e286c(int a);
 
 int func_ov002_0222d230(struct Self0222d230 *self) {
     int v = *(int *)(data_ov002_022ce288 + 0x5a8);

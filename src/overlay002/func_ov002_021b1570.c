@@ -1,4 +1,4 @@
-extern void func_ov002_0229cd70(void *dst, void *src, int n);
+extern int func_ov002_0229cd70(void *dst, void *src, int n);
 extern void func_ov002_0229cd1c(void *buf, int len);
 extern void func_ov002_021b1488(int a, int b);
 

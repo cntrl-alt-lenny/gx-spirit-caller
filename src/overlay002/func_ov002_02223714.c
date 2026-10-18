@@ -19,7 +19,7 @@ extern struct ce288 data_ov002_022ce288;
 extern struct d0e6c data_ov002_022d0e6c;
 extern int func_ov002_02257b48(struct F_Self *self, int a);
 extern void func_ov002_0226b034(int a, int b, int c);
-extern void func_ov002_021de910(struct F_Self *self, int a, int b);
+extern int func_ov002_021de910(struct F_Self *self, int a, int b);
 
 int func_ov002_02223714(struct F_Self *self, int unused) {
     unsigned short v;
