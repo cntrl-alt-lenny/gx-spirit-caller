@@ -100,7 +100,7 @@ src/overlay020/func_ov020_021ab418.c:
     complete
     .text start:0x021ab418 end:0x021ab43c
 
-src/overlay020/func_ov020_021ab43c.s:
+src/overlay020/func_ov020_021ab43c.c:
     complete
     .text start:0x021ab43c end:0x021ab4a0
 
