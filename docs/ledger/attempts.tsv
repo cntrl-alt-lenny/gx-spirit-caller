@@ -4054,3 +4054,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021bab38	ov002	256	default	factory	shipped	100	n/a		factory-1017-L1	
 0x021c2d34	ov002	256	default	factory	parked	9.4	register-numbering-permutation-cascade	P-30	factory-1017-L1	
 0x021c2d34	ov002	256	legacy	factory	parked	3	register-numbering-permutation-cascade	P-30	factory-1017-L1	
+0x021ea1b4	ov002	256	default	factory	parked	42.2	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
+0x021ea1b4	ov002	256	legacy	factory	parked	26.9	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
+0x021ea1b4	ov002	256	legacy_sp3	factory	parked	39.1	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L1	
