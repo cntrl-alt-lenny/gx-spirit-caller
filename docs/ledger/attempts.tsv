@@ -5009,3 +5009,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d9ef0	ov004	212	default	factory	parked	45.3	frame-shape	PROVISIONAL:frame/epilogue	factory-1018-U1	
 0x021d9ef0	ov004	212	legacy	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1018-U1	
 0x021d9ef0	ov004	212	legacy_sp3	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1018-U1	
+0x021c9fcc	ov004	216	default	factory	shipped	100	n/a		factory-1018-U1	
+0x021c9fcc	ov004	216	legacy_sp3	factory	parked	25	unknown	UNCLASSIFIED:unknown	factory-1018-U1	

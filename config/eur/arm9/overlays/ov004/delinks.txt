@@ -33,7 +33,7 @@ src/overlay004/func_ov004_021c9f94.c:
     complete
     .text start:0x021c9f94 end:0x021c9fcc
 
-src/overlay004/func_ov004_021c9fcc.s:
+src/overlay004/func_ov004_021c9fcc.c:
     complete
     .text start:0x021c9fcc end:0x021ca0a4
 
