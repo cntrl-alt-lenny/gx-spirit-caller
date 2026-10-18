@@ -3982,3 +3982,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02280b74	ov002	204	legacy	factory	parked	5.3	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L4	
 0x02280b74	ov002	204	legacy_sp3	factory	parked	5.4	reg-alloc	PROVISIONAL:register-allocation	factory-1017-L4	
 0x0228ae94	ov002	204	default	factory	shipped	100	n/a		factory-1017-L4	
+0x02292998	ov002	204	default	factory	shipped	100	n/a		factory-1017-L4	
