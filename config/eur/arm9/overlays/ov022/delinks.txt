@@ -12,7 +12,7 @@ src/overlay022/func_ov022_021aa540.c:
     complete
     .text start:0x021aa540 end:0x021aa680
 
-src/overlay022/func_ov022_021aa680.s:
+src/overlay022/func_ov022_021aa680.c:
     complete
     .text start:0x021aa680 end:0x021aa6e0
 
