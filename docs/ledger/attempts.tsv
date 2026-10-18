@@ -5110,3 +5110,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204706c	main	272	default	factory	parked	29.4	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x020618a8	main	272	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
 0x020651a8	main	272	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
+0x02098b60	main	272	legacy	factory	shipped	100	n/a		factory-1018-S3	
