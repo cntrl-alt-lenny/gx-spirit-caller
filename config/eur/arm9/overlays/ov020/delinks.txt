@@ -88,7 +88,7 @@ src/overlay020/func_ov020_021ab1dc.s:
     complete
     .text start:0x021ab1dc end:0x021ab364
 
-src/overlay020/func_ov020_021ab364.s:
+src/overlay020/func_ov020_021ab364.c:
     complete
     .text start:0x021ab364 end:0x021ab3c8
 
