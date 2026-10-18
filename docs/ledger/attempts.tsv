@@ -5084,3 +5084,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206be1c	main	12	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1018-S3	
 0x0206be1c	main	12	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1018-S3	
 0x0206be1c	main	12	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1018-S3	
+0x0202f2e4	main	260	default	factory	shipped	100	n/a		factory-1018-S3	
