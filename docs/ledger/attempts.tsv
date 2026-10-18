@@ -4964,3 +4964,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021ab4bc	ov000	48	default	factory	shipped	100	n/a		factory-1018-C1	
 0x021ab4bc	ov000	48	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1018-C1	
 0x021ab4bc	ov000	48	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1018-C1	
+0x021ab4ec	ov000	52	default	factory	shipped	100	n/a		factory-1018-C1	
