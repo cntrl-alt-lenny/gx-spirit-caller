@@ -370,7 +370,7 @@ src/overlay002/func_ov002_021b1e80.s:
     complete
     .text start:0x021b1e80 end:0x021b1f20
 
-src/overlay002/func_ov002_021b1f20.s:
+src/overlay002/func_ov002_021b1f20.c:
     complete
     .text start:0x021b1f20 end:0x021b1fe8
 src/overlay002/func_ov002_021b1fe8.c:
