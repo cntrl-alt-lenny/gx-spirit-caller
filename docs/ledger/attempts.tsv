@@ -4978,3 +4978,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d1308	ov004	88	default	factory	parked	54.5	register-numbering-permutation-cascade	P-30	factory-1018-U1	
 0x021d1308	ov004	88	legacy	factory	parked	16	register-numbering-permutation-cascade	P-30	factory-1018-U1	
 0x021d1308	ov004	88	legacy_sp3	factory	parked	16.7	register-numbering-permutation-cascade	P-30	factory-1018-U1	
+0x021dc1cc	ov004	108	default	factory	parked	1.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-U1	
+0x021dc1cc	ov004	108	legacy	factory	parked	1.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-U1	
+0x021dc1cc	ov004	108	legacy_sp3	factory	parked	1.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-U1	
