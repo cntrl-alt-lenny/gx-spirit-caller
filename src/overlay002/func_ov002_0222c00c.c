@@ -26,7 +26,7 @@ extern int data_ov002_022ce288[];
 extern char data_ov002_022d0e6c[];
 
 extern int func_ov002_021d59cc(int a, int b, int c, int d, int e);
-extern void func_ov002_0226b258();
+extern int func_ov002_0226b258();
 
 int func_ov002_0222c00c(struct Arg *arg)
 {

@@ -22,7 +22,7 @@ typedef struct {
 
 extern GlobA data_ov002_022ce288;
 extern GlobB data_ov002_022d0e6c;
-extern void func_ov002_0226b258();
+extern int func_ov002_0226b258();
 extern int func_ov002_02257704(Obj *self);
 extern int func_ov002_021de408(Obj *self, int v);
 

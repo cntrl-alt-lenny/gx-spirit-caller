@@ -28,7 +28,7 @@ extern int data_ov002_022cf178[];
 
 extern void func_ov002_021d71e0(int a, int b, int c);
 extern int func_ov002_021e286c(int a);
-extern void func_ov002_021e104c();
+extern int func_ov002_021e104c();
 
 int func_ov002_0222f348(struct F222f348_Self *self) {
     int p = 1 - self->f2.bit0;

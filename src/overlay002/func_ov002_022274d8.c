@@ -22,7 +22,7 @@ extern State data_ov002_022ce288;
 extern Data data_ov002_022d0e6c;
 extern s32 func_ov002_021bbf50(s32 a);
 extern int func_ov002_021de4b0(Unit *u, s32 a, s32 b);
-extern void func_ov002_021e96a0();
+extern int func_ov002_021e96a0();
 extern s32 func_ov002_02257878();
 extern void func_ov002_0226b034(s32 a, s32 b, s32 c);
 

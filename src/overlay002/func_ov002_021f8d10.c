@@ -12,7 +12,7 @@ extern struct { char pad[0xd70]; int a; int pad2; int b; } data_ov002_022d016c;
 
 extern int func_ov002_021ae400(int a, int b);
 extern void func_ov002_021d7c40(int a, int b);
-extern void func_ov002_022107b4();
+extern int func_ov002_022107b4();
 extern void func_ov002_022592ec(void *fn);
 extern int func_ov002_022593f4(void);
 extern void func_ov002_02290500(int a, int b, void *fn);

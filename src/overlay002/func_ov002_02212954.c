@@ -22,7 +22,7 @@ extern struct Row data_ov002_022cf178[];
 extern s32 data_ov002_022d016c[];
 extern int func_ov002_021ae484(s32 a);
 extern void func_ov002_021d71e0(s32 a, s32 b, s32 c);
-extern void func_ov002_0221292c();
+extern int func_ov002_0221292c();
 extern void func_ov002_022592ec(void *fn);
 extern s32 func_ov002_022593f4(void);
 

@@ -1,5 +1,5 @@
 extern int func_ov002_0229cd70(void *dst, void *src, int n);
-extern void func_ov002_0229cd1c();
+extern int func_ov002_0229cd1c();
 extern void func_ov002_021b1488(int a, int b);
 
 void func_ov002_021b1570(int a, int b, void *c, int n) {

@@ -1,4 +1,4 @@
-extern void func_ov002_0229cd5c();
+extern int func_ov002_0229cd5c();
 
 typedef struct A {
     int pad0[2];
