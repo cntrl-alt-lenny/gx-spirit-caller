@@ -1,7 +1,7 @@
 typedef unsigned short u16;
 typedef unsigned int u32;
 extern char data_ov002_022cf17c[];
-extern int func_ov002_021ca2b8(int a);
+extern int func_ov002_021ca2b8();
 extern int func_ov002_0223f6c4(void *p);
 extern int func_ov002_022536e8(int a, int b, int c);
 

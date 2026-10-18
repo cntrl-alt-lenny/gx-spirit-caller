@@ -24,7 +24,7 @@ extern struct Slot0223aa68 data_ov002_022ce588[];
 extern int IsValue12D3Or147E(int a0);
 extern void func_ov002_021d8904(int player, int idx, int value);
 extern int func_ov002_021de598(int arg0, int arg1, int arg2);
-extern void func_ov002_0226b13c(int a, int b);
+extern void func_ov002_0226b13c();
 
 int func_ov002_0223aa68(struct Self0223aa68 *self) {
     int i = CE288->f_484 - 1;

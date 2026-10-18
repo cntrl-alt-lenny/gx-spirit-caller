@@ -9,7 +9,7 @@ typedef struct {
 } Bits;
 
 extern int func_ov002_021c1e44(void *a0, int a1, int a2);
-extern int func_ov002_021c84e0(int a0, int a1);
+extern int func_ov002_021c84e0();
 extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf1a4[];
 

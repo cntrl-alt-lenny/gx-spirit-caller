@@ -12,7 +12,7 @@ struct Side {
 
 extern struct Side data_ov002_022cf16c[];
 extern char data_ov002_022cf178[];
-extern int func_ov002_021ca2b8(int a);
+extern int func_ov002_021ca2b8();
 extern int func_ov002_021bd030(int a);
 extern int func_0202e234(int a);
 extern int func_0202e6f4(int a);

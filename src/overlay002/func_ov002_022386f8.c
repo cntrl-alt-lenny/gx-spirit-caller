@@ -11,7 +11,7 @@ typedef struct Obj {
 } Obj;
 
 extern char data_ov002_022cf16c[];
-extern int func_ov002_021ff3bc(Obj *obj);
+extern int func_ov002_021ff3bc();
 extern int func_ov002_021b9aa8(u32 bit, u32 w);
 extern int func_ov002_0227adb8(u32 bit, void *p, int one, u32 w);
 

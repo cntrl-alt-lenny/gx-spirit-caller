@@ -7,7 +7,7 @@ typedef struct {
     unsigned short pad15 : 1;
 } S02206380;
 
-extern int func_ov002_021ca2b8(int);
+extern int func_ov002_021ca2b8();
 extern int func_ov002_021b9e00(int, int);
 extern int func_ov002_021f4194(S02206380 *);
 extern int func_ov002_021bc8c8(int, int, int);

@@ -28,7 +28,7 @@ struct Ov002Ce288 {
 extern struct Ov002Ce288 data_ov002_022ce288;
 extern void func_ov002_021d8904(int a, int b, int c);
 extern int func_ov002_021de598(int a, int b, int c);
-extern int func_ov002_021e104c(int a, int b);
+extern int func_ov002_021e104c();
 
 int func_ov002_0222cee4(struct Ov002Ent *self, struct Ov002Ent *ent) {
     int mode = data_ov002_022ce288.mode;

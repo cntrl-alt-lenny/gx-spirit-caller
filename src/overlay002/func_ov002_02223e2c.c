@@ -15,7 +15,7 @@ extern struct { char pad0[0x5a8]; int state; u32 count; } data_ov002_022ce288;
 extern struct { char pad0[0xcec]; u32 side; } data_ov002_022d016c;
 extern struct { char pad0[0xb0]; u16 val; } data_ov002_022d0e6c;
 
-extern void func_ov002_0226b258(u32 a, int b);
+extern void func_ov002_0226b258();
 extern void func_ov002_021df818(Param *p, int a, int b);
 
 int func_ov002_02223e2c(Param *p)

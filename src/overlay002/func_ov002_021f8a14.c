@@ -16,7 +16,7 @@ struct Slot8a14 {
 extern char data_ov002_022cf16c[];
 extern int func_0202b878(int x);
 extern int func_ov002_021c23ac(int a, int b);
-extern int func_ov002_021c8940(int a, int b);
+extern int func_ov002_021c8940();
 extern int func_ov002_021ca5bc(int x);
 
 int func_ov002_021f8a14(u32 a, int b, int c) {

@@ -6,8 +6,8 @@ struct S02206bf8 {
 
 extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf178[];
-extern int func_ov002_021bbc58(int a, int b);
-extern int func_ov002_021ca2b8(int a);
+extern int func_ov002_021bbc58();
+extern int func_ov002_021ca2b8();
 extern int func_ov002_022536e8(int a, int b, int c);
 
 int func_ov002_02206bf8(struct S02206bf8 *self) {

@@ -1,8 +1,8 @@
 extern char data_ov002_022cf1ac[];
 extern char data_ov002_022cf1a4[];
 extern int func_ov002_021b9ecc(int self, int arg1);
-extern int func_02031764(void);
-extern int func_ov002_021bbd04(int self, int arg1);
+extern int func_02031764();
+extern int func_ov002_021bbd04();
 
 int func_ov002_021c1954(int self, int arg1) {
     int off = (self & 1) * 0x868;

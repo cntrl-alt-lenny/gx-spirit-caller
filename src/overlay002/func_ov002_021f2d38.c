@@ -2,7 +2,7 @@ typedef unsigned short u16;
 typedef unsigned int u32;
 
 extern int func_ov002_021c23ac(int a, int b);
-extern int func_ov002_021c84e0(int a, int b);
+extern int func_ov002_021c84e0();
 extern char data_ov002_022cf16c[];
 
 struct Card2d38 {

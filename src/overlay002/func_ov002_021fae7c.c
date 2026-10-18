@@ -18,8 +18,8 @@ extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf178[];
 
 extern void func_ov002_021d7c1c(unsigned int a, void *b, void *c);
-extern void func_ov002_021e2b3c(void);
-extern void func_ov002_021e2c5c(void);
+extern void func_ov002_021e2b3c();
+extern void func_ov002_021e2c5c();
 
 int func_ov002_021fae7c(struct F021fae7c_Self *self) {
     unsigned int idx;

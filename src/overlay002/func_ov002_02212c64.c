@@ -6,7 +6,7 @@ typedef struct {
 } Obj;
 
 extern int func_ov002_021c2f24(int a, int b);
-extern int func_ov002_021e13f4(int a, int b, int c);
+extern int func_ov002_021e13f4();
 
 int func_ov002_02212c64(Obj *self) {
     int r = 1;

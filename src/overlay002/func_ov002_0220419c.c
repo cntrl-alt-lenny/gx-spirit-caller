@@ -19,7 +19,7 @@ typedef struct {
 
 extern char data_ov002_022cf1a8[];
 extern Pair data_ov002_022cd3f4;
-extern int func_ov002_021c8940(int a, int b);
+extern int func_ov002_021c8940();
 
 int func_ov002_0220419c(Obj *self) {
     int val = *(int *)(data_ov002_022cf1a8 + (self->bit0 & 1) * 0x868 + self->idx * 0x14);

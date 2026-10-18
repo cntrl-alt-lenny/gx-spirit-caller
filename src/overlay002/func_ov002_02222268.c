@@ -4,7 +4,7 @@ struct ce288 {
     int f5ac;
 };
 extern struct ce288 data_ov002_022ce288;
-extern int func_ov002_021e104c(int a, int b);
+extern int func_ov002_021e104c();
 
 int func_ov002_02222268(int *p) {
     switch (data_ov002_022ce288.f5a8) {

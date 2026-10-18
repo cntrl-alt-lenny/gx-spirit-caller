@@ -19,8 +19,8 @@ struct G {
 };
 extern struct G data_ov002_022ce288;
 extern struct Side data_ov002_022cf16c[];
-extern void func_ov002_021e2b3c(void);
-extern void func_ov002_021e2c5c(void);
+extern void func_ov002_021e2b3c();
+extern void func_ov002_021e2c5c();
 extern int func_ov002_0223def4(struct Card *c, int n);
 extern int func_ov002_021b99b4(int side, int v);
 extern void func_ov002_021d7d0c(struct Card *c, int side, int *p);

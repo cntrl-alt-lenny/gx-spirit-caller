@@ -1,5 +1,5 @@
 extern int func_ov002_021b41a4(int a, int b, int c);
-extern void func_ov002_021d5c50(int a, int b, int c, int d);
+extern int func_ov002_021d5c50(int a, int b, int c, int d);
 extern int func_ov002_021e30b4(unsigned int a, int b, int c);
 
 int func_ov002_02266a50(int a)

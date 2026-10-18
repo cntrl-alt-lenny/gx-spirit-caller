@@ -1,4 +1,4 @@
-extern int func_0202e2f8(void);
+extern int func_0202e2f8();
 extern void func_ov002_021b91c4(void *dst, void *src);
 extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf180[];

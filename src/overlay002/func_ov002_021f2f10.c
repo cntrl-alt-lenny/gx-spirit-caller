@@ -8,9 +8,9 @@ extern char data_ov002_022cf1a4[];
 extern int func_ov002_021c1e44(void *self, int player, int idx);
 extern int func_ov002_021b9e00(int player, int idx);
 extern int func_ov002_021b9e48(int player, int idx);
-extern int func_ov002_021b9e90(int player, int idx);
-extern int func_ov002_021b9ea4(int player, int idx);
-extern int func_ov002_021b9eb8(int player, int idx);
+extern int func_ov002_021b9e90();
+extern int func_ov002_021b9ea4();
+extern int func_ov002_021b9eb8();
 
 int func_ov002_021f2f10(void *self, int player, int idx) {
     int off;

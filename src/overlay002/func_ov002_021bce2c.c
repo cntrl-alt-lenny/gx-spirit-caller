@@ -3,7 +3,7 @@
 extern char data_ov002_022cf16c[];
 extern int func_ov002_021bb068(int code);
 extern int func_ov002_021bc8c8(int arg0, int arg1, int arg2);
-extern int func_ov002_021c8940(int arg0, int arg1);
+extern int func_ov002_021c8940();
 
 int func_ov002_021bce2c(int self, int key) {
     int player;

@@ -13,7 +13,7 @@ typedef struct {
 extern Grp data_ov002_022cf1a8[];
 
 extern int func_ov002_021b9ecc(void);
-extern int func_020312a0(void);
+extern int func_020312a0();
 extern void func_ov002_021d479c(u16 a, u16 b, u16 c, int d);
 
 void func_ov002_021d93e0(int a, int b, int c)

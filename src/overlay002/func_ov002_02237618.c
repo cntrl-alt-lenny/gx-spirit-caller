@@ -7,9 +7,9 @@ extern struct ent2 data_ov002_022cf16c[];
 extern int func_0202e234(int a);
 extern int func_ov002_021ca5bc(int a);
 extern void func_ov002_021df818(struct arg *p, int b, int c);
-extern void func_ov002_021e13f4(int a, int b, int c);
-extern void func_ov002_021e2b3c(void);
-extern void func_ov002_021e2c5c(void);
+extern void func_ov002_021e13f4();
+extern void func_ov002_021e2b3c();
+extern void func_ov002_021e2c5c();
 
 int func_ov002_02237618(struct arg *p) {
     int i;

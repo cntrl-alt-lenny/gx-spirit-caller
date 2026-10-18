@@ -10,8 +10,8 @@ extern struct ent2 data_ov002_022cf16c[];
 
 extern unsigned func_ov002_021b00d0(int a);
 extern void func_ov002_021e16a4(int a, int b, int c, int d);
-extern void func_ov002_021e2b3c(void);
-extern void func_ov002_021e2c5c(void);
+extern void func_ov002_021e2b3c();
+extern void func_ov002_021e2c5c();
 
 int func_ov002_02236728(struct arg *p) {
     unsigned r;

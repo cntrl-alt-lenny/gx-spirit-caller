@@ -22,7 +22,7 @@ extern struct G288 data_ov002_022ce288;
 extern int data_ov002_022cd744[];
 extern struct G16c data_ov002_022d016c;
 
-extern int func_ov002_021ff500(void);
+extern int func_ov002_021ff500();
 extern int func_ov002_021ae484(int a);
 extern int func_ov002_0223fa20(struct S022438e0 *self, int b);
 

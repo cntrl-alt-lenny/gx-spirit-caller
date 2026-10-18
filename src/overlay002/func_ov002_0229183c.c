@@ -15,7 +15,7 @@ struct Slot183c {
 };
 
 extern char data_ov002_022cf16c[];
-extern int func_ov002_021ca2b8(int player);
+extern int func_ov002_021ca2b8();
 extern int func_ov002_022575c8(struct Obj183c *obj, int player, int idx);
 extern int func_0203058c(int id);
 

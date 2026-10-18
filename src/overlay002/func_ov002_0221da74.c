@@ -5,7 +5,7 @@ extern char data_ov002_022cf16c[];
 extern int func_ov002_021b947c(int idx);
 extern int func_ov002_021bc618(int a);
 extern int func_ov002_021c33e4(int a, int b, int c);
-extern int func_ov002_021ca2b8(int a);
+extern int func_ov002_021ca2b8();
 extern int func_ov002_0227adb8(int a, int b, int c, int d);
 
 typedef struct {

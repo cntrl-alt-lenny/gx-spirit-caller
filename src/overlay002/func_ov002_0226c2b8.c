@@ -5,7 +5,7 @@ extern char data_ov002_022d016c[];
 extern char data_ov002_022d0e6c[];
 extern char data_ov002_022d0f1c[];
 extern int func_ov002_021bc8c8(int a, int b, int c);
-extern int func_ov002_021c8940(int a, int b);
+extern int func_ov002_021c8940();
 
 int func_ov002_0226c2b8(int a, int b, int c) {
     int e = b + c;

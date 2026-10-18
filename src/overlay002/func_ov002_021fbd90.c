@@ -23,8 +23,8 @@ extern void func_ov002_021ae400(int, int);
 extern void func_ov002_021af9d0(int, int, int, int);
 extern int func_ov002_021b004c(int);
 extern void func_ov002_021d8128(int, int, int);
-extern void func_ov002_021e2b3c(void);
-extern void func_ov002_021e2c5c(void);
+extern void func_ov002_021e2b3c();
+extern void func_ov002_021e2c5c();
 
 int func_ov002_021fbd90(S021fbd90 *p) {
     unsigned int i;

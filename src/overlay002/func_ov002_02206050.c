@@ -5,7 +5,7 @@ struct Ov002_02206050Self {
     u16 _pad0 : 15;
 };
 
-extern int func_ov002_021bb90c(int bit0, int c);
+extern int func_ov002_021bb90c();
 extern char data_ov002_022cf178[];
 
 int func_ov002_02206050(void *arg0)

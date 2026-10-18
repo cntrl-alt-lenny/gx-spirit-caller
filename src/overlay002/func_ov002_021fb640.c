@@ -22,7 +22,7 @@ struct E640 {
 
 extern struct E640 data_ov002_022d0250[];
 
-extern int func_ov002_021ff3bc(struct S640 *self);
+extern int func_ov002_021ff3bc();
 extern unsigned int func_ov002_021b947c(unsigned int id);
 extern int func_0202e234(int x);
 extern int func_ov002_021c33e4(int a, int b, int c);

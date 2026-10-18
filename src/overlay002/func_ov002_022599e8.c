@@ -13,7 +13,7 @@ struct Slot {
     struct Ent ent[1];
 };
 
-extern int func_ov002_021ba310(int player);
+extern int func_ov002_021ba310();
 extern int func_ov002_0226f4dc(int player, int val);
 
 int func_ov002_022599e8(int player) {

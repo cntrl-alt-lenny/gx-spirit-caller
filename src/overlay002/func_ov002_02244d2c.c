@@ -15,7 +15,7 @@ extern char data_ov002_022d016c[];
 extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021d8770(int a, int b);
 extern void func_ov002_0223dad0(void *self, unsigned short v);
-extern void func_ov002_02244cd8(void);
+extern void func_ov002_02244cd8();
 extern void func_ov002_0225935c(int arg0, int arg1, int arg2);
 extern int func_ov002_022593f4(void);
 

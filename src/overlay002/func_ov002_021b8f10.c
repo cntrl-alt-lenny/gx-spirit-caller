@@ -9,7 +9,7 @@ typedef struct Obj {
 } Obj;
 
 extern u32 func_ov002_0223de94(Obj *o, int a);
-extern int func_ov002_021b8fcc(u32 a);
+extern int func_ov002_021b8fcc();
 
 int func_ov002_021b8f10(Obj *o) {
     u32 v = func_ov002_0223de94(o, 0);

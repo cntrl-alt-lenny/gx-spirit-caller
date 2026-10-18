@@ -13,7 +13,7 @@ typedef struct {
 
 extern ent_021ffb54_t data_ov002_022cf288[];
 extern int func_ov002_021ff2b8(obj_021ffb54_t *p, int idx);
-extern int func_ov002_021ca2b8(int a);
+extern int func_ov002_021ca2b8();
 extern int func_ov002_021ca3f0(int a, int b);
 
 int func_ov002_021ffb54(obj_021ffb54_t *p) {

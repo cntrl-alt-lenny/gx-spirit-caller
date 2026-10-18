@@ -15,7 +15,7 @@ struct G16c {
 extern struct G288 data_ov002_022ce288;
 extern struct G16c data_ov002_022d016c;
 extern int data_ov002_022cd744[];
-extern void func_ov002_021b1570(int a, int b, short *c);
+extern void func_ov002_021b1570();
 
 void func_ov002_021e2bd4(void) {
     short s;

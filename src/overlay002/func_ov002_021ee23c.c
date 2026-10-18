@@ -13,7 +13,7 @@ extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf1a4[];
 extern int func_ov002_021c1a2c(int player, int idx, int v);
 extern int func_ov002_021c1e44(struct Ov002Self *self, int player, int idx);
-extern int func_ov002_021c84e0(int player, int idx);
+extern int func_ov002_021c84e0();
 
 int func_ov002_021ee23c(struct Ov002Self *self, int player, int idx) {
     int off;
