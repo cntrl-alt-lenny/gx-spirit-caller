@@ -12320,7 +12320,7 @@ src/main/func_0206c110.legacy.c:
 src/main/func_0206c188.legacy.c:
     complete
     .text start:0x0206c188 end:0x0206c1b4
-src/main/func_0206c1b4.s:
+src/main/func_0206c1b4.legacy.c:
     complete
     .text start:0x0206c1b4 end:0x0206c2c0
 
