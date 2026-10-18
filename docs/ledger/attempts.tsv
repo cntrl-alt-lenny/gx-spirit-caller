@@ -4009,3 +4009,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0229407c	ov002	220	default	factory	shipped	100	n/a		factory-1017-L4	
 0x022989bc	ov002	220	default	factory	shipped	100	n/a		factory-1017-L4	
 0x022a8454	ov002	220	default	factory	shipped	100	n/a		factory-1017-L4	
+0x02262fd0	ov002	224	default	factory	parked	7.1	register-numbering-permutation-cascade	P-30	factory-1017-L4	
+0x02262fd0	ov002	224	legacy	factory	parked	3.1	register-numbering-permutation-cascade	P-30	factory-1017-L4	
+0x02262fd0	ov002	224	legacy_sp3	factory	parked	0	register-numbering-permutation-cascade	P-30	factory-1017-L4	
