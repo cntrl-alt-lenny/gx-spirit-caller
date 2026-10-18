@@ -5095,3 +5095,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203251c	main	264	default	factory	shipped	100	n/a		factory-1018-S3	
 0x0203251c	main	264	legacy_sp3	factory	parked	13.2	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x0203251c	main	264	legacy	factory	parked	2.8	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x0200a7a4	main	268	default	factory	parked	52.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x0200a7a4	main	268	legacy	factory	parked	6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x0200a7a4	main	268	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
