@@ -19509,7 +19509,7 @@ src/main/func_020a95a0.c:
     complete
     .text start:0x020a95a0 end:0x020a95e4
 
-src/main/func_020a95e4.s:
+src/main/func_020a95e4.c:
     complete
     .text start:0x020a95e4 end:0x020a96fc
 
