@@ -3,7 +3,7 @@ extern int func_ov002_021ca2b8(unsigned int a0);
 extern int func_ov002_021ca2c8(unsigned int a0, int a1);
 extern int func_ov002_021ca2d0(unsigned int a0, int a1);
 
-int func_ov002_02206780(void *arg0) {
+int func_ov002_02206780(void *arg0, int unused1) {
     int r4;
     int r5;
 

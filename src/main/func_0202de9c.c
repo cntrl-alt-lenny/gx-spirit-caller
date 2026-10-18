@@ -11,7 +11,7 @@
  * table. Proven recipe: func_ov013_021ca618 (switch returning constants). */
 extern int func_0202b8d8(void);
 
-int func_0202de9c(void) {
+int func_0202de9c(int unused0) {
     switch (func_0202b8d8()) {
     case 0:  return 0;
     case 1:  return 1;

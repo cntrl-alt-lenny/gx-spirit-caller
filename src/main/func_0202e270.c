@@ -1,6 +1,6 @@
 extern int func_0202b8d8(void);
 
-int func_0202e270(void)
+int func_0202e270(int unused0)
 {
     switch (func_0202b8d8()) {
     case 1:

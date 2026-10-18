@@ -11,7 +11,7 @@
 
 extern int func_ov002_021de134(int a, unsigned int mask, int k1);
 
-int func_ov002_021de64c(int a, int b, int c) {
+int func_ov002_021de64c(int a, int b, int c, int unused3) {
     int bit = c + (b << 4);
     unsigned int mask = 1u << bit;
     return (func_ov002_021de134(a, mask, 0xf) & mask) ? 1 : 0;

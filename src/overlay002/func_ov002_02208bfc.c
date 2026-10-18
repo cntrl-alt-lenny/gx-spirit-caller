@@ -18,7 +18,7 @@ extern int func_ov002_021ca2b8(int bit0);
 extern int func_ov002_0223f6c4(struct SA0 *self);
 extern int func_ov002_022536e8(int bit0, u16 val0, int c);
 
-int func_ov002_02208bfc(struct SA0 *a0) {
+int func_ov002_02208bfc(struct SA0 *a0, int unused1) {
     int r;
 
     if (func_ov002_021c23ac(a0->bit0, a0->field1_5) == 0) {

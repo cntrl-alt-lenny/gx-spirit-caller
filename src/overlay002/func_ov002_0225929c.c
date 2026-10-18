@@ -17,6 +17,6 @@ typedef struct {
 
 extern state_022d016c_t data_ov002_022d016c;
 
-int func_ov002_0225929c(void) {
+int func_ov002_0225929c(int unused0) {
     return data_ov002_022d016c.f_d4c ? data_ov002_022d016c.f_d48 : 0;
 }

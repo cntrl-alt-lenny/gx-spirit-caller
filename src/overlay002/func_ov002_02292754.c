@@ -23,7 +23,7 @@ extern struct Glob data_ov002_022d016c;
 extern struct Side data_ov002_022cf16c[];
 extern unsigned short data_ov002_022cf26c[];
 
-int func_ov002_02292754(struct Arg *arg)
+int func_ov002_02292754(struct Arg *arg, int unused1)
 {
     int off;
     int found;

@@ -9,7 +9,7 @@ typedef struct {
 extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf26c[];
 
-int func_ov002_022927d0(Self022927d0 *self) {
+int func_ov002_022927d0(Self022927d0 *self, int unused1) {
     int poff = (self->b0 & 1) * 0x868;
     RowF8 *row = (RowF8 *)(data_ov002_022cf16c + poff);
     int flag = 0;

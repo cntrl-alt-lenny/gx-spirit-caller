@@ -25,7 +25,7 @@ extern struct d016c data_ov002_022d016c;
 extern int data_ov002_022cd744[];
 extern int func_ov002_021b1570(int a, int b, unsigned short *c, int d);
 
-void func_ov002_021e2b3c(void) {
+void func_ov002_021e2b3c(int unused0) {
     unsigned short local;
     if (data_ov002_022ce288.f1496 != 0) return;
     if (data_ov002_022d016c.f3340 == 0 ||

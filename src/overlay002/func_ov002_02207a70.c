@@ -27,7 +27,7 @@ struct Obj {
     struct Word w;
 };
 
-int func_ov002_02207a70(struct Obj *obj) {
+int func_ov002_02207a70(struct Obj *obj, int unused1) {
     if (obj->hdr.kind == 0x16) {
         if (obj->w.type != 0xe) {
             return 0;

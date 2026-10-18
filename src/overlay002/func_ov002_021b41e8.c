@@ -14,7 +14,7 @@
 
 extern void *func_ov002_021b3c10(unsigned short key);
 
-int func_ov002_021b41e8(unsigned short *p) {
+int func_ov002_021b41e8(unsigned short *p, int unused1) {
     unsigned short *r = (unsigned short *)func_ov002_021b3c10(p[5]);
     if (r != 0) return r[2];
     return -1;

@@ -5,7 +5,7 @@
 extern int func_ov002_021bb068(int code);
 extern int func_ov002_021c9df0(unsigned int bit);
 
-int func_ov002_02204d78(struct Ov002Self *self) {
+int func_ov002_02204d78(struct Ov002Self *self, int unused1) {
     if (func_ov002_021bb068(0x135D) != 0)
         return 0;
     return func_ov002_021c9df0(self->b0) != 0;
