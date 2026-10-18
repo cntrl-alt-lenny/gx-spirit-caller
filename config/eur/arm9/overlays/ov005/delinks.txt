@@ -398,7 +398,7 @@ src/overlay005/func_ov005_021af2dc.s:
     complete
     .text start:0x021af2dc end:0x021af704
 
-src/overlay005/func_ov005_021af704.s:
+src/overlay005/func_ov005_021af704.c:
     complete
     .text start:0x021af704 end:0x021af750
 
