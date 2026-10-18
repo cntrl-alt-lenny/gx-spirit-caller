@@ -5101,3 +5101,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b59e4	ov006	72	default	factory	shipped	100	n/a		factory-1018-S4	
 0x021b59e4	ov006	72	legacy_sp3	factory	parked	66.7	unknown	UNCLASSIFIED:unknown	factory-1018-S4	
 0x021b59e4	ov006	72	legacy	factory	parked	9.5	unknown	UNCLASSIFIED:unknown	factory-1018-S4	
+0x021aaa3c	ov018	76	default	factory	shipped	100	n/a		factory-1018-S4	
+0x021aaa3c	ov018	76	legacy	factory	parked	31.6	unknown	UNCLASSIFIED:unknown	factory-1018-S4	
+0x021aaa3c	ov018	76	legacy_sp3	factory	parked	31.6	unknown	UNCLASSIFIED:unknown	factory-1018-S4	
