@@ -725,7 +725,7 @@ src/overlay000/ov000_021aed18.c:
     complete
     .text start:0x021aed18 end:0x021aed38
 
-src/overlay000/func_ov000_021aed38.s:
+src/overlay000/func_ov000_021aed38.c:
     complete
     .text start:0x021aed38 end:0x021aed8c
 
