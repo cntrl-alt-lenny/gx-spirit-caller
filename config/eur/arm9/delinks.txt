@@ -7845,7 +7845,7 @@ src/main/func_0203dc10.s:
     complete
     .text start:0x0203dc10 end:0x0203dc94
 
-src/main/func_0203dc94.s:
+src/main/func_0203dc94.legacy.c:
     complete
     .text start:0x0203dc94 end:0x0203ddc4
 
