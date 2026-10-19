@@ -17374,7 +17374,7 @@ src/main/func_02094a20.s:
     complete
     .text start:0x02094a20 end:0x02094b24
 
-src/main/func_02094b24.s:
+src/main/func_02094b24.legacy.c:
     complete
     .text start:0x02094b24 end:0x02094c70
 
