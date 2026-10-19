@@ -8053,7 +8053,7 @@ src/overlay002/func_ov002_02242570.c:
 src/overlay002/func_ov002_022425ac.c:
     complete
     .text start:0x022425ac end:0x022426a4
-src/overlay002/func_ov002_022426a4.s:
+src/overlay002/func_ov002_022426a4.c:
     complete
     .text start:0x022426a4 end:0x022427ec
 src/overlay002/func_ov002_022427ec.c:
