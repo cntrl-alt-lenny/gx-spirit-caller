@@ -5254,3 +5254,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206931c	main	312	default	factory	parked	1.3	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x0207b888	main	312	legacy	factory	shipped	100	n/a		factory-1018-S3	
 0x0206b0c4	main	308	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1018-S3	
+0x0207e238	main	312	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
+0x0207e238	main	312	default	factory	parked	16.2	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x0207e238	main	312	legacy	factory	parked	12.2	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
