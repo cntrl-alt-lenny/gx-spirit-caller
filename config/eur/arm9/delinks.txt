@@ -7409,7 +7409,7 @@ src/main/func_0203953c.c:
     complete
     .text start:0x0203953c end:0x02039690
 
-src/main/func_02039690.s:
+src/main/func_02039690.c:
     complete
     .text start:0x02039690 end:0x020397e0
 
