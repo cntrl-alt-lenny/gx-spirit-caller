@@ -8570,7 +8570,7 @@ src/main/func_020461fc.legacy_sp3.c:
     complete
     .text start:0x020461fc end:0x02046254
 
-src/main/func_02046254.s:
+src/main/func_02046254.legacy_sp3.c:
     complete
     .text start:0x02046254 end:0x020463dc
 
