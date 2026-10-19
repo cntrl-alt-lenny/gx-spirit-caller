@@ -5197,3 +5197,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0228c460	ov002	292	default	factory	parked	75.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S2	
 0x0228c460	ov002	292	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S2	
 0x0228c460	ov002	292	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S2	
+0x0224a3d0	ov002	296	default	factory	shipped	100	n/a		factory-1018-S2	
