@@ -18,7 +18,7 @@
  * shape).
  */
 
-asm void func_0209448c(void) {
+asm void func_0209448c(int unused0, int unused1, int unused2) {
     nofralloc
     mov     r3, #0x0
 loop_top:

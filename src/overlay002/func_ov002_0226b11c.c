@@ -6,7 +6,7 @@
 
 extern void func_ov002_0226acf8(void);
 
-asm void func_ov002_0226b11c(void) {
+asm void func_ov002_0226b11c(int unused0, int unused1) {
     nofralloc
     ldr ip, =func_ov002_0226acf8
     mov r1, r1, lsl #0x10

@@ -13,6 +13,6 @@
 extern int func_0206ed54(void);
 extern int func_02054ea8(int x, int y);
 
-int func_02054cf8(void) {
+int func_02054cf8(int unused0, int unused1, int unused2, int unused3) {
     return func_02054ea8(func_0206ed54(), -1);
 }

@@ -13,7 +13,7 @@ typedef struct {
     u16 f_2;
 } Self02210104;
 
-int func_ov002_02210104(Self02210104 *self) {
+int func_ov002_02210104(Self02210104 *self, int unused1) {
     int local[2];
     int side;
 

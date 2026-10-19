@@ -12,7 +12,7 @@
 extern int func_0203624c(int x);
 extern int func_020362b0(void);
 
-int func_02036298(int x) {
+int func_02036298(int x, int unused1) {
     if (x == 0) return x;
     func_0203624c(x);
     return func_020362b0();

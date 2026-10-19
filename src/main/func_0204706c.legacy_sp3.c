@@ -16,8 +16,8 @@ extern int func_020459c4(unsigned short *arr);
 extern void func_020466f4(int arg);
 extern void func_020480b4(int a, int b);
 extern void func_0205396c(void *a);
-extern void func_0209448c();
-extern void func_020944a4();
+extern asm void func_0209448c();
+extern asm void func_020944a4();
 
 int func_0204706c(unsigned short *text, int unused, int a, int b)
 {

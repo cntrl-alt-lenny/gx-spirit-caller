@@ -11,6 +11,6 @@
 
 extern int func_0207d494(int a, int b);
 
-int func_02038c84(int a, int b) {
+int func_02038c84(int a, int b, int unused2) {
     return func_0207d494(a, (b + 0x3f) & ~0x1f);
 }

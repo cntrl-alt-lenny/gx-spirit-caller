@@ -6,7 +6,7 @@
 
 extern char data_021a8334[];
 
-asm void func_02098c70(void) {
+asm void func_02098c70(int unused0, int unused1) {
     nofralloc
     sub sp, sp, #0x8
     ldr r2, =data_021a8334

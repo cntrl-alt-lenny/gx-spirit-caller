@@ -9,7 +9,7 @@
  * NitroSDK identity confirmed by verbatim match with other NDS decomps.
  */
 
-asm void OS_RestoreIrq(void) {
+asm void OS_RestoreIrq(int unused0) {
     nofralloc
     mrs     r1, cpsr
     bic     r2, r1, #0x80

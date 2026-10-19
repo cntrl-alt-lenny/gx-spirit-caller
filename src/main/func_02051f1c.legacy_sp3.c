@@ -2,7 +2,7 @@
  * SP3 tier (1.2/sp3). */
 extern void func_02046888(void);
 extern int func_02062518(void);
-int func_02051f1c(void){
+int func_02051f1c(int unused0){
     int r;
     func_02046888();
     r = func_02062518() - 519;

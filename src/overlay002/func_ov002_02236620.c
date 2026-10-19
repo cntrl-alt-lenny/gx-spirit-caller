@@ -6,7 +6,7 @@ extern char data_ov002_022cf178[];
 extern char data_ov002_022cf16c[];
 extern void func_ov002_021d7c1c(void *a, void *b, void *c);
 extern int func_ov002_021ca5bc(int arg0);
-extern void func_ov002_021df818(void *self, int side, int val);
+extern int func_ov002_021df818(void *self, int side, int val);
 int func_ov002_02236620(struct Arg *self) {
     unsigned int idx, off;
     struct Row *row;

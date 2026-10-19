@@ -7,7 +7,7 @@
  * timing-only loop it can prove has no effect.
  */
 
-asm void func_02093814(void) {
+asm void func_02093814(int unused0) {
     nofralloc
 loop_top:
     subs    r0, r0, #0x4

@@ -18,7 +18,7 @@ int func_ov006_021b7010(char *base, int kind, int target, int *out) {
     case 3: entry = (Entry *)(base + 0xe60); entry = (Entry *)((char *)entry + 0x7000); break;
     case 4: entry = (Entry *)(base + 0x60); entry = (Entry *)((char *)entry + 0x8000); break;
     }
-    count = *(unsigned short *)(base + kind * 2 + 0x8100 + 0x60);
+    count = *(unsigned short *)(base + kind * 2 + 0x8160);
     total = 0;
     for (i = 0; i < count; i++) {
         if (func_0202df78(target, entry->id)) {
