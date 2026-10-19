@@ -14331,7 +14331,7 @@ src/main/func_0207ec28.s:
     complete
     .text start:0x0207ec28 end:0x0207ec68
 
-src/main/func_0207ec68.s:
+src/main/func_0207ec68.legacy_sp3.c:
     complete
     .text start:0x0207ec68 end:0x0207ed94
 
