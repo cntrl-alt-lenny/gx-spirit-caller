@@ -6145,3 +6145,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0226e580	ov002	352	default	factory	shipped	100	n/a		factory-1019-N2	
 0x0227af30	ov002	352	default	factory	shipped	100	n/a		factory-1019-N2	
 0x0228c1d0	ov002	352	default	factory	shipped	100	n/a		factory-1019-N2	
+0x022938fc	ov002	352	default	factory	parked	73.9	register-numbering-permutation-cascade	P-30	factory-1019-N2	
+0x022938fc	ov002	352	legacy	factory	parked	8.7	register-numbering-permutation-cascade	P-30	factory-1019-N2	
+0x022938fc	ov002	352	legacy_sp3	factory	parked	49.4	register-numbering-permutation-cascade	P-30	factory-1019-N2	
