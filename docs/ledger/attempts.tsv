@@ -5196,3 +5196,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020459f0	main	300	default	factory	parked	17.3	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x020459f0	main	300	legacy	factory	parked	69.3	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x020459f0	main	300	legacy_sp3	factory	parked	74.7	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x02061d5c	main	300	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
+0x02061d5c	main	300	default	factory	parked	6.7	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
