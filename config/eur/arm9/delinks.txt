@@ -653,7 +653,7 @@ src/main/func_02003b18.s:
     complete
     .text start:0x02003b18 end:0x02003c68
 
-src/main/func_02003c68.s:
+src/main/func_02003c68.c:
     complete
     .text start:0x02003c68 end:0x02003d98
 

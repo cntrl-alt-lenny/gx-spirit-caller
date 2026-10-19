@@ -5207,3 +5207,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020973fc	main	300	default	factory	parked	9.3	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S3	
 0x020973fc	main	300	legacy	factory	parked	85.3	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S3	
 0x020973fc	main	300	legacy_sp3	factory	parked	80	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S3	
+0x02003c68	main	304	default	factory	shipped	100	n/a		factory-1018-S3	
