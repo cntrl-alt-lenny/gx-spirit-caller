@@ -60,7 +60,7 @@ src/overlay007/ov007_021b2598.c:
 
 
 
-src/overlay007/func_ov007_021b25a0.s:
+src/overlay007/func_ov007_021b25a0.c:
     complete
     .text start:0x021b25a0 end:0x021b2628
 
