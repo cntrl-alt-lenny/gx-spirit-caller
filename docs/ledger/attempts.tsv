@@ -6179,3 +6179,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205da48	main	348	legacy	factory	parked	14.6	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x02060dd4	main	348	legacy_sp3	factory	shipped	100	n/a		factory-1019-N4	
 0x02060dd4	main	348	default	factory	parked	11.4	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
+0x0206504c	main	348	legacy_sp3	factory	shipped	100	n/a		factory-1019-N4	
