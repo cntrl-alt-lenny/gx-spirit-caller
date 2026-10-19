@@ -13250,7 +13250,7 @@ src/main/func_0207576c.legacy.c:
     complete
     .text start:0x0207576c end:0x020757e0
 
-src/main/func_020757e0.s:
+src/main/func_020757e0.legacy.c:
     complete
     .text start:0x020757e0 end:0x02075928
 
