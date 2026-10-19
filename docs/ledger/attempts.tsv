@@ -5229,3 +5229,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022151c0	ov002	316	default	factory	shipped	100	n/a		factory-1018-S1	
 0x02216560	ov002	316	default	factory	shipped	100	n/a		factory-1018-S1	
 0x02221050	ov002	316	default	factory	shipped	100	n/a		factory-1018-S1	
+0x0222e5e4	ov002	316	default	factory	parked	96.2	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S1	
+0x0222e5e4	ov002	316	legacy	factory	parked	3.5	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S1	
+0x0222e5e4	ov002	316	legacy_sp3	factory	parked	67.1	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S1	
