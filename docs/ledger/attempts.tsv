@@ -5193,3 +5193,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6ba0	main	296	default	factory	shipped	100	n/a		factory-1018-S3	
 0x020a6ba0	main	296	legacy	factory	parked	40.8	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x020a6ba0	main	296	legacy_sp3	factory	parked	41.3	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x020459f0	main	300	default	factory	parked	17.3	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x020459f0	main	300	legacy	factory	parked	69.3	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x020459f0	main	300	legacy_sp3	factory	parked	74.7	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
