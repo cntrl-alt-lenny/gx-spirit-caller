@@ -561,7 +561,7 @@ src/overlay006/func_ov006_021b6f50.c:
     complete
     .text start:0x021b6f50 end:0x021b7010
 
-src/overlay006/func_ov006_021b7010.s:
+src/overlay006/func_ov006_021b7010.legacy_sp3.c:
     complete
     .text start:0x021b7010 end:0x021b70fc
 
