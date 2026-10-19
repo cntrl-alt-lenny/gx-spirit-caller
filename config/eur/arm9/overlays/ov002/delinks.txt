@@ -11240,7 +11240,7 @@ src/overlay002/func_ov002_0227d82c.c:
 src/overlay002/func_ov002_0227d850.c:
     complete
     .text start:0x0227d850 end:0x0227d8c4
-src/overlay002/func_ov002_0227d8c4.s:
+src/overlay002/func_ov002_0227d8c4.c:
     complete
     .text start:0x0227d8c4 end:0x0227da08
 src/overlay002/func_ov002_0227da08.c:
