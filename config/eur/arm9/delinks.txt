@@ -9961,7 +9961,7 @@ src/main/func_020548b4.s:
     complete
     .text start:0x020548b4 end:0x020548f4
 
-src/main/func_020548f4.s:
+src/main/func_020548f4.legacy_sp3.c:
     complete
     .text start:0x020548f4 end:0x02054a30
 src/main/func_02054a30.legacy_sp3.c:
