@@ -12017,7 +12017,7 @@ src/main/func_02069454.s:
     complete
     .text start:0x02069454 end:0x0206950c
 
-src/main/func_0206950c.s:
+src/main/func_0206950c.legacy.c:
     complete
     .text start:0x0206950c end:0x02069634
 
