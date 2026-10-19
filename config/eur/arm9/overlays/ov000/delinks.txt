@@ -106,7 +106,7 @@ src/overlay000/func_ov000_021aaec4.c:
     complete
     .text start:0x021aaec4 end:0x021aaee4
 
-src/overlay000/func_ov000_021aaee4.s:
+src/overlay000/func_ov000_021aaee4.c:
     complete
     .text start:0x021aaee4 end:0x021ab01c
 
