@@ -433,7 +433,6 @@ eur	src/main/func_0202a27c.c	wrong-target	.text+0x78 original ABS32 data_0219a93
 eur	src/main/func_0202be4c.s	wrong-target	.text+0xa8 original ABS32 data_020c6aa0+0x0 built ABS32 data_020c6a9c+0x4
 eur	src/main/func_020318b8.c	wrong-target	.text+0x70 original ABS32 data_0219adb8+0x0 built ABS32 data_0219adb8_alias+0x0
 eur	src/main/func_0203e0a0.s	wrong-target	.text+0xf4 original ABS32 data_020bec4c+0x0 built ABS32 data_020bec3c+0x10
-eur	src/main/func_0203e610.s	wrong-target	.text+0x11c original ABS32 data_020bee7c+0x0 built ABS32 data_020bee6c+0x10
 eur	src/main/func_0203e8b8.c	wrong-target	.text+0x9c original ABS32 data_020bee7c+0x0 built ABS32 data_020bee6c+0x10
 eur	src/main/func_0203e8b8.c	wrong-target	.text+0xa0 original ABS32 data_020bee84+0x0 built ABS32 data_020bee6c+0x18
 eur	src/main/func_0203e9ac.legacy_sp3.c	wrong-target	.text+0xec original ABS32 data_020bee7c+0x0 built ABS32 data_020bee6c+0x10
@@ -448,9 +447,6 @@ eur	src/main/func_02049270.s	wrong-target	.text+0x58 original ABS32 data_020ff92
 eur	src/main/func_0204a174.s	wrong-target	.text+0x170 original ABS32 data_020bed38+0x0 built ABS32 data_020bece4+0x54
 eur	src/main/func_0204cf7c.s	wrong-target	.text+0x2fc original ABS32 data_020ff9c8+0x0 built ABS32 data_020ff9c4+0x4
 eur	src/main/func_0204f820.s	wrong-target	.text+0xcc original ABS32 data_020ff9c8+0x0 built ABS32 data_020ff9c4+0x4
-eur	src/main/func_020548f4.s	wrong-target	.text+0x128 original ABS32 data_020bed50+0x0 built ABS32 data_020bece4+0x6c
-eur	src/main/func_020548f4.s	wrong-target	.text+0x12c original ABS32 data_020bed54+0x0 built ABS32 data_020bece4+0x70
-eur	src/main/func_020548f4.s	wrong-target	.text+0x130 original ABS32 data_020bed58+0x0 built ABS32 data_020bece4+0x74
 eur	src/main/func_02055f84.s	wrong-target	.text+0x64 original ABS32 data_020ffd40+0x0 built ABS32 data_020ffd3c+0x4
 eur	src/main/func_0205c258.s	wrong-target	.text+0xe4 original ABS32 data_02100b74+0x0 built ABS32 data_02100b70+0x4
 eur	src/main/func_0205fe18.c	wrong-target	.text+0xa0 original ABS32 data_021011d4+0x0 built ABS32 data_021011d0+0x4
@@ -459,7 +455,6 @@ eur	src/main/func_02060a3c.legacy_sp3.c	wrong-target	.text+0x8c original ABS32 d
 eur	src/main/func_02064dfc.s	wrong-target	.text+0x178 original ABS32 data_02101558+0x0 built ABS32 data_02101554+0x4
 eur	src/main/func_020667e8.s	wrong-target	.text+0x1d8 original ABS32 data_02101770+0x0 built ABS32 data_0210176c+0x4
 eur	src/main/func_02068a20.s	wrong-target	.text+0x8c original ABS32 data_02101d60+0x0 built ABS32 data_02101d5c+0x4
-eur	src/main/func_0206b0c4.s	wrong-target	.text+0x12c original ABS32 data_02101dfc+0x0 built ABS32 data_02101df8+0x4
 eur	src/main/func_02077398.s	missing-reloc	.text+0x210 original PC24 .text-0x8 built none
 eur	src/main/func_02077398.s	missing-reloc	.text+0x3fc original PC24 .text-0x8 built none
 eur	src/main/func_02077398.s	missing-reloc	.text+0x470 original PC24 .text-0x8 built none
@@ -481,7 +476,6 @@ eur	src/main/func_02090330.s	wrong-target	.text+0x68 original ABS32 data_020c319
 eur	src/main/func_02090330.s	wrong-target	.text+0x6c original ABS32 data_020c319c+0x0 built ABS32 data_020c3198+0x4
 eur	src/main/func_0209085c.s	missing-reloc	.text+0x8 original ABS32 func_020909b0+0x0 built none
 eur	src/main/func_020988a8.s	missing-reloc	.text+0xf8 original ABS32 data_02102c44+0x0 built none
-eur	src/main/func_0209d288.s	missing-reloc	.text+0x74 original PC24 .text-0x8 built none
 eur	src/main/func_020a8d50.s	wrong-target	.text+0x81c original ABS32 data_02102a98+0x0 built ABS32 data_02102a94+0x4
 eur	src/main/func_020a8d50.s	wrong-target	.text+0x820 original ABS32 data_02102a9c+0x0 built ABS32 data_02102a94+0x8
 eur	src/main/func_020ab130.s	wrong-target	.text+0xfe0 original ABS32 data_020c3881+0x0 built ABS32 data_020c387c+0x5
@@ -4986,8 +4980,6 @@ eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0xba4 original PC24
 eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0xc50 original PC24 .text-0x8 built none
 eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0xf8 original PC24 .text-0x8 built none
 eur	src/overlay002/func_ov002_021dd950.s	missing-reloc	.text+0x134 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021df818.s	missing-reloc	.text+0x7c original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021df818.s	missing-reloc	.text+0x98 original PC24 .text-0x8 built none
 eur	src/overlay002/func_ov002_022476e8.c	missing-reloc	.text+0xb4 original ABS32 data_ov002_022cacc0+0x0 built none
 eur	src/overlay002/func_ov002_02247ad8.c	missing-reloc	.text+0x90 original ABS32 data_ov002_022cacc0+0x0 built none
 eur	src/overlay002/func_ov002_02264b84.s	wrong-target	.text+0x15c original ABS32 data_ov002_022c836c+0x0 built ABS32 data_ov002_022c8368+0x4
