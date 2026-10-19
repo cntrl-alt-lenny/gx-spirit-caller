@@ -5345,3 +5345,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206cd64	main	340	legacy_sp3	factory	parked	43.5	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
 0x020718d8	main	340	legacy	factory	shipped	100	n/a		factory-1019-S3	
 0x0208c04c	main	340	legacy	factory	shipped	100	n/a		factory-1019-S3	
+0x0209d288	main	340	legacy	factory	shipped	100	n/a		factory-1019-S3	
