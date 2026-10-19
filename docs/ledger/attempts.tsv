@@ -5238,3 +5238,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020aacac	main	304	default	factory	shipped	100	n/a		factory-1018-S3	
 0x0206b0c4	main	308	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
 0x0206b0c4	main	308	default	factory	parked	13	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x02081348	main	308	default	factory	parked	3.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x02081348	main	308	legacy	factory	parked	13.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x02081348	main	308	legacy_sp3	factory	parked	53.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
