@@ -6143,3 +6143,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020294c0	main	356	legacy_sp3	factory	parked	13.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N3	
 0x0203abe0	main	356	default	factory	shipped	100	n/a		factory-1019-N3	
 0x0201fdc4	main	360	default	factory	shipped	100	n/a		factory-1019-N3	
+0x02046094	main	360	legacy_sp3	factory	shipped	100	n/a		factory-1019-N3	
+0x02046094	main	360	default	factory	parked	71.1	unknown	UNCLASSIFIED:unknown	factory-1019-N3	
+0x02046094	main	360	legacy	factory	parked	8.2	unknown	UNCLASSIFIED:unknown	factory-1019-N3	
