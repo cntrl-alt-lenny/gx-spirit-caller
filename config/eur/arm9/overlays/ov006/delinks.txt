@@ -2031,7 +2031,7 @@ src/overlay006/func_ov006_021ca518.c:
     complete
     .text start:0x021ca518 end:0x021ca570
 
-src/overlay006/func_ov006_021ca570.s:
+src/overlay006/func_ov006_021ca570.c:
     complete
     .text start:0x021ca570 end:0x021ca678
 
