@@ -9970,7 +9970,7 @@ src/overlay002/func_ov002_022640f4.c:
 src/overlay002/func_ov002_022641a8.c:
     complete
     .text start:0x022641a8 end:0x022642ac
-src/overlay002/func_ov002_022642ac.s:
+src/overlay002/func_ov002_022642ac.c:
     complete
     .text start:0x022642ac end:0x022643e8
 src/overlay002/func_ov002_022643e8.s:
