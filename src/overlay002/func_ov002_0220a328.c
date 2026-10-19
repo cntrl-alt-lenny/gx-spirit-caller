@@ -4,7 +4,7 @@ extern int func_ov002_021bc8c8(int, int, int);
 extern int func_ov002_021ff2b8(int unused_a, int b);
 extern int func_ov002_021bc288(int, int);
 extern int func_ov002_021ca2b8();
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int player, int arg1, int arg2);
 extern char data_ov002_022cf178[];
 extern char data_ov002_022cf16c[];
 int func_ov002_0220a328(struct Self *self) {
@@ -16,7 +16,7 @@ int func_ov002_0220a328(struct Self *self) {
     if (!func_ov002_021ca2b8(self->player)) return 0;
     i = 0;
     if (*(unsigned int *)(data_ov002_022cf178 + (self->player & 1) * 0x868) > i) do {
-        if (func_ov002_022536e8((void *)self->player, self->id, i)) return 1;
+        if (func_ov002_022536e8(self->player, self->id, i)) return 1;
         i++;
     } while (i < *(unsigned int *)(data_ov002_022cf16c + (self->player & 1) * 0x868 + 0xc));
     return 0;

@@ -1,5 +1,5 @@
 extern int OS_DisableIrq(void);
-extern asm void OS_RestoreIrq(int mask);
+extern void OS_RestoreIrq(int mask);
 extern void func_02094688(const void *src, void *dst, unsigned int size);
 typedef struct { unsigned int head, tail, size; unsigned char *buf; } ring_t;
 typedef struct { unsigned char type, wrap; unsigned short length; } header_t;

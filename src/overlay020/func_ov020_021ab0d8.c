@@ -1,6 +1,6 @@
 extern void *func_0208e200(void);
 /* The assembly fill routine consumes value, destination, and byte count. */
-extern asm void func_0209448c(int, void *, unsigned int);
+extern void func_0209448c(int, void *, unsigned int);
 /* Division returns quotient in r0 and remainder in r1. */
 extern long long func_020b3870(int, int);
 extern char data_ov020_021ae060[];

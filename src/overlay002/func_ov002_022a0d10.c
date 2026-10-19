@@ -15,7 +15,7 @@ extern int func_0201d47c(Obj *o);
 extern int func_0201e5b8(Desc *);
 extern void Task_Invoke(void *p);
 extern int func_0208df94(void);
-extern asm void func_02094550(int *src, int *dst, unsigned int count);
+extern void func_02094550(int *src, int *dst, unsigned int count);
 void func_ov002_022a0d10(Self *self, int count) {
  int i;
  int base;

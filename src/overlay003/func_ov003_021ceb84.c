@@ -1,6 +1,6 @@
 extern void *func_02005dac(int select, int slot);
 /* The assembly copy routine uses three argument registers despite its void placeholder definition. */
-extern asm void func_020944a4();
+extern void func_020944a4();
 typedef struct { unsigned int attr; unsigned short tile; } Packet;
 void func_ov003_021ceb84(int unused, int screen, int kind, int palette, int x) {
     Packet packet;

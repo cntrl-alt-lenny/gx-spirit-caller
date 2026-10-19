@@ -4,7 +4,7 @@ typedef struct {
 } DrawCmd;
 
 extern int func_02005dac(int a, int b);
-extern asm void func_020944a4(void *buf, int handle, int count);
+extern void func_020944a4(void *buf, int handle, int count);
 
 void func_ov017_021b44d4(int x, int flags, int code, int pal, int width)
 {

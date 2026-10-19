@@ -1,5 +1,5 @@
 extern void *func_02005dac(int a, int b);
-extern asm void func_020944a4(const void *src, void *dst, int size);
+extern void func_020944a4(const void *src, void *dst, int size);
 
 typedef struct {
     unsigned int attr;

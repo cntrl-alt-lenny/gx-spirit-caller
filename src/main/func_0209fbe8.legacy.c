@@ -20,7 +20,7 @@ typedef struct Event {
     State *state;
 } Event;
 extern int func_0209d724(void);
-extern asm void func_020944a4(const void *src, void *dst, int size_bytes);
+extern void func_020944a4(const void *src, void *dst, int size_bytes);
 void func_0209fbe8(Event *event) {
     State *state = event->state;
     if (state == 0) return;

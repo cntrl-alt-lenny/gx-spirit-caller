@@ -6,12 +6,12 @@ typedef struct {
     volatile u32 flags;
 } Context;
 extern int OS_DisableIrq(void);
-extern asm void OS_RestoreIrq(int saved);
+extern void OS_RestoreIrq(int saved);
 extern void func_02091a8c(void *q);
 extern void func_020928cc(void *p, u32 size);
 extern void func_02092904(void *p, u32 size);
 extern void DC_WaitWriteBufferEmpty(void);
-extern asm void func_02093814(int count);
+extern void func_02093814(int count);
 extern int func_02096358(int a, int b, int c);
 extern int func_0209640c(int bit, int idx);
 int func_0209d288(Context *p, int command, int count) {

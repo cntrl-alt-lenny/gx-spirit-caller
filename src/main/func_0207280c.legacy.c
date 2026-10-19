@@ -1,6 +1,6 @@
 typedef struct { char pad[0x64]; unsigned int flag; } ctx_020919d8_t;
 extern int OS_DisableIrq(void);
-extern asm void OS_RestoreIrq(int saved);
+extern void OS_RestoreIrq(int saved);
 extern void func_020919d8(ctx_020919d8_t *ctx);
 extern void func_02094688(const void *src, void *dst, unsigned int size);
 typedef struct {

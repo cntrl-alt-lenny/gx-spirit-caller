@@ -6,7 +6,7 @@ extern int func_ov002_02257704(void *self);
 extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_021d5a08(struct Ov002Self *arg0, int arg1, int arg2, int arg3, u16 arg4, u16 arg5);
-extern asm void func_ov002_0226b11c(int arg0, int arg1);
+extern void func_ov002_0226b11c(int arg0, int arg1);
 int func_ov002_02230af0(struct Ov002Self *self) {
     int side, slot;
     switch (data_ov002_022ce288.state) {

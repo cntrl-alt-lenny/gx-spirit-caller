@@ -1,5 +1,5 @@
 extern int OS_DisableIrq(void);
-extern asm void OS_RestoreIrq(int state);
+extern void OS_RestoreIrq(int state);
 typedef union {
     unsigned int raw;
     struct { unsigned int tag:5; unsigned int error:1; unsigned int data:26; } bits;
