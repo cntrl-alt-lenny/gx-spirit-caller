@@ -5292,3 +5292,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02066ee0	main	324	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
 0x02066ee0	main	324	default	factory	parked	46.9	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x02066ee0	main	324	legacy	factory	parked	50.6	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x020791e8	main	324	legacy	factory	shipped	100	n/a		factory-1018-S3	
