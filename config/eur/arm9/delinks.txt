@@ -9804,7 +9804,7 @@ src/main/func_02053728.c:
 src/main/func_02053748.legacy.c:
     complete
     .text start:0x02053748 end:0x02053774
-src/main/func_02053774.s:
+src/main/func_02053774.legacy_sp3.c:
     complete
     .text start:0x02053774 end:0x020538b0
 
