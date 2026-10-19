@@ -5241,3 +5241,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d3e58	ov002	324	legacy	factory	parked	16.7	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S1	
 0x021d3e58	ov002	324	legacy_sp3	factory	parked	13.6	reg-alloc	PROVISIONAL:register-allocation	factory-1018-S1	
 0x021ed4c0	ov002	324	default	factory	shipped	100	n/a		factory-1018-S1	
+0x021fe9c4	ov002	324	default	factory	shipped	100	n/a		factory-1018-S1	
