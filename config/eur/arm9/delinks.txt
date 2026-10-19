@@ -12009,7 +12009,7 @@ src/main/func_020692d0.c:
     complete
     .text start:0x020692d0 end:0x0206931c
 
-src/main/func_0206931c.s:
+src/main/func_0206931c.legacy_sp3.c:
     complete
     .text start:0x0206931c end:0x02069454
 
