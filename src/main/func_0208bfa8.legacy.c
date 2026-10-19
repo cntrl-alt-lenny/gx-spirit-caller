@@ -5,7 +5,7 @@
 extern void func_0208be38(void);
 extern void func_0208bed8(void);
 
-void func_0208bfa8(void) {
+void func_0208bfa8(int unused0, int unused1) {
     func_0208be38();
     func_0208bed8();
 }

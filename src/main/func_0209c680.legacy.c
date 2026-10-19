@@ -1,0 +1,62 @@
+typedef struct { char pad[0x64]; unsigned int flag; } ctx_020919d8_t;
+typedef struct Container { void *head; void *f04; } Container;
+typedef struct { int result; int f4; int f8; int fc; void *f10; int f14; } Request;
+typedef struct {
+    Request *head;
+    char pad4[0x38-4];
+    void (*callback)(void *);
+    void *argument;
+    char pad40[0x104-0x40];
+    int f104;
+    int f108;
+    Container queue;
+    unsigned int flags;
+    char pad118[8];
+    int f120;
+} Core;
+typedef struct { int f0; int f4; } Other;
+extern Core data_021a84c0;
+extern Other data_021a63d0;
+extern void func_02000b60();
+extern void func_02093bfc(void);
+extern int func_0209c0a0(void);
+extern int OS_DisableIrq(void);
+extern void OS_RestoreIrq(int);
+extern void func_02091a8c(void *q);
+extern void func_02091a0c(Container *c);
+extern void func_020919d8(ctx_020919d8_t *ctx);
+extern void func_0209c364(int a);
+extern int func_0209d288(Core *p, int mode, int count);
+int func_0209c680(int a) {
+    Core *p = &data_021a84c0;
+    int irq;
+    void (*callback)(void *);
+    void *argument;
+    func_02000b60(0x02000c1c);
+    if (a == 0) func_02093bfc();
+    func_0209c0a0();
+    irq = OS_DisableIrq();
+    if (p->flags & 4) {
+        do { func_02091a8c(&p->queue); } while (p->flags & 4);
+    }
+    p->flags |= 4;
+    p->callback = 0;
+    p->argument = 0;
+    OS_RestoreIrq(irq);
+    func_0209c364(a);
+    data_021a84c0.f104 = data_021a63d0.f4;
+    func_0209d288(p, 2, 1);
+    p->head->fc = 0;
+    p->head->f10 = &p->f120;
+    p->head->f14 = 1;
+    func_0209d288(p, 6, 1);
+    callback = p->callback;
+    argument = p->argument;
+    irq = OS_DisableIrq();
+    p->flags &= ~0x4c;
+    func_02091a0c(&p->queue);
+    if (p->flags & 0x10) func_020919d8((ctx_020919d8_t *)((char *)p + 0x44));
+    OS_RestoreIrq(irq);
+    if (callback != 0) callback(argument);
+    return p->head->result == 0;
+}

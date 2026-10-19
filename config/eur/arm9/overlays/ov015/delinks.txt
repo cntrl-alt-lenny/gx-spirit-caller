@@ -41,7 +41,7 @@ src/overlay015/Ov015_UpdateScrollTarget.c:
     complete
     .text start:0x021b238c end:0x021b23f4
 
-src/overlay015/func_ov015_021b23f4.s:
+src/overlay015/func_ov015_021b23f4.c:
     complete
     .text start:0x021b23f4 end:0x021b2450
 
@@ -77,7 +77,7 @@ src/overlay015/ov015_021b2488.c:
 
 
 
-src/overlay015/func_ov015_021b2490.s:
+src/overlay015/func_ov015_021b2490.c:
     complete
     .text start:0x021b2490 end:0x021b24f4
 
@@ -95,7 +95,7 @@ src/overlay015/ov015_021b24f4.c:
 
 
 
-src/overlay015/func_ov015_021b2514.s:
+src/overlay015/func_ov015_021b2514.c:
     complete
     .text start:0x021b2514 end:0x021b25f8
 
@@ -107,7 +107,7 @@ src/overlay015/func_ov015_021b2630.s:
     complete
     .text start:0x021b2630 end:0x021b27d8
 
-src/overlay015/func_ov015_021b27d8.s:
+src/overlay015/func_ov015_021b27d8.c:
     complete
     .text start:0x021b27d8 end:0x021b285c
 
@@ -195,7 +195,7 @@ src/overlay015/ov015_021b2890.c:
 
 
 
-src/overlay015/func_ov015_021b28a8.s:
+src/overlay015/func_ov015_021b28a8.c:
     complete
     .text start:0x021b28a8 end:0x021b28f0
 

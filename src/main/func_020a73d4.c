@@ -9,7 +9,7 @@
 
 extern void func_020a7480(int x);
 
-int func_020a73d4(int x) {
+int func_020a73d4(int x, int unused1, int unused2) {
     func_020a7480(x);
     return x;
 }
