@@ -1,8 +1,8 @@
+#include "runtime/intrinsics.h"
 typedef unsigned char u8;
 typedef unsigned int u32;
 typedef struct { u8 b[6]; } Magic;
 extern Magic data_020bee6c;
-extern void *__memcpy(void *dst, const void *src, unsigned long n);
 typedef struct {
     u8 pad[0xa0];
     void (*special)(u32, void *);

@@ -1,3 +1,4 @@
+#include "runtime/intrinsics.h"
 typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
@@ -20,7 +21,6 @@ typedef struct {
     u8 flag, state;
 } Packet;
 extern u8 data_02101598[6];
-extern void *__memcpy(void *dst, const void *src, unsigned long size);
 extern int func_02065dc0(int sock, unsigned int addr, int port, void *buf, int len);
 extern int func_02055330(void);
 
