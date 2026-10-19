@@ -5267,3 +5267,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02072234	main	316	legacy	factory	shipped	100	n/a		factory-1018-S3	
 0x02027ee4	main	320	default	factory	shipped	100	n/a		factory-1018-S3	
 0x02027ee4	main	320	legacy	factory	parked	1.7	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x0203e730	main	320	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
