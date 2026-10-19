@@ -19490,7 +19490,7 @@ src/main/func_020a7fec.s:
     complete
     .text start:0x020a7fec end:0x020a84c8
 
-src/main/func_020a84c8.s:
+src/main/func_020a84c8.c:
     complete
     .text start:0x020a84c8 end:0x020a85ec
 
