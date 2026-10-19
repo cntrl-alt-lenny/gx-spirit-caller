@@ -669,7 +669,7 @@ src/overlay006/func_ov006_021b7db0.s:
     complete
     .text start:0x021b7db0 end:0x021b7e80
 
-src/overlay006/func_ov006_021b7e80.s:
+src/overlay006/func_ov006_021b7e80.c:
     complete
     .text start:0x021b7e80 end:0x021b7f6c
 
