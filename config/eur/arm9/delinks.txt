@@ -4803,7 +4803,7 @@ src/main/func_02027ed4.c:
 
 
 
-src/main/func_02027ee4.s:
+src/main/func_02027ee4.c:
     complete
     .text start:0x02027ee4 end:0x02028024
 
