@@ -313,7 +313,7 @@ src/overlay016/func_ov016_021b8040.s:
     complete
     .text start:0x021b8040 end:0x021b82e4
 
-src/overlay016/func_ov016_021b82e4.s:
+src/overlay016/func_ov016_021b82e4.c:
     complete
     .text start:0x021b82e4 end:0x021b83a0
 
