@@ -2247,7 +2247,7 @@ src/main/func_020169d0.s:
     complete
     .text start:0x020169d0 end:0x02016b60
 
-src/main/func_02016b60.s:
+src/main/func_02016b60.c:
     complete
     .text start:0x02016b60 end:0x02016cd8
 
