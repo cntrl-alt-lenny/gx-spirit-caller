@@ -5247,3 +5247,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02051c4c	main	312	default	factory	parked	5.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
 0x02051c4c	main	312	legacy	factory	parked	8.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
 0x02051c4c	main	312	legacy_sp3	factory	parked	82	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x02061018	main	312	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
+0x02061018	main	312	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x02061018	main	312	legacy	factory	parked	25	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
