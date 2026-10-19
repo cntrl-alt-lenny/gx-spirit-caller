@@ -120,7 +120,7 @@ src/overlay008/func_ov008_021ac430.c:
     complete
     .text start:0x021ac430 end:0x021ac4d0
 
-src/overlay008/func_ov008_021ac4d0.s:
+src/overlay008/func_ov008_021ac4d0.legacy_sp3.c:
     complete
     .text start:0x021ac4d0 end:0x021ac590
 
