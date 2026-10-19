@@ -1790,7 +1790,7 @@ src/main/func_0200fdfc.s:
     complete
     .text start:0x0200fdfc end:0x02010040
 
-src/main/func_02010040.s:
+src/main/func_02010040.c:
     complete
     .text start:0x02010040 end:0x020101b4
 
