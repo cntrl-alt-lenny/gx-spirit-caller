@@ -4552,7 +4552,7 @@ src/main/func_02022b74.s:
     complete
     .text start:0x02022b74 end:0x02022d54
 
-src/main/func_02022d54.s:
+src/main/func_02022d54.c:
     complete
     .text start:0x02022d54 end:0x02022ee4
 
