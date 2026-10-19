@@ -6156,3 +6156,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0224ee48	ov002	100	default	factory	parked	84	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N5	
 0x0224ee48	ov002	100	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N5	
 0x0224ee48	ov002	100	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N5	
+0x0221074c	ov002	104	default	factory	shipped	100	n/a		factory-1019-N5	
