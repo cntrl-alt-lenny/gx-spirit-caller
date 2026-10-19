@@ -1,10 +1,10 @@
 typedef struct { int a; int b; } Pair;
 typedef struct {
-    volatile int field_0;
+    int field_0;
     int field_4, field_8, field_c, field_10;
     char pad_14[4];
     int field_18;
-    volatile int field_1c;
+    int field_1c;
 } Obj_t;
 typedef struct {
     char pad0[8]; int ctx; unsigned int flags;

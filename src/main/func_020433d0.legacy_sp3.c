@@ -1,4 +1,4 @@
-typedef struct { int f_0; volatile int f_4; int f_8; int f_c; } state_021_4clear_t;
+typedef struct { int f_0; int f_4; int f_8; int f_c; } state_021_4clear_t;
 typedef struct { void *(*alloc)(const void *, int); int b; int c; } Config;
 extern char *data_0219d9f0;
 extern void *data_0219d9fc;

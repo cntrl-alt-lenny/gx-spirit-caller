@@ -3,7 +3,7 @@ extern void func_020a6d54(int a, int b, int c, int d);
 extern void *func_020541b8(int elemSize, int count, int extra);
 extern char data_020ffb80[], data_020ffb8c[], data_020ffb94[], data_020ffb9c[], data_020ffba4[], data_020ffbb0[], data_020ffbbc[];
 typedef struct {
-    void ** volatile items;
+    void ** items;
     int count;
     int extra;
     int a3;

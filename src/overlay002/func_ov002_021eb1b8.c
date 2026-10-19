@@ -32,7 +32,7 @@ int func_ov002_021eb1b8(Header *a0, int a1, int a2) {
                         if (player == a0->flags.side && (int)a0->flags.slot == slot) {
                         } else
                         {
-                            if (func_ov002_021b3ac0(a1, a2, a0->flags.side, ((volatile Header *)a0)->flags.slot) != 0) return 1;
+                            if (func_ov002_021b3ac0(a1, a2, a0->flags.side, ((Header *)a0)->flags.slot) != 0) return 1;
                         }
                         return 0;
                     }

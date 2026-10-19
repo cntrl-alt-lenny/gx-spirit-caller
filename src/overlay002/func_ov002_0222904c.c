@@ -1,5 +1,5 @@
 struct Self { unsigned short f0; unsigned short side:1; unsigned short rest:15; };
-struct State { char pad[0x5a8]; int state; volatile unsigned int count; };
+struct State { char pad[0x5a8]; int state; unsigned int count; };
 struct Slot { unsigned int id:13; unsigned int rest:19; };
 extern struct State data_ov002_022ce288;
 extern unsigned int data_ov002_022be154[];

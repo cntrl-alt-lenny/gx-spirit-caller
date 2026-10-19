@@ -8,7 +8,7 @@ extern char *data_0219e3ec;
 typedef struct {
     int data;
     int pad4[2];
-    volatile int done;
+    int done;
     int pad10;
     int size;
     int pad18;
