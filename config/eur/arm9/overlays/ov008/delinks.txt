@@ -64,7 +64,7 @@ src/overlay008/func_ov008_021ab164.s:
     complete
     .text start:0x021ab164 end:0x021ab3ac
 
-src/overlay008/func_ov008_021ab3ac.s:
+src/overlay008/func_ov008_021ab3ac.c:
     complete
     .text start:0x021ab3ac end:0x021ab484
 
