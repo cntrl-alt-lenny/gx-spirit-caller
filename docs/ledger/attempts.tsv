@@ -5276,3 +5276,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02061150	main	320	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-S3	
 0x02061150	main	320	legacy	factory	parked	82.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-S3	
 0x02061150	main	320	legacy_sp3	factory	parked	97.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-S3	
+0x0206d4c0	main	320	legacy	factory	shipped	100	n/a		factory-1018-S3	
