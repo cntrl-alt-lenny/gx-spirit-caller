@@ -7514,7 +7514,7 @@ src/main/func_0203ab9c.c:
     complete
     .text start:0x0203ab9c end:0x0203abe0
 
-src/main/func_0203abe0.s:
+src/main/func_0203abe0.c:
     complete
     .text start:0x0203abe0 end:0x0203ad44
 
