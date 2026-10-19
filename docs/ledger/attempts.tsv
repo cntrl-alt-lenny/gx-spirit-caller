@@ -5330,3 +5330,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204a024	main	336	default	factory	parked	11.9	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
 0x0204a024	main	336	legacy	factory	parked	18	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
 0x0207932c	main	336	legacy	factory	shipped	100	n/a		factory-1019-S3	
+0x02085d24	main	336	legacy_sp3	factory	shipped	100	n/a		factory-1019-S3	
+0x02085d24	main	336	default	factory	parked	33.3	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
