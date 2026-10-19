@@ -19380,7 +19380,7 @@ src/main/func_020a6b54.legacy_sp3.c:
 
 
 
-src/main/func_020a6ba0.s:
+src/main/func_020a6ba0.c:
     complete
     .text start:0x020a6ba0 end:0x020a6cc8
 
