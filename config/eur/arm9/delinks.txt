@@ -649,7 +649,7 @@ src/main/func_02003ac0.c:
 libs/nitro/func_02003b14.legacy.c:
     complete
     .text start:0x02003b14 end:0x02003b18
-src/main/func_02003b18.s:
+src/main/func_02003b18.c:
     complete
     .text start:0x02003b18 end:0x02003c68
 
