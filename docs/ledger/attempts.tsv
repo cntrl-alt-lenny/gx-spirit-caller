@@ -5340,3 +5340,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02063034	main	340	default	factory	parked	1.2	reg-alloc	PROVISIONAL:register-allocation	factory-1019-S3	
 0x02063034	main	340	legacy	factory	parked	34.8	reg-alloc	PROVISIONAL:register-allocation	factory-1019-S3	
 0x02063034	main	340	legacy_sp3	factory	parked	92.9	reg-alloc	PROVISIONAL:register-allocation	factory-1019-S3	
+0x0206cd64	main	340	legacy	factory	shipped	100	n/a		factory-1019-S3	
+0x0206cd64	main	340	default	factory	parked	12.9	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
+0x0206cd64	main	340	legacy_sp3	factory	parked	43.5	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
