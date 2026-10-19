@@ -6159,3 +6159,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0224aeb8	ov002	356	legacy_sp3	factory	parked	29.7	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N2	
 0x022bd2c4	ov002	356	default	factory	shipped	100	n/a		factory-1019-N2	
 0x02240f88	ov002	360	default	factory	shipped	100	n/a		factory-1019-N2	
+0x02264b84	ov002	352	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1019-N2	
