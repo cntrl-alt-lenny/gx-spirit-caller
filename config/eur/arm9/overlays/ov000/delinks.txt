@@ -280,7 +280,7 @@ src/overlay000/func_ov000_021ac144.s:
     complete
     .text start:0x021ac144 end:0x021ac478
 
-src/overlay000/func_ov000_021ac478.s:
+src/overlay000/func_ov000_021ac478.c:
     complete
     .text start:0x021ac478 end:0x021ac508
 
