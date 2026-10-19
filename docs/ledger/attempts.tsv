@@ -5159,3 +5159,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0228cf94	ov002	280	default	factory	shipped	100	n/a		factory-1018-S2	
 0x0228cf94	ov002	280	legacy	factory	parked	6.8	unknown	UNCLASSIFIED:unknown	factory-1018-S2	
 0x0228cf94	ov002	280	legacy_sp3	factory	parked	6.9	unknown	UNCLASSIFIED:unknown	factory-1018-S2	
+0x0229f1e0	ov002	280	default	factory	shipped	100	n/a		factory-1018-S2	
+0x0229f1e0	ov002	280	legacy	factory	parked	2.3	unknown	UNCLASSIFIED:unknown	factory-1018-S2	
+0x0229f1e0	ov002	280	legacy_sp3	factory	parked	2.5	unknown	UNCLASSIFIED:unknown	factory-1018-S2	
