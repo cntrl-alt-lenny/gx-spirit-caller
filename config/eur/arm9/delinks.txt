@@ -2215,7 +2215,7 @@ src/main/func_02015b10.s:
     complete
     .text start:0x02015b10 end:0x02015e00
 
-src/main/func_02015e00.s:
+src/main/func_02015e00.c:
     complete
     .text start:0x02015e00 end:0x02015f7c
 

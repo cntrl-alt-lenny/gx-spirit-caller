@@ -6167,3 +6167,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204a174	main	376	legacy	factory	parked	7.3	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N3	
 0x0204a174	main	376	legacy_sp3	factory	parked	88.3	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N3	
 0x0205190c	main	376	legacy_sp3	factory	shipped	100	n/a		factory-1019-N3	
+0x02015e00	main	380	default	factory	shipped	100	n/a		factory-1019-N3	
