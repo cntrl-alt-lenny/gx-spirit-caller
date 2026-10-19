@@ -5283,3 +5283,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020934cc	main	320	legacy	factory	shipped	100	n/a		factory-1018-S3	
 0x02096e24	main	320	legacy	factory	shipped	100	n/a		factory-1018-S3	
 0x0209fbe8	main	320	legacy	factory	shipped	100	n/a		factory-1018-S3	
+0x0201cbd8	main	324	default	factory	parked	86.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x0201cbd8	main	324	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x0201cbd8	main	324	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
