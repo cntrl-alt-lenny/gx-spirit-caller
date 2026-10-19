@@ -12949,7 +12949,7 @@ src/main/func_02072144.legacy.c:
     complete
     .text start:0x02072144 end:0x02072234
 
-src/main/func_02072234.s:
+src/main/func_02072234.legacy.c:
     complete
     .text start:0x02072234 end:0x02072370
 
