@@ -12917,7 +12917,7 @@ src/main/func_020716bc.s:
     complete
     .text start:0x020716bc end:0x020718d8
 
-src/main/func_020718d8.s:
+src/main/func_020718d8.legacy.c:
     complete
     .text start:0x020718d8 end:0x02071a2c
 
