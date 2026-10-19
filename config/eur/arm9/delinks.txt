@@ -16216,7 +16216,7 @@ src/main/func_0208e890.legacy.c:
     complete
     .text start:0x0208e890 end:0x0208e918
 
-src/main/func_0208e918.s:
+src/main/func_0208e918.legacy.c:
     complete
     .text start:0x0208e918 end:0x0208ea74
 
