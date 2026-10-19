@@ -196,7 +196,7 @@ src/overlay020/func_ov020_021adb8c.c:
     complete
     .text start:0x021adb8c end:0x021add24
 
-src/overlay020/func_ov020_021add24.s:
+src/overlay020/func_ov020_021add24.c:
     complete
     .text start:0x021add24 end:0x021addc0
 
