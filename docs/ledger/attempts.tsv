@@ -6148,3 +6148,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b5de8	ov017	316	default	factory	parked	92.4	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N4	
 0x021b5de8	ov017	316	legacy	factory	parked	44.4	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N4	
 0x021b5de8	ov017	316	legacy_sp3	factory	parked	78.5	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N4	
+0x021b81dc	ov006	320	default	factory	parked	78.8	register-numbering-permutation-cascade	P-30	factory-1019-N4	
+0x021b81dc	ov006	320	legacy	factory	parked	37.4	register-numbering-permutation-cascade	P-30	factory-1019-N4	
+0x021b81dc	ov006	320	legacy_sp3	factory	parked	38.9	register-numbering-permutation-cascade	P-30	factory-1019-N4	
