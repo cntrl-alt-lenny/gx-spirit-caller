@@ -9009,7 +9009,7 @@ libs/nitro/func_0204a01c.legacy.c:
 libs/nitro/func_0204a020.legacy.c:
     complete
     .text start:0x0204a020 end:0x0204a024
-src/main/func_0204a024.s:
+src/main/func_0204a024.legacy_sp3.c:
     complete
     .text start:0x0204a024 end:0x0204a174
 
