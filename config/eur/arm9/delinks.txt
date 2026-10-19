@@ -12082,7 +12082,7 @@ src/main/func_0206a724.s:
     complete
     .text start:0x0206a724 end:0x0206a7b0
 
-src/main/func_0206a7b0.s:
+src/main/func_0206a7b0.legacy_sp3.c:
     complete
     .text start:0x0206a7b0 end:0x0206a8c0
 
