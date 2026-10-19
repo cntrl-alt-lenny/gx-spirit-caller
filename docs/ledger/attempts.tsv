@@ -5349,3 +5349,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200c0e4	main	344	default	factory	parked	84.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-S3	
 0x0200c0e4	main	344	legacy	factory	parked	11.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-S3	
 0x0200c0e4	main	344	legacy_sp3	factory	parked	34.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-S3	
+0x020747e0	main	344	legacy	factory	shipped	100	n/a		factory-1019-S3	
+0x020747e0	main	344	default	factory	parked	4.7	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
+0x020747e0	main	344	legacy_sp3	factory	parked	65.1	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
