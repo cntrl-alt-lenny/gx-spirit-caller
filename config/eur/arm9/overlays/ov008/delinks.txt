@@ -137,7 +137,7 @@ src/overlay008/func_ov008_021ac658.c:
     complete
     .text start:0x021ac658 end:0x021ac718
 
-src/overlay008/func_ov008_021ac718.s:
+src/overlay008/func_ov008_021ac718.c:
     complete
     .text start:0x021ac718 end:0x021ac7f0
 
