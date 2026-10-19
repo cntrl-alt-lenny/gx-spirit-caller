@@ -7129,7 +7129,7 @@ src/main/func_02037414.s:
     complete
     .text start:0x02037414 end:0x02037780
 
-src/main/func_02037780.s:
+src/main/func_02037780.c:
     complete
     .text start:0x02037780 end:0x020378c8
 
