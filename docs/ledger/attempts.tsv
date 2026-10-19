@@ -6135,3 +6135,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c9e1c	ov012	300	default	factory	parked	97.3	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
 0x021c9e1c	ov012	300	legacy	factory	parked	54	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
 0x021c9e1c	ov012	300	legacy_sp3	factory	parked	66.7	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
+0x021b4444	ov015	304	default	factory	parked	64.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
+0x021b4444	ov015	304	legacy	factory	parked	37.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
+0x021b4444	ov015	304	legacy_sp3	factory	parked	37.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
