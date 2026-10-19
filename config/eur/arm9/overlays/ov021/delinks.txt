@@ -149,7 +149,7 @@ src/overlay021/func_ov021_021ab9d0.c:
     complete
     .text start:0x021ab9d0 end:0x021aba18
 
-src/overlay021/func_ov021_021aba18.s:
+src/overlay021/func_ov021_021aba18.c:
     complete
     .text start:0x021aba18 end:0x021abaa0
 
