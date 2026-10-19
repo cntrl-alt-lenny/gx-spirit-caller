@@ -18096,7 +18096,7 @@ src/main/func_02099c38.c:
     complete
     .text start:0x02099c38 end:0x02099c50
 
-src/main/func_02099c50.s:
+src/main/func_02099c50.legacy.c:
     complete
     .text start:0x02099c50 end:0x02099d80
 
