@@ -5217,3 +5217,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020415c8	main	304	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
 0x020415c8	main	304	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
 0x020415c8	main	304	legacy	factory	parked	39.2	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x02068e24	main	304	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
+0x02068e24	main	304	default	factory	parked	50	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
+0x02068e24	main	304	legacy	factory	parked	63.3	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
