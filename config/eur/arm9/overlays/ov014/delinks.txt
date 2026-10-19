@@ -70,7 +70,7 @@ src/overlay014/func_ov014_021b3938.s:
     complete
     .text start:0x021b3938 end:0x021b3a84
 
-src/overlay014/func_ov014_021b3a84.s:
+src/overlay014/func_ov014_021b3a84.c:
     complete
     .text start:0x021b3a84 end:0x021b3b9c
 
