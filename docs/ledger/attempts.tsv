@@ -5167,3 +5167,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022b35d8	ov002	280	legacy_sp3	factory	parked	6.8	unknown	UNCLASSIFIED:unknown	factory-1018-S2	
 0x022b35d8	ov002	280	legacy	factory	parked	6.7	unknown	UNCLASSIFIED:unknown	factory-1018-S2	
 0x0223a3b0	ov002	284	default	factory	shipped	100	n/a		factory-1018-S2	
+0x0223a94c	ov002	284	default	factory	parked	78.9	register-numbering-permutation-cascade	P-30	factory-1018-S2	
+0x0223a94c	ov002	284	legacy	factory	parked	5.1	register-numbering-permutation-cascade	P-30	factory-1018-S2	
+0x0223a94c	ov002	284	legacy_sp3	factory	parked	30.1	register-numbering-permutation-cascade	P-30	factory-1018-S2	
