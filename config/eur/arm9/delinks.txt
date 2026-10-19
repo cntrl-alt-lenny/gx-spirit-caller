@@ -6716,7 +6716,7 @@ src/main/func_02033d78.c:
     complete
     .text start:0x02033d78 end:0x02033de8
 
-src/main/func_02033de8.s:
+src/main/func_02033de8.c:
     complete
     .text start:0x02033de8 end:0x02033f10
 
