@@ -9945,7 +9945,7 @@ src/main/func_02054684.legacy_sp3.c:
     complete
     .text start:0x02054684 end:0x02054700
 
-src/main/func_02054700.s:
+src/main/func_02054700.legacy_sp3.c:
     complete
     .text start:0x02054700 end:0x02054840
 
