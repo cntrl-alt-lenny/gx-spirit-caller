@@ -6178,3 +6178,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c1ef0	ov002	404	legacy	factory	parked	30.7	unknown	UNCLASSIFIED:unknown	factory-1019-N1	
 0x021df130	ov002	404	default	factory	shipped	100	n/a		factory-1019-N1	
 0x02213974	ov002	404	default	factory	shipped	100	n/a		factory-1019-N1	
+0x02221348	ov002	404	default	factory	parked	82.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
+0x02221348	ov002	404	legacy	factory	parked	3.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
+0x02221348	ov002	404	legacy_sp3	factory	parked	4.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
