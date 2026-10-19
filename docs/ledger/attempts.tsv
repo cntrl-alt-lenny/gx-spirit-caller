@@ -5352,3 +5352,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020747e0	main	344	legacy	factory	shipped	100	n/a		factory-1019-S3	
 0x020747e0	main	344	default	factory	parked	4.7	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
 0x020747e0	main	344	legacy_sp3	factory	parked	65.1	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
+0x02081988	main	344	legacy_sp3	factory	shipped	100	n/a		factory-1019-S3	
+0x02081988	main	344	default	factory	parked	15.1	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
