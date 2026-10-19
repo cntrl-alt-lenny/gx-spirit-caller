@@ -5236,3 +5236,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02094688	main	304	legacy_sp3	factory	parked	11.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1018-S3	
 0x02099c50	main	304	legacy	factory	shipped	100	n/a		factory-1018-S3	
 0x020aacac	main	304	default	factory	shipped	100	n/a		factory-1018-S3	
+0x0206b0c4	main	308	legacy_sp3	factory	shipped	100	n/a		factory-1018-S3	
+0x0206b0c4	main	308	default	factory	parked	13	unknown	UNCLASSIFIED:unknown	factory-1018-S3	
