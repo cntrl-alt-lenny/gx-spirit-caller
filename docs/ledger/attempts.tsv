@@ -5244,3 +5244,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020321b0	main	312	default	factory	parked	39.7	register-numbering-permutation-cascade	P-30	factory-1018-S3	
 0x020321b0	main	312	legacy	factory	parked	23.8	register-numbering-permutation-cascade	P-30	factory-1018-S3	
 0x020321b0	main	312	legacy_sp3	factory	parked	7.7	register-numbering-permutation-cascade	P-30	factory-1018-S3	
+0x02051c4c	main	312	default	factory	parked	5.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x02051c4c	main	312	legacy	factory	parked	8.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
+0x02051c4c	main	312	legacy_sp3	factory	parked	82	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S3	
