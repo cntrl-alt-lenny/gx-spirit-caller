@@ -37,11 +37,11 @@ src/overlay016/func_ov016_021b2824.c:
     complete
     .text start:0x021b2824 end:0x021b287c
 
-src/overlay016/func_ov016_021b287c.s:
+src/overlay016/func_ov016_021b287c.c:
     complete
     .text start:0x021b287c end:0x021b28f4
 
-src/overlay016/func_ov016_021b28f4.s:
+src/overlay016/func_ov016_021b28f4.c:
     complete
     .text start:0x021b28f4 end:0x021b296c
 
@@ -49,7 +49,7 @@ src/overlay016/func_ov016_021b296c.s:
     complete
     .text start:0x021b296c end:0x021b2a8c
 
-src/overlay016/func_ov016_021b2a8c.s:
+src/overlay016/func_ov016_021b2a8c.c:
     complete
     .text start:0x021b2a8c end:0x021b2b24
 
@@ -133,7 +133,7 @@ src/overlay016/ov016_stubs_b3a70.c:
 
 
 
-src/overlay016/func_ov016_021b3a78.s:
+src/overlay016/func_ov016_021b3a78.c:
     complete
     .text start:0x021b3a78 end:0x021b3b14
 
@@ -173,11 +173,11 @@ src/overlay016/func_ov016_021b5244.c:
     complete
     .text start:0x021b5244 end:0x021b5284
 
-src/overlay016/func_ov016_021b5284.s:
+src/overlay016/func_ov016_021b5284.c:
     complete
     .text start:0x021b5284 end:0x021b5390
 
-src/overlay016/func_ov016_021b5390.s:
+src/overlay016/func_ov016_021b5390.c:
     complete
     .text start:0x021b5390 end:0x021b5414
 
@@ -189,7 +189,7 @@ src/overlay016/func_ov016_021b5414.c:
 
 
 
-src/overlay016/func_ov016_021b5424.s:
+src/overlay016/func_ov016_021b5424.c:
     complete
     .text start:0x021b5424 end:0x021b553c
 
@@ -241,7 +241,7 @@ src/overlay016/func_ov016_021b5fb0.c:
     complete
     .text start:0x021b5fb0 end:0x021b6074
 
-src/overlay016/func_ov016_021b6074.s:
+src/overlay016/func_ov016_021b6074.c:
     complete
     .text start:0x021b6074 end:0x021b60cc
 
@@ -281,11 +281,11 @@ src/overlay016/func_ov016_021b7504.c:
     complete
     .text start:0x021b7504 end:0x021b75c8
 
-src/overlay016/func_ov016_021b75c8.s:
+src/overlay016/func_ov016_021b75c8.c:
     complete
     .text start:0x021b75c8 end:0x021b7694
 
-src/overlay016/func_ov016_021b7694.s:
+src/overlay016/func_ov016_021b7694.c:
     complete
     .text start:0x021b7694 end:0x021b7718
 
@@ -305,7 +305,7 @@ src/overlay016/func_ov016_021b77cc.s:
     complete
     .text start:0x021b77cc end:0x021b7fbc
 
-src/overlay016/func_ov016_021b7fbc.s:
+src/overlay016/func_ov016_021b7fbc.c:
     complete
     .text start:0x021b7fbc end:0x021b8040
 
@@ -313,7 +313,7 @@ src/overlay016/func_ov016_021b8040.s:
     complete
     .text start:0x021b8040 end:0x021b82e4
 
-src/overlay016/func_ov016_021b82e4.s:
+src/overlay016/func_ov016_021b82e4.c:
     complete
     .text start:0x021b82e4 end:0x021b83a0
 
