@@ -1121,7 +1121,7 @@ src/main/func_02008888.s:
     complete
     .text start:0x02008888 end:0x02008ac8
 
-src/main/func_02008ac8.c:
+src/main/func_02008ac8.s:
     complete
     .text start:0x02008ac8 end:0x02008c10
 
