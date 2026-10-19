@@ -5177,3 +5177,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0224ff28	ov002	284	default	factory	parked	87.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S2	
 0x0224ff28	ov002	284	legacy	factory	parked	42.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S2	
 0x0224ff28	ov002	284	legacy_sp3	factory	parked	54.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1018-S2	
+0x02256e1c	ov002	284	default	factory	parked	97.2	unknown	UNCLASSIFIED:unknown	factory-1018-S2	
