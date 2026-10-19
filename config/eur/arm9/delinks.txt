@@ -14970,7 +14970,7 @@ src/main/func_0208610c.s:
     complete
     .text start:0x0208610c end:0x02086334
 
-src/main/func_02086334.s:
+src/main/func_02086334.legacy_sp3.c:
     complete
     .text start:0x02086334 end:0x02086464
 
