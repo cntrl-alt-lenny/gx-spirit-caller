@@ -5306,3 +5306,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02074498	main	328	legacy	factory	shipped	100	n/a		factory-1018-S3	
 0x020757e0	main	328	legacy	factory	shipped	100	n/a		factory-1018-S3	
 0x02008ac8	main	328	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1019-S3	
+0x02086464	main	328	legacy_sp3	factory	shipped	100	n/a		factory-1019-S3	
+0x02086464	main	328	default	factory	parked	61	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
+0x02086464	main	328	legacy	factory	parked	72	unknown	UNCLASSIFIED:unknown	factory-1019-S3	
