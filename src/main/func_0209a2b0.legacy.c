@@ -6,7 +6,7 @@ typedef struct {
 } State;
 extern State data_021a8394;
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int state);
+extern asm void OS_RestoreIrq(int state);
 
 void func_0209a2b0(short *p) {
     int state;

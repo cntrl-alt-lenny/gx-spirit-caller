@@ -24,7 +24,7 @@ extern int func_0206e550(int arg);
 extern int func_0206e4ec(int arg);
 extern void func_02091a0c(Container *c);
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int saved);
+extern asm void OS_RestoreIrq(int saved);
 
 void func_0206dcb4(Object *p) {
     int flag;

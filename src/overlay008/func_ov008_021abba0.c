@@ -3,7 +3,7 @@ typedef struct {
     unsigned short param;
 } Packed;
 extern int func_02005dac(int a, int b);
-extern void func_020944a4(void *buf, int handle, int count);
+extern asm void func_020944a4(void *buf, int handle, int count);
 void func_ov008_021abba0(int a0, int a1) {
     Packed p;
     int handle;

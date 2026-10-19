@@ -1,5 +1,5 @@
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int mask);
+extern asm void OS_RestoreIrq(int mask);
 extern void func_0207b230(void);
 extern void func_0207cd7c(void);
 extern unsigned int func_020931e8(void);

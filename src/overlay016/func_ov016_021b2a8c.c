@@ -3,7 +3,7 @@ typedef struct {
     unsigned short tile;
 } Sprite;
 extern void *func_02005dac(int engine, int slot);
-extern void func_020944a4(void *src, void *dst, int n);
+extern asm void func_020944a4(void *src, void *dst, int n);
 void func_ov016_021b2a8c(int x, int y, int tile, int palette, int width) {
     Sprite sprite;
     int count = width / 32;

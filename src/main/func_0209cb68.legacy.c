@@ -1,6 +1,6 @@
 extern int func_0209c0a0(void);
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int);
+extern asm void OS_RestoreIrq(int);
 extern void func_02091a8c(void *);
 extern void func_02093d44(int);
 extern int func_0209cea4(void *);

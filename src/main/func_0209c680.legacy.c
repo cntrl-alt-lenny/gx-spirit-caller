@@ -21,7 +21,7 @@ extern void func_02000b60();
 extern void func_02093bfc(void);
 extern int func_0209c0a0(void);
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int);
+extern asm void OS_RestoreIrq(int);
 extern void func_02091a8c(void *q);
 extern void func_02091a0c(Container *c);
 extern void func_020919d8(ctx_020919d8_t *ctx);

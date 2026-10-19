@@ -1,5 +1,5 @@
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int state);
+extern asm void OS_RestoreIrq(int state);
 extern int func_02096358(int a, int b, int c);
 typedef struct { unsigned int a; unsigned short b; unsigned short c; } Entry;
 struct State {

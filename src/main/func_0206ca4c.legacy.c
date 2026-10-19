@@ -7,7 +7,7 @@ typedef struct Allocator { char pad[0x18]; Packet *(*alloc)(unsigned int); } All
 extern Allocator *data_0219ecd8;
 extern unsigned int data_0219ed40[2];
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int);
+extern asm void OS_RestoreIrq(int);
 extern void func_02091a0c(Container *c);
 extern void func_02094688(const void *src, void *dst, unsigned int size);
 int func_0206ca4c(void *src, unsigned int size, Arg *arg) {

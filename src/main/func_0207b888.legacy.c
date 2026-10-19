@@ -13,7 +13,7 @@ typedef struct {
 } GxState;
 
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int mask);
+extern asm void OS_RestoreIrq(int mask);
 extern void func_0207b038(int mode);
 extern int func_0209f698(int a0);
 extern int func_0207a1dc(Obj_0207a1dc_t *a);

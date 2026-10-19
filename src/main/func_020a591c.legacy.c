@@ -11,7 +11,7 @@ typedef struct {
     Task sentinel;
 } Context;
 extern int OS_DisableIrq(void);
-extern void OS_RestoreIrq(int state);
+extern asm void OS_RestoreIrq(int state);
 extern int func_02091814(void *p);
 extern int func_0209181c(char *a0, void *a1);
 extern void func_02091a8c(void *q);

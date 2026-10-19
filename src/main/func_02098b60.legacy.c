@@ -15,7 +15,7 @@ extern int func_02098104(int *self, int a1, int a2, int a3, int a4);
 extern int func_02097f10();
 extern int func_02097ff0(int *self);
 extern int func_02098088(Self *self, Pair p);
-extern void func_02098c70(Pair *out, int *info);
+extern asm void func_02098c70(Pair *out, int *info);
 int func_02098b60(int *out, int mode, unsigned int index, int ctx,
                  int base0, unsigned int size0, int base1, unsigned int size1) {
     int io[18];

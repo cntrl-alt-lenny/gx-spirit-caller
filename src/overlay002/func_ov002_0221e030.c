@@ -14,7 +14,7 @@ extern int func_ov002_021de4d8(struct Ov002Self *self, int player, int idx);
 extern int func_ov002_021d5a08(struct Ov002Self *arg0, int arg1, int arg2, int arg3, u16 arg4, u16 arg5);
 extern int func_ov002_021c1e44(Card021c1e44 *a0, int a1, int a2);
 /* Assembly wrapper consumes r0 and r1 despite its void parameter spelling. */
-extern void func_ov002_0226b11c(int player, int idx);
+extern asm void func_ov002_0226b11c(int player, int idx);
 extern struct { char pad[0x5a8]; int mode; } data_ov002_022ce288;
 int func_ov002_0221e030(struct Ov002Self *self) {
  int raw0, raw1;
