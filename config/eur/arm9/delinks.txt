@@ -5480,7 +5480,7 @@ src/main/func_0202c518.c:
 
 
 
-src/main/func_0202c528.s:
+src/main/func_0202c528.c:
     complete
     .text start:0x0202c528 end:0x0202c6ac
 
