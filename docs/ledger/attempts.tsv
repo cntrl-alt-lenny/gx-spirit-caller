@@ -5314,3 +5314,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a37c4	ov002	340	legacy	factory	parked	45.4	unknown	UNCLASSIFIED:unknown	factory-1019-S2	
 0x022a37c4	ov002	340	legacy_sp3	factory	parked	51.8	unknown	UNCLASSIFIED:unknown	factory-1019-S2	
 0x022a7e00	ov002	340	default	factory	shipped	100	n/a		factory-1019-S2	
+0x022539a0	ov002	344	default	factory	shipped	100	n/a		factory-1019-S2	
+0x022539a0	ov002	344	legacy	factory	parked	12.8	unknown	UNCLASSIFIED:unknown	factory-1019-S2	
+0x022539a0	ov002	344	legacy_sp3	factory	parked	8.1	unknown	UNCLASSIFIED:unknown	factory-1019-S2	
