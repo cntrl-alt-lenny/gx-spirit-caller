@@ -6236,3 +6236,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021e1920	ov002	460	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1019-N1	
 0x021e1920	ov002	460	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1019-N1	
 0x022125e8	ov002	460	default	factory	shipped	100	n/a		factory-1019-N1	
+0x0221f0e4	ov002	460	default	factory	parked	99.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N1	
+0x0221f0e4	ov002	460	legacy	factory	parked	10.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N1	
+0x0221f0e4	ov002	460	legacy_sp3	factory	parked	62.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N1	
