@@ -6273,3 +6273,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205c3c0	main	396	default	factory	parked	88.9	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x0205c3c0	main	396	legacy	factory	parked	7.4	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x02064dfc	main	392	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1019-N4	
+0x0207f294	main	396	default	factory	parked	3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
+0x0207f294	main	396	legacy	factory	parked	51	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
+0x0207f294	main	396	legacy_sp3	factory	parked	86.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
