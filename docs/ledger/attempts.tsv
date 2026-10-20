@@ -6303,3 +6303,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d38c4	ov004	404	default	factory	shipped	100	n/a		factory-1019-N4	
 0x021d38c4	ov004	404	legacy_sp3	factory	parked	12	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x021d38c4	ov004	404	legacy	factory	parked	5.4	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
+0x0205c54c	main	408	default	factory	parked	29.4	frame-shape	PROVISIONAL:frame/epilogue	factory-1019-N4	
+0x0205c54c	main	408	legacy	factory	parked	13.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1019-N4	
+0x0205c54c	main	408	legacy_sp3	factory	parked	94.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1019-N4	
