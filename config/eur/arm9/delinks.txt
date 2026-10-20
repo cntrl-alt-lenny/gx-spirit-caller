@@ -3699,7 +3699,7 @@ src/main/func_0201d134.c:
     complete
     .text start:0x0201d134 end:0x0201d150
 
-src/main/func_0201d150.s:
+src/main/func_0201d150.c:
     complete
     .text start:0x0201d150 end:0x0201d34c
 
