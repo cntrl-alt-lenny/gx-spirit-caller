@@ -7230,3 +7230,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02023274	main	516	legacy	factory	parked	40.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D2	
 0x02023274	main	516	legacy_sp3	factory	parked	43.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D2	
 0x0205b7a8	main	516	legacy_sp3	factory	shipped	100	n/a		factory-1020-D2	
+0x0208d4f0	main	516	legacy	factory	shipped	100	n/a		factory-1020-D2	

@@ -16046,7 +16046,7 @@ src/main/func_0208d3fc.legacy.c:
     complete
     .text start:0x0208d3fc end:0x0208d4f0
 
-src/main/func_0208d4f0.s:
+src/main/func_0208d4f0.legacy.c:
     complete
     .text start:0x0208d4f0 end:0x0208d6f4
 
