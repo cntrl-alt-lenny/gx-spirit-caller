@@ -45,7 +45,7 @@ factory rounds wait meanwhile. Evaluated at the end on:
 
 ## Scorecard
 
-First line due 2026-10-20, from the trial measures above.
+2026-10-20: natural-C 17.4% to 36.8%, 2,120 functions; see `docs/batches/trial-2026-10-scorecard.md`.
 
 ## Owner decisions (2026-09-23)
 
