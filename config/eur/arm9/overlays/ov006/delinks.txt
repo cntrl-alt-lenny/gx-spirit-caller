@@ -1807,7 +1807,7 @@ src/overlay006/func_ov006_021c7d08.c:
     complete
     .text start:0x021c7d08 end:0x021c7d60
 
-src/overlay006/func_ov006_021c7d60.s:
+src/overlay006/func_ov006_021c7d60.c:
     complete
     .text start:0x021c7d60 end:0x021c7edc
 
