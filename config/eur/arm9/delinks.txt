@@ -2239,7 +2239,7 @@ src/main/func_0201660c.c:
     complete
     .text start:0x0201660c end:0x020167c0
 
-src/main/func_020167c0.s:
+src/main/func_020167c0.c:
     complete
     .text start:0x020167c0 end:0x020169d0
 
