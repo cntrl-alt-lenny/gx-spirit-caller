@@ -6219,3 +6219,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209f970	main	372	legacy	factory	shipped	100	n/a		factory-1019-N4	
 0x0207ca44	main	376	legacy	factory	shipped	100	n/a		factory-1019-N4	
 0x020a2fcc	main	376	legacy	factory	shipped	100	n/a		factory-1019-N4	
+0x020965ac	main	380	legacy	factory	shipped	100	n/a		factory-1019-N4	
+0x020965ac	main	380	default	factory	parked	6.3	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
+0x020965ac	main	380	legacy_sp3	factory	parked	61	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
