@@ -6223,3 +6223,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0221af10	ov002	128	legacy	factory	parked	72.7	unknown	UNCLASSIFIED:unknown	factory-1019-N5	
 0x022342d0	ov002	128	default	factory	shipped	100	n/a		factory-1019-N5	
 0x021b33b0	ov002	132	default	factory	shipped	100	n/a		factory-1019-N5	
+0x021ba11c	ov002	132	default	factory	shipped	100	n/a		factory-1019-N5	
+0x021ba11c	ov002	132	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1019-N5	
+0x021ba11c	ov002	132	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1019-N5	
