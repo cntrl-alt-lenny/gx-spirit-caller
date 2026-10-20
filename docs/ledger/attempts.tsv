@@ -6301,3 +6301,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200b614	main	488	default	factory	shipped	100	n/a		factory-1020-N3	
 0x02013c64	main	488	default	factory	shipped	100	n/a		factory-1020-N3	
 0x02019af4	main	492	default	factory	shipped	100	n/a		factory-1020-N3	
+0x0201c2a8	main	496	default	factory	parked	96	asm-int	PROVISIONAL:inline-asm	factory-1020-N3	
+0x0201c2a8	main	496	legacy	factory	parked	2.9	asm-int	PROVISIONAL:inline-asm	factory-1020-N3	
+0x0201c2a8	main	496	legacy_sp3	factory	parked	3.8	asm-int	PROVISIONAL:inline-asm	factory-1020-N3	
