@@ -1,0 +1,43 @@
+typedef unsigned char u8;
+typedef unsigned short u16;
+typedef unsigned int u32;
+typedef unsigned long long u64;
+typedef struct { u64 state, mul, add; } Lcg;
+extern Lcg data_0219ef3c;
+extern u32 data_0219ef1c;
+extern u8 data_0219ef2c[];
+extern u8 data_02101eac[];
+extern void func_020945f4(void *ptr, int val, unsigned count);
+extern void func_02094688(const void *src, void *dst, unsigned count);
+static inline u16 swap(u16 x) { return (x >> 8) | (x << 8); }
+u8 *func_0206fc6c(u8 *buf, int type, u32 *out) {
+    u32 value;
+    func_020945f4(buf, 0, 0xec);
+    *(u16 *)(buf + 0) = 0x101;
+    buf[2] = 6;
+    data_0219ef3c.state = data_0219ef3c.mul * data_0219ef3c.state + data_0219ef3c.add;
+    value = data_0219ef3c.state >> 32;
+    if (out) *out = value;
+    *(u16 *)(buf + 4) = swap((u16)(value >> 16));
+    *(u16 *)(buf + 6) = swap((u16)value);
+    *(u16 *)(buf + 0xc) = swap((u16)(data_0219ef1c >> 16));
+    *(u16 *)(buf + 0xe) = swap((u16)data_0219ef1c);
+    func_02094688(data_0219ef2c, buf + 0x1c, 6);
+    *(u16 *)(buf + 0xec) = 0x8263;
+    *(u16 *)(buf + 0xee) = 0x6353;
+    *(u16 *)(buf + 0xf0) = 0x135;
+    buf[0xf2] = type;
+    buf[0xf3] = 0x3d;
+    buf[0xf4] = 7;
+    buf[0xf5] = 1;
+    func_02094688(data_0219ef2c, buf + 0xf6, 6);
+    buf[0xfc] = 0xc;
+    buf[0xfd] = 0xa;
+    func_02094688(data_02101eac, buf + 0xfe, 0xa);
+    buf[0x108] = 0x37;
+    buf[0x109] = 3;
+    buf[0x10a] = 1;
+    buf[0x10b] = 3;
+    buf[0x10c] = 6;
+    return buf + 0x10d;
+}
