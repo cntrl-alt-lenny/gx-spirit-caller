@@ -6217,3 +6217,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a82d4	ov002	384	default	factory	shipped	100	n/a		factory-1019-N2	
 0x022a82d4	ov002	384	legacy_sp3	factory	parked	7.4	unknown	UNCLASSIFIED:unknown	factory-1019-N2	
 0x022a82d4	ov002	384	legacy	factory	parked	3.6	unknown	UNCLASSIFIED:unknown	factory-1019-N2	
+0x02242abc	ov002	388	default	factory	shipped	100	n/a		factory-1019-N2	
