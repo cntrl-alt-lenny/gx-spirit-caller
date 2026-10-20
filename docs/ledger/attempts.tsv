@@ -6315,3 +6315,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02080f40	main	412	default	factory	parked	7.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
 0x02080f40	main	412	legacy	factory	parked	13.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
 0x02080f40	main	412	legacy_sp3	factory	parked	61.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
+0x020b21ec	main	412	default	factory	parked	1.5	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
+0x020b21ec	main	412	legacy	factory	parked	1.4	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
+0x020b21ec	main	412	legacy_sp3	factory	parked	0.7	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
