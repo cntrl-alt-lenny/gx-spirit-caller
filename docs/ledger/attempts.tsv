@@ -7244,3 +7244,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d2c64	ov011	40	default	factory	parked	90	asm-int	PROVISIONAL:inline-asm	factory-1020-D6	
 0x021d2c64	ov011	40	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1020-D6	
 0x021d2c64	ov011	40	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1020-D6	
+0x021c1958	ov006	72	default	factory	shipped	100	n/a		factory-1020-D6	
+0x021c1958	ov006	72	legacy_sp3	factory	parked	16.7	unknown	UNCLASSIFIED:unknown	factory-1020-D6	
+0x021c1958	ov006	72	legacy	factory	parked	21.1	unknown	UNCLASSIFIED:unknown	factory-1020-D6	
