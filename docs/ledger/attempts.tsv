@@ -7250,3 +7250,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022ae7b4	ov002	524	default	factory	shipped	100	n/a		factory-1020-D1	
 0x02235480	ov002	528	default	factory	shipped	100	n/a		factory-1020-D1	
 0x02236228	ov002	528	default	factory	shipped	100	n/a		factory-1020-D1	
+0x02242f28	ov002	528	default	factory	shipped	100	n/a		factory-1020-D1	
