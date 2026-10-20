@@ -19686,7 +19686,7 @@ src/main/func_020aee3c.c:
     complete
     .text start:0x020aee3c end:0x020aee58
 
-src/main/func_020aee58.s:
+src/main/func_020aee58.c:
     complete
     .text start:0x020aee58 end:0x020aee78
 
