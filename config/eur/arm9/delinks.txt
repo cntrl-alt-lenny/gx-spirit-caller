@@ -16224,7 +16224,7 @@ src/main/func_0208ea74.legacy_sp3.c:
     complete
     .text start:0x0208ea74 end:0x0208eb40
 
-src/main/func_0208eb40.s:
+src/main/func_0208eb40.legacy.c:
     complete
     .text start:0x0208eb40 end:0x0208ecd8
 
