@@ -18799,7 +18799,7 @@ src/main/func_0209f904.s:
     complete
     .text start:0x0209f904 end:0x0209f970
 
-src/main/func_0209f970.s:
+src/main/func_0209f970.legacy.c:
     complete
     .text start:0x0209f970 end:0x0209fae4
 
