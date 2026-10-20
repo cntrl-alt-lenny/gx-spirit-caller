@@ -1794,7 +1794,7 @@ src/main/func_02010040.c:
     complete
     .text start:0x02010040 end:0x020101b4
 
-src/main/func_020101b4.s:
+src/main/func_020101b4.c:
     complete
     .text start:0x020101b4 end:0x02010354
 
