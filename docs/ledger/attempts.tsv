@@ -6339,3 +6339,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b4334	ov017	416	legacy_sp3	factory	parked	12.3	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x021b4334	ov017	416	legacy	factory	parked	12	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x021cc49c	ov004	416	default	factory	shipped	100	n/a		factory-1019-N4	
+0x02067ce8	main	420	legacy_sp3	factory	shipped	100	n/a		factory-1019-N4	
