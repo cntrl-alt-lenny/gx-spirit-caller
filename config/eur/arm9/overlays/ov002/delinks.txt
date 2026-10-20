@@ -2309,7 +2309,7 @@ src/overlay002/func_ov002_021de910.c:
     complete
     .text start:0x021de910 end:0x021de940
 
-src/overlay002/func_ov002_021de940.s:
+src/overlay002/func_ov002_021de940.c:
     complete
     .text start:0x021de940 end:0x021de9c0
 
