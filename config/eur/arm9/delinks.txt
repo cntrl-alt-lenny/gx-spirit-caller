@@ -5703,7 +5703,7 @@ src/main/func_0202e864.c:
     complete
     .text start:0x0202e864 end:0x0202e8ec
 
-src/main/func_0202e8ec.s:
+src/main/func_0202e8ec.c:
     complete
     .text start:0x0202e8ec end:0x0202eab0
 
