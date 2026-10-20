@@ -6223,3 +6223,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020965ac	main	380	default	factory	parked	6.3	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x020965ac	main	380	legacy_sp3	factory	parked	61	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x021c7d60	ov006	380	default	factory	shipped	100	n/a		factory-1019-N4	
+0x02055a84	main	384	default	factory	parked	2.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
+0x02055a84	main	384	legacy	factory	parked	14.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
+0x02055a84	main	384	legacy_sp3	factory	parked	70.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
