@@ -7053,7 +7053,7 @@ src/main/func_02036298.c:
     complete
     .text start:0x02036298 end:0x020362b0
 
-src/main/func_020362b0.s:
+src/main/func_020362b0.c:
     complete
     .text start:0x020362b0 end:0x02036474
 
