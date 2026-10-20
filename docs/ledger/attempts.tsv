@@ -6295,3 +6295,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02003400	main	488	default	factory	parked	79.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
 0x02003400	main	488	legacy	factory	parked	14.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
 0x02003400	main	488	legacy_sp3	factory	parked	15	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
+0x020035e8	main	488	default	factory	parked	28	structural	PROVISIONAL:structural	factory-1020-N3	
+0x020035e8	main	488	legacy	factory	parked	6	structural	PROVISIONAL:structural	factory-1020-N3	
+0x020035e8	main	488	legacy_sp3	factory	parked	7.6	structural	PROVISIONAL:structural	factory-1020-N3	
