@@ -15866,7 +15866,7 @@ src/main/func_0208c66c.s:
 libs/nitro/func_0208c840.legacy.c:
     complete
     .text start:0x0208c840 end:0x0208c844
-src/main/func_0208c844.s:
+src/main/func_0208c844.legacy.c:
     complete
     .text start:0x0208c844 end:0x0208c884
 
