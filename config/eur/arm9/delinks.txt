@@ -4670,7 +4670,7 @@ src/main/func_02024630.s:
     complete
     .text start:0x02024630 end:0x02025678
 
-src/main/func_02025678.s:
+src/main/func_02025678.c:
     complete
     .text start:0x02025678 end:0x02025840
 
