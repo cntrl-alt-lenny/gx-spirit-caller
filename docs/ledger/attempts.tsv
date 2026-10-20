@@ -6248,3 +6248,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202b4f4	main	448	default	factory	parked	94.6	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N3	
 0x0202b4f4	main	448	legacy	factory	parked	8.3	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N3	
 0x0202b4f4	main	448	legacy_sp3	factory	parked	8.7	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N3	
+0x0203cd38	main	448	default	factory	parked	99.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N3	
+0x0203cd38	main	448	legacy	factory	parked	60.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N3	
+0x0203cd38	main	448	legacy_sp3	factory	parked	83	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N3	
