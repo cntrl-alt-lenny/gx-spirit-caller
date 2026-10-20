@@ -7817,7 +7817,7 @@ src/main/func_0203d6c4.c:
     complete
     .text start:0x0203d6c4 end:0x0203d6e0
 
-src/main/func_0203d6e0.s:
+src/main/func_0203d6e0.legacy_sp3.c:
     complete
     .text start:0x0203d6e0 end:0x0203d888
 
