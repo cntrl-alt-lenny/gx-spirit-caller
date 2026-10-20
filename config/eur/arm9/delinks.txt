@@ -12624,7 +12624,7 @@ src/main/func_0206e7b0.c:
 
 
 
-src/main/func_0206e7bc.s:
+src/main/func_0206e7bc.legacy.c:
     complete
     .text start:0x0206e7bc end:0x0206e940
 
