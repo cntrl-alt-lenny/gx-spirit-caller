@@ -11180,7 +11180,7 @@ src/overlay002/func_ov002_0227b0b8.c:
     complete
     .text start:0x0227b0b8 end:0x0227b174
 
-src/overlay002/func_ov002_0227b174.s:
+src/overlay002/func_ov002_0227b174.c:
     complete
     .text start:0x0227b174 end:0x0227b37c
 src/overlay002/func_ov002_0227b37c.s:
