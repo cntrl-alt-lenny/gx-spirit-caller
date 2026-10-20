@@ -8544,7 +8544,7 @@ src/overlay002/func_ov002_0224b550.c:
 src/overlay002/func_ov002_0224b5b4.s:
     complete
     .text start:0x0224b5b4 end:0x0224b68c
-src/overlay002/func_ov002_0224b68c.s:
+src/overlay002/func_ov002_0224b68c.c:
     complete
     .text start:0x0224b68c end:0x0224b848
 src/overlay002/func_ov002_0224b848.s:

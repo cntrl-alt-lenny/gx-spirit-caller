@@ -6268,3 +6268,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0229ed30	ov002	428	default	factory	shipped	100	n/a		factory-1020-N2	
 0x0229eedc	ov002	428	default	factory	shipped	100	n/a		factory-1020-N2	
 0x02241a14	ov002	432	default	factory	shipped	100	n/a		factory-1020-N2	
+0x0224b68c	ov002	444	default	factory	shipped	100	n/a		factory-1020-N2	
+0x0224b68c	ov002	444	legacy	factory	parked	4.2	unknown	UNCLASSIFIED:unknown	factory-1020-N2	
+0x0224b68c	ov002	444	legacy_sp3	factory	parked	68.5	unknown	UNCLASSIFIED:unknown	factory-1020-N2	
