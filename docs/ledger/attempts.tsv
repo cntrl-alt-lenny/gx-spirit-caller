@@ -6253,3 +6253,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b0558	main	388	legacy	factory	parked	8.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
 0x020b0558	main	388	legacy_sp3	factory	parked	9.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
 0x021b40d4	ov019	388	default	factory	shipped	100	n/a		factory-1019-N4	
+0x02064dfc	main	392	legacy_sp3	factory	shipped	100	n/a		factory-1019-N4	
+0x02064dfc	main	392	default	factory	parked	3	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
