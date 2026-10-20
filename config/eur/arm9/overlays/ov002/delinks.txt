@@ -13150,7 +13150,7 @@ src/overlay002/func_ov002_0229ec04.c:
 src/overlay002/func_ov002_0229ed30.c:
     complete
     .text start:0x0229ed30 end:0x0229eedc
-src/overlay002/func_ov002_0229eedc.s:
+src/overlay002/func_ov002_0229eedc.c:
     complete
     .text start:0x0229eedc end:0x0229f088
 src/overlay002/func_ov002_0229f088.c:
