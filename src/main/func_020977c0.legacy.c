@@ -8,7 +8,7 @@ extern int OS_DisableIrq(void);
 extern void OS_RestoreIrq(int state);
 extern Node *data_021a8308;
 
-Node *func_020977c0(void) {
+Node *func_020977c0(int unused0, int unused1) {
     int key = func_02097d60();
     int irqState = OS_DisableIrq();
     Node *node = data_021a8308;

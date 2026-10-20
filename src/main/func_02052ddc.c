@@ -7,7 +7,7 @@
 
 extern void func_0205337c(void);
 
-asm void func_02052ddc(void) {
+asm void func_02052ddc(int unused0, int unused1, int unused2) {
     nofralloc
     ldr     ip, =func_0205337c
     mov     r3, r0

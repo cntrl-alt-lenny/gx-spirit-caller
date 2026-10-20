@@ -4,4 +4,4 @@
  *     bx  lr
  */
 
-int func_02067e8c(void) { return 1; }
+int func_02067e8c(int unused0, int unused1, int unused2, int unused3) { return 1; }

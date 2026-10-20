@@ -10,7 +10,7 @@ typedef struct {
 
 extern int func_0205d6bc(void *arg0, int junk, Item020556c8 **out);
 
-int func_020556c8(void *self) {
+int func_020556c8(void *self, int unused1) {
     Obj020556c8 *obj;
     Item020556c8 *item;
     int junk;

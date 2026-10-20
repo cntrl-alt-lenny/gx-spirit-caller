@@ -12,6 +12,6 @@
 
 extern int *func_020540d0(int x);
 
-int func_0206b644(int *p) {
+int func_0206b644(int *p, int unused1) {
     return *func_020540d0(p[1]);
 }

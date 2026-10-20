@@ -13,6 +13,6 @@
 
 extern int func_02053688(void);
 
-int func_020531a0(void) {
+int func_020531a0(int unused0) {
     return func_02053688() == 1 ? 1 : 0;
 }

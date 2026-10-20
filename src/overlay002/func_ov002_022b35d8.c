@@ -7,7 +7,7 @@ extern void *func_02006c0c(const char *name, int heap, int flag);
 extern void *func_0201d738(void *self);
 extern void func_02094550(int *src, int *dst, unsigned int count);
 extern void Task_Invoke(void *p);
-void func_ov002_022b35d8(void *self, int kind) {
+void func_ov002_022b35d8(void *self, int kind, int unused2) {
     s8 name[32];
     s8 *part = 0;
     void *task;

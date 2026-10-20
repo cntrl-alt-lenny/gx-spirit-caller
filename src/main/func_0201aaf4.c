@@ -7,7 +7,7 @@
 
 extern void *GetSystemWork(void);
 
-asm void func_0201aaf4(void) {
+asm void func_0201aaf4(int unused0) {
     nofralloc
     stmdb   sp!, {r4, lr}
     mov     r4, r0

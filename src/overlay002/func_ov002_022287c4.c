@@ -14,7 +14,7 @@ extern int func_ov002_021b99b4(unsigned bit, unsigned field9);
 extern int func_ov002_021c33e4(int bit, int bit2, int idx);
 extern int func_ov002_0227adb8(u32 bit, void *p, int one, u32 w);
 
-int func_ov002_022287c4(struct Ov002287Self *self) {
+int func_ov002_022287c4(struct Ov002287Self *self, int unused1) {
     int idx;
     char *ptr;
 

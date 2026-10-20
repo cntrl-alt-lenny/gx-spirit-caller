@@ -18,7 +18,7 @@ extern void func_ov002_0225935c(int arg0, int arg1, int arg2);
 extern int func_ov002_022593f4(void);
 extern int func_ov002_021de408(int a, int b);
 extern int func_ov002_0225764c(int arg0, int arg1, int arg2);
-int func_ov002_02216180(struct Self *self) {
+int func_ov002_02216180(struct Self *self, int unused1) {
     if (self->blocked) return 0;
     switch (data_ov002_022ce288.mode) {
     case 0x80:

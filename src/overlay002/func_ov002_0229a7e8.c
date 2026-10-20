@@ -30,7 +30,7 @@ extern void *func_02006c0c(int entry,int a,int b);
 extern int func_ov002_021aea7c(void *p);
 extern void Task_InvokeLocked(void *p);
 extern int func_ov002_021aea58(void);
-extern void func_ov002_021ae89c(void);
+extern int func_ov002_021ae89c(void);
 extern void func_0208e2f4(u16 *ptr,fx32 a,fx32 brightness);
 extern void func_ov002_022aa7b8(void *p);
 extern void func_ov002_022a57b8(void *p,int a,int b);

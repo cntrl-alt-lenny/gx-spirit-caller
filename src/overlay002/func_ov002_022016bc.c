@@ -7,7 +7,7 @@
  */
 #include "ov002_core.h"
 
-int func_ov002_022016bc(void *arg0) {
+int func_ov002_022016bc(void *arg0, int unused1) {
     struct Ov002Self *self = (struct Ov002Self *)arg0;
     u16 h;
     int field6;

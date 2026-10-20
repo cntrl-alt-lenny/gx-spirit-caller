@@ -11,7 +11,7 @@ typedef struct {
     int field_10;        /* +0x10 */
 } Obj02065788;
 
-void func_02065788(void) {
+void func_02065788(int unused0) {
     Obj02065788 *self = func_02065fa8();
     if (self == 0) return;
 

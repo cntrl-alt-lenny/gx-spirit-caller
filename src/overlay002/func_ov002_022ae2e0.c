@@ -26,7 +26,7 @@ void func_ov002_022ae2e0(void *arr, int idx, int target) {
     func_0201d47c((Obj *)&d);
     d.task = task;
     d.flags = (d.flags & ~0xf) | 9;
-    d.fc = (idx << 11) + 0x80 + 0x4000;
+    d.fc = (idx << 11) + 0x4080;
     d.f10 = -1;
     func_0201e5b8(&d);
     Task_Invoke(task);
