@@ -7254,3 +7254,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a68ec	ov002	528	default	factory	parked	18.2	structural	PROVISIONAL:structural	factory-1020-D1	
 0x022a68ec	ov002	528	legacy	factory	parked	8.3	structural	PROVISIONAL:structural	factory-1020-D1	
 0x022a68ec	ov002	528	legacy_sp3	factory	parked	8.3	structural	PROVISIONAL:structural	factory-1020-D1	
+0x021cfb94	ov002	532	default	factory	shipped	100	n/a		factory-1020-D1	
