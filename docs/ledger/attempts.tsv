@@ -6309,3 +6309,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208eb40	main	408	legacy	factory	shipped	100	n/a		factory-1019-N4	
 0x021ab5c8	ov022	408	default	factory	shipped	100	n/a		factory-1019-N4	
 0x021acf80	ov018	408	default	factory	shipped	100	n/a		factory-1019-N4	
+0x021b9ef8	ov006	408	default	factory	shipped	100	n/a		factory-1019-N4	
+0x021b9ef8	ov006	408	legacy	factory	parked	43.3	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
+0x021b9ef8	ov006	408	legacy_sp3	factory	parked	43.7	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
