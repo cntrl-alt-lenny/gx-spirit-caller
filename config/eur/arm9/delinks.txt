@@ -8060,7 +8060,7 @@ src/main/func_0203f968.s:
     complete
     .text start:0x0203f968 end:0x0203fc70
 
-src/main/func_0203fc70.s:
+src/main/func_0203fc70.legacy_sp3.c:
     complete
     .text start:0x0203fc70 end:0x0203fe78
 
