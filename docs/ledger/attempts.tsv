@@ -6220,3 +6220,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203d6e0	main	424	legacy_sp3	factory	shipped	100	n/a		factory-1019-N3	
 0x0203f7c0	main	424	legacy_sp3	factory	shipped	100	n/a		factory-1019-N3	
 0x0203f7c0	main	424	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1019-N3	
+0x0203a370	main	432	default	factory	parked	7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N3	
+0x0203a370	main	432	legacy	factory	parked	2.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N3	
+0x0203a370	main	432	legacy_sp3	factory	parked	2.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N3	
