@@ -2139,7 +2139,7 @@ src/main/func_02013b4c.c:
     complete
     .text start:0x02013b4c end:0x02013c64
 
-src/main/func_02013c64.s:
+src/main/func_02013c64.c:
     complete
     .text start:0x02013c64 end:0x02013e4c
 
