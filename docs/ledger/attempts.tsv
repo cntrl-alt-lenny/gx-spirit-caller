@@ -6214,3 +6214,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02044cb8	main	416	legacy	factory	parked	16.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N3	
 0x02044cb8	main	416	legacy_sp3	factory	parked	80.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N3	
 0x02015494	main	420	default	factory	shipped	100	n/a		factory-1019-N3	
+0x0204c1e0	main	420	legacy_sp3	factory	shipped	100	n/a		factory-1019-N3	
