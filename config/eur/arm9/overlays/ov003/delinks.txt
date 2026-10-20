@@ -40,7 +40,7 @@ src/overlay003/func_ov003_021cbdf4.s:
     complete
     .text start:0x021cbdf4 end:0x021cbe8c
 
-src/overlay003/func_ov003_021cbe8c.s:
+src/overlay003/func_ov003_021cbe8c.c:
     complete
     .text start:0x021cbe8c end:0x021cbf08
 src/overlay003/func_ov003_021cbf08.s:
