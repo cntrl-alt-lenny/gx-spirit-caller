@@ -6280,3 +6280,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02086ad4	main	396	default	factory	parked	25.2	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x02086ad4	main	396	legacy	factory	parked	92.9	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x020a0a4c	main	396	legacy	factory	shipped	100	n/a		factory-1019-N4	
+0x021acef8	ov000	396	default	factory	shipped	100	n/a		factory-1019-N4	
+0x021acef8	ov000	396	legacy_sp3	factory	parked	1	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
+0x021acef8	ov000	396	legacy	factory	parked	1	unknown	UNCLASSIFIED:unknown	factory-1019-N4	

@@ -547,7 +547,7 @@ src/overlay000/ov000_021acebc.c:
 
 
 
-src/overlay000/func_ov000_021acef8.s:
+src/overlay000/func_ov000_021acef8.c:
     complete
     .text start:0x021acef8 end:0x021ad084
 
