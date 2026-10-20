@@ -2142,7 +2142,7 @@ src/overlay006/func_ov006_021cae24.c:
     complete
     .text start:0x021cae24 end:0x021caea8
 
-src/overlay006/func_ov006_021caea8.s:
+src/overlay006/func_ov006_021caea8.c:
     complete
     .text start:0x021caea8 end:0x021cb028
 
