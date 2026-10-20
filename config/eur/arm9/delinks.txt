@@ -10462,7 +10462,7 @@ src/main/func_0205c7d8.c:
     complete
     .text start:0x0205c7d8 end:0x0205c7f4
 
-src/main/func_0205c7f4.s:
+src/main/func_0205c7f4.legacy.c:
     complete
     .text start:0x0205c7f4 end:0x0205c830
 
