@@ -6429,7 +6429,7 @@ src/overlay002/func_ov002_0221f2b0.s:
 src/overlay002/func_ov002_0221f6c4.s:
     complete
     .text start:0x0221f6c4 end:0x0221fafc
-src/overlay002/func_ov002_0221fafc.s:
+src/overlay002/func_ov002_0221fafc.c:
     complete
     .text start:0x0221fafc end:0x0221fcbc
 
