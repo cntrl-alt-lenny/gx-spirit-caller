@@ -6326,3 +6326,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02098478	main	416	default	factory	parked	8.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
 0x02098478	main	416	legacy	factory	parked	76.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
 0x02098478	main	416	legacy_sp3	factory	parked	30.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N4	
+0x021ab4f4	ov018	416	default	factory	shipped	100	n/a		factory-1019-N4	
+0x021ab4f4	ov018	416	legacy	factory	parked	3.2	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
+0x021ab4f4	ov018	416	legacy_sp3	factory	parked	3.2	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
