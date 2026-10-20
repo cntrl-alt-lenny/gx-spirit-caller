@@ -7220,3 +7220,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022b8430	ov002	144	default	matched-only-via-volatile-cast-of-a-parameter	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1019-review	
 0x021dbd48	ov002	460	default	verifier-found-match	shipped	100	n/a		factory-1019-review	
 0x0221f0e4	ov002	460	default	verifier-found-match	shipped	100	n/a		factory-1019-review	
+0x0207708c	main	8	default	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1020-D3	
+0x0207708c	main	8	legacy	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1020-D3	
+0x0207708c	main	8	legacy_sp3	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1020-D3	
