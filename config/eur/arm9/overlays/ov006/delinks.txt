@@ -802,7 +802,7 @@ src/overlay006/ov006_021b9c88.c:
 
 
 
-src/overlay006/func_ov006_021b9c98.s:
+src/overlay006/func_ov006_021b9c98.c:
     complete
     .text start:0x021b9c98 end:0x021b9d1c
 
