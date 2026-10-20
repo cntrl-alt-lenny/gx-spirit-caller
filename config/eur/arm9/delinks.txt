@@ -1176,7 +1176,7 @@ src/main/func_020092e0.s:
     complete
     .text start:0x020092e0 end:0x02009494
 
-src/main/func_02009494.s:
+src/main/func_02009494.c:
     complete
     .text start:0x02009494 end:0x0200962c
 
