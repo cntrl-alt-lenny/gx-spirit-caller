@@ -6229,3 +6229,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0223976c	ov002	456	default	factory	parked	79	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
 0x0223976c	ov002	456	legacy	factory	parked	0.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
 0x0223976c	ov002	456	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
+0x021dbd48	ov002	460	default	factory	parked	99.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N1	
+0x021dbd48	ov002	460	legacy	factory	parked	2.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N1	
+0x021dbd48	ov002	460	legacy_sp3	factory	parked	5.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1019-N1	
