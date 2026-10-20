@@ -6292,3 +6292,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02044eec	main	484	legacy_sp3	factory	shipped	100	n/a		factory-1020-N3	
 0x02044eec	main	484	default	factory	parked	29.8	unknown	UNCLASSIFIED:unknown	factory-1020-N3	
 0x02044eec	main	484	legacy	factory	parked	7.1	unknown	UNCLASSIFIED:unknown	factory-1020-N3	
+0x02003400	main	488	default	factory	parked	79.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
+0x02003400	main	488	legacy	factory	parked	14.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
+0x02003400	main	488	legacy_sp3	factory	parked	15	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
