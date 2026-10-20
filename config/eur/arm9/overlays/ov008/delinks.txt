@@ -293,7 +293,7 @@ src/overlay008/func_ov008_021b0bc4.s:
     complete
     .text start:0x021b0bc4 end:0x021b16f8
 
-src/overlay008/func_ov008_021b16f8.s:
+src/overlay008/func_ov008_021b16f8.c:
     complete
     .text start:0x021b16f8 end:0x021b18a4
 
