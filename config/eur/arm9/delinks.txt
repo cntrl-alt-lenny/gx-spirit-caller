@@ -1557,7 +1557,7 @@ src/main/func_0200b614.c:
     complete
     .text start:0x0200b614 end:0x0200b7fc
 
-src/main/func_0200b7fc.s:
+src/main/func_0200b7fc.c:
     complete
     .text start:0x0200b7fc end:0x0200ba00
 

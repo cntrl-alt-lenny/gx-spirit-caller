@@ -7223,3 +7223,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200a488	main	516	default	factory	parked	79.1	register-numbering-permutation-cascade	P-30	factory-1020-D2	
 0x0200a488	main	516	legacy	factory	parked	1.4	register-numbering-permutation-cascade	P-30	factory-1020-D2	
 0x0200a488	main	516	legacy_sp3	factory	parked	1.4	register-numbering-permutation-cascade	P-30	factory-1020-D2	
+0x0200b7fc	main	516	default	factory	shipped	100	n/a		factory-1020-D2	
+0x0200b7fc	main	516	legacy	factory	parked	0.7	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
+0x0200b7fc	main	516	legacy_sp3	factory	parked	1.4	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
