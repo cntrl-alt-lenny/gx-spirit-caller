@@ -6272,3 +6272,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02036080	main	460	default	factory	parked	98.3	unknown	UNCLASSIFIED:unknown	factory-1019-N3	
 0x02036080	main	460	legacy	factory	parked	5.8	unknown	UNCLASSIFIED:unknown	factory-1019-N3	
 0x02036080	main	460	legacy_sp3	factory	parked	7.8	unknown	UNCLASSIFIED:unknown	factory-1019-N3	
+0x0201adb0	main	464	default	factory	shipped	100	n/a		factory-1020-N3	
