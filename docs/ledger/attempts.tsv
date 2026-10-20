@@ -6248,3 +6248,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02062600	main	388	legacy_sp3	factory	parked	88.7	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N4	
 0x0206bb68	main	388	legacy	factory	shipped	100	n/a		factory-1019-N4	
 0x0206e7bc	main	388	legacy	factory	shipped	100	n/a		factory-1019-N4	
+0x0208ca04	main	388	legacy	factory	shipped	100	n/a		factory-1019-N4	
