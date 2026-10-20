@@ -19076,7 +19076,7 @@ src/main/func_020a3830.c:
 
 
 
-src/main/func_020a3840.s:
+src/main/func_020a3840.legacy.c:
     complete
     .text start:0x020a3840 end:0x020a39ec
 
