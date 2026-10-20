@@ -6229,3 +6229,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02057980	main	384	legacy_sp3	factory	shipped	100	n/a		factory-1019-N4	
 0x02057980	main	384	default	factory	parked	28.1	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x02057980	main	384	legacy	factory	parked	14.1	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
+0x0207352c	main	384	legacy	factory	shipped	100	n/a		factory-1019-N4	
