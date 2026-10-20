@@ -6348,3 +6348,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c9e98	ov011	420	legacy_sp3	factory	parked	34.2	structural	PROVISIONAL:structural	factory-1019-N4	
 0x021b2630	ov010	424	default	factory	shipped	100	n/a		factory-1019-N4	
 0x021b2630	ov015	424	default	factory	shipped	100	n/a		factory-1019-N4	
+0x021ca42c	ov013	424	default	factory	parked	97.2	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
+0x021ca42c	ov013	424	legacy	factory	parked	29.2	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
+0x021ca42c	ov013	424	legacy_sp3	factory	parked	29.5	asm-int	PROVISIONAL:inline-asm	factory-1019-N4	
