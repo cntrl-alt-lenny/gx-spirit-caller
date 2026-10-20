@@ -6310,3 +6310,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022029e0	ov002	152	legacy_sp3	factory	parked	15	unknown	UNCLASSIFIED:unknown	factory-1020-N5	
 0x022029e0	ov002	152	legacy	factory	parked	14.3	unknown	UNCLASSIFIED:unknown	factory-1020-N5	
 0x02238cb4	ov002	152	default	factory	shipped	100	n/a		factory-1020-N5	
+0x02296ebc	ov002	152	default	factory	parked	89.5	reg-alloc	PROVISIONAL:register-allocation	factory-1020-N5	
+0x02296ebc	ov002	152	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1020-N5	
+0x02296ebc	ov002	152	legacy_sp3	factory	parked	5	reg-alloc	PROVISIONAL:register-allocation	factory-1020-N5	
