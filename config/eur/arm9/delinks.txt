@@ -2999,7 +2999,7 @@ src/main/func_0201a110.c:
 src/main/func_0201a134.s:
     complete
     .text start:0x0201a134 end:0x0201a170
-src/main/func_0201a170.c:
+src/main/func_0201a170.s:
     complete
     .text start:0x0201a170 end:0x0201a32c
 src/main/func_0201a32c.c:
