@@ -24,7 +24,7 @@ int func_ov002_0223a118(struct Ov002Self *self) {
  if (*(u16 *)(data_ov002_022cf1a4 + off + roff) == 0) return 0;
  if (self->kind == 5) {
   value = func_ov002_021b4120(self->side, self->idx, 0x1472);
-  side = ((volatile struct Ov002Self *)self)->side;
+  side = ((struct Ov002Self *)self)->side;
   if ((unsigned char)value == side && func_ov002_021c9dac(side) != 0)
    func_ov002_021d6c98(self, self->side, self->idx);
  } else {

@@ -1,7 +1,7 @@
 typedef struct {
  unsigned short f0;
  unsigned short side:1, pad1:13, flip:1, pad2:1;
- unsigned short f4,f6; volatile unsigned short result;
+ unsigned short f4,f6; unsigned short result;
 } Self;
 typedef struct { char pad[0x5b4]; int state; } State;
 typedef struct { unsigned int pad0:13, bit:1, pad1:8, id:8, pad2:2; } Entry;

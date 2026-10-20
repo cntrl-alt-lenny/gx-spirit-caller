@@ -1,8 +1,8 @@
-typedef struct { volatile unsigned int control; unsigned short status; unsigned short vcount; volatile unsigned short bg[4]; } Display;
+typedef struct { unsigned int control; unsigned short status; unsigned short vcount; unsigned short bg[4]; } Display;
 typedef struct { unsigned int low:8; unsigned int mode:5; unsigned int high:19; } DisplayControl;
 typedef struct { char pad[0x50]; int start; int end; } Timers;
 extern Timers data_ov018_021ad860;
-typedef struct { int state; int field4; int divisor; volatile int timer; } State;
+typedef struct { int state; int field4; int divisor; int timer; } State;
 extern State data_ov018_021ad8a8;
 extern int func_02037b34(void);
 extern int func_020379f8(int id);
@@ -11,10 +11,10 @@ extern void func_0208c940(void);
 extern void func_0208c884(unsigned short *a0, int a1);
 extern int func_020b3870(int a, int b);
 
-static inline void setPlanes(volatile unsigned int *reg, unsigned int planes) {
+static inline void setPlanes(unsigned int *reg, unsigned int planes) {
     *reg = (*reg & ~0x1f00) | (planes << 8);
 }
-static inline void setPriority(volatile unsigned short *reg, int priority) {
+static inline void setPriority(unsigned short *reg, int priority) {
     *reg = (*reg & ~3) | priority;
 }
 int func_ov018_021ab4f4(void) {

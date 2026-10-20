@@ -7,7 +7,7 @@ struct Obj {
  unsigned short rest:4;
 };
 struct Record { u32 card:13; u32 bit:1; u32 pad:8; u32 value:8; u32 pad2:2; };
-struct State { char pad[0x5a8]; int state; volatile int index; };
+struct State { char pad[0x5a8]; int state; int index; };
 extern int data_ov002_022be13c[];
 extern int data_ov002_022be144[];
 extern struct State data_ov002_022ce288;

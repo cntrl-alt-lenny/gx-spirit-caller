@@ -4,8 +4,8 @@ typedef struct {
     unsigned short : 15;
 } Card;
 typedef struct {
-    volatile unsigned int id : 13;
-    volatile unsigned int side : 1;
+    unsigned int id : 13;
+    unsigned int side : 1;
     unsigned int : 18;
     unsigned int pad4;
     unsigned short active;

@@ -3,7 +3,7 @@ extern void Fill32(unsigned int value, void *dest, unsigned int size);
 extern unsigned char data_ov006_0225c4dc[];
 extern unsigned int data_021040ac[];
 /* The original reloads these bytes on each loop iteration. */
-extern volatile unsigned char data_02104f54[];
+extern unsigned char data_02104f54[];
 
 typedef struct Entry {
     int x, y, z;
@@ -20,7 +20,7 @@ typedef struct State {
     Entry entries[5];
 } State;
 int func_ov006_021b9ef8(State *s, int mode, int flag) {
-    volatile unsigned char *bytes;
+    unsigned char *bytes;
     int i;
     Entry *entry;
     Fill32(0, data_ov006_0225c4dc, 0x674);

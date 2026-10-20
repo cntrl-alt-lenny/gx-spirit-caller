@@ -27,7 +27,7 @@ void func_0207e3d4(Header *h) {
         int b;
         SubHeader *s;
         h->f14 += (int)h;
-        s = (SubHeader *)(*(volatile int *)&h->f14 + 8);
+        s = (SubHeader *)(*(int *)&h->f14 + 8);
         s->entries = (SubEntry *)((int)s->entries + (int)s);
         for (a=0; (u32)a<s->count; a++) {
             SubEntry *e = &s->entries[a];

@@ -1,4 +1,4 @@
-typedef struct { volatile unsigned int control; char pad[0x68]; unsigned short brightness; } Display;
+typedef struct { unsigned int control; char pad[0x68]; unsigned short brightness; } Display;
 typedef unsigned short u16;
 typedef struct { int index; u16 first,last,previous,other,pad0c,saved; int pad10; int active; } State;
 typedef struct { u16 a,b,flags,d; } Entry;

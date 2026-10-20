@@ -1,4 +1,4 @@
-typedef struct { unsigned short index:1; unsigned short type:5; unsigned short sub:8; volatile unsigned short flag:1; volatile unsigned short high:1; } Selection;
+typedef struct { unsigned short index:1; unsigned short type:5; unsigned short sub:8; unsigned short flag:1; unsigned short high:1; } Selection;
 typedef struct { unsigned short index:1; unsigned short type:5; unsigned short sub:8; unsigned short flag:1; unsigned short high:1; } PlainSelection;
 typedef struct { int active; int id; } Pair;
 extern Pair data_ov002_022d28fc[];
@@ -18,7 +18,7 @@ int func_ov002_022bbcb4(char *self) {
                   | (((Selection *)(self + 0xc6a))->type == 11 ? 4 : 0)
                   | (((PlainSelection *)(self + 0xc6c))->high ? 16 : 0)
                   | (((Selection *)(self + 0xc6c))->flag ? 32 : 0)
-                  | (((volatile Selection *)(self + 0xc6c))->type == 11 ? 64 : 0);
+                  | (((Selection *)(self + 0xc6c))->type == 11 ? 64 : 0);
         if (((Selection *)(self + 0xc6a))->type == 11)
             *(int *)(self + 0xc90) += 29;
 
