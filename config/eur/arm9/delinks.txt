@@ -579,7 +579,7 @@ src/main/func_02001e54.c:
 
 
 
-src/main/func_02001e5c.s:
+src/main/func_02001e5c.c:
     complete
     .text start:0x02001e5c end:0x02001e84
 
