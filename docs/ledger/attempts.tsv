@@ -6268,3 +6268,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203f37c	main	456	default	factory	parked	3.5	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N3	
 0x0203f37c	main	456	legacy	factory	parked	83.5	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N3	
 0x0203f37c	main	456	legacy_sp3	factory	parked	94.7	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N3	
+0x0202928c	main	460	default	factory	shipped	100	n/a		factory-1019-N3	
