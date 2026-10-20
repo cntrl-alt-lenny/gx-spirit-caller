@@ -7240,3 +7240,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02220f48	ov002	264	default	factory	shipped	100	n/a		factory-1020-D4	
 0x022341c8	ov002	264	default	factory	shipped	100	n/a		factory-1020-D4	
 0x02236bbc	ov002	264	default	factory	shipped	100	n/a		factory-1020-D4	
+0x022930ec	ov002	264	default	factory	shipped	100	n/a		factory-1020-D4	
+0x022930ec	ov002	264	legacy_sp3	factory	parked	61.2	unknown	UNCLASSIFIED:unknown	factory-1020-D4	
+0x022930ec	ov002	264	legacy	factory	parked	11.4	unknown	UNCLASSIFIED:unknown	factory-1020-D4	
