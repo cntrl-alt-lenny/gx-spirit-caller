@@ -6281,3 +6281,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02022b74	main	480	default	factory	parked	80	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
 0x02022b74	main	480	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
 0x02022b74	main	480	legacy_sp3	factory	parked	0.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-N3	
+0x02047c08	main	480	legacy_sp3	factory	shipped	100	n/a		factory-1020-N3	
+0x02047c08	main	480	default	factory	parked	84.2	unknown	UNCLASSIFIED:unknown	factory-1020-N3	
+0x02047c08	main	480	legacy	factory	parked	69.4	unknown	UNCLASSIFIED:unknown	factory-1020-N3	
