@@ -11194,7 +11194,7 @@ src/main/func_02064490.c:
     complete
     .text start:0x02064490 end:0x020644a4
 
-src/main/func_020644a4.s:
+src/main/func_020644a4.c:
     complete
     .text start:0x020644a4 end:0x020644c4
 
