@@ -103,7 +103,7 @@ src/overlay015/func_ov015_021b25f8.c:
     complete
     .text start:0x021b25f8 end:0x021b2630
 
-src/overlay015/func_ov015_021b2630.s:
+src/overlay015/func_ov015_021b2630.c:
     complete
     .text start:0x021b2630 end:0x021b27d8
 
@@ -219,7 +219,7 @@ src/overlay015/Ov015_RegisterCallbacks.c:
     complete
     .text start:0x021b2bf8 end:0x021b2c18
 
-src/overlay015/func_ov015_021b2c18.s:
+src/overlay015/func_ov015_021b2c18.c:
     complete
     .text start:0x021b2c18 end:0x021b2db8
 
@@ -380,7 +380,7 @@ src/overlay015/func_ov015_021b4444.s:
     complete
     .text start:0x021b4444 end:0x021b4574
 
-src/overlay015/func_ov015_021b4574.s:
+src/overlay015/func_ov015_021b4574.c:
     complete
     .text start:0x021b4574 end:0x021b46c8
 

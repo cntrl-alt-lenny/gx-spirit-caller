@@ -354,7 +354,7 @@ src/overlay005/ov005_stubs_ad058.c:
 
 
 
-src/overlay005/func_ov005_021ad060.s:
+src/overlay005/func_ov005_021ad060.c:
     complete
     .text start:0x021ad060 end:0x021ad20c
 

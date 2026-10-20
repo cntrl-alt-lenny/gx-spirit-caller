@@ -6,7 +6,7 @@
 
 extern void func_ov002_0229ade0(void);
 
-asm void func_ov002_021ae70c(void) {
+asm void func_ov002_021ae70c(int unused0, int unused1, int unused2, int unused3, int unused4) {
     nofralloc
     stmdb sp!, {r3, lr}
     ldr ip, [sp, #8]

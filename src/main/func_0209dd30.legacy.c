@@ -12,7 +12,7 @@ extern int  func_02096358(int a, int b, int c);
 extern void func_0209256c(void *a, void *b, int c);
 extern int data_021a8d30;
 
-int func_0209dd30(int arg0, unsigned short count, int arg2, int arg3) {
+int func_0209dd30(int arg0, unsigned short count, int arg2, int arg3, int unused4) {
     int *p;
     int i;
     int r;

@@ -4,7 +4,7 @@
  * reachable from natural C without risking a mismatch.
  */
 
-asm void func_ov002_022b3434(void) {
+asm void func_ov002_022b3434(int unused0, int unused1) {
     nofralloc
     ldr r1, [r0, #0x4]
     cmp r1, #0x0

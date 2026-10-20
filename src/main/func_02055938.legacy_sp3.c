@@ -21,7 +21,7 @@ extern int func_0205ffc0(void *arg0, void *key);
 
 extern char data_020ffc10[];
 
-int func_02055938(void *arg0) {
+int func_02055938(void *arg0, int unused1) {
     obj_t *obj;
     item_t *item;
     int junk;
