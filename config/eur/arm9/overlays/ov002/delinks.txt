@@ -13751,7 +13751,7 @@ src/overlay002/func_ov002_022b53c4.c:
     complete
     .text start:0x022b53c4 end:0x022b540c
 
-src/overlay002/func_ov002_022b540c.s:
+src/overlay002/func_ov002_022b540c.c:
     complete
     .text start:0x022b540c end:0x022b5588
 libs/nitro/func_ov002_022b5588.legacy.c:
