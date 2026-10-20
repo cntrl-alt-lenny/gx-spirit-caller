@@ -6343,3 +6343,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b646c	ov017	420	default	factory	shipped	100	n/a		factory-1019-N4	
 0x021b646c	ov017	420	legacy_sp3	factory	parked	54.3	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
 0x021b646c	ov017	420	legacy	factory	parked	44.3	unknown	UNCLASSIFIED:unknown	factory-1019-N4	
+0x021c9e98	ov011	420	default	factory	parked	95.2	structural	PROVISIONAL:structural	factory-1019-N4	
+0x021c9e98	ov011	420	legacy	factory	parked	10.7	structural	PROVISIONAL:structural	factory-1019-N4	
+0x021c9e98	ov011	420	legacy_sp3	factory	parked	34.2	structural	PROVISIONAL:structural	factory-1019-N4	
