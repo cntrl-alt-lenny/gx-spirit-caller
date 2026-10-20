@@ -7227,3 +7227,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0227b174	ov002	520	default	factory	shipped	100	n/a		factory-1020-D1	
 0x0227b174	ov002	520	legacy	factory	parked	22.1	unknown	UNCLASSIFIED:unknown	factory-1020-D1	
 0x0227b174	ov002	520	legacy_sp3	factory	parked	50.4	unknown	UNCLASSIFIED:unknown	factory-1020-D1	
+0x0227ee34	ov002	520	default	factory	shipped	100	n/a		factory-1020-D1	
