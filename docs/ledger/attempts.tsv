@@ -6310,3 +6310,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0220be14	ov002	508	default	factory	shipped	100	n/a		factory-1019-N1	
 0x02234950	ov002	508	default	factory	shipped	100	n/a		factory-1019-N1	
 0x022369c0	ov002	508	default	factory	shipped	100	n/a		factory-1019-N1	
+0x02236f18	ov002	508	default	factory	parked	88.2	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N1	
+0x02236f18	ov002	508	legacy	factory	parked	4.5	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N1	
+0x02236f18	ov002	508	legacy_sp3	factory	parked	19.5	reg-alloc	PROVISIONAL:register-allocation	factory-1019-N1	
