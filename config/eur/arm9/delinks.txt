@@ -19168,7 +19168,7 @@ src/main/func_020a5668.legacy.c:
     complete
     .text start:0x020a5668 end:0x020a56bc
 
-src/main/func_020a56bc.s:
+src/main/func_020a56bc.legacy.c:
     complete
     .text start:0x020a56bc end:0x020a584c
 
