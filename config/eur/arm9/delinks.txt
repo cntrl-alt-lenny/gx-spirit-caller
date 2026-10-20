@@ -9189,7 +9189,7 @@ src/main/func_0204d468.s:
     complete
     .text start:0x0204d468 end:0x0204d4b4
 
-src/main/func_0204d4b4.s:
+src/main/func_0204d4b4.legacy_sp3.c:
     complete
     .text start:0x0204d4b4 end:0x0204d674
 
