@@ -7441,7 +7441,7 @@ src/main/func_0203a150.c:
     complete
     .text start:0x0203a150 end:0x0203a194
 
-src/main/func_0203a194.s:
+src/main/func_0203a194.c:
     complete
     .text start:0x0203a194 end:0x0203a370
 
