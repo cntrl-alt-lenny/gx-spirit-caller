@@ -4732,7 +4732,7 @@ src/main/func_020265e4.s:
     complete
     .text start:0x020265e4 end:0x0202695c
 
-src/main/func_0202695c.s:
+src/main/func_0202695c.c:
     complete
     .text start:0x0202695c end:0x02026b38
 
