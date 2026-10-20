@@ -10,7 +10,7 @@ extern int func_ov002_021bc618(int arg0);
 extern unsigned int func_0202b878(int id);
 extern unsigned int func_0202b890(int id);
 extern int func_ov002_021c93cc(int a, int b, int bit);
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 
 int func_ov002_0226e580(int player, int card) {
     int count = func_ov002_0226e46c(card);
@@ -38,6 +38,6 @@ int func_ov002_0226e580(int player, int card) {
         }
         return 0;
     } else {
-        return func_ov002_022536e8((void *)player, card, 0) >= count;
+        return func_ov002_022536e8(player, card, 0) >= count;
     }
 }

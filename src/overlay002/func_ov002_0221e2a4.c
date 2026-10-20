@@ -8,7 +8,7 @@ extern struct Totals data_ov002_022cf16c;
 extern struct Result data_ov002_022d016c;
 extern int func_ov002_02257704(void *self);
 extern int func_ov002_021de408(int a, int b);
-extern void func_ov002_021e276c(void *self, int a, int b, int c);
+extern void func_ov002_021e276c(int self, int a, int b, int c);
 extern int func_ov002_022577dc(void *self);
 extern void func_ov002_0229cf10(char *dst, const char *fmt, int val);
 extern void func_ov002_021ae400(int a, int b);
@@ -24,7 +24,7 @@ int func_ov002_0221e2a4(struct Self *self) {
  case 0x80:
   data_ov002_022ce288.remaining = data_ov002_022cf16c.a + data_ov002_022cf16c.b;
   func_ov002_021de408((int)self, func_ov002_02257704(self));
-  func_ov002_021e276c((void *)self->player, self->id, 1, 0);
+  func_ov002_021e276c(self->player, self->id, 1, 0);
   return 0x7f;
  case 0x7f:
   { int a = data_ov002_022cf16c.a; int b = data_ov002_022cf16c.b; data_ov002_022ce288.remaining = (a + b) - data_ov002_022ce288.remaining; }

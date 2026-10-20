@@ -21,7 +21,7 @@ extern int func_020459c4(unsigned short *arr);
 extern void func_020945f4(void *, int, unsigned int);
 extern void func_02094688(const void *, void *, unsigned int);
 extern void func_020aadf8(char *, const char *);
-extern void func_020454cc(int,int);
+extern void *func_020454cc(void *, unsigned int);
 extern void func_0204548c(int,int,int);
 extern void *func_020454ac(int,int,int);
 extern int func_0204052c(Config *config, void *arg);
@@ -46,7 +46,7 @@ void func_02047c08(void *cb, int arg) {
     }
     func_02094688(*(void **)(data_0219dc78+0x10),&config,(func_020459c4(*(unsigned short **)(data_0219dc78+0x10))<<1)+2);
     func_020aadf8(config.text,data_0219dc78+0x251);
-    config.alloc=(void *(*)(void *, unsigned int))func_020454cc;
+    config.alloc=func_020454cc;
     config.free=func_0204548c;
     handle=func_020454ac(0,0x1c10,4);
     *(void **)(data_0219dc78+0x24)=handle;

@@ -6,7 +6,7 @@ extern u16 func_ov002_0223de94(struct node *arg0, int arg1);
 extern int func_ov002_022575c8(int a0, int a1, int a2);
 /* This caller supplies only r0 and r1; the thunk definition has four parameters. */
 extern int func_ov002_021c84e0();
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 extern int func_ov002_021bcf00(int a);
 int func_ov002_0228b9d8(Obj *self, Obj *other)
 {
@@ -22,10 +22,10 @@ int func_ov002_0228b9d8(Obj *self, Obj *other)
         if (side == self->side && slot <= 4 && func_ov002_022575c8((int)self, side, slot) != 0) {
             switch (self->id) {
             case 0x1768:
-                if (func_ov002_022536e8((void *)self->side, self->id, func_ov002_021c84e0(side, slot) + 3) == 0) return 0;
+                if (func_ov002_022536e8(self->side, self->id, func_ov002_021c84e0(side, slot) + 3) == 0) return 0;
                 break;
             case 0x1a98:
-                if (func_ov002_022536e8((void *)self->side, self->id, func_ov002_021c84e0(side, slot)) == 0) return 0;
+                if (func_ov002_022536e8(self->side, self->id, func_ov002_021c84e0(side, slot)) == 0) return 0;
                 break;
             case 0x1a9a:
                 if (func_ov002_021bcf00(1 - self->side) == 0) return 0;

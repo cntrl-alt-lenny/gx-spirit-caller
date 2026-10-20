@@ -6,7 +6,7 @@ extern char data_ov002_022cf178[];
 extern int func_ov002_021b3ecc(int, int, int);
 extern int func_ov002_021b3fd8(int, int, int, int);
 extern void func_ov002_021df6d4(int, int);
-extern void func_ov002_021d7970(void *, int, int);
+extern void func_ov002_021d7970(int side, int, int);
 extern int func_ov002_021dec2c(int, int, int, unsigned short);
 extern void func_ov002_021d5b80(int, int, int, int);
 int func_ov002_022645b4(int arg) {
@@ -20,7 +20,7 @@ int func_ov002_022645b4(int arg) {
                 Card *c = (Card *)(data_ov002_022cf16c + offset + 0x120) + j;
                 if (func_ov002_021b3fd8(side, 11, 0x1379, c->key*2+c->flag)) {
                     func_ov002_021df6d4(side, 0x1379);
-                    func_ov002_021d7970((void *)side, j, 0);
+                    func_ov002_021d7970(side, j, 0);
                 }
             }
             { Card *c = (Card *)(data_ov002_022cf16c + offset + 0x94);

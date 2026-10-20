@@ -19,13 +19,13 @@ extern int *func_ov002_021afb74(void);
 extern int func_ov002_021afba0(void);
 extern void func_ov002_0223de04(struct SelfDE04 *self, int arg1, int arg2, int arg3);
 extern int func_ov002_0223def4(struct Node0223def4 *self, int idx);
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 extern int func_ov002_02257ca8(void *arg0, int arg1);
 int func_ov002_02244554(struct SelfDE04 *self, int arg1) {
     int side = self->side ^ self->flip;
     switch (data_ov002_022ce288.state) {
     case 0:
-        if (func_ov002_022536e8((void *)side, self->id, 0) == 0) return 1;
+        if (func_ov002_022536e8(side, self->id, 0) == 0) return 1;
         func_ov002_021ae400(side, 0x5e);
         data_ov002_022ce288.state++;
         return 0;
