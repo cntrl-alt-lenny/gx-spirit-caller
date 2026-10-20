@@ -9274,7 +9274,7 @@ src/main/func_0204fa24.legacy_sp3.c:
 src/main/func_0204fa50.legacy_sp3.c:
     complete
     .text start:0x0204fa50 end:0x0204fa7c
-src/main/func_0204fa7c.s:
+src/main/func_0204fa7c.legacy_sp3.c:
     complete
     .text start:0x0204fa7c end:0x0204fc38
 
