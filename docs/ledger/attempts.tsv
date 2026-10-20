@@ -6284,3 +6284,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02236438	ov002	488	default	factory	shipped	100	n/a		factory-1019-N1	
 0x02236438	ov002	488	legacy	factory	parked	1.4	unknown	UNCLASSIFIED:unknown	factory-1019-N1	
 0x02236438	ov002	488	legacy_sp3	factory	parked	1.5	unknown	UNCLASSIFIED:unknown	factory-1019-N1	
+0x021ab874	ov002	492	default	factory	parked	91.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
+0x021ab874	ov002	492	legacy	factory	parked	5.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
+0x021ab874	ov002	492	legacy_sp3	factory	parked	5.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1019-N1	
