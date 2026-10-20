@@ -1812,7 +1812,7 @@ src/overlay002/func_ov002_021d1690.c:
 src/overlay002/func_ov002_021d16f8.c:
     complete
     .text start:0x021d16f8 end:0x021d17a4
-src/overlay002/func_ov002_021d17a4.s:
+src/overlay002/func_ov002_021d17a4.c:
     complete
     .text start:0x021d17a4 end:0x021d1820
 
