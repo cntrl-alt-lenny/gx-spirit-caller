@@ -7231,3 +7231,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022b4380	ov002	520	default	factory	parked	76.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D1	
 0x022b4380	ov002	520	legacy	factory	parked	1.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D1	
 0x022b4380	ov002	520	legacy_sp3	factory	parked	3.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D1	
+0x0220e77c	ov002	524	default	factory	shipped	100	n/a		factory-1020-D1	
