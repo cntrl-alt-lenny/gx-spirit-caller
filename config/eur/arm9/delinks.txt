@@ -10411,7 +10411,7 @@ src/main/func_0205bc24.s:
     complete
     .text start:0x0205bc24 end:0x0205bccc
 
-src/main/func_0205bccc.s:
+src/main/func_0205bccc.legacy.c:
     complete
     .text start:0x0205bccc end:0x0205bd0c
 
