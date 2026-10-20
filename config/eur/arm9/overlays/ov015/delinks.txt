@@ -219,7 +219,7 @@ src/overlay015/Ov015_RegisterCallbacks.c:
     complete
     .text start:0x021b2bf8 end:0x021b2c18
 
-src/overlay015/func_ov015_021b2c18.s:
+src/overlay015/func_ov015_021b2c18.c:
     complete
     .text start:0x021b2c18 end:0x021b2db8
 
