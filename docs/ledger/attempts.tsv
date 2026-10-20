@@ -7256,3 +7256,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209d788	main	28	legacy	factory	shipped	100	n/a		factory-1020-D3	
 0x0209d788	main	28	default	factory	parked	85.7	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x0209d788	main	28	legacy_sp3	factory	parked	28.6	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
+0x02007f38	main	32	default	factory	shipped	100	n/a		factory-1020-D3	
+0x02007f38	main	32	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
+0x02007f38	main	32	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
