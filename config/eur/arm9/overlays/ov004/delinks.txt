@@ -360,7 +360,7 @@ src/overlay004/func_ov004_021d2628.s:
     complete
     .text start:0x021d2628 end:0x021d2aac
 
-src/overlay004/func_ov004_021d2aac.s:
+src/overlay004/func_ov004_021d2aac.c:
     complete
     .text start:0x021d2aac end:0x021d2c40
 
