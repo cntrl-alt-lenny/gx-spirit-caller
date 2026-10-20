@@ -9037,7 +9037,7 @@ src/overlay002/func_ov002_02251908.s:
 src/overlay002/func_ov002_022519c4.s:
     complete
     .text start:0x022519c4 end:0x02251b14
-src/overlay002/func_ov002_02251b14.s:
+src/overlay002/func_ov002_02251b14.c:
     complete
     .text start:0x02251b14 end:0x02251bb0
 
