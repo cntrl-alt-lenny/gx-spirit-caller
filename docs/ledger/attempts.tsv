@@ -6286,3 +6286,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02047c08	main	480	legacy	factory	parked	69.4	unknown	UNCLASSIFIED:unknown	factory-1020-N3	
 0x02005f2c	main	484	default	factory	shipped	100	n/a		factory-1020-N3	
 0x02014630	main	484	default	factory	shipped	100	n/a		factory-1020-N3	
+0x0201bfb4	main	484	default	factory	parked	99.2	asm-int	PROVISIONAL:inline-asm	factory-1020-N3	
+0x0201bfb4	main	484	legacy	factory	parked	35.5	asm-int	PROVISIONAL:inline-asm	factory-1020-N3	
+0x0201bfb4	main	484	legacy_sp3	factory	parked	36.1	asm-int	PROVISIONAL:inline-asm	factory-1020-N3	
