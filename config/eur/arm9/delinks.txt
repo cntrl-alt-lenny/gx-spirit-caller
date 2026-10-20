@@ -19285,7 +19285,7 @@ src/main/func_020a61f0.legacy.c:
     complete
     .text start:0x020a61f0 end:0x020a622c
 
-src/main/func_020a622c.s:
+src/main/func_020a622c.legacy.c:
     complete
     .text start:0x020a622c end:0x020a6444
 
