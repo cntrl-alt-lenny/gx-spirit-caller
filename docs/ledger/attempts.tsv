@@ -7266,3 +7266,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02066010	main	532	default	factory	parked	62.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D2	
 0x02066010	main	532	legacy	factory	parked	64.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D2	
 0x02066010	main	532	legacy_sp3	factory	parked	84.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D2	
+0x02075df4	main	532	legacy	factory	shipped	100	n/a		factory-1020-D2	
