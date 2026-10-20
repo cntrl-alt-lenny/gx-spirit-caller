@@ -6290,3 +6290,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0229ea40	ov002	452	legacy	factory	parked	92.9	unknown	UNCLASSIFIED:unknown	factory-1020-N2	
 0x0229ea40	ov002	452	legacy_sp3	factory	parked	92.9	unknown	UNCLASSIFIED:unknown	factory-1020-N2	
 0x02253ea4	ov002	456	default	factory	shipped	100	n/a		factory-1020-N2	
+0x0225a354	ov002	456	default	factory	shipped	100	n/a		factory-1020-N2	
