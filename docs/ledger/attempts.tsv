@@ -7238,3 +7238,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c9d8c	ov012	20	default	factory	parked	60	asm-int	PROVISIONAL:inline-asm	factory-1020-D6	
 0x021c9d8c	ov012	20	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1020-D6	
 0x021c9d8c	ov012	20	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1020-D6	
+0x021ca0ac	ov011	24	default	factory	parked	66.7	structural	PROVISIONAL:structural	factory-1020-D6	
+0x021ca0ac	ov011	24	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1020-D6	
+0x021ca0ac	ov011	24	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1020-D6	
