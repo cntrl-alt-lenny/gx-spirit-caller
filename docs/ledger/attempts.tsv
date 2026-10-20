@@ -6310,3 +6310,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02046c88	main	504	legacy_sp3	factory	shipped	100	n/a		factory-1020-N3	
 0x0201d150	main	508	default	factory	shipped	100	n/a		factory-1020-N3	
 0x02030608	main	512	default	factory	shipped	100	n/a		factory-1020-N3	
+0x0203af58	main	512	default	factory	shipped	100	n/a		factory-1020-N3	
+0x0203af58	main	512	legacy_sp3	factory	parked	6.2	unknown	UNCLASSIFIED:unknown	factory-1020-N3	
+0x0203af58	main	512	legacy	factory	parked	16	unknown	UNCLASSIFIED:unknown	factory-1020-N3	
