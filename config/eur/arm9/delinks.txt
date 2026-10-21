@@ -19361,7 +19361,7 @@ src/main/func_020a6a28.s:
     complete
     .text start:0x020a6a28 end:0x020a6a94
 
-src/main/func_020a6a94.s:
+src/main/func_020a6a94.legacy.c:
     complete
     .text start:0x020a6a94 end:0x020a6afc
 
