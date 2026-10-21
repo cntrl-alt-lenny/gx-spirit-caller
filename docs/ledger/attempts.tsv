@@ -8370,3 +8370,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02065acc	main	588	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
 0x02065acc	main	588	default	factory	parked	68.7	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
 0x02065acc	main	588	legacy	factory	parked	69.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x020a7ac0	main	588	default	factory	parked	98.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x020a7ac0	main	588	legacy	factory	parked	2.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x020a7ac0	main	588	legacy_sp3	factory	parked	2.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
