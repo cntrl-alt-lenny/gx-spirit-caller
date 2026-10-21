@@ -14371,7 +14371,7 @@ src/main/func_0207f510.legacy_sp3.c:
     complete
     .text start:0x0207f510 end:0x0207f610
 
-src/main/func_0207f610.s:
+src/main/func_0207f610.legacy_sp3.c:
     complete
     .text start:0x0207f610 end:0x0207f850
 
