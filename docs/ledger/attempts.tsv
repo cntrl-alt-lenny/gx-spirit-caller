@@ -8399,3 +8399,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020121b4	main	612	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E3	
 0x020121b4	main	612	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E3	
 0x0204861c	main	612	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
+0x0201eaa0	main	616	default	factory	parked	59.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x0201eaa0	main	616	legacy	factory	parked	4.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x0201eaa0	main	616	legacy_sp3	factory	parked	4.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
