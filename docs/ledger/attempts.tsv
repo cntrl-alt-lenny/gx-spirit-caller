@@ -7403,3 +7403,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203de2c	main	84	default	factory	parked	76.2	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x020480b4	main	84	legacy_sp3	factory	shipped	100	n/a		factory-1020-D3	
 0x020480b4	main	84	default	factory	parked	19.1	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
+0x0209b448	main	84	legacy	factory	shipped	100	n/a		factory-1020-D3	
