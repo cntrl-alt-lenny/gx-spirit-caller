@@ -164,7 +164,7 @@ src/overlay020/func_ov020_021ac394.s:
     complete
     .text start:0x021ac394 end:0x021ac4fc
 
-src/overlay020/func_ov020_021ac4fc.s:
+src/overlay020/func_ov020_021ac4fc.c:
     complete
     .text start:0x021ac4fc end:0x021ac71c
 

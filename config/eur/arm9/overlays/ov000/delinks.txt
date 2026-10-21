@@ -26,7 +26,7 @@ src/overlay000/func_ov000_021aa4c4.s:
     complete
     .text start:0x021aa4c4 end:0x021aa5b8
 
-src/overlay000/func_ov000_021aa5b8.s:
+src/overlay000/func_ov000_021aa5b8.c:
     complete
     .text start:0x021aa5b8 end:0x021aa7e0
 
@@ -130,7 +130,7 @@ src/overlay000/ov000_021ab21c.c:
 
 
 
-src/overlay000/func_ov000_021ab258.s:
+src/overlay000/func_ov000_021ab258.c:
     complete
     .text start:0x021ab258 end:0x021ab474
 
