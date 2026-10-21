@@ -7392,3 +7392,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cd940	ov011	572	default	factory	parked	95.8	asm-int	PROVISIONAL:inline-asm	factory-1020-D2	
 0x021cd940	ov011	572	legacy	factory	parked	6	asm-int	PROVISIONAL:inline-asm	factory-1020-D2	
 0x021cd940	ov011	572	legacy_sp3	factory	parked	6.8	asm-int	PROVISIONAL:inline-asm	factory-1020-D2	
+0x02008888	main	576	default	factory	parked	95.1	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D2	
+0x02008888	main	576	legacy	factory	parked	35.6	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D2	
+0x02008888	main	576	legacy_sp3	factory	parked	44.1	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D2	
