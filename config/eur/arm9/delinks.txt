@@ -2272,7 +2272,7 @@ src/main/func_020172a0.s:
     complete
     .text start:0x020172a0 end:0x0201762c
 
-src/main/func_0201762c.s:
+src/main/func_0201762c.c:
     complete
     .text start:0x0201762c end:0x02017888
 
