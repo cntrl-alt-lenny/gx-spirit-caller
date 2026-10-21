@@ -8375,3 +8375,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0221f6c4	ov002	1080	legacy_sp3	factory	parked	62.6	unknown	UNCLASSIFIED:unknown	factory-1021-E5	
 0x0221f6c4	ov002	1080	legacy	factory	parked	3.5	unknown	UNCLASSIFIED:unknown	factory-1021-E5	
 0x021e3968	ov002	1092	default	factory	shipped	100	n/a		factory-1021-E5	
+0x021c84f0	ov002	1104	default	factory	parked	98.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E5	
+0x021c84f0	ov002	1104	legacy	factory	parked	7.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E5	
+0x021c84f0	ov002	1104	legacy_sp3	factory	parked	14.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E5	
