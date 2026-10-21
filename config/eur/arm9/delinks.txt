@@ -1996,7 +1996,7 @@ src/main/func_02012454.c:
     complete
     .text start:0x02012454 end:0x020124a4
 
-src/main/func_020124a4.s:
+src/main/func_020124a4.c:
     complete
     .text start:0x020124a4 end:0x020124f4
 
