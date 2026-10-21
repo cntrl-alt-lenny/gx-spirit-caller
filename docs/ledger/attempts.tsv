@@ -7432,3 +7432,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02046694	main	96	default	factory	parked	62.5	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x0204918c	main	96	legacy_sp3	factory	shipped	100	n/a		factory-1020-D3	
 0x02049270	main	96	legacy_sp3	factory	shipped	100	n/a		factory-1020-D3	
+0x020685c8	main	96	legacy_sp3	factory	shipped	100	n/a		factory-1020-D3	
+0x020685c8	main	96	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
+0x020685c8	main	96	legacy	factory	parked	45.8	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
