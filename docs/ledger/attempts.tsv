@@ -7314,3 +7314,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208b32c	main	544	legacy	factory	shipped	100	n/a		factory-1020-D2	
 0x0208b32c	main	544	default	factory	parked	4.2	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
 0x0208b32c	main	544	legacy_sp3	factory	parked	7.7	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
+0x021ac4fc	ov020	544	default	factory	shipped	100	n/a		factory-1020-D2	
+0x021ac4fc	ov020	544	legacy	factory	parked	5.2	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
+0x021ac4fc	ov020	544	legacy_sp3	factory	parked	5.2	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
