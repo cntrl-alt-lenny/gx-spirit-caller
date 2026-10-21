@@ -8435,3 +8435,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020906dc	main	76	default	factory	parked	42.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E7	
 0x020906dc	main	76	legacy	factory	parked	79	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E7	
 0x020906dc	main	76	legacy_sp3	factory	parked	42.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E7	
+0x02094504	main	76	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
+0x02094504	main	76	legacy	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
+0x02094504	main	76	legacy_sp3	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
