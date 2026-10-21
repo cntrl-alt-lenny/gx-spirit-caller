@@ -8393,3 +8393,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02235e0c	ov002	672	default	factory	shipped	100	n/a		factory-1021-E2	
 0x02272414	ov002	672	default	factory	shipped	100	n/a		factory-1021-E2	
 0x02270fcc	ov002	684	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0227352c	ov002	688	default	factory	shipped	100	n/a		factory-1021-E2	
