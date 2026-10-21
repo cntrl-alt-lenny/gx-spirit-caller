@@ -11,7 +11,7 @@ extern int func_ov002_02210264(struct Obj1074c *self);
 /* This caller supplies only two arguments to the four-parameter thunk. */
 extern int func_ov002_021e104c();
 
-int func_ov002_0221074c(struct Obj1074c *self) {
+int func_ov002_0221074c(struct Obj1074c *self, int unused1) {
     int side = self->a ^ self->c;
     int result = func_ov002_02210264(self);
     if (self->id == 0x19c7 || self->id == 0x1a63) {

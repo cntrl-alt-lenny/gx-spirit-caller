@@ -7,6 +7,6 @@
  */
 
 extern int func_0202e8ec(void);
-int func_0202eab0(void) {
+int func_0202eab0(int unused0) {
     return func_0202e8ec() > 0;
 }

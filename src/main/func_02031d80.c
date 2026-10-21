@@ -20,6 +20,6 @@ typedef struct {
 
 extern data_0219adb8_t data_0219adb8;
 
-int func_02031d80(int arg) {
+int func_02031d80(int arg, int unused1, int unused2) {
     return data_0219adb8.fnptr_c(arg);
 }

@@ -1,4 +1,4 @@
-int func_ov014_021b4810(void) {
+int func_ov014_021b4810(int unused0) {
     volatile unsigned int *reg = (volatile unsigned int *)0x04001000;
     unsigned int t;
 

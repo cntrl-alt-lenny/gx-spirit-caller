@@ -12,6 +12,6 @@
 
 extern void *data_0219e4d0;
 
-void *func_02054bfc(void) {
+void *func_02054bfc(int unused0) {
     return data_0219e4d0;
 }

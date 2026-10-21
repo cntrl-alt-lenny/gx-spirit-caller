@@ -8,7 +8,7 @@ typedef struct {
 extern int func_ov002_021c2f24(int a, int b);
 extern int func_ov002_021e13f4();
 
-int func_ov002_02212c64(Obj *self) {
+int func_ov002_02212c64(Obj *self, int unused1) {
     int r = 1;
     switch (self->id) {
     case 0x11d8:

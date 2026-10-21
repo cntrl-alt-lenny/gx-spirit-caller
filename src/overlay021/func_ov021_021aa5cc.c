@@ -21,7 +21,7 @@ extern int func_02021064(void);
 extern int func_02021190(int idx, int b);
 extern int func_020211b4(int idx, int b);
 extern void func_0200ad0c(int id);
-extern void func_0200f854(int a, int b, int c, int d, int e);
+extern int func_0200f854(int a, int b, int c, int d, int e);
 extern void func_020057c8(int a, int b);
 extern int data_02103da0;
 extern int data_020c3e48;

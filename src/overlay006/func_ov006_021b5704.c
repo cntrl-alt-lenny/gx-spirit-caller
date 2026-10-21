@@ -19,7 +19,7 @@ extern int func_02021064(void);
 extern int func_02021190(int, int);
 extern int func_020211b4(int, int);
 extern void func_0200ad0c(int);
-extern void func_0200f854(int, int, int, int, int);
+extern int func_0200f854(int, int, int, int, int);
 extern void func_020057c8(int, int);
 extern int  data_02103da0[];
 extern int  data_020c3e48[];
