@@ -19670,7 +19670,7 @@ src/main/func_020ade28.s:
 src/main/func_020ae474.s:
     complete
     .text start:0x020ae474 end:0x020aed64
-src/main/func_020aed64.s:
+src/main/func_020aed64.c:
     complete
     .text start:0x020aed64 end:0x020aeda4
 
