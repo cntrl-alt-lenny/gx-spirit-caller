@@ -7425,3 +7425,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cc194	ov011	188	legacy	factory	parked	32.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D6	
 0x021cc194	ov011	188	legacy_sp3	factory	parked	34.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D6	
 0x021d705c	ov004	188	default	factory	shipped	100	n/a		factory-1020-D6	
+0x021da100	ov004	188	default	factory	shipped	100	n/a		factory-1020-D6	
