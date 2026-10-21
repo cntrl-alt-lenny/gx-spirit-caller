@@ -5714,7 +5714,7 @@ src/main/func_0202eab0.c:
 
 
 
-src/main/func_0202eac8.s:
+src/main/func_0202eac8.c:
     complete
     .text start:0x0202eac8 end:0x0202ed04
 
