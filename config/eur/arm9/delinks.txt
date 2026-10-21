@@ -1869,7 +1869,7 @@ src/main/func_02011688.s:
     complete
     .text start:0x02011688 end:0x020116ec
 
-src/main/func_020116ec.s:
+src/main/func_020116ec.c:
     complete
     .text start:0x020116ec end:0x0201174c
 
