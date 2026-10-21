@@ -8669,7 +8669,7 @@ src/main/func_02046a1c.legacy_sp3.c:
     complete
     .text start:0x02046a1c end:0x02046a5c
 
-src/main/func_02046a5c.s:
+src/main/func_02046a5c.legacy_sp3.c:
     complete
     .text start:0x02046a5c end:0x02046ac4
 
