@@ -7875,7 +7875,7 @@ src/main/func_0203dde8.c:
     complete
     .text start:0x0203dde8 end:0x0203de2c
 
-src/main/func_0203de2c.s:
+src/main/func_0203de2c.legacy_sp3.c:
     complete
     .text start:0x0203de2c end:0x0203de80
 
