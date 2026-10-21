@@ -19513,7 +19513,7 @@ src/main/func_020a95e4.c:
     complete
     .text start:0x020a95e4 end:0x020a96fc
 
-src/main/func_020a96fc.s:
+src/main/func_020a96fc.c:
     complete
     .text start:0x020a96fc end:0x020a9764
 
