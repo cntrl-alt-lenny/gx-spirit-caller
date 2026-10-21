@@ -8376,3 +8376,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b0138	main	588	default	factory	parked	32.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
 0x020b0138	main	588	legacy	factory	parked	44	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
 0x020b0138	main	588	legacy_sp3	factory	parked	44	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
+0x020ad438	main	592	default	factory	parked	81.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x020ad438	main	592	legacy	factory	parked	2.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x020ad438	main	592	legacy_sp3	factory	parked	2.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
