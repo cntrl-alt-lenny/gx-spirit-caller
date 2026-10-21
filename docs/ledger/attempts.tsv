@@ -8388,3 +8388,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201762c	main	604	default	factory	shipped	100	n/a		factory-1021-E3	
 0x0201762c	main	604	legacy_sp3	factory	parked	2.3	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
 0x0201762c	main	604	legacy	factory	parked	1	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x02066ae8	main	604	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
+0x02066ae8	main	604	default	factory	parked	41.7	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
