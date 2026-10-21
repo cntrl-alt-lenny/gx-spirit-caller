@@ -659,7 +659,7 @@ src/overlay000/func_ov000_021ae2cc.s:
     complete
     .text start:0x021ae2cc end:0x021ae394
 
-src/overlay000/func_ov000_021ae394.s:
+src/overlay000/func_ov000_021ae394.c:
     complete
     .text start:0x021ae394 end:0x021ae42c
 
