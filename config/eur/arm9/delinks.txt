@@ -12143,7 +12143,7 @@ src/main/func_0206b06c.legacy_sp3.c:
 src/main/func_0206b0c4.s:
     complete
     .text start:0x0206b0c4 end:0x0206b1f8
-src/main/func_0206b1f8.s:
+src/main/func_0206b1f8.legacy_sp3.c:
     complete
     .text start:0x0206b1f8 end:0x0206b258
 
