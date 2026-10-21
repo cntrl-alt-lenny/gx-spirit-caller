@@ -13313,7 +13313,7 @@ src/main/func_020767c8.legacy.c:
     complete
     .text start:0x020767c8 end:0x02076870
 
-src/main/func_02076870.s:
+src/main/func_02076870.legacy.c:
     complete
     .text start:0x02076870 end:0x02076ad0
 
