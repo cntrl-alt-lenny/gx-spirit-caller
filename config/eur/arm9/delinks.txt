@@ -9185,7 +9185,7 @@ src/main/func_0204d284.legacy_sp3.c:
 src/main/func_0204d438.legacy_sp3.c:
     complete
     .text start:0x0204d438 end:0x0204d468
-src/main/func_0204d468.s:
+src/main/func_0204d468.legacy_sp3.c:
     complete
     .text start:0x0204d468 end:0x0204d4b4
 
