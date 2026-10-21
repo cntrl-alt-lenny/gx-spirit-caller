@@ -7414,3 +7414,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206cd0c	main	88	default	factory	parked	31.8	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D3	
 0x0206cd0c	main	88	legacy	factory	parked	95.5	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D3	
 0x0206cd0c	main	88	legacy_sp3	factory	parked	31.8	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D3	
+0x02090048	main	88	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
+0x02090048	main	88	legacy	factory	parked	95.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
+0x02090048	main	88	legacy_sp3	factory	parked	54.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
