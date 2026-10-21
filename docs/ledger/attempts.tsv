@@ -7340,3 +7340,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b700c	ov016	548	legacy	factory	parked	25	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D2	
 0x021b700c	ov016	548	legacy_sp3	factory	parked	25.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D2	
 0x02030c7c	main	552	default	factory	shipped	100	n/a		factory-1020-D2	
+0x0208610c	main	552	default	factory	parked	6.5	register-numbering-permutation-cascade	P-30	factory-1020-D2	
+0x0208610c	main	552	legacy	factory	parked	17.6	register-numbering-permutation-cascade	P-30	factory-1020-D2	
+0x0208610c	main	552	legacy_sp3	factory	parked	65.2	register-numbering-permutation-cascade	P-30	factory-1020-D2	
