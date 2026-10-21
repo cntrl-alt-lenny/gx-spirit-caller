@@ -8393,3 +8393,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020ac854	main	1100	default	factory	parked	24.7	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E6	
 0x020ac854	main	1100	legacy	factory	parked	1.8	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E6	
 0x020ac854	main	1100	legacy_sp3	factory	parked	1.8	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E6	
+0x021b47c8	ov016	1100	default	factory	parked	99.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
+0x021b47c8	ov016	1100	legacy	factory	parked	8.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
+0x021b47c8	ov016	1100	legacy_sp3	factory	parked	9.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
