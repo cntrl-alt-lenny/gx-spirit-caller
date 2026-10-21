@@ -7357,3 +7357,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d6384	ov004	152	default	factory	shipped	100	n/a		factory-1020-D6	
 0x021b43a8	ov015	156	default	factory	shipped	100	n/a		factory-1020-D6	
 0x021cab6c	ov006	156	default	factory	shipped	100	n/a		factory-1020-D6	
+0x021cb400	ov012	156	default	factory	parked	71.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D6	
+0x021cb400	ov012	156	legacy	factory	parked	21.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D6	
+0x021cb400	ov012	156	legacy_sp3	factory	parked	21.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1020-D6	
