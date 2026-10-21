@@ -7411,3 +7411,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b3e14	ov015	184	default	factory	parked	13	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D6	
 0x021b3e14	ov015	184	legacy	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D6	
 0x021b3e14	ov015	184	legacy_sp3	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D6	
+0x021d3de4	ov004	184	default	factory	shipped	100	n/a		factory-1020-D6	
+0x021d3de4	ov004	184	legacy_sp3	factory	parked	22.4	unknown	UNCLASSIFIED:unknown	factory-1020-D6	
+0x021d3de4	ov004	184	legacy	factory	parked	21.1	unknown	UNCLASSIFIED:unknown	factory-1020-D6	
