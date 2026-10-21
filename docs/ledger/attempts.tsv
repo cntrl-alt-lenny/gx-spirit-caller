@@ -7342,3 +7342,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02055298	main	68	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x02055298	main	68	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x02063620	main	68	legacy_sp3	factory	shipped	100	n/a		factory-1020-D3	
+0x02063dc8	main	68	default	factory	shipped	100	n/a		factory-1020-D3	
