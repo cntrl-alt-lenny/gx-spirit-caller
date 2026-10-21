@@ -2219,7 +2219,7 @@ src/main/func_02015e00.c:
     complete
     .text start:0x02015e00 end:0x02015f7c
 
-src/main/func_02015f7c.s:
+src/main/func_02015f7c.c:
     complete
     .text start:0x02015f7c end:0x020161ac
 
