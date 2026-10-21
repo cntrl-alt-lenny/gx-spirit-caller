@@ -36,7 +36,7 @@ src/overlay003/func_ov003_021ca2bc.s:
 src/overlay003/func_ov003_021cbb78.s:
     complete
     .text start:0x021cbb78 end:0x021cbdf4
-src/overlay003/func_ov003_021cbdf4.s:
+src/overlay003/func_ov003_021cbdf4.c:
     complete
     .text start:0x021cbdf4 end:0x021cbe8c
 
