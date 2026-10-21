@@ -877,7 +877,7 @@ src/main/func_020061ac.c:
 
 
 
-src/main/func_020061bc.s:
+src/main/func_020061bc.c:
     complete
     .text start:0x020061bc end:0x02006228
 
