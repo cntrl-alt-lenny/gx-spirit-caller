@@ -8361,3 +8361,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021dbdd0	ov004	8	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1021-E9	
 0x021dbdd0	ov004	8	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1021-E9	
 0x021dbdd0	ov004	8	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1021-E9	
+0x021de280	ov004	8	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1021-E9	
+0x021de280	ov004	8	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1021-E9	
+0x021de280	ov004	8	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1021-E9	
