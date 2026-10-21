@@ -8417,3 +8417,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c7f48	ov002	708	default	factory	parked	96.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E1	
 0x021c7f48	ov002	708	legacy	factory	parked	8.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E1	
 0x021c7f48	ov002	708	legacy_sp3	factory	parked	8.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E1	
+0x021f699c	ov002	708	default	factory	shipped	100	n/a		factory-1021-E1	
