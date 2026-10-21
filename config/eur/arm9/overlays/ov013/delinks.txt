@@ -7,7 +7,7 @@
 src/overlay013/func_ov013_021c9d60.s:
     complete
     .text start:0x021c9d60 end:0x021c9d74
-src/overlay013/func_ov013_021c9d74.s:
+src/overlay013/func_ov013_021c9d74.c:
     complete
     .text start:0x021c9d74 end:0x021c9ff8
 
