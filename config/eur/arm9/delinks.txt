@@ -8829,7 +8829,7 @@ src/main/func_02048c28.legacy_sp3.c:
     complete
     .text start:0x02048c28 end:0x02048c68
 
-src/main/func_02048c68.s:
+src/main/func_02048c68.legacy_sp3.c:
     complete
     .text start:0x02048c68 end:0x02048ed4
 
