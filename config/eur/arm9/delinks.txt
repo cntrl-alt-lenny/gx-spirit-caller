@@ -18183,7 +18183,7 @@ src/main/func_0209a854.legacy.c:
 
 
 
-src/main/func_0209a884.s:
+src/main/func_0209a884.legacy.c:
     complete
     .text start:0x0209a884 end:0x0209a8d0
 
