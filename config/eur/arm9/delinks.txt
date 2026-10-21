@@ -4819,7 +4819,7 @@ src/main/func_02028238.c:
     complete
     .text start:0x02028238 end:0x0202838c
 
-src/main/func_0202838c.s:
+src/main/func_0202838c.c:
     complete
     .text start:0x0202838c end:0x020285bc
 
