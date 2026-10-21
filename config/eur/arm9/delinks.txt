@@ -19969,7 +19969,7 @@ src/main/func_020b41e8.c:
     complete
     .text start:0x020b41e8 end:0x020b41f8
 
-src/main/func_020b41f8.s:
+src/main/func_020b41f8.c:
     complete
     .text start:0x020b41f8 end:0x020b4248
 
