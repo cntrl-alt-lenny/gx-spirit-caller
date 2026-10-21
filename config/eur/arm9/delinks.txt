@@ -12913,7 +12913,7 @@ src/main/func_020713ac.s:
     complete
     .text start:0x020713ac end:0x020716bc
 
-src/main/func_020716bc.s:
+src/main/func_020716bc.legacy.c:
     complete
     .text start:0x020716bc end:0x020718d8
 
