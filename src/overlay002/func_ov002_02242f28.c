@@ -12,12 +12,12 @@ extern void func_ov002_021ae400(int a, int b);
 extern void func_ov002_021af9d0(int a, int b, int c, int d);
 extern int *func_ov002_021afb74(void);
 extern void func_ov002_0223de04(struct SelfDE04 *self, int arg1, int arg2, int arg3);
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 int func_ov002_02242f28(struct SelfDE04 *self) {
     switch (data_ov002_022ce288.state) {
     case 0:
-        if (func_ov002_022536e8((void *)self->side, self->f0, 0) == 0) return -1;
-        if (func_ov002_022536e8((void *)self->side, self->f0, 1) == 0) return -1;
+        if (func_ov002_022536e8(self->side, self->f0, 0) == 0) return -1;
+        if (func_ov002_022536e8(self->side, self->f0, 1) == 0) return -1;
         func_ov002_021ae400(self->side, 0x5e);
         data_ov002_022ce288.state++;
         return 0;

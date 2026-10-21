@@ -22,7 +22,7 @@ extern void func_ov002_021af9d0(int a,int b,int c,u32 d);
 extern int *func_ov002_021afb74(void);
 extern void func_ov002_021d8128(int arg0,void *arg1,int arg2);
 extern unsigned int func_0202b8a8(int id);
-extern void func_ov002_021e276c(void *self,int a,int b,int c);
+extern void func_ov002_021e276c(int self,int a,int b,int c);
 /* Original passes no argument to the unused parameter. */
 extern void func_ov002_021e2c5c();
 int func_ov002_02235480(struct Self *self,void *q) {

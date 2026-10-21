@@ -13,7 +13,7 @@ extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021c3bdc(int idx);
 extern int func_ov002_021c8470(int a, int b);
 extern int func_ov002_021df818(Card *card, int side, int amount);
-extern void func_ov002_021e2550(void *self, int a, int b, int c);
+extern void func_ov002_021e2550(int self, int a, int b, int c);
 extern int func_ov002_021e27c0(int self_thing, int arg1);
 /* Original supplies no argument to the unused-argument counter helpers. */
 extern void func_ov002_021e2b3c();

@@ -9,7 +9,7 @@ extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021d59cc(int a,int b,int c,int d,unsigned short e);
 extern void func_ov002_021d7c1c(void *a,void *b,void *c);
 extern int func_ov002_021ded1c(int a,int b);
-extern void func_ov002_021e276c(void *a,int b,int c,int d);
+extern void func_ov002_021e276c(int a,int b,int c,int d);
 extern int func_ov002_0225764c(int a,int b,int c);
 extern int func_ov002_022577dc(void *self);
 extern void func_ov002_0225935c(int a,int b,int c);
@@ -52,7 +52,7 @@ int func_ov002_0222396c(struct Self *self) {
             return 0x7b;
         }
         case 0x7b:
-            func_ov002_021e276c((void *)(1-self->side),self->value,1,0);
+            func_ov002_021e276c((1-self->side),self->value,1,0);
             return 0;
         }
     }

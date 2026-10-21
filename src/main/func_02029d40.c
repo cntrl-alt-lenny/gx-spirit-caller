@@ -17,7 +17,7 @@ typedef struct {
 extern void Copy32(const void *src, void *dst, unsigned int size);
 extern void Fill32(unsigned int value, void *dst, unsigned int size);
 extern void Task_InvokeLocked(void *p);
-extern int Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void *Task_PostLocked(int size, int align, int flags);
 extern int func_02006c0c(signed char *, int, int);
 extern int func_02007104(signed char *, const char *);
 extern int func_0201d760(int arg);
@@ -41,7 +41,7 @@ int func_02029d40(Obj *o, int start, int count) {
             int handle;
             if (o->b2) {
                 size = (*(unsigned char *)&o->source == 1 ? 0x100 : 0x10) * 2;
-                o->buffer = (void *)Task_PostLocked((void *)size, 4, 0);
+                o->buffer = Task_PostLocked(size, 4, 0);
                 Fill32(0, o->buffer, size);
                 if (func_02007104(o->name, data_020c6958) >= 0) {
                     handle = func_0202be4c((o->name[11]-0x30) + ((o->name[10]-0x30)*10 + ((o->name[8]-0x30)*1000 + (o->name[9]-0x30)*100)));
@@ -52,7 +52,7 @@ int func_02029d40(Obj *o, int start, int count) {
                 Task_InvokeLocked((void *)handle);
             } else {
                 size = (o->kind == 1 ? 0x100 : 0x10) * 2;
-                o->buffer = (void *)Task_PostLocked((void *)size, 4, 0);
+                o->buffer = Task_PostLocked(size, 4, 0);
                 Fill32(0, o->buffer, size);
                 handle = func_0201ede4((int)&pal, o->source);
                 Copy32(pal->data, o->buffer, size);

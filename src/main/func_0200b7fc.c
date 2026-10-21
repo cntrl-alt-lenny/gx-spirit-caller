@@ -1,4 +1,4 @@
-extern int Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void *Task_PostLocked(int size, int align, int flags);
 /* Fill32 is assembly with a three argument calling convention. */
 extern void Fill32(int value, void *dst, int size);
 typedef struct { unsigned short a, b; void *data; } Item;
@@ -14,20 +14,20 @@ List *func_0200b7fc(Header *base)
     int i, j;
     Record *records;
     ItemRecord *items;
-    out = (List *)Task_PostLocked((void *)8, 4, 0);
+    out = Task_PostLocked(8, 4, 0);
     if (out) {
         Fill32(0, out, 8);
         count = base->count;
         out->count = count;
-        out->entries = (Entry **)Task_PostLocked((void *)(count * 4), 4, 0);
+        out->entries = Task_PostLocked((count * 4), 4, 0);
         if (!out->entries) goto failure;
         for (i = 0; i < count; i++) {
-            out->entries[i] = (Entry *)Task_PostLocked((void *)0x10, 4, 0);
+            out->entries[i] = Task_PostLocked(0x10, 4, 0);
             if (!out->entries[i]) goto failure;
-            out->entries[i]->items = (Item **)Task_PostLocked((void *)0x34, 4, 0);
+            out->entries[i]->items = Task_PostLocked(0x34, 4, 0);
             if (!out->entries[i]->items) goto failure;
             for (j = 0; j < 13; j++) {
-                out->entries[i]->items[j] = (Item *)Task_PostLocked((void *)8, 4, 0);
+                out->entries[i]->items[j] = Task_PostLocked(8, 4, 0);
                 if (!out->entries[i]->items[j]) goto failure;
             }
         }

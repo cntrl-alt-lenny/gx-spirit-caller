@@ -15,7 +15,7 @@ extern int func_ov002_021b3ecc(int arg0,int arg1,int arg2);
 extern int func_ov002_021bae7c(int player,int id,int except);
 extern void func_ov002_021d479c(u16 a0,u16 a1,u16 a2,u16 a3);
 extern void func_ov002_021df680(int arg0,int arg1);
-extern void func_ov002_021e276c(void *self,int a,int b,int c);
+extern void func_ov002_021e276c(int self,int a,int b,int c);
 int func_ov002_0226a504(void) {
     int packed = data_ov002_022d0e6c.a2;
     int player = data_ov002_022d016c.player;

@@ -22,7 +22,7 @@ extern u16 func_ov002_0223de94(struct node *arg0, int arg1);
 extern int func_ov002_0225764c(int arg0, int arg1, int arg2);
 extern int func_ov002_021c848c(int a, int b);
 extern int func_ov002_021df818(Card *card, int side, int amount);
-extern void func_ov002_021e276c(void *self, int a, int b, int c);
+extern void func_ov002_021e276c(int self, int a, int b, int c);
 int func_ov002_02237434(Card *self) {
     int a, b;
     int pair;

@@ -20,7 +20,7 @@ extern void func_ov002_021af9d0(int player, int phase, int card, int arg);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021afba0(void);
 extern void func_ov002_0223de04(struct SelfDE04 *self, int arg1, int arg2, int arg3);
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 int func_ov002_0223fa20(struct Self *self) {
     int player = self->bit0 ^ self->bit14;
     int value = func_ov002_0223f6c4(self);

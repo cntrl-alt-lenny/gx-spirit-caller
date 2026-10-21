@@ -6,7 +6,7 @@ extern char data_ov002_022cf16c[];
 extern int func_ov002_021d5a08(struct Ov002Self *, int, int, int, u16, u16);
 extern int func_ov002_021d63fc(struct Ov002Self *, int, int, int);
 extern int func_ov002_021d6808(struct Ov002Self *, int, int, int, int);
-extern void func_ov002_021e276c(void *, int, int, int);
+extern void func_ov002_021e276c(int side, int, int, int);
 int func_ov002_02220f48(struct Ov002Self *self) {
     unsigned int id;
     int i;

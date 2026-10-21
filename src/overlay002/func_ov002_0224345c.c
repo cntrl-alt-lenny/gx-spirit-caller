@@ -9,7 +9,7 @@ struct State { char pad[0x5b8]; int phase; };
 struct Data { char pad[0xb2]; u16 value; };
 extern struct State data_ov002_022ce288;
 extern struct Data data_ov002_022d0e6c;
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 extern int func_ov002_0226b194(int arg0, int arg1, int arg2);
 extern void func_ov002_0223de04(struct SelfDE04 *self, int arg1, int arg2, int arg3);
 

@@ -7,7 +7,7 @@ extern void func_0209448c(int, int, int);
 extern void func_020945f4(void *, int, int);
 extern int func_0209640c(int, int);
 extern void func_020a1e3c(int);
-extern void func_020a5d74(char *);
+extern void func_020a5d74(int);
 extern int func_020a5d54(int);
 extern void func_020a3308(void);
 extern int func_020a3d34(void);
@@ -22,7 +22,7 @@ int func_020a3b20(int arg) {
  func_0209448c(0, (int)(data_021a98fc+0x1340), 0x69c0);
  func_020a1e3c(old);
  *(int *)(data_021a98fc+0x1318) = *(unsigned short *)(data_021a98f8+0x500)-6;
- func_020a5d74((char *)*(unsigned short *)(data_021a98f8+0x502));
+ func_020a5d74(*(unsigned short *)(data_021a98f8+0x502));
  func_020a5d54((int)(data_021a98fc+0x1538));
  for(i=0;i<15;i++) {
   ((int *)(data_021a98fc+0x14e8))[i]=0;

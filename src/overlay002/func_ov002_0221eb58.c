@@ -8,7 +8,7 @@ extern void func_ov002_021af9d0(int a,int b,int c,int d);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021d7268(int player,int id,int flag);
 extern int func_ov002_021d7d0c(struct Self *,int,int *);
-extern void func_ov002_021e276c(void *self,int a,int b,int c);
+extern void func_ov002_021e276c(int self,int a,int b,int c);
 extern int func_ov002_0225368c(int ctx,int card_id,int arg2);
 int func_ov002_0221eb58(struct Self *self) {
     int player;

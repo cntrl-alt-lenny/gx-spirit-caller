@@ -7,7 +7,7 @@ struct State {
     int *f70;
 };
 extern void Task_InvokeLocked(void *p);
-extern int Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void *Task_PostLocked(int size, int align, int flags);
 extern unsigned int func_0202b0e0(int id);
 extern int func_0202bb20(int a);
 extern int func_0202bb30(int a);
@@ -38,10 +38,10 @@ void func_ov002_022ac0c0(struct State *self)
     case 0x4c:
     case 0x4d:
         count = data_020b4768;
-        self->f70 = (int *)Task_PostLocked((void *)(count * 4), 4, 0);
+        self->f70 = Task_PostLocked((count * 4), 4, 0);
         break;
     default:
-        self->f68 = (int *)Task_PostLocked((void *)((int)func_ov002_021afbc4() * 4), 4, 0);
+        self->f68 = Task_PostLocked(((int)func_ov002_021afbc4() * 4), 4, 0);
         for (j = 0; j < (int)func_ov002_021afbc4(); j++) {
             self->f68[j] = j;
         }

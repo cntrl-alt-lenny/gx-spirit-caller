@@ -13,7 +13,7 @@ typedef struct {
     unsigned short b1:1;
     unsigned short b2:1;
 } Obj;
-extern int Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void *Task_PostLocked(int size, int align, int flags);
 extern void Task_InvokeLocked(void *p);
 extern int func_0202813c(Obj *o, int a, int b, int c);
 extern int func_020b3870(int numerator, int denominator);
@@ -36,7 +36,7 @@ int func_0202838c(Obj *o) {
         count = 0x100;
     }
     size = count * 2;
-    out = (unsigned short *)Task_PostLocked((void *)size, 4, 0);
+    out = Task_PostLocked(size, 4, 0);
     i = 0;
     half = o->duration / 2;
     phase = o->counter;

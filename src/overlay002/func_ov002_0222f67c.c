@@ -10,7 +10,7 @@ extern void func_ov002_021ae400(int a, int b);
 extern void func_ov002_021af9d0(int a, int b, int c, int d);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021e1aec(int arg0, int arg1, int arg2);
-extern void func_ov002_021e276c(void *self, int a, int b, int c);
+extern void func_ov002_021e276c(int self, int a, int b, int c);
 extern int func_ov002_021e286c(int arg0);
 int func_ov002_0222f67c(struct Self *self) {
     struct Word *p;
