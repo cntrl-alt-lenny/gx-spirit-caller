@@ -8395,3 +8395,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02050450	main	608	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
 0x02076870	main	608	legacy	factory	shipped	100	n/a		factory-1021-E3	
 0x0207b9c0	main	608	legacy	factory	shipped	100	n/a		factory-1021-E3	
+0x020121b4	main	612	default	factory	parked	92.2	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E3	
+0x020121b4	main	612	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E3	
+0x020121b4	main	612	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E3	
