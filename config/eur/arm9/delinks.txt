@@ -673,7 +673,7 @@ src/main/func_02003f70.s:
     complete
     .text start:0x02003f70 end:0x02004684
 
-src/main/func_02004684.s:
+src/main/func_02004684.c:
     complete
     .text start:0x02004684 end:0x020048c0
 
