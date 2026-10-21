@@ -11012,7 +11012,7 @@ src/main/func_0206292c.s:
     complete
     .text start:0x0206292c end:0x020629b8
 
-src/main/func_020629b8.s:
+src/main/func_020629b8.legacy_sp3.c:
     complete
     .text start:0x020629b8 end:0x02062a20
 
