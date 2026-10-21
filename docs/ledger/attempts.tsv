@@ -8355,3 +8355,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b5fe4	ov006	192	legacy_sp3	factory	parked	2	unknown	UNCLASSIFIED:unknown	factory-1020-D6	
 0x021b5fe4	ov006	192	legacy	factory	parked	2	unknown	UNCLASSIFIED:unknown	factory-1020-D6	
 0x022b8430	ov002	144	default	matched-only-via-volatile-union-over-parameters	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1020-review	
+0x0207708c	main	8	default	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1021-E7	
+0x0207708c	main	8	legacy	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1021-E7	
+0x0207708c	main	8	legacy_sp3	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1021-E7	
