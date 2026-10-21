@@ -8260,7 +8260,7 @@ src/main/func_020433d0.legacy_sp3.c:
     complete
     .text start:0x020433d0 end:0x020434e4
 
-src/main/func_020434e4.s:
+src/main/func_020434e4.legacy_sp3.c:
     complete
     .text start:0x020434e4 end:0x02043728
 
