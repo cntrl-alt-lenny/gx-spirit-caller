@@ -8360,3 +8360,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02298f78	ov002	1040	legacy_sp3	factory	parked	3.9	unknown	UNCLASSIFIED:unknown	factory-1021-E5	
 0x0221f2b0	ov002	1044	default	factory	shipped	100	n/a		factory-1021-E5	
 0x021d6870	ov002	1064	default	factory	parked	82.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E5	
+0x0225702c	ov002	1064	default	factory	parked	98.5	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E5	
+0x0225702c	ov002	1064	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E5	
+0x0225702c	ov002	1064	legacy_sp3	factory	parked	11.4	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E5	
