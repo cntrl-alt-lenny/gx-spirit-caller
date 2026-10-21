@@ -8404,3 +8404,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02033a48	main	56	legacy	factory	parked	25	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
 0x02033a48	main	56	legacy_sp3	factory	parked	57.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
 0x0201a134	main	60	default	factory	shipped	100	n/a		factory-1021-E7	
+0x020689e4	main	60	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1021-E7	
+0x020689e4	main	60	legacy	factory	parked	81.2	structural	PROVISIONAL:structural	factory-1021-E7	
+0x020689e4	main	60	legacy_sp3	factory	parked	93.3	structural	PROVISIONAL:structural	factory-1021-E7	
