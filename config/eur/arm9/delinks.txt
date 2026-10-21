@@ -1750,7 +1750,7 @@ src/main/func_0200f684.s:
     complete
     .text start:0x0200f684 end:0x0200f854
 
-src/main/func_0200f854.s:
+src/main/func_0200f854.c:
     complete
     .text start:0x0200f854 end:0x0200fa90
 
