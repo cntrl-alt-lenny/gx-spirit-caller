@@ -8371,3 +8371,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b3068	ov019	1056	default	factory	shipped	100	n/a		factory-1021-E6	
 0x021b3068	ov019	1056	legacy_sp3	factory	parked	7.2	unknown	UNCLASSIFIED:unknown	factory-1021-E6	
 0x021b3068	ov019	1056	legacy	factory	parked	7.2	unknown	UNCLASSIFIED:unknown	factory-1021-E6	
+0x021be0b0	ov006	1056	default	factory	parked	58.9	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E6	
+0x021be0b0	ov006	1056	legacy	factory	parked	3.5	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E6	
+0x021be0b0	ov006	1056	legacy_sp3	factory	parked	8.7	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E6	
