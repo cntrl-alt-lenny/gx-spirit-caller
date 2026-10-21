@@ -8772,7 +8772,7 @@ src/overlay002/func_ov002_0224e0dc.s:
     complete
     .text start:0x0224e0dc end:0x0224e184
 
-src/overlay002/func_ov002_0224e184.s:
+src/overlay002/func_ov002_0224e184.c:
     complete
     .text start:0x0224e184 end:0x0224e230
 
