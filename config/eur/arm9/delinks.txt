@@ -19121,7 +19121,7 @@ src/main/func_020a3ed8.s:
     complete
     .text start:0x020a3ed8 end:0x020a3f48
 
-src/main/func_020a3f48.s:
+src/main/func_020a3f48.legacy.c:
     complete
     .text start:0x020a3f48 end:0x020a4180
 
