@@ -13273,7 +13273,7 @@ src/main/func_02075df4.legacy.c:
     complete
     .text start:0x02075df4 end:0x02076008
 
-src/main/func_02076008.s:
+src/main/func_02076008.legacy.c:
     complete
     .text start:0x02076008 end:0x02076244
 
