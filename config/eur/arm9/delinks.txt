@@ -11222,7 +11222,7 @@ src/main/func_02064790.legacy.c:
     complete
     .text start:0x02064790 end:0x02064864
 
-src/main/func_02064864.s:
+src/main/func_02064864.legacy_sp3.c:
     complete
     .text start:0x02064864 end:0x02064a88
 
