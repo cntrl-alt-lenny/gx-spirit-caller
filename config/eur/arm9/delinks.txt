@@ -13532,7 +13532,7 @@ src/main/func_02078f50.legacy.c:
     complete
     .text start:0x02078f50 end:0x02078fb0
 
-src/main/func_02078fb0.s:
+src/main/func_02078fb0.legacy.c:
     complete
     .text start:0x02078fb0 end:0x020791e8
 
