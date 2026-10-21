@@ -78,11 +78,11 @@ src/overlay007/ov007_021b2628.c:
 
 
 
-src/overlay007/func_ov007_021b2630.s:
+src/overlay007/func_ov007_021b2630.c:
     complete
     .text start:0x021b2630 end:0x021b2694
 
-src/overlay007/func_ov007_021b2694.s:
+src/overlay007/func_ov007_021b2694.c:
     complete
     .text start:0x021b2694 end:0x021b28c4
 

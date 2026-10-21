@@ -1,0 +1,38 @@
+int func_0202eac8(int id) {
+    switch (id) {
+    case 0x18a6:
+    case 0x18a7:
+    case 0x18a8:
+    case 0x18a9:
+    case 0x18c8:
+    case 0x18c9:
+    case 0x18f9:
+    case 0x1943:
+    case 0x194d:
+    case 0x194e:
+    case 0x1956:
+    case 0x1957:
+    case 0x1958:
+    case 0x197f:
+    case 0x1981:
+    case 0x1987:
+    case 0x19a6:
+    case 0x19ef:
+    case 0x19f3:
+    case 0x19f4:
+    case 0x19fd:
+    case 0x19ff:
+    case 0x1a00:
+    case 0x1a01:
+    case 0x1a4d:
+    case 0x1a6d:
+    case 0x1a6e:
+    case 0x1a6f:
+    case 0x1a80:
+    case 0x1b4c:
+    case 0x1b4d:
+    case 0x1b4e:
+        return 1;
+    }
+    return 0;
+}

@@ -17,7 +17,7 @@
 
 #pragma thumb on
 
-asm void func_0208b0fc(void) {
+asm void func_0208b0fc(int unused0, int unused1, int unused2) {
     nofralloc
     str r2, [r0, #0]
     str r1, [r0, #4]
