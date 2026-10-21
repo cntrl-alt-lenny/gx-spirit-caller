@@ -8405,3 +8405,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cf3dc	ov011	612	default	factory	parked	99.3	asm-int	PROVISIONAL:inline-asm	factory-1021-E4	
 0x021cf3dc	ov011	612	legacy	factory	parked	30.2	asm-int	PROVISIONAL:inline-asm	factory-1021-E4	
 0x021cf3dc	ov011	612	legacy_sp3	factory	parked	30.6	asm-int	PROVISIONAL:inline-asm	factory-1021-E4	
+0x021dba08	ov004	624	default	factory	shipped	100	n/a		factory-1021-E4	

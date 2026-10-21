@@ -899,7 +899,7 @@ src/overlay004/func_ov004_021db874.s:
 src/overlay004/func_ov004_021db994.c:
     complete
     .text start:0x021db994 end:0x021dba08
-src/overlay004/func_ov004_021dba08.s:
+src/overlay004/func_ov004_021dba08.c:
     complete
     .text start:0x021dba08 end:0x021dbc78
 
