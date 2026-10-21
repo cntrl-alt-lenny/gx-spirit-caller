@@ -7371,3 +7371,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02055420	main	564	default	factory	parked	0.7	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
 0x02055420	main	564	legacy	factory	parked	8.7	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
 0x021b3568	ov014	564	default	factory	shipped	100	n/a		factory-1020-D2	
+0x0201f954	main	568	default	factory	shipped	100	n/a		factory-1020-D2	
+0x0201f954	main	568	legacy_sp3	factory	parked	14.8	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
+0x0201f954	main	568	legacy	factory	parked	8.9	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
