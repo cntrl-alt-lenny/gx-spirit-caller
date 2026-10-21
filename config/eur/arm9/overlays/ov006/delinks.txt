@@ -993,7 +993,7 @@ src/overlay006/func_ov006_021beec4.c:
     complete
     .text start:0x021beec4 end:0x021bef6c
 
-src/overlay006/func_ov006_021bef6c.s:
+src/overlay006/func_ov006_021bef6c.c:
     complete
     .text start:0x021bef6c end:0x021bf01c
 
