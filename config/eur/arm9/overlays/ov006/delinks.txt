@@ -1923,7 +1923,7 @@ src/overlay006/func_ov006_021c9bc8.c:
     complete
     .text start:0x021c9bc8 end:0x021c9c54
 
-src/overlay006/func_ov006_021c9c54.s:
+src/overlay006/func_ov006_021c9c54.c:
     complete
     .text start:0x021c9c54 end:0x021c9d00
 
