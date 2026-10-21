@@ -7326,3 +7326,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02220c14	ov002	576	legacy	factory	parked	0.7	unknown	UNCLASSIFIED:unknown	factory-1020-D1	
 0x022295a0	ov002	576	default	factory	shipped	100	n/a		factory-1020-D1	
 0x02238d4c	ov002	580	default	factory	shipped	100	n/a		factory-1020-D1	
+0x02243ae4	ov002	580	default	factory	shipped	100	n/a		factory-1020-D1	
