@@ -5,7 +5,7 @@ typedef struct { char pad0[0xc]; short start; char padE[6]; unsigned short width
 typedef struct { short left,top,right,bottom; } Rect;
 typedef struct { int unk0,scroll; char pad08[0x10]; int active; char pad1c[0x18]; Rect rect[5]; char pad5c[0x14]; unsigned dirty:1,disabled:1,rest:30; char pad74[0x18]; int hit[6]; } Scroll;
 struct Entry { int a,b; };
-struct S { char pad0[0x2c]; void *cell; char pad30[0x24]; short x,y,right,bottom; int index,min,max,state; short height,pad6e; volatile int timer; unsigned disabled:1,rest:31; };
+struct S { char pad0[0x2c]; void *cell; char pad30[0x24]; short x,y,right,bottom; int index,min,max,state; short height,pad6e; int timer; unsigned disabled:1,rest:31; };
 struct S575 { char _pad[0x56]; short f56,_58,f5a; char _g5c[4]; int f60,f64; char _g68[4]; short f6c; };
 typedef struct { char pad0[0x40]; Scroll *scroll; char pad44[0x50]; State *bg; } Global;
 typedef struct { char pad0[4]; int selected; char pad8[0x10]; char anim[0x1c]; void *window; char pad38[0x4c]; void *manager; state_30_34_t *list; char cursor[0x2cc]; unsigned dirty:1, pending:1, rest:30; } Overlay;

@@ -5,7 +5,7 @@ typedef struct {
     unsigned short length;
     unsigned int **addr_list;
 } hostent_0206ebe8_t;
-typedef struct { int x0; volatile int socket; volatile int buf; volatile int size; } Stream;
+typedef struct { int x0; int socket; int buf; int size; } Stream;
 typedef struct { int x0; Stream *stream; int x8; int xc; int x10; int ready; } Req;
 typedef struct { unsigned char len; unsigned char family; unsigned short port; unsigned int addr; } Address;
 extern int func_020453e8(int a);

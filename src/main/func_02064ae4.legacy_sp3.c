@@ -1,12 +1,11 @@
-extern void *memset(void *p, int c, unsigned int n);
 typedef struct { unsigned char len; unsigned char family; unsigned short port; int address; } SockAddr;
 typedef struct { void **items; int count; int extra; int a3; int a4; } Obj;
 typedef struct { void **items; int count; } Self02054684;
 typedef struct Q { int field0; unsigned short field4; } Q_02064d88;
 typedef struct { Q_02064d88 *q; } T_02064d88;
 typedef struct {
-    volatile int sock; int address; unsigned short port; unsigned short pad;
-    Obj *volatile list; void *volatile array; char gap[0x10]; int param;
+    int sock; int address; unsigned short port; unsigned short pad;
+    Obj *list; void *array; char gap[0x10]; int param;
     char gap2[0x10]; int size1; int size2; int tail;
 } State;
 extern int func_020453e8(int a);

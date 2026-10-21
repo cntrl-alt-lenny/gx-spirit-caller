@@ -22,7 +22,7 @@ int func_ov002_021c1ad0(int self, int idx) {
     if (*(unsigned short *)(data_ov002_022cf1a4 + off + slot) == 0) return 0;
     p = data_ov002_022cf1ac + off;
     if (((*(unsigned int *)(p + slot) >> 6) & 1) == 0) {
-        unsigned int flags = *(volatile unsigned int *)(slot + (unsigned int)p);
+        unsigned int flags = *(unsigned int *)(slot + (unsigned int)p);
         if ((((flags >> 1) | (flags >> 2)) & 1) == 0) {
         switch (id) {
         case 0x12a8:

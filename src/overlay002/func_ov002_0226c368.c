@@ -16,9 +16,9 @@ extern int func_ov002_02290500(int a,int b,int (*fn)(int,int,int));
 extern int func_ov002_0229ade0(int a,int b,int c,int d);
 struct Slot { u32 id:13; u32 flag:1; u32 pad:8; u32 value:8; u32 rest:2; u32 extra[4]; };
 #define STATE (data_ov002_022d016c.state)
-#define A (*(volatile int *)((char *)&data_ov002_022d016c + 0xd70))
-#define B (*(volatile int *)((char *)&data_ov002_022d016c + 0xd74))
-#define C (*(volatile int *)((char *)&data_ov002_022d016c + 0xd78))
+#define A (*(int *)((char *)&data_ov002_022d016c + 0xd70))
+#define B (*(int *)((char *)&data_ov002_022d016c + 0xd74))
+#define C (*(int *)((char *)&data_ov002_022d016c + 0xd78))
 #define H(o) data_ov002_022d0e6c.h_##o
 int func_ov002_0226c368(int a,int b,int c) {
     c=(u8)c;

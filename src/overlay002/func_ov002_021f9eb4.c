@@ -1,5 +1,5 @@
 typedef unsigned short u16;
-struct St { u16 f0; u16 bit:1; u16 field:5; u16 rest:10; u16 pad[2]; u16 id; u16 mask; volatile u16 count; };
+struct St { u16 f0; u16 bit:1; u16 field:5; u16 rest:10; u16 pad[2]; u16 id; u16 mask; u16 count; };
 struct State { char pad[0x5b4]; int step; };
 struct Result { char pad[0xd70]; int player; int base; int idx; };
 extern struct State data_ov002_022ce288;

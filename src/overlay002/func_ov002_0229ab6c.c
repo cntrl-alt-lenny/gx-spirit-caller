@@ -23,7 +23,7 @@ extern void func_02006918(void);
 extern void func_0208c8cc(u32 a, u32 b, u32 c);
 extern void func_0208c8b0(unsigned int v);
 extern int func_02036590(unsigned int id, int arg);
-extern void func_0208e2f4(volatile u16 *ptr, fx32 a, fx32 brightness);
+extern void func_0208e2f4(u16 *ptr, fx32 a, fx32 brightness);
 extern void func_020139fc(int x);
 extern void func_020057dc(void *arg);
 extern int func_0201261c(void);

@@ -1,7 +1,7 @@
 struct Entry { int a,b; };
 struct S {
  char pad0[0x2c]; void *cell; char pad30[0x24];
- short x,y,right,bottom; int index,min,max,state; short height,pad6e; volatile int timer;
+ short x,y,right,bottom; int index,min,max,state; short height,pad6e; int timer;
  unsigned int disabled:1; unsigned int rest:31;
 };
 extern void func_02006110(int *out_a, int *out_b);
