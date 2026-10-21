@@ -7297,3 +7297,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a60f4	ov002	560	default	factory	parked	98.6	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D1	
 0x022a60f4	ov002	560	legacy	factory	parked	46.8	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D1	
 0x022a60f4	ov002	560	legacy_sp3	factory	parked	49.3	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D1	
+0x022bbe88	ov002	560	default	factory	shipped	100	n/a		factory-1020-D1	
+0x022bbe88	ov002	560	legacy	factory	parked	6.8	unknown	UNCLASSIFIED:unknown	factory-1020-D1	
+0x022bbe88	ov002	560	legacy_sp3	factory	parked	6.9	unknown	UNCLASSIFIED:unknown	factory-1020-D1	
