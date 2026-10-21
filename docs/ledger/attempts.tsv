@@ -8447,3 +8447,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02090048	main	88	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
 0x02090048	main	88	legacy	factory	parked	95.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
 0x02090048	main	88	legacy_sp3	factory	parked	54.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
+0x02049270	main	96	legacy_sp3	factory	shipped	100	n/a		factory-1021-E7	
