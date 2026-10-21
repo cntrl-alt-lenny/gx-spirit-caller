@@ -650,7 +650,7 @@ src/overlay004/func_ov004_021d62b8.s:
     complete
     .text start:0x021d62b8 end:0x021d6384
 
-src/overlay004/func_ov004_021d6384.s:
+src/overlay004/func_ov004_021d6384.c:
     complete
     .text start:0x021d6384 end:0x021d641c
 
