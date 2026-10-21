@@ -7389,3 +7389,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02076ddc	main	572	legacy	factory	shipped	100	n/a		factory-1020-D2	
 0x02076ddc	main	572	default	factory	parked	10.5	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
 0x02076ddc	main	572	legacy_sp3	factory	parked	79.7	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
+0x021cd940	ov011	572	default	factory	parked	95.8	asm-int	PROVISIONAL:inline-asm	factory-1020-D2	
+0x021cd940	ov011	572	legacy	factory	parked	6	asm-int	PROVISIONAL:inline-asm	factory-1020-D2	
+0x021cd940	ov011	572	legacy_sp3	factory	parked	6.8	asm-int	PROVISIONAL:inline-asm	factory-1020-D2	
