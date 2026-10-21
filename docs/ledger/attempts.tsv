@@ -8373,3 +8373,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a7ac0	main	588	default	factory	parked	98.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
 0x020a7ac0	main	588	legacy	factory	parked	2.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
 0x020a7ac0	main	588	legacy_sp3	factory	parked	2.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x020b0138	main	588	default	factory	parked	32.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
+0x020b0138	main	588	legacy	factory	parked	44	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
+0x020b0138	main	588	legacy_sp3	factory	parked	44	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
