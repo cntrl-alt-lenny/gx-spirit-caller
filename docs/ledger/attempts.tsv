@@ -8416,3 +8416,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021edc38	ov002	176	default	factory	parked	97.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E8	
 0x021edc38	ov002	176	legacy	factory	parked	22.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E8	
 0x021edc38	ov002	176	legacy_sp3	factory	parked	42.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E8	
+0x021eb704	ov002	180	default	factory	parked	97.8	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E8	
+0x021eb704	ov002	180	legacy	factory	parked	22	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E8	
+0x021eb704	ov002	180	legacy_sp3	factory	parked	34.8	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E8	
