@@ -58,7 +58,7 @@ src/overlay014/Ov014_HitTestSecondary.c:
     complete
     .text start:0x021b34f0 end:0x021b3568
 
-src/overlay014/func_ov014_021b3568.s:
+src/overlay014/func_ov014_021b3568.c:
     complete
     .text start:0x021b3568 end:0x021b379c
 
