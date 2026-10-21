@@ -8398,3 +8398,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b47c8	ov016	1100	legacy_sp3	factory	parked	9.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
 0x02069ec4	main	1104	legacy_sp3	factory	shipped	100	n/a		factory-1021-E6	
 0x02069ec4	main	1104	default	factory	parked	4	unknown	UNCLASSIFIED:unknown	factory-1021-E6	
+0x02077fd8	main	1108	legacy	factory	shipped	100	n/a		factory-1021-E6	
