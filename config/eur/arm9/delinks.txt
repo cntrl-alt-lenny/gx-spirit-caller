@@ -9035,7 +9035,7 @@ src/main/func_0204a960.legacy_sp3.c:
     complete
     .text start:0x0204a960 end:0x0204a9b0
 
-src/main/func_0204a9b0.s:
+src/main/func_0204a9b0.legacy_sp3.c:
     complete
     .text start:0x0204a9b0 end:0x0204aa0c
 
