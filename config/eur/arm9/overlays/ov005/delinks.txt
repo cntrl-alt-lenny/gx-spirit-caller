@@ -390,7 +390,7 @@ src/overlay005/func_ov005_021aef74.s:
     complete
     .text start:0x021aef74 end:0x021af090
 
-src/overlay005/func_ov005_021af090.s:
+src/overlay005/func_ov005_021af090.c:
     complete
     .text start:0x021af090 end:0x021af2dc
 
