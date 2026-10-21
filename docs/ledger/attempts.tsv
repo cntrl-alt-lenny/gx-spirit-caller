@@ -7446,3 +7446,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206ba4c	main	100	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x0206ba4c	main	100	legacy	factory	parked	61.5	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x02049270	main	96	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1020-D3	
+0x02011620	main	104	default	factory	shipped	100	n/a		factory-1020-D3	
+0x02011620	main	104	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
+0x02011620	main	104	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
