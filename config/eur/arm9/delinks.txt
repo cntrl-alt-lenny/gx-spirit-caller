@@ -436,7 +436,7 @@ src/main/func_02000cb4.c:
 
 
 
-src/main/func_02000cc4.s:
+src/main/func_02000cc4.c:
     complete
     .text start:0x02000cc4 end:0x02000d0c
 
