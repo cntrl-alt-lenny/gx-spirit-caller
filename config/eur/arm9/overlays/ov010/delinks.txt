@@ -613,7 +613,7 @@ src/overlay010/func_ov010_021b8514.c:
     complete
     .text start:0x021b8514 end:0x021b8608
 
-src/overlay010/func_ov010_021b8608.s:
+src/overlay010/func_ov010_021b8608.c:
     complete
     .text start:0x021b8608 end:0x021b8848
 
