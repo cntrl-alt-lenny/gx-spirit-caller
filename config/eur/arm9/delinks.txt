@@ -12128,7 +12128,7 @@ src/main/func_0206aea0.s:
 src/main/func_0206afb8.c:
     complete
     .text start:0x0206afb8 end:0x0206afec
-src/main/func_0206afec.s:
+src/main/func_0206afec.legacy.c:
     complete
     .text start:0x0206afec end:0x0206b048
 
