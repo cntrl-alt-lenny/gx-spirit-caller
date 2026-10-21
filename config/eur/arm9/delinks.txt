@@ -19792,7 +19792,7 @@ src/main/func_020b18c4.c:
     complete
     .text start:0x020b18c4 end:0x020b18f0
 
-src/main/func_020b18f0.s:
+src/main/func_020b18f0.c:
     complete
     .text start:0x020b18f0 end:0x020b1958
 
