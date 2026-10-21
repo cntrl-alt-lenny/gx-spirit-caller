@@ -9249,7 +9249,7 @@ src/overlay002/func_ov002_02254a2c.c:
 src/overlay002/func_ov002_02254a84.s:
     complete
     .text start:0x02254a84 end:0x02254c64
-src/overlay002/func_ov002_02254c64.s:
+src/overlay002/func_ov002_02254c64.c:
     complete
     .text start:0x02254c64 end:0x02254d94
 src/overlay002/func_ov002_02254d94.c:
