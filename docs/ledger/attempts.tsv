@@ -8426,3 +8426,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02000cc4	main	72	default	factory	shipped	100	n/a		factory-1021-E7	
 0x02000cc4	main	72	legacy_sp3	factory	parked	44.4	unknown	UNCLASSIFIED:unknown	factory-1021-E7	
 0x02000cc4	main	72	legacy	factory	parked	21.1	unknown	UNCLASSIFIED:unknown	factory-1021-E7	
+0x020054a4	main	76	default	factory	parked	55	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E7	
+0x020054a4	main	76	legacy	factory	parked	31.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E7	
+0x020054a4	main	76	legacy_sp3	factory	parked	33.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E7	
