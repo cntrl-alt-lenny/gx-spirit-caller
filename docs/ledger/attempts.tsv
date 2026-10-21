@@ -8409,3 +8409,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02250e40	ov002	708	legacy	factory	parked	5.1	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
 0x02250e40	ov002	708	legacy_sp3	factory	parked	2.3	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
 0x022392e4	ov002	720	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0227e9d4	ov002	736	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0227e9d4	ov002	736	legacy_sp3	factory	parked	9.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0227e9d4	ov002	736	legacy	factory	parked	9.8	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
