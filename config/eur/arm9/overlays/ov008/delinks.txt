@@ -60,7 +60,7 @@ src/overlay008/func_ov008_021ab120.c:
     complete
     .text start:0x021ab120 end:0x021ab164
 
-src/overlay008/func_ov008_021ab164.s:
+src/overlay008/func_ov008_021ab164.c:
     complete
     .text start:0x021ab164 end:0x021ab3ac
 
