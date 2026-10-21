@@ -8363,3 +8363,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0225702c	ov002	1064	default	factory	parked	98.5	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E5	
 0x0225702c	ov002	1064	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E5	
 0x0225702c	ov002	1064	legacy_sp3	factory	parked	11.4	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E5	
+0x021c0be4	ov002	1068	default	factory	shipped	100	n/a		factory-1021-E5	
