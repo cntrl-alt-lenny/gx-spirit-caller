@@ -7353,3 +7353,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209a8d0	main	72	legacy	factory	shipped	100	n/a		factory-1020-D3	
 0x0209a8d0	main	72	default	factory	parked	21.1	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x020a6858	main	72	legacy	factory	shipped	100	n/a		factory-1020-D3	
+0x020054a4	main	76	default	factory	parked	55	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
+0x020054a4	main	76	legacy	factory	parked	31.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
+0x020054a4	main	76	legacy_sp3	factory	parked	33.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
