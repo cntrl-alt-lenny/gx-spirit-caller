@@ -4209,7 +4209,7 @@ src/main/func_02020738.c:
     complete
     .text start:0x02020738 end:0x02020814
 
-src/main/func_02020814.s:
+src/main/func_02020814.c:
     complete
     .text start:0x02020814 end:0x02020860
 

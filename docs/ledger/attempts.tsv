@@ -7356,3 +7356,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020054a4	main	76	default	factory	parked	55	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
 0x020054a4	main	76	legacy	factory	parked	31.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
 0x020054a4	main	76	legacy_sp3	factory	parked	33.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1020-D3	
+0x02020814	main	76	default	factory	shipped	100	n/a		factory-1020-D3	
+0x02020814	main	76	legacy_sp3	factory	parked	4.8	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
+0x02020814	main	76	legacy	factory	parked	4.5	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
