@@ -19573,7 +19573,7 @@ src/main/func_020aadf8.s:
     complete
     .text start:0x020aadf8 end:0x020aaec0
 
-src/main/func_020aaec0.s:
+src/main/func_020aaec0.c:
     complete
     .text start:0x020aaec0 end:0x020aaf10
 
