@@ -8363,3 +8363,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0229e27c	ov002	620	legacy_sp3	factory	parked	10.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
 0x0229e27c	ov002	620	legacy	factory	parked	10.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
 0x022bca80	ov002	620	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02235690	ov002	628	default	factory	shipped	100	n/a		factory-1021-E2	
