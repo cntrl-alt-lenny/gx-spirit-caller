@@ -7364,3 +7364,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022133fc	ov002	600	default	factory	shipped	100	n/a		factory-1020-D1	
 0x022133fc	ov002	600	legacy_sp3	factory	parked	19.9	unknown	UNCLASSIFIED:unknown	factory-1020-D1	
 0x022133fc	ov002	600	legacy	factory	parked	33.8	unknown	UNCLASSIFIED:unknown	factory-1020-D1	
+0x022b867c	ov002	584	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1020-D1	
