@@ -8426,3 +8426,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020754f4	main	632	legacy	factory	shipped	100	n/a		factory-1021-E3	
 0x020754f4	main	632	default	factory	parked	0.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
 0x020754f4	main	632	legacy_sp3	factory	parked	14.6	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x020b33d0	main	632	default	factory	parked	0.6	asm-int	PROVISIONAL:inline-asm	factory-1021-E3	
+0x020b33d0	main	632	legacy	factory	parked	1.9	asm-int	PROVISIONAL:inline-asm	factory-1021-E3	
+0x020b33d0	main	632	legacy_sp3	factory	parked	0.6	asm-int	PROVISIONAL:inline-asm	factory-1021-E3	
