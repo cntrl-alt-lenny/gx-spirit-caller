@@ -2000,7 +2000,7 @@ src/main/func_020124a4.c:
     complete
     .text start:0x020124a4 end:0x020124f4
 
-src/main/func_020124f4.s:
+src/main/func_020124f4.c:
     complete
     .text start:0x020124f4 end:0x02012560
 
