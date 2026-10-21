@@ -7376,3 +7376,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d3e9c	ov004	168	default	factory	parked	78.6	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D6	
 0x021d3e9c	ov004	168	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D6	
 0x021d3e9c	ov004	168	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1020-D6	
+0x021d42f8	ov004	168	default	factory	shipped	100	n/a		factory-1020-D6	
