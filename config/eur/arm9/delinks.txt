@@ -2255,7 +2255,7 @@ src/main/func_02016cd8.s:
     complete
     .text start:0x02016cd8 end:0x02017018
 
-src/main/func_02017018.s:
+src/main/func_02017018.c:
     complete
     .text start:0x02017018 end:0x02017290
 
