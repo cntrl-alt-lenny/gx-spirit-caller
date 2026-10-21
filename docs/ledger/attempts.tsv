@@ -7456,3 +7456,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a5458	main	104	legacy	factory	shipped	100	n/a		factory-1020-D3	
 0x020a5458	main	104	default	factory	parked	11.5	unknown	UNCLASSIFIED:unknown	factory-1020-D3	
 0x020a6a94	main	104	legacy	factory	shipped	100	n/a		factory-1020-D3	
+0x020a6ce0	main	104	default	factory	parked	50	structural	PROVISIONAL:structural	factory-1020-D3	
+0x020a6ce0	main	104	legacy	factory	parked	3.6	structural	PROVISIONAL:structural	factory-1020-D3	
+0x020a6ce0	main	104	legacy_sp3	factory	parked	3.7	structural	PROVISIONAL:structural	factory-1020-D3	
