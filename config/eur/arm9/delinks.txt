@@ -9163,7 +9163,7 @@ src/main/func_0204cb54.legacy_sp3.c:
     complete
     .text start:0x0204cb54 end:0x0204cc20
 
-src/main/func_0204cc20.s:
+src/main/func_0204cc20.c:
     complete
     .text start:0x0204cc20 end:0x0204ce3c
 
