@@ -7300,3 +7300,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020705d4	main	540	default	factory	parked	5.2	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
 0x020705d4	main	540	legacy_sp3	factory	parked	83.7	unknown	UNCLASSIFIED:unknown	factory-1020-D2	
 0x020716bc	main	540	legacy	factory	shipped	100	n/a		factory-1020-D2	
+0x020730fc	main	540	legacy	factory	shipped	100	n/a		factory-1020-D2	
