@@ -9,7 +9,7 @@ src/overlay014/Ov014_UpdatePanes.c:
     complete
     .text start:0x021b25b0 end:0x021b2644
 
-src/overlay014/func_ov014_021b2644.s:
+src/overlay014/func_ov014_021b2644.c:
     complete
     .text start:0x021b2644 end:0x021b26ec
 src/overlay014/func_ov014_021b26ec.c:
