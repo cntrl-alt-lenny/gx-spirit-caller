@@ -1919,7 +1919,7 @@ src/overlay006/func_ov006_021c91e0.s:
     complete
     .text start:0x021c91e0 end:0x021c9bc8
 
-src/overlay006/func_ov006_021c9bc8.s:
+src/overlay006/func_ov006_021c9bc8.c:
     complete
     .text start:0x021c9bc8 end:0x021c9c54
 
