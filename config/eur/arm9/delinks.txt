@@ -12074,7 +12074,7 @@ src/main/func_0206a31c.legacy_sp3.c:
     complete
     .text start:0x0206a31c end:0x0206a44c
 
-src/main/func_0206a44c.s:
+src/main/func_0206a44c.legacy_sp3.c:
     complete
     .text start:0x0206a44c end:0x0206a724
 
