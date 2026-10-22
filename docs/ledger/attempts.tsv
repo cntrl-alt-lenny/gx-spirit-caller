@@ -10058,3 +10058,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208610c	main	552	default	factory	parked	7	register-numbering-permutation-cascade	P-30	factory-1022-F1	
 0x0208610c	main	552	legacy	factory	parked	18.9	register-numbering-permutation-cascade	P-30	factory-1022-F1	
 0x0208610c	main	552	legacy_sp3	factory	parked	63	register-numbering-permutation-cascade	P-30	factory-1022-F1	
+0x02008fb8	main	572	default	factory	shipped	100	n/a		factory-1022-F1	
+0x02008fb8	main	572	legacy_sp3	factory	parked	2.8	unknown	UNCLASSIFIED:unknown	factory-1022-F1	
+0x02008fb8	main	572	legacy	factory	parked	2.8	unknown	UNCLASSIFIED:unknown	factory-1022-F1	
