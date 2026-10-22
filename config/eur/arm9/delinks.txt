@@ -5537,7 +5537,7 @@ src/main/func_0202c9b0.c:
 
 
 
-src/main/func_0202c9c0.s:
+src/main/func_0202c9c0.c:
     complete
     .text start:0x0202c9c0 end:0x0202cc8c
 
