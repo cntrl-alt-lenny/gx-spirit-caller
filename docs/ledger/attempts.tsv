@@ -10045,3 +10045,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a8d50	main	2084	legacy	factory	parked	0.8	unknown	UNCLASSIFIED:unknown	factory-1022-F7	
 0x020a8d50	main	2084	legacy_sp3	factory	parked	0.8	unknown	UNCLASSIFIED:unknown	factory-1022-F7	
 0x021d2428	ov011	2100	default	factory	shipped	100	n/a		factory-1022-F7	
+0x021b4570	ov017	2112	default	factory	parked	83.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F7	
+0x021b4570	ov017	2112	legacy	factory	parked	2.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F7	
+0x021b4570	ov017	2112	legacy_sp3	factory	parked	2.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F7	
