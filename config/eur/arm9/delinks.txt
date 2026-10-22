@@ -8370,7 +8370,7 @@ src/main/func_02044724.legacy_sp3.c:
     complete
     .text start:0x02044724 end:0x02044758
 
-src/main/func_02044758.s:
+src/main/func_02044758.legacy_sp3.c:
     complete
     .text start:0x02044758 end:0x020447d8
 
