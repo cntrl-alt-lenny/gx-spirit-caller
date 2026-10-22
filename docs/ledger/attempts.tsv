@@ -8490,3 +8490,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02211b64	ov002	856	default	factory	shipped	100	n/a		factory-1021-E1	
 0x02211b64	ov002	856	legacy_sp3	factory	parked	2.1	unknown	UNCLASSIFIED:unknown	factory-1021-E1	
 0x02211b64	ov002	856	legacy	factory	parked	2.4	unknown	UNCLASSIFIED:unknown	factory-1021-E1	
+0x021cd0b8	ov002	860	default	factory	parked	95.8	register-numbering-permutation-cascade	P-30	factory-1021-E1	
+0x021cd0b8	ov002	860	legacy	factory	parked	33.3	register-numbering-permutation-cascade	P-30	factory-1021-E1	
+0x021cd0b8	ov002	860	legacy_sp3	factory	parked	27	register-numbering-permutation-cascade	P-30	factory-1021-E1	
