@@ -1937,7 +1937,7 @@ src/overlay002/func_ov002_021d3e58.s:
 src/overlay002/func_ov002_021d3f9c.s:
     complete
     .text start:0x021d3f9c end:0x021d40b0
-src/overlay002/func_ov002_021d40b0.s:
+src/overlay002/func_ov002_021d40b0.c:
     complete
     .text start:0x021d40b0 end:0x021d45cc
 src/overlay002/func_ov002_021d45cc.c:
