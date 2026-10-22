@@ -8454,3 +8454,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b5188	ov016	188	default	factory	parked	48.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E9	
 0x021b5188	ov016	188	legacy	factory	parked	1.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E9	
 0x021b5188	ov016	188	legacy_sp3	factory	parked	2	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E9	
+0x021cc194	ov011	188	default	factory	parked	42	structural	PROVISIONAL:structural	factory-1021-E9	
+0x021cc194	ov011	188	legacy	factory	parked	32.1	structural	PROVISIONAL:structural	factory-1021-E9	
+0x021cc194	ov011	188	legacy_sp3	factory	parked	34.6	structural	PROVISIONAL:structural	factory-1021-E9	
