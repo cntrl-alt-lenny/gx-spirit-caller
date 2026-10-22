@@ -16062,7 +16062,7 @@ src/main/func_0208d8c0.legacy.c:
     complete
     .text start:0x0208d8c0 end:0x0208da2c
 
-src/main/func_0208da2c.s:
+src/main/func_0208da2c.legacy.c:
     complete
     .text start:0x0208da2c end:0x0208dce4
 
