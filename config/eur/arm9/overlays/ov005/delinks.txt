@@ -177,7 +177,7 @@ src/overlay005/ov005_stubs_ab3e0.c:
 
 
 
-src/overlay005/func_ov005_021ab3e8.s:
+src/overlay005/func_ov005_021ab3e8.c:
     complete
     .text start:0x021ab3e8 end:0x021ab6ac
 
@@ -390,7 +390,7 @@ src/overlay005/func_ov005_021aef74.s:
     complete
     .text start:0x021aef74 end:0x021af090
 
-src/overlay005/func_ov005_021af090.s:
+src/overlay005/func_ov005_021af090.c:
     complete
     .text start:0x021af090 end:0x021af2dc
 

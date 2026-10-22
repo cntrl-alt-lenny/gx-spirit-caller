@@ -148,7 +148,7 @@ src/overlay019/func_ov019_021b4c30.c:
     complete
     .text start:0x021b4c30 end:0x021b4c74
 
-src/overlay019/func_ov019_021b4c74.s:
+src/overlay019/func_ov019_021b4c74.c:
     complete
     .text start:0x021b4c74 end:0x021b4ed0
 
@@ -160,7 +160,7 @@ src/overlay019/func_ov019_021b4f1c.c:
     complete
     .text start:0x021b4f1c end:0x021b4fdc
 
-src/overlay019/func_ov019_021b4fdc.s:
+src/overlay019/func_ov019_021b4fdc.c:
     complete
     .text start:0x021b4fdc end:0x021b52e8
 
