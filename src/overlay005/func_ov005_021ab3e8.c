@@ -1,0 +1,73 @@
+typedef unsigned short u16;
+typedef struct {
+ void *a; int b,c;
+ short x0,y0,x1,y1;
+ u16 w,h;
+ int vram0,vram1,vram2;
+ u16 pal,pad26;
+ int buf0,buf1;
+ char pad30[10]; u16 f3a;
+ char pad3c[16]; int f4c,f50,f54; int f58;
+ struct { unsigned short mode:2; unsigned short b2:1; unsigned short b3:1; unsigned short b4:2; unsigned short count:4; unsigned short rest:6; } flags;
+ u16 pad5e; int items; int f64,f68; void *callback;
+} Obj;
+typedef struct { unsigned int a,b; char pad[44]; } state_t;
+extern void Fill32(int,void *,int);
+extern int Task_PostLocked(void *,int,int);
+extern void func_020945f4(int,int,int);
+extern void func_02094504(int,int,int);
+extern void func_02001bc8(unsigned short *,unsigned short,unsigned short);
+extern void func_02001c98(unsigned int,unsigned int);
+extern void func_02001d0c(state_t *,int,int);
+extern void func_02001d68(int);
+extern void *Vram_GetBankBaseCD(void);
+extern void *Vram_GetBankBaseE(void);
+extern void *func_0208dd9c(void);
+extern int func_0208de4c(void);
+extern int func_0208df94(void);
+extern int func_0208e0a0(void);
+extern void *func_0208e1ac(void);
+extern void *func_0208e200(void);
+extern int func_ov005_021ab0fc(void *);
+extern void func_ov005_021ab6ac(Obj *);
+extern void func_ov005_021abc88(int *,int);
+extern char data_ov005_021b1ddc[];
+extern state_t data_02102c90;
+extern struct { int a; unsigned int mode:3; unsigned int rest:29; } data_02104f4c;
+void func_ov005_021ab3e8(Obj *p,void *a,short *rect,int mode,int pal,void *callback) {
+ int n;
+ Fill32(0,data_ov005_021b1ddc,0x70);
+ p->a=a;
+ p->callback=callback;
+ p->flags.count=1;
+ p->b=0; p->c=0;
+ p->x0=rect[0]; p->y0=rect[1]; p->x1=rect[2]; p->y1=rect[3];
+ p->pal=pal;
+ p->w=(rect[2]-rect[0]+7)>>3;
+ p->h=((rect[3]-rect[1]+7)>>3)+4;
+ p->flags.mode=(u16)mode;
+ switch(p->flags.mode) {
+ case 0: p->vram0=(int)Vram_GetBankBaseCD()+0x20; p->vram2=(int)func_0208e200(); break;
+ case 1: p->vram0=(int)Vram_GetBankBaseE()+0x20; p->vram2=(int)func_0208e1ac(); break;
+ case 2: p->vram0=func_0208de4c()+0x20; p->vram2=func_0208e0a0(); break;
+ case 3: p->vram0=(int)func_0208dd9c()+0x20; p->vram2=func_0208df94(); break;
+ }
+ p->flags.b3=0;
+ n=(p->h*8)/16+2;
+ p->buf0=Task_PostLocked((void *)(n*12),4,0);
+ func_020945f4(p->buf0,0,((p->h*8)/16+2)*12);
+ p->buf1=Task_PostLocked((void *)(((p->h*8)/16+2)*4),4,0);
+ func_020945f4(p->buf1,0,((p->h*8)/16+2)*4);
+ p->items=Task_PostLocked((void *)((func_ov005_021ab0fc(p->a)+1)*16),4,0);
+ func_ov005_021ab6ac(p);
+ func_02001d0c(&data_02102c90,p->w,p->h);
+ func_02001d68(data_02104f4c.mode);
+ func_ov005_021abc88((int *)p,0);
+ func_ov005_021abc88((int *)p,1);
+ func_02094504(0,p->vram2,0x800);
+ func_02001bc8((unsigned short *)(0x5000400+(p->pal<<5)),0x7fff,0);
+ func_02001c98(15,1);
+ p->f54=0; p->f50=0; p->f4c=0;
+ p->f3a=14;
+}
+
