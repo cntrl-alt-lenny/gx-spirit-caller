@@ -8444,3 +8444,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021fd928	ov002	736	legacy	factory	parked	3.6	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E1	
 0x021fd928	ov002	736	legacy_sp3	factory	parked	8.9	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E1	
 0x02229290	ov002	740	default	factory	shipped	100	n/a		factory-1021-E1	
+0x02226860	ov002	748	default	factory	shipped	100	n/a		factory-1021-E1	
