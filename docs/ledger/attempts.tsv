@@ -8553,3 +8553,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a72f0	main	120	default	factory	shipped	100	n/a		factory-1021-E7	
 0x020a72f0	main	120	legacy_sp3	factory	parked	5.7	unknown	UNCLASSIFIED:unknown	factory-1021-E7	
 0x020a72f0	main	120	legacy	factory	parked	5.4	unknown	UNCLASSIFIED:unknown	factory-1021-E7	
+0x020234f8	main	124	default	factory	parked	61.3	structural	PROVISIONAL:structural	factory-1021-E7	
+0x020234f8	main	124	legacy	factory	parked	13.9	structural	PROVISIONAL:structural	factory-1021-E7	
+0x020234f8	main	124	legacy_sp3	factory	parked	14.7	structural	PROVISIONAL:structural	factory-1021-E7	
