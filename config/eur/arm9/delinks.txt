@@ -18911,7 +18911,7 @@ src/main/func_020a11e4.s:
     complete
     .text start:0x020a11e4 end:0x020a16f4
 
-src/main/func_020a16f4.s:
+src/main/func_020a16f4.legacy.c:
     complete
     .text start:0x020a16f4 end:0x020a1bbc
 

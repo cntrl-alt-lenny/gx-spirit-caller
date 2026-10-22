@@ -8443,3 +8443,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021ccea4	ov003	1204	default	factory	parked	97	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
 0x021ccea4	ov003	1204	legacy	factory	parked	17.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
 0x021ccea4	ov003	1204	legacy_sp3	factory	parked	16.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
+0x020a16f4	main	1224	legacy	factory	shipped	100	n/a		factory-1021-E6	
