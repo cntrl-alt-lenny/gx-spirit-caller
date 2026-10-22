@@ -8474,3 +8474,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02074194	main	700	legacy	factory	parked	64.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
 0x02074194	main	700	legacy_sp3	factory	parked	30.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
 0x020409d8	main	704	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
+0x02063288	main	704	default	factory	parked	13.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
+0x02063288	main	704	legacy	factory	parked	16.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
+0x02063288	main	704	legacy_sp3	factory	parked	97.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
