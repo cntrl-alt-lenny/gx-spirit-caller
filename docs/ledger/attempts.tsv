@@ -8481,3 +8481,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b2eec	ov014	204	default	factory	shipped	100	n/a		factory-1021-E9	
 0x021b66a8	ov017	204	default	factory	shipped	100	n/a		factory-1021-E9	
 0x021bd700	ov006	204	default	factory	shipped	100	n/a		factory-1021-E9	
+0x021cc014	ov004	204	default	factory	parked	90.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E9	
+0x021cc014	ov004	204	legacy	factory	parked	11.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E9	
+0x021cc014	ov004	204	legacy_sp3	factory	parked	11.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E9	
