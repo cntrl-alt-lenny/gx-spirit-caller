@@ -15768,7 +15768,7 @@ libs/nitro/MTX_Copy44To43_.legacy.c:
     complete
     .text start:0x0208b94c end:0x0208b980
 
-src/main/func_0208b980.s:
+src/main/func_0208b980.legacy.c:
     complete
     .text start:0x0208b980 end:0x0208bca4
 
