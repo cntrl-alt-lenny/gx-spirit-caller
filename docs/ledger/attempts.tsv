@@ -8427,3 +8427,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022aed20	ov002	1232	default	factory	parked	21.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E5	
 0x022aed20	ov002	1232	legacy	factory	parked	2.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E5	
 0x022aed20	ov002	1232	legacy_sp3	factory	parked	2.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E5	
+0x021b4684	ov002	1248	default	factory	shipped	100	n/a		factory-1021-E5	
