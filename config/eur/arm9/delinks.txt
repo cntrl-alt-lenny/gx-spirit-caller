@@ -4927,7 +4927,7 @@ src/main/func_0202a320.s:
     complete
     .text start:0x0202a320 end:0x0202a718
 
-src/main/func_0202a718.s:
+src/main/func_0202a718.c:
     complete
     .text start:0x0202a718 end:0x0202a998
 
