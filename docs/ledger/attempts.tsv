@@ -8569,3 +8569,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02094030	main	124	legacy	factory	shipped	100	n/a		factory-1021-E7	
 0x02097258	main	124	legacy	factory	shipped	100	n/a		factory-1021-E7	
 0x020a54c0	main	124	legacy	factory	shipped	100	n/a		factory-1021-E7	
+0x02023478	main	128	default	factory	parked	6.2	structural	PROVISIONAL:structural	factory-1021-E7	
+0x02023478	main	128	legacy	factory	parked	62.5	structural	PROVISIONAL:structural	factory-1021-E7	
+0x02023478	main	128	legacy_sp3	factory	parked	59.4	structural	PROVISIONAL:structural	factory-1021-E7	
