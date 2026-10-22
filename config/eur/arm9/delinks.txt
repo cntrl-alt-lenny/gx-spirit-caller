@@ -19357,7 +19357,7 @@ src/main/Strlen.c:
     complete
     .text start:0x020a6a00 end:0x020a6a28
 
-src/main/func_020a6a28.s:
+src/main/func_020a6a28.legacy.c:
     complete
     .text start:0x020a6a28 end:0x020a6a94
 
