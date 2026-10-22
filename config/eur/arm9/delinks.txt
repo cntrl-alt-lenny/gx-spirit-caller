@@ -9103,7 +9103,7 @@ src/main/func_0204b850.legacy_sp3.c:
     complete
     .text start:0x0204b850 end:0x0204b8d0
 
-src/main/func_0204b8d0.s:
+src/main/func_0204b8d0.legacy_sp3.c:
     complete
     .text start:0x0204b8d0 end:0x0204bb5c
 
