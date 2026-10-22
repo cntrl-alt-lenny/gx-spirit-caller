@@ -10095,3 +10095,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b3814	main	60	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1022-F8	
 0x020b3814	main	60	legacy	factory	parked	15.8	structural	PROVISIONAL:structural	factory-1022-F8	
 0x020b3814	main	60	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1022-F8	
+0x02099ba8	main	64	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1022-F8	
+0x02099ba8	main	64	legacy	factory	parked	4.8	structural	PROVISIONAL:structural	factory-1022-F8	
+0x02099ba8	main	64	legacy_sp3	factory	parked	4.8	structural	PROVISIONAL:structural	factory-1022-F8	
