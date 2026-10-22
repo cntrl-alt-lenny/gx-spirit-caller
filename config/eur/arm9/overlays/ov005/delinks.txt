@@ -61,7 +61,7 @@ src/overlay005/func_ov005_021aafac.c:
     complete
     .text start:0x021aafac end:0x021ab00c
 
-src/overlay005/func_ov005_021ab00c.s:
+src/overlay005/func_ov005_021ab00c.c:
     complete
     .text start:0x021ab00c end:0x021ab0fc
 
@@ -362,7 +362,7 @@ src/overlay005/func_ov005_021ad20c.c:
     complete
     .text start:0x021ad20c end:0x021ad284
 
-src/overlay005/func_ov005_021ad284.s:
+src/overlay005/func_ov005_021ad284.c:
     complete
     .text start:0x021ad284 end:0x021ad35c
 

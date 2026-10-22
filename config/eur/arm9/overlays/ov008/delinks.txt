@@ -112,7 +112,7 @@ src/overlay008/func_ov008_021ac2ac.c:
     complete
     .text start:0x021ac2ac end:0x021ac35c
 
-src/overlay008/func_ov008_021ac35c.s:
+src/overlay008/func_ov008_021ac35c.c:
     complete
     .text start:0x021ac35c end:0x021ac430
 
@@ -221,11 +221,11 @@ src/overlay008/func_ov008_021aeeac.c:
     complete
     .text start:0x021aeeac end:0x021aef18
 
-src/overlay008/func_ov008_021aef18.s:
+src/overlay008/func_ov008_021aef18.c:
     complete
     .text start:0x021aef18 end:0x021aefd4
 
-src/overlay008/func_ov008_021aefd4.s:
+src/overlay008/func_ov008_021aefd4.c:
     complete
     .text start:0x021aefd4 end:0x021af0a8
 
