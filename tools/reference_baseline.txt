@@ -393,8 +393,6 @@ eur	src/main/func_02006a38.s	missing-reloc	.text+0xd0 original ABS32 data_02104f
 eur	src/main/func_02006a38.s	missing-reloc	.text+0xd4 original ABS32 data_020c3e84+0x0 built none
 eur	src/main/func_020071c4.c	wrong-target	.text+0x50 original ABS32 data_02104f1c+0x0 built ABS32 data_02104f1c_alias+0x0
 eur	src/main/func_0200ac60.s	missing-reloc	.text+0xa4 original ABS32 data_02186a58+0x0 built none
-eur	src/main/func_0200c874.s	missing-reloc	.text+0x1b0 original PC24 .text-0x8 built none
-eur	src/main/func_0200c874.s	missing-reloc	.text+0x2b8 original PC24 .text-0x8 built none
 eur	src/main/func_0200cb50.s	missing-reloc	.text+0x1d8 original PC24 .text-0x8 built none
 eur	src/main/func_0200cb50.s	missing-reloc	.text+0x2e0 original PC24 .text-0x8 built none
 eur	src/main/func_020119f4.c	wrong-target	.text+0x18 original ABS32 data_020b52d4+0x0 built ABS32 data_020b52d0+0x4
@@ -458,10 +456,6 @@ eur	src/main/func_02064dfc.s	wrong-target	.text+0x178 original ABS32 data_021015
 eur	src/main/func_020667e8.s	wrong-target	.text+0x1d8 original ABS32 data_02101770+0x0 built ABS32 data_0210176c+0x4
 eur	src/main/func_02068a20.s	wrong-target	.text+0x8c original ABS32 data_02101d60+0x0 built ABS32 data_02101d5c+0x4
 eur	src/main/func_0206b0c4.s	wrong-target	.text+0x12c original ABS32 data_02101dfc+0x0 built ABS32 data_02101df8+0x4
-eur	src/main/func_02077398.s	missing-reloc	.text+0x210 original PC24 .text-0x8 built none
-eur	src/main/func_02077398.s	missing-reloc	.text+0x3fc original PC24 .text-0x8 built none
-eur	src/main/func_02077398.s	missing-reloc	.text+0x470 original PC24 .text-0x8 built none
-eur	src/main/func_02077398.s	missing-reloc	.text+0x4d0 original PC24 .text-0x8 built none
 eur	src/main/func_0207845c.s	wrong-target	.text+0x38 original ABS32 data_021020b5+0x0 built ABS32 data_021020b4+0x1
 eur	src/main/func_0207b250.s	wrong-target	.text+0x1ac original ABS32 data_020bee7c+0x0 built ABS32 data_020bee6c+0x10
 eur	src/main/func_0207b250.s	wrong-target	.text+0x1b0 original ABS32 data_020bee84+0x0 built ABS32 data_020bee6c+0x18
