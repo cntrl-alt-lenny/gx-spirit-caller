@@ -19678,7 +19678,7 @@ src/main/func_020aeda4.c:
     complete
     .text start:0x020aeda4 end:0x020aedcc
 
-src/main/func_020aedcc.s:
+src/main/func_020aedcc.c:
     complete
     .text start:0x020aedcc end:0x020aee3c
 
