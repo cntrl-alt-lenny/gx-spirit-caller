@@ -7101,7 +7101,7 @@ src/main/func_02036c6c.c:
     complete
     .text start:0x02036c6c end:0x02036d7c
 
-src/main/func_02036d7c.s:
+src/main/func_02036d7c.c:
     complete
     .text start:0x02036d7c end:0x02037208
 
