@@ -8532,3 +8532,171 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02228bcc	ov002	992	default	factory	parked	77.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E1	
 0x02228bcc	ov002	992	legacy	factory	parked	3.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E1	
 0x02228bcc	ov002	992	legacy_sp3	factory	parked	3.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E1	
+0x022a4a30	ov002	608	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022bd5a4	ov002	608	default	factory	parked	97.4	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x022bd5a4	ov002	608	legacy	factory	parked	26.3	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x022bd5a4	ov002	608	legacy_sp3	factory	parked	26.6	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x0229e27c	ov002	620	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0229e27c	ov002	620	legacy_sp3	factory	parked	10.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0229e27c	ov002	620	legacy	factory	parked	10.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022bca80	ov002	620	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02235690	ov002	628	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0225a0e0	ov002	628	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022ac67c	ov002	628	default	factory	parked	77.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022ac67c	ov002	628	legacy	factory	parked	8.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022ac67c	ov002	628	legacy_sp3	factory	parked	8.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x0229a19c	ov002	632	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022aacc0	ov002	632	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022aacc0	ov002	632	legacy_sp3	factory	parked	37.1	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022aacc0	ov002	632	legacy	factory	parked	35	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0223a5fc	ov002	640	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0224215c	ov002	640	default	factory	parked	65	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x0224215c	ov002	640	legacy	factory	parked	1.1	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x0224215c	ov002	640	legacy_sp3	factory	parked	0.6	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x022663cc	ov002	644	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022663cc	ov002	644	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022663cc	ov002	644	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0226c988	ov002	644	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0223fdb4	ov002	648	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0226bbb8	ov002	652	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022745f0	ov002	656	default	factory	parked	74.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022745f0	ov002	656	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022745f0	ov002	656	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02275c28	ov002	660	default	factory	parked	80	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02275c28	ov002	660	legacy	factory	parked	4.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02275c28	ov002	660	legacy_sp3	factory	parked	0.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x0229d32c	ov002	660	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022bc4fc	ov002	668	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02235e0c	ov002	672	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02272414	ov002	672	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02270fcc	ov002	684	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0227352c	ov002	688	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02267644	ov002	692	default	factory	parked	96.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02267644	ov002	692	legacy	factory	parked	0.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02267644	ov002	692	legacy_sp3	factory	parked	0.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b4df0	ov002	692	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022555a4	ov002	696	default	factory	parked	97.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022555a4	ov002	696	legacy	factory	parked	0.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022555a4	ov002	696	legacy_sp3	factory	parked	1.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02245f18	ov002	704	default	factory	parked	93.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02245f18	ov002	704	legacy	factory	parked	2.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02245f18	ov002	704	legacy_sp3	factory	parked	2.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02283908	ov002	704	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02250e40	ov002	708	default	factory	parked	98.3	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x02250e40	ov002	708	legacy	factory	parked	5.1	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x02250e40	ov002	708	legacy_sp3	factory	parked	2.3	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E2	
+0x022392e4	ov002	720	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0227e9d4	ov002	736	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0227e9d4	ov002	736	legacy_sp3	factory	parked	9.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0227e9d4	ov002	736	legacy	factory	parked	9.8	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02285e28	ov002	744	default	factory	parked	82.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02285e28	ov002	744	legacy	factory	parked	2.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02285e28	ov002	744	legacy_sp3	factory	parked	2.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022bc798	ov002	744	default	factory	parked	81.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022bc798	ov002	744	legacy	factory	parked	14.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022bc798	ov002	744	legacy_sp3	factory	parked	14.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02240364	ov002	748	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022477e8	ov002	752	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022477e8	ov002	752	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022477e8	ov002	752	legacy_sp3	factory	parked	0.5	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022a4ed8	ov002	756	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022afcf0	ov002	756	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022737dc	ov002	760	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022737dc	ov002	760	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022737dc	ov002	760	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022a1e60	ov002	764	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022768b4	ov002	772	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022768b4	ov002	772	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022768b4	ov002	772	legacy	factory	parked	2.1	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0229dd0c	ov002	772	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0229dd0c	ov002	772	legacy_sp3	factory	parked	8.8	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0229dd0c	ov002	772	legacy	factory	parked	7.6	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022a8e40	ov002	772	default	factory	parked	68.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022a8e40	ov002	772	legacy	factory	parked	16.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022a8e40	ov002	772	legacy_sp3	factory	parked	17.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02258d4c	ov002	780	default	factory	parked	96.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02258d4c	ov002	780	legacy	factory	parked	9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02258d4c	ov002	780	legacy_sp3	factory	parked	25.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022a3f44	ov002	780	default	factory	parked	99	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022a3f44	ov002	780	legacy	factory	parked	4.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022a3f44	ov002	780	legacy_sp3	factory	parked	4.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b18a0	ov002	780	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0226bfa8	ov002	784	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0226bfa8	ov002	784	legacy_sp3	factory	parked	8	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0226bfa8	ov002	784	legacy	factory	parked	30.6	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022b394c	ov002	784	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022ac2fc	ov002	788	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02299d34	ov002	792	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02299d34	ov002	792	legacy_sp3	factory	parked	68	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02299d34	ov002	792	legacy	factory	parked	7.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0224003c	ov002	808	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02258690	ov002	816	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b1570	ov002	816	default	factory	parked	85.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b1570	ov002	816	legacy	factory	parked	19.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b1570	ov002	816	legacy_sp3	factory	parked	19.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02298a98	ov002	820	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02298a98	ov002	820	legacy_sp3	factory	parked	5.6	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02298a98	ov002	820	legacy	factory	parked	5.9	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0226b400	ov002	828	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0226b400	ov002	828	legacy_sp3	factory	parked	1.4	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0226b400	ov002	828	legacy	factory	parked	1.8	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022a59ec	ov002	828	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022a59ec	ov002	828	legacy_sp3	factory	parked	7.9	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022a59ec	ov002	828	legacy	factory	parked	2.7	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02259420	ov002	852	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0228d544	ov002	852	default	factory	parked	54	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E2	
+0x0228d544	ov002	852	legacy	factory	parked	4.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E2	
+0x0228d544	ov002	852	legacy_sp3	factory	parked	3.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E2	
+0x0223f6c4	ov002	860	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022a6500	ov002	864	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022ac9ec	ov002	864	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b3c5c	ov002	864	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b3c5c	ov002	864	legacy_sp3	factory	parked	5.1	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022b3c5c	ov002	864	legacy	factory	parked	5	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02297158	ov002	868	default	factory	parked	83	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02297158	ov002	868	legacy	factory	parked	2.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02297158	ov002	868	legacy_sp3	factory	parked	2.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x0226a928	ov002	876	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022726b4	ov002	880	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0226e0ec	ov002	896	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b809c	ov002	904	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b809c	ov002	904	legacy_sp3	factory	parked	11	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022589c0	ov002	908	default	factory	parked	95.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022589c0	ov002	908	legacy	factory	parked	5.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022589c0	ov002	908	legacy_sp3	factory	parked	8.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x02237f58	ov002	916	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02237f58	ov002	916	legacy_sp3	factory	parked	3.5	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02237f58	ov002	916	legacy	factory	parked	18.1	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022aa7b8	ov002	916	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022aa7b8	ov002	916	legacy_sp3	factory	parked	26.1	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022aa7b8	ov002	916	legacy	factory	parked	26	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02259b4c	ov002	924	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02259b4c	ov002	924	legacy	factory	parked	0.4	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02259b4c	ov002	924	legacy_sp3	factory	parked	0.4	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0225bd4c	ov002	940	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0225bd4c	ov002	940	legacy_sp3	factory	parked	4.9	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0225bd4c	ov002	940	legacy	factory	parked	2.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022414ec	ov002	948	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02257db4	ov002	948	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02257db4	ov002	948	legacy_sp3	factory	parked	4.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02257db4	ov002	948	legacy	factory	parked	5.7	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022a3b84	ov002	960	default	factory	parked	95.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022a3b84	ov002	960	legacy	factory	parked	4.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022a3b84	ov002	960	legacy_sp3	factory	parked	4.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b3fbc	ov002	964	default	factory	parked	88.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b3fbc	ov002	964	legacy	factory	parked	0.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b3fbc	ov002	964	legacy_sp3	factory	parked	0.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b4588	ov002	968	default	factory	parked	84.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b4588	ov002	968	legacy	factory	parked	1.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022b4588	ov002	968	legacy_sp3	factory	parked	1.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E2	
+0x022a5d28	ov002	972	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b5590	ov002	972	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b5590	ov002	972	legacy_sp3	factory	parked	0.8	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022b5590	ov002	972	legacy	factory	parked	0.8	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0223cb40	ov002	984	default	factory	shipped	100	n/a		factory-1021-E2	
+0x0223cb40	ov002	984	legacy_sp3	factory	parked	43.9	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x0223cb40	ov002	984	legacy	factory	parked	2.3	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x022707b8	ov002	1000	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022acd4c	ov002	1000	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b5590	ov002	972	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1021-E2	
+0x022461d8	ov002	1020	default	factory	shipped	100	n/a		factory-1021-E2	
