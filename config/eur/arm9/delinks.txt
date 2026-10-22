@@ -7570,7 +7570,7 @@ src/main/func_0203b8fc.s:
     complete
     .text start:0x0203b8fc end:0x0203ba24
 
-src/main/func_0203ba24.s:
+src/main/func_0203ba24.c:
     complete
     .text start:0x0203ba24 end:0x0203baa0
 
