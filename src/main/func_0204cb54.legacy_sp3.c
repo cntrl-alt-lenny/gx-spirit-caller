@@ -6,7 +6,7 @@ extern void func_0204bf00(void);
 extern void func_020498dc(int a);
 extern int func_0204ce90(int a);
 
-int func_0204cb54(void) {
+int func_0204cb54(int unused0) {
     int ret = 1;
     void *p;
 

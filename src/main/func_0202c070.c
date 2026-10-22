@@ -21,7 +21,7 @@ typedef struct Ctx0202c070 {
 
 extern Ctx0202c070 *data_0219a93c;
 
-void func_0202c070(void) {
+void func_0202c070(int unused0) {
     func_0202c1ac();
     data_0219a93c->f_18 = func_02006c0c(data_020c6af4, 4, 0);
     data_0219a93c->f_1c = func_02006c0c(data_020c6b08, 4, 0);

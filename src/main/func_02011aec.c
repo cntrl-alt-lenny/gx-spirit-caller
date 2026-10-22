@@ -4,7 +4,7 @@ extern int func_02018f80(void);
 extern int func_02018f90(void);
 extern void func_020117e4(int a, int b, int c, int d, int e);
 
-void func_02011aec(void) {
+void func_02011aec(int unused0, int unused1) {
     int v1 = func_02019210();
     int v3;
     int v4;

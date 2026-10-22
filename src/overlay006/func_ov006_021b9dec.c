@@ -12,7 +12,7 @@
 extern int OS_SPrintf(int x, void *y);
 extern void *data_ov006_021cbf24;
 
-int func_ov006_021b9dec(int unused, int x) {
+int func_ov006_021b9dec(int unused, int x, int unused2) {
     OS_SPrintf(x, &data_ov006_021cbf24);
     return 1;
 }

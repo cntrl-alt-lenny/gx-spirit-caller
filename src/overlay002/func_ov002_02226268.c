@@ -23,7 +23,7 @@ extern int func_ov002_021e797c(struct Input *,int,int);
 extern u16 func_ov002_0223de94(struct node *,int);
 extern int func_ov002_0223df38(struct Node *,int,int *);
 extern void func_ov002_0227ac64(int,struct Record *,int,int,unsigned);
-int func_ov002_02226268(struct Input *self) {
+int func_ov002_02226268(struct Input *self, int unused1) {
     switch (data_ov002_022ce288.state) {
     case 0x80: {
         unsigned kind = self->kind; unsigned side = self->side;

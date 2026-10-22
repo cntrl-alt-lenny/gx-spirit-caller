@@ -11,7 +11,7 @@ extern int func_ov002_021b3ecc(int a, int b, int c);
 extern void func_ov002_021dbf98(int a, int b, int c, int d, int e);
 extern void func_ov002_021dd950(int a, int b, int c, int d, int e);
 extern int func_0202e2c8(int unused0);
-extern void func_ov002_021fe3d4(void);
+extern int func_ov002_021fe3d4(void);
 /* These callees have unused formal arguments; the original supplies none. */
 extern int func_ov002_021ca51c();
 extern void func_ov002_021e2b3c();

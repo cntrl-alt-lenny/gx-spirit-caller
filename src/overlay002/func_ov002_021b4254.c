@@ -7,7 +7,7 @@
 extern void func_ov002_021b3d2c(void);
 extern char data_ov002_022d0252[];
 
-asm void func_ov002_021b4254(void) {
+asm void func_ov002_021b4254(int unused0, int unused1) {
     nofralloc
     ldr r2, =data_ov002_022d0252
     mov r0, r0, lsl #0x2
