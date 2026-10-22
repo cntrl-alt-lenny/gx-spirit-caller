@@ -8310,7 +8310,7 @@ src/main/func_02043ca4.s:
     complete
     .text start:0x02043ca4 end:0x02043d3c
 
-src/main/func_02043d3c.s:
+src/main/func_02043d3c.legacy_sp3.c:
     complete
     .text start:0x02043d3c end:0x02044228
 
