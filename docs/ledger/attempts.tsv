@@ -8480,3 +8480,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022321e0	ov002	844	default	factory	shipped	100	n/a		factory-1021-E1	
 0x022321e0	ov002	844	legacy_sp3	factory	parked	0.9	unknown	UNCLASSIFIED:unknown	factory-1021-E1	
 0x022321e0	ov002	844	legacy	factory	parked	2.6	unknown	UNCLASSIFIED:unknown	factory-1021-E1	
+0x02218068	ov002	848	default	factory	shipped	100	n/a		factory-1021-E1	
