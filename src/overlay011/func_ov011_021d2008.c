@@ -10,7 +10,7 @@ typedef struct {
 } state_t;
 extern void Task_InvokeLocked(void *p);
 /* The assembly consumes a byte count in r0; the C wrapper types it as a pointer. */
-extern int Task_PostLocked(u32 size, int alignment, int kind);
+extern void *Task_PostLocked(int size, int align, int flags);
 /* Fill32 is an assembly definition consuming r0, r1 and r2. */
 extern void Fill32(u32 value, void *dest, u32 size);
 void func_ov011_021d2008(state_t *p, u32 width, u32 height) {
@@ -18,7 +18,7 @@ void func_ov011_021d2008(state_t *p, u32 width, u32 height) {
     if (p->data) { Task_InvokeLocked(p->data); p->data = 0; }
     if (p->data) { Task_InvokeLocked(p->data); p->data = 0; }
     count = width * height;
-    p->data = (void *)Task_PostLocked(count * 4, 4, 0);
+    p->data = Task_PostLocked(count * 4, 4, 0);
     p->count = count;
     p->position = 0;
     if (p->data) { Fill32(0, p->data, p->count * 4); p->position = 0; }

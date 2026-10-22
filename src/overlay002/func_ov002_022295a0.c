@@ -15,7 +15,7 @@ extern void func_ov002_0226b094(int arg0, int arg1);
 extern void func_ov002_021d479c(u16 a0, u16 a1, u16 a2, u16 a3);
 extern int func_ov002_021c3b60(int player, int arg1);
 extern int func_ov002_021b97d4(int a, u32 b);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021e278c(int arg0, int arg1);
 extern void func_ov002_021df73c(int arg0, int arg1);
@@ -35,7 +35,7 @@ int func_ov002_022295a0(struct Self *self) {
             if (data_ov002_022cd744[self->bit] == 1) {
                 data_ov002_022d016c.flag = 1;
             } else {
-                func_ov002_021ae4bc((void *)0x12b, func_ov002_021b97d4(self->bit, 0x167b));
+                func_ov002_021ae4bc(0x12b, func_ov002_021b97d4(self->bit, 0x167b));
             }
             return 0x7d;
         } else {

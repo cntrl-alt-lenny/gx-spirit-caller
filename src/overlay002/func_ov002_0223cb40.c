@@ -66,7 +66,7 @@ int func_ov002_0223cb40(Self *self, void *other)
                 return 0x7c;
             } else {
                 u32 n = data_ov002_022ce288.max - data_ov002_022ce288.count;
-                if (n == func_ov002_022536e8((void *)side,self->id,data_ov002_022ce288.key)) {
+                if (n == func_ov002_022536e8(side,self->id,data_ov002_022ce288.key)) {
                     if (n >= 32) n = 32;
                     func_ov002_021af9d0(side,n+6,self->id,data_ov002_022ce288.key);
                     return 0x7c;
@@ -93,7 +93,7 @@ int func_ov002_0223cb40(Self *self, void *other)
         if (data_ov002_022ce288.key == 0x1a4e) {
             if (data_ov002_022ce288.count == 2 && data_ov002_022ce288.count - n < 2) {
                 data_ov002_022ce288.slots[1] = 7;
-                if (func_ov002_022536e8((void *)side,self->id) != 0) return 0x7d;
+                if (func_ov002_022536e8(side,self->id) != 0) return 0x7d;
             }
             data_ov002_022ce288.max = data_ov002_022ce288.count;
         }

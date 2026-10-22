@@ -7,7 +7,7 @@ extern char data_ov002_022ccfec[];
 extern int func_02022234(unsigned int idx, unsigned int v);
 extern int func_02036590(unsigned int id, int arg);
 extern int func_02037208(int a0, int r1, int r2, int r3);
-extern int func_02037dc0(int modeArg, void *arg1, void *arg2);
+extern int func_02037dc0(int modeArg, int arg1, int arg2);
 extern int func_020a978c(char *dest, const char *format, ...);
 extern int func_ov002_022bc2b4(int value);
 extern int func_ov002_022bdb88(Pair *array, int id, int flags, void *position, void *end);
@@ -44,10 +44,10 @@ int func_ov002_022bc4fc(char *self) {
             func_02036590(sound, 15);
             if (*(int *)(self + 0xc50) == 0) {
                 if (func_ov002_022bc2b4(*(int *)(self + 0xc5c)) != 0)
-                    func_02037dc0(data_ov002_022d0f2c[0x36], 0, (void *)15);
+                    func_02037dc0(data_ov002_022d0f2c[0x36], 0, 15);
             }
             *(int *)(self + 0xc50) = 0;
-        } else func_02037dc0(data_ov002_022d0f2c[0x36], 0, (void *)15);
+        } else func_02037dc0(data_ov002_022d0f2c[0x36], 0, 15);
         if (*(int *)(self + 0xc5c) != 0) func_02037208(0x8f, -1, 0, 1);
         *(int *)(self + 0xc60) = 2;
         *(int *)(self + 0xc64) = 0;
@@ -64,7 +64,7 @@ int func_ov002_022bc4fc(char *self) {
         if (sound != 0) {
             func_02037208(sound, -1, 30, 1);
             *(int *)(self + 0xc50) = 0xf0;
-        } else func_02037dc0(data_ov002_022d0f2c[0x36], (void *)0x7f, (void *)15);
+        } else func_02037dc0(data_ov002_022d0f2c[0x36], 0x7f, 15);
         *(int *)(self + 0xc60) = 3;
         *(int *)(self + 0xc64) = 0;
         break;

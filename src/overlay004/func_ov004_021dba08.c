@@ -21,7 +21,7 @@ extern void func_ov004_021d8cd0(void *);
 extern int func_0200a9dc(void);
 extern void func_02006314(void);
 extern void func_02045618(void);
-extern int Task_PostLocked(void *, int, int);
+extern void *Task_PostLocked(int size, int align, int flags);
 extern void func_020458d8(int);
 extern void func_ov004_021e7e30_unk(int, int, int);
 extern void Task_InvokeLocked(void *);
@@ -69,7 +69,7 @@ int func_ov004_021dba08(void) {
     func_02045618();
     flags = 1;
     mode = 1;
-    task = Task_PostLocked((void *)0x40000, 4, 0);
+    task = Task_PostLocked(0x40000, 4, 0);
     func_020458d8(2);
     switch (data_021040ac[13]) {
     case 0: flags = 0x10; break;

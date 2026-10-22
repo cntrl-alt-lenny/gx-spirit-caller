@@ -20,7 +20,7 @@ extern void func_ov002_021ae400(int a,int b);
 extern void func_ov002_021ae430(int a,const char *src);
 extern unsigned int func_ov002_021b00d0(unsigned int x);
 extern int func_ov002_021b9b64(int unused0);
-extern void func_ov002_021d7c1c(void *a,void *b,void *c);
+extern void func_ov002_021d7c1c(int a, int b,void *c);
 extern int func_ov002_021d87a4(int arg0,int arg1,int arg2);
 extern int func_ov002_022028c8(State *p,int unused1);
 extern int func_ov002_0221beac(int side,int kind,int slot);
@@ -110,13 +110,13 @@ int func_ov002_0221bfb0(State *self,int arg1) {
   for(i=0;i<3;i++) {
    if(i==data_ov002_022ce288.selected) continue;
    idx=func_ov002_021b9b64(self->slots[i]);
-   func_ov002_021d7c1c((void *)self->side,(void *)idx,0);
+   func_ov002_021d7c1c(self->side,idx,0);
   }
   return 0x76;
  case 0x76:
   card=(Card *)func_ov002_021b9b64(self->slots[data_ov002_022ce288.selected]);
   if(func_0202e234(card->id)) func_ov002_0227adb8(self->side,(int)card,1,0);
-  else func_ov002_021d7c1c((void *)self->side,card,0);
+  else func_ov002_021d7c1c(self->side,card,0);
   return 0;
  }
  return 0;

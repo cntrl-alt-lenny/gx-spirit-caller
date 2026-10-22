@@ -24,10 +24,10 @@ extern int data_ov002_022cd744[];
 extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf180[];
 extern int func_ov002_0226eb5c(int a, int b, int c, int d);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern int func_ov002_021b3fd8(int arg0, int arg1, int arg2, int arg3);
 extern void func_ov002_021df62c(int arg0, int arg1, int idx);
-extern void func_ov002_021e276c(void *self, int a, int b, int c);
+extern void func_ov002_021e276c(int self, int a, int b, int c);
 extern int func_ov002_02271ab4(void);
 int func_ov002_02272414(void) {
     int mask;
@@ -39,7 +39,7 @@ int func_ov002_02272414(void) {
                 if (data_ov002_022cd744[data_ov002_022cd300.player] == 1)
                     data_ov002_022d016c.done = 1;
                 else
-                    func_ov002_021ae4bc((void *)0x72, data_ov002_022cd300.selection);
+                    func_ov002_021ae4bc(0x72, data_ov002_022cd300.selection);
             } else {
                 data_ov002_022d016c.done = 1;
             }
@@ -63,7 +63,7 @@ int func_ov002_02272414(void) {
                 }
             }
             func_ov002_021df62c(data_ov002_022cd300.player, 14, selected);
-            func_ov002_021e276c((void *)data_ov002_022cd300.player, 0x197f, 5, (unsigned short)selected);
+            func_ov002_021e276c(data_ov002_022cd300.player, 0x197f, 5, (unsigned short)selected);
             return 1;
         }
         data_ov002_022cd300.phase = 0;

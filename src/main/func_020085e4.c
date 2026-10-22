@@ -14,7 +14,7 @@ extern int func_0209bfe4();
 extern int func_0209bfd4();
 /* The original leaves the byte count in r1, supplying only r0 explicitly. */
 extern int func_02007240();
-extern int Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void *Task_PostLocked(int size, int align, int flags);
 extern void Task_InvokeLocked(void *p);
 extern int func_0209c7dc(int,int,int,int,int,int,int,int,int);
 extern void func_020944a4(int unused0, int unused1, int unused2);
@@ -43,7 +43,7 @@ int func_020085e4(void) {
                     valid=1;
                     if (h.size>0x1b0c) valid=0;
                     else {
-                        buffer = Task_PostLocked((void *)h.size,4,0);
+                        buffer = Task_PostLocked(h.size,4,0);
                         data_02104f3c[1] |= func_0209c7dc(address+16,buffer,h.size,0,0,0,6,1,0)==0;
                         if (h.size==0x1b0c) {
                             if(h.crc!=func_02007240((void *)buffer,h.size)) valid=0;

@@ -13,7 +13,7 @@ extern void func_ov002_021afffc(int id);
 extern u32 *func_ov002_021b004c(int id);
 extern int func_ov002_021bc618(int arg0);
 extern void func_ov002_0223de04(struct SelfDE04 *self, int arg1, int arg2, int arg3);
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 extern int func_ov002_02257b48(void *p, void *q);
 extern void func_ov002_0229cf10(char *dst, const char *fmt, int val);
 int func_ov002_022414ec(struct Self *self, void *arg) {
@@ -44,7 +44,7 @@ int func_ov002_022414ec(struct Self *self, void *arg) {
     switch (data_ov002_022ce288.state) {
     case 0:
         if (phase>=6 && phase<=0x26) {
-            if (func_ov002_022536e8((void *)self->player,self->id,0)<phase-6) return 1;
+            if (func_ov002_022536e8(self->player,self->id,0)<phase-6) return 1;
         }
         if (!func_ov002_02257b48(self,arg)) return 1;
         func_ov002_0229cf10(buf,(const char *)fmt,phase-6);

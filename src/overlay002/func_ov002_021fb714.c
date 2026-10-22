@@ -15,7 +15,7 @@ extern Player data_ov002_022cf16c[];
 extern unsigned int data_ov002_022cf178[];
 extern int func_ov002_021ff46c(Self *p, int unused1);
 extern int func_ov002_0227ddf8(Self *p);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern void func_ov002_021df62c(int arg0, int arg1, int idx);
 extern int func_ov002_022536e8(void *self, int arg1, int arg2);
 extern void func_ov002_021ae400(int a, int b);

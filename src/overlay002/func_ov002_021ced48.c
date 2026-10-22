@@ -9,7 +9,7 @@ extern char data_ov002_022cf288[];
 extern unsigned int func_0202b8a8(int id);
 extern int func_0202e234(int x);
 extern int func_0202e2f8(int x);
-extern int func_ov002_021b0c04(void *self, int arg1);
+extern int func_ov002_021b0c04(int self, int arg1);
 extern void func_ov002_021b1f20(int a0,int a1,int a2,int a3,int a4);
 extern void func_ov002_021b91c4(int *dst,const int *src);
 extern unsigned int func_ov002_021b947c(int id);
@@ -66,7 +66,7 @@ void func_ov002_021ced48(void) {
             func_ov002_021c2934(0,0x16da,1);
             func_ov002_021c2934(1,0x16da,1);
         }
-        if (player == data_ov002_022cd73c[1]) func_ov002_021b0c04((void *)0x1e,1);
+        if (player == data_ov002_022cd73c[1]) func_ov002_021b0c04(0x1e,1);
         func_ov002_021b91c4((int *)&data_ov002_022cf168,(const int *)p);
         from.player = (u16)player;
         from.kind = (u16)kind;

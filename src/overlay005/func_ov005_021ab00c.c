@@ -1,4 +1,4 @@
-extern int Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void *Task_PostLocked(int size, int align, int flags);
 /* Fill32's assembly body consumes three registers despite its void definition. */
 extern void Fill32(int value, void *dest, int size);
 extern void func_ov005_021aafac(void *o, char *buf);
@@ -7,7 +7,7 @@ typedef struct Node { int id, a, next, b, c, d, e; } Node;
 typedef struct Buffer { char tag[4]; int count, size; Node head; Node nodes[1]; } Buffer;
 Buffer *func_ov005_021ab00c(void *o, int count) {
     int size = (count + 1) * 0x1c + 0xc;
-    Buffer *p = (Buffer *)Task_PostLocked((void *)size, 4, 0);
+    Buffer *p = Task_PostLocked(size, 4, 0);
     Node *n;
     int i;
     if (p) {

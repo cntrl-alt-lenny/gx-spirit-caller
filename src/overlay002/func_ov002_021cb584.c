@@ -10,7 +10,7 @@ extern Card data_ov002_022cf168;
 extern int data_ov002_022cd73c[];
 extern int func_0202e234(int x);
 /* Existing definition types self as void *, but this caller passes integer IDs. */
-extern int func_ov002_021b0c04(void *self,int arg1);
+extern int func_ov002_021b0c04(int self,int arg1);
 extern void func_ov002_021b91c4(int *dst,const int *src);
 extern u32 func_ov002_021b947c(int id);
 extern int func_ov002_021b99b4(int player,int id);

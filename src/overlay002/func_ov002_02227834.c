@@ -10,7 +10,7 @@ struct Player { int pad, side; };
 extern struct State data_ov002_022ce288;
 extern struct Player data_ov002_022cd73c;
 extern char data_ov002_022cf16c[];
-extern int func_ov002_021b0c04(void *self, int arg1);
+extern int func_ov002_021b0c04(int self, int arg1);
 extern int func_ov002_021b3ecc(int arg0, int arg1, int arg2);
 extern int func_ov002_021bc6c4(int arg0);
 extern int func_ov002_021bd030(int self);
@@ -47,7 +47,7 @@ int func_ov002_02227834(struct Self *self) {
                 if (data_ov002_022ce288.slot >= 0) {
                     func_ov002_021ded54((int)self, a, b, a, data_ov002_022ce288.slot);
                     func_ov002_021d5d58(self->side, (u16)((u8)a | ((u8)data_ov002_022ce288.slot << 8)), (u16)((u8)c | ((u8)d << 8)), 11);
-                    if (self->side == data_ov002_022cd73c.side) func_ov002_021b0c04((void *)0x30, 1);
+                    if (self->side == data_ov002_022cd73c.side) func_ov002_021b0c04(0x30, 1);
                     return 0x7f;
                 }
             }

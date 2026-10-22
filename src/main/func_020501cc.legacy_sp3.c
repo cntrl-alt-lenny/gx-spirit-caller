@@ -4,7 +4,7 @@ extern void *func_020467e4(int i);
 extern void *func_02046760(int i);
 extern int func_0204a8bc(int code);
 extern int func_0204cc20(int a0);
-extern void func_02050054(void *a0, void *a1);
+extern void func_02050054(int a0, int a1);
 extern void func_0204c40c(int state);
 typedef struct { char pad[0x40]; int field_40; } Obj020624cc;
 extern void func_020624cc(Obj020624cc *self, int val);
@@ -67,7 +67,7 @@ void func_020501cc(Obj020624cc *obj, int action) {
     }    } else {
         slot = func_0204682c();
         if (slot == -1) {
-            func_02050054((void *)6,(void *)0xfffeabc4);
+            func_02050054(6,0xfffeabc4);
             return;
         }
         ptr = func_020467e4(slot);

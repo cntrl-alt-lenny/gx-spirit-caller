@@ -11,7 +11,7 @@ extern int func_0202e310(int unused0);
 extern int func_ov002_021b0b0c(int arg0);
 extern void func_ov002_021b0b54(int id,int value);
 extern int func_ov002_021b0bdc(void *self,int arg);
-extern int func_ov002_021b0c04(void *self,int arg1);
+extern int func_ov002_021b0c04(int self,int arg1);
 extern void func_ov002_021b1f20(int,int,int,int,int);
 extern int func_ov002_0229ade0(int,int,int,int);
 extern int func_ov002_0229c7f8(int);

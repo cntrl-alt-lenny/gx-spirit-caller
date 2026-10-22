@@ -9,7 +9,7 @@ extern int func_0202eab0(int unused0);
 extern void func_ov002_021ae400(int a, int b);
 extern void func_ov002_021af9d0(int player, int phase, int card, int arg);
 extern int *func_ov002_021afb74(void);
-extern int func_ov002_021b0c04(void *self, int arg1);
+extern int func_ov002_021b0c04(int self, int arg1);
 extern int func_ov002_021bc6c4(int arg0);
 extern int func_ov002_021e27c0(int self_thing, int arg1);
 extern int func_ov002_021e286c(int arg0);
@@ -52,7 +52,7 @@ int func_ov002_02211b64(S021ff3bc *self, int arg1) {
         }
         if (player == data_ov002_022cd73c[1]) {
             if (func_0202eab0(((struct Card *)func_ov002_021afb74())->id) != 0)
-                func_ov002_021b0c04((void *)0x32, 1);
+                func_ov002_021b0c04(0x32, 1);
         }
         *(int *)(data_ov002_022ce288 + 0x5ac) = func_ov002_021bc6c4(player);
         func_ov002_0227adb8(player, (int)func_ov002_021afb74(), 1,

@@ -25,7 +25,7 @@ extern char data_ov002_022cf16c[];
 extern int func_0202b100(int a0);
 extern int func_0202f050(int x);
 extern void func_ov002_021ae400(int a, int b);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern int func_ov002_021b3fd8(int arg0, int arg1, int arg2, int arg3);
 extern int func_ov002_021b97d4(int a, unsigned int b);
 extern int func_ov002_021bc618(int arg0);
@@ -49,7 +49,7 @@ int func_ov002_022726b4(void) {
                 if (data_ov002_022cd744[data_ov002_022cd300.player] == 1)
                     data_ov002_022d016c.done = 1;
                 else
-                    func_ov002_021ae4bc((void *)0xfa,func_ov002_021b97d4(data_ov002_022cd300.player,0x19b2));
+                    func_ov002_021ae4bc(0xfa,func_ov002_021b97d4(data_ov002_022cd300.player,0x19b2));
             } else data_ov002_022d016c.done = 1;
         } else data_ov002_022d016c.done = 0;
         data_ov002_022cd318.phase++;

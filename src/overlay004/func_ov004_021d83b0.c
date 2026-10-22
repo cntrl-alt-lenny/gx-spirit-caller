@@ -4,7 +4,7 @@ extern State data_ov004_0220b500;
 extern int data_ov004_0220e500[];
 extern int func_0202c0c0(int id);
 extern void func_ov004_021c9dd4(void *, void *, int, int);
-extern void func_ov004_021c9ef0(void *selfv);
+extern void func_ov004_021c9ef0(int selfv);
 extern void func_ov004_021ca0a4(Record *self, int a, int x, int y, void *p, int index);
 extern void func_ov004_021d6f20(int a, int b, int c);
 extern void func_ov004_021d71ec(void);
@@ -26,7 +26,7 @@ int func_ov004_021d83b0(void) {
         if (F(0x58) >= 0x100) { F(0x54) = 3; F(0x58) = 0; }
         break;
     case 3:
-        func_ov004_021c9ef0((void *)0xe1);
+        func_ov004_021c9ef0(0xe1);
         func_ov004_021d7c84();
         break;
     case 4:
@@ -45,7 +45,7 @@ int func_ov004_021d83b0(void) {
         else if (F(0x58) >= 0x100) { F(0x54) = 6; F(0x58) = 0; }
         break;
     case 6:
-        func_ov004_021c9ef0((void *)0xe0);
+        func_ov004_021c9ef0(0xe0);
         func_ov004_021d7f2c();
         break;
     }

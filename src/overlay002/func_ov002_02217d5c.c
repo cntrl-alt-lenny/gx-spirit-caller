@@ -1,5 +1,5 @@
 typedef unsigned short u16;
-struct Self { u16 id; u16 side:6; u16 kind:6; u16 :4; u16 :2; u16 blocked:1; u16 :13; u16 pad; u16 masks[2]; u16 counts[2]; };
+struct Self { u16 id; u16 side:6; u16 kind:6; u16 :4; u16 :2; u16 blocked:1; u16 :13; u16 pad; u16 masks[4]; };
 struct State { char pad[0x5a8]; int mode, player, timer; };
 struct Global { char pad[0xcec]; int player; };
 struct Key { unsigned id:13; unsigned side:1; unsigned :18; };
@@ -52,8 +52,8 @@ int func_ov002_02217d5c(struct Self *self) {
   data_ov002_022ce288.player=data_ov002_022d016c.player;
   data_ov002_022ce288.timer=5;
   self->masks[0]=self->masks[1]=0;
-  self->counts[0]=func_ov002_021ca2b8(0);
-  self->counts[1]=func_ov002_021ca2b8(1);
+  self->masks[2]=func_ov002_021ca2b8(0);
+  self->masks[3]=func_ov002_021ca2b8(1);
   func_ov002_021e2b1c(30); func_ov002_021e2b3c();
   return 0x7e;
  case 0x7e:

@@ -9,7 +9,7 @@ extern struct Pending data_ov002_022d016c;
 extern int data_ov002_022cd744[];
 extern struct Player data_ov002_022cf16c[];
 extern void func_ov002_021ae400(int a,int b);
-extern int func_ov002_021ae4bc(void *self,int idx);
+extern int func_ov002_021ae4bc(int self,int idx);
 /* This caller supplies only two arguments to the four-parameter thunk. */
 extern int func_ov002_021bb90c();
 extern void func_ov002_021df62c(int arg0,int arg1,int idx);
@@ -28,7 +28,7 @@ int func_ov002_021f8b00(struct Obj *self) {
             else
                 data_ov002_022d016c.choice=1;
         } else {
-            func_ov002_021ae4bc((void *)250,self->index);
+            func_ov002_021ae4bc(250,self->index);
         }
         data_ov002_022ce288.step++;
         return 0;

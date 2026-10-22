@@ -20,11 +20,11 @@ typedef struct Entry68 {
 } Entry68;
 
 extern Entry68 *func_02037b58(int id);
-extern int func_02037d28(void *entry, void *arg1, void *arg2);
+extern int func_02037d28(void *entry, int arg1, int arg2);
 extern unsigned char data_0219b760[];
 extern unsigned char data_0219b2e0[];
 
-int func_02037dc0(int modeArg, void *arg1, void *arg2) {
+int func_02037dc0(int modeArg, int arg1, int arg2) {
     unsigned int mode = modeArg - 0x8f00000;
     unsigned char *entry = data_0219b760;
     int idx;

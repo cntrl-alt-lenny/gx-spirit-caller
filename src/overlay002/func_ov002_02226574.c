@@ -20,7 +20,7 @@ extern void func_ov002_021d81d4(unsigned,unsigned);
 extern void func_ov002_021d8474(int,int,int,int,int,int,int);
 extern int func_ov002_021de480(int,int,int,int);
 extern int func_ov002_021de678(struct Input *,int,int,int);
-extern void func_ov002_021e276c(void *,int,int,int);
+extern void func_ov002_021e276c(int,int,int,int);
 extern void func_ov002_021e2d94(int,int,int,int);
 extern u16 func_ov002_0223de94(struct node *,int);
 extern int func_ov002_0223df38(struct Node *,int,int *);
@@ -40,7 +40,7 @@ int func_ov002_02226574(struct Input *self) {
                 if (!func_ov002_021de678(self,side,slot,0x2000)) return 0;
                 if (!func_0202e2f8(((struct Row *)((char *)row + stride))->id)) {
                     u16 value = *(u16 *)(data_ov002_022cf1a2 + offset + stride);
-                    func_ov002_021e276c((void *)self->side,self->code,1,(u16)(func_ov002_021c10e8(side,slot,1) * 4 + number * 8 + value * 2 + 1));
+                    func_ov002_021e276c(self->side,self->code,1,(u16)(func_ov002_021c10e8(side,slot,1) * 4 + number * 8 + value * 2 + 1));
                 }
             }
         }

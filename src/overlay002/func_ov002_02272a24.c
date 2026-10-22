@@ -21,7 +21,7 @@ extern struct Phase data_ov002_022cd318;
 extern struct Global data_ov002_022d016c;
 extern int data_ov002_022cd744[];
 extern int func_ov002_0226eb5c(int a, int b, int c, int d);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern void func_ov002_021df680(int arg0, int arg1);
 extern int func_ov002_02271ab4(void);
 int func_ov002_02272a24(void) {
@@ -34,7 +34,7 @@ int func_ov002_02272a24(void) {
                 if (data_ov002_022cd744[data_ov002_022cd300.player] == 1)
                     data_ov002_022d016c.done = 1;
                 else
-                    func_ov002_021ae4bc((void *)0x72, data_ov002_022cd300.selection);
+                    func_ov002_021ae4bc(0x72, data_ov002_022cd300.selection);
             } else {
                 data_ov002_022d016c.done = 1;
             }

@@ -6,7 +6,7 @@ extern struct Global data_ov002_022ce288;
 extern struct Mode data_ov002_022d016c;
 extern int data_ov002_022cd744[];
 extern void func_ov002_021ae400(int a, int b);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern void func_ov002_021af9d0(int a, int b, int c, int d);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021ca440(int arg0, int arg1);
@@ -39,7 +39,7 @@ int func_ov002_022369c0(struct Arg *p, int unused) {
                 data_ov002_022d016c.value = ((struct Record *)func_ov002_021afb74())->card == 0x18aa;
             } else {
                 r = (struct Record *)func_ov002_021afb74();
-                func_ov002_021ae4bc((void *)0x35, ((struct Record *)func_ov002_021afb74())->value * 2 + r->bit);
+                func_ov002_021ae4bc(0x35, ((struct Record *)func_ov002_021afb74())->value * 2 + r->bit);
             }
             return 0x7c;
         } else {

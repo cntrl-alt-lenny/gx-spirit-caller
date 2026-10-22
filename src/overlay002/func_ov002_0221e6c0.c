@@ -21,7 +21,7 @@ extern int func_ov002_021d8288();
 extern int func_ov002_021de9d4(int a,int b,int c);
 extern int func_ov002_021e286c(int arg0);
 extern int func_ov002_0223df38(struct Node *self,int idx,int *out);
-extern int func_ov002_022536e8(void *self,int arg1,int arg2);
+extern int func_ov002_022536e8(int self,int arg1,int arg2);
 extern int func_ov002_0225764c(int arg0,int arg1,int arg2);
 extern void func_ov002_0226b054(int arg0);
 int func_ov002_0221e6c0(struct Ov002Self *self) {
@@ -45,7 +45,7 @@ int func_ov002_0221e6c0(struct Ov002Self *self) {
  } else if(func_ov002_021b4254(self->value,self->id)<3) {
   switch(data_ov002_022ce288.state) {
   case 0x80:
-   if(func_ov002_022536e8((void *)self->player,self->id,0)==0) return 0;
+   if(func_ov002_022536e8(self->player,self->id,0)==0) return 0;
    func_ov002_021ae400(self->player,0x5e);
    return 0x7f;
   case 0x7f:

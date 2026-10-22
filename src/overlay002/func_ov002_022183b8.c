@@ -12,7 +12,7 @@ extern struct Ctrl data_ov002_022ce288;
 extern struct Global data_ov002_022d016c;
 extern int data_ov002_022cd744[];
 extern char data_ov002_022cf16c[];
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern int func_ov002_021ba294(int player, int arg1);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c9df0(int arg);

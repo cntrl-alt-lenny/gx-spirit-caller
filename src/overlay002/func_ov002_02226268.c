@@ -10,7 +10,7 @@ extern struct State data_ov002_022ce288;
 extern char data_ov002_022cf16c[];
 extern struct Entry data_ov002_022d0250[];
 extern int data_ov002_022cd73c[];
-extern int func_ov002_021b0c04(void *,int);
+extern int func_ov002_021b0c04(int,int);
 extern int func_ov002_021bc6c4(int);
 extern int func_ov002_021bd030(int);
 /* The original supplies only r0 to this four-argument thunk. */
@@ -61,8 +61,8 @@ int func_ov002_02226268(struct Input *self, int unused1) {
             func_ov002_021de480(self->side,data_ov002_022ce288.count,0,0);
         }
         if (self->side == data_ov002_022cd73c[1]) {
-            if (data_ov002_022ce288.count >= 5) func_ov002_021b0c04((void *)0x30,1);
-            func_ov002_021b0c04((void *)0x31,1);
+            if (data_ov002_022ce288.count >= 5) func_ov002_021b0c04(0x30,1);
+            func_ov002_021b0c04(0x31,1);
         }
         return 0;
     }

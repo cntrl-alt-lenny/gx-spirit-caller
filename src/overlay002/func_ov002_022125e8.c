@@ -7,7 +7,7 @@ extern struct Result data_ov002_022d016c;
 extern int data_ov002_022cd744[];
 extern char data_ov002_022cf16c[];
 extern void func_ov002_021ae400(int a, int b);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern int func_ov002_021ba294(int player, int arg1);
 extern int func_ov002_021d8288(int a, int b, int unused, int d);
 extern int func_ov002_021e286c(int arg0);
@@ -36,7 +36,7 @@ int func_ov002_022125e8(struct Self *self) {
             data_ov002_022d016c.value = 1;
             return 0x7d;
         }
-        func_ov002_021ae4bc((void *)0x1c, self->index);
+        func_ov002_021ae4bc(0x1c, self->index);
         return 0x7d;
     case 0x7d:
         return data_ov002_022d016c.value != 0 ? 0x7f : 0x64;

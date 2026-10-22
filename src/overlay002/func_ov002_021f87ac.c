@@ -14,7 +14,7 @@ extern int func_ov002_02257b48(void *,void *);
 extern int func_0202de9c(int);
 extern int func_ov002_021b9aa8(u32,u32);
 extern int func_ov002_0227ddf8(Self *);
-extern int func_ov002_021ae4bc(void *,int);
+extern int func_ov002_021ae4bc(int,int);
 extern void func_ov002_021df62c(int,int,int);
 extern int func_ov002_021e278c(int,int);
 int func_ov002_021f87ac(Self *self, void *arg) {
@@ -45,7 +45,7 @@ int func_ov002_021f87ac(Self *self, void *arg) {
         if(data_ov002_022cd744[self->side]==1) {
             *(int *)(data_ov002_022d016c+0xd44)=func_ov002_0227ddf8(self);
         } else {
-            func_ov002_021ae4bc((void *)250,self->index);
+            func_ov002_021ae4bc(250,self->index);
         }
         data_ov002_022ce288.state++;
         return 0;

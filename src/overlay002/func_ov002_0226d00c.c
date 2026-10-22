@@ -11,8 +11,8 @@ extern void func_ov002_021af9d0(int player, int phase, int card, int arg);
 extern int *func_ov002_021afb74(void);
 extern u32 *func_ov002_021b004c(int id);
 extern int func_ov002_021bc618(int arg0);
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
-int func_ov002_0226d00c(void *self, int id) {
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
+int func_ov002_0226d00c(int self, int id) {
     int amount = data_ov002_022d0e6c.amount;
     int value;
     int i;
@@ -22,41 +22,41 @@ int func_ov002_0226d00c(void *self, int id) {
     case 0:
         switch (id) {
         case 0x132f: case 0x13ed: case 0x1717: case 0x17f4:
-            func_ov002_021ae400((int)self, 0xf6); break;
+            func_ov002_021ae400(self, 0xf6); break;
         case 0x14ee: case 0x1522: case 0x1531: case 0x166b: case 0x1746:
             if (func_ov002_022536e8(self,id,amount) == 0) {
-                func_ov002_021ae400((int)self,0xd);
+                func_ov002_021ae400(self,0xd);
                 data_ov002_022d0e6c.count = 0;
                 data_ov002_022d0e6c.value = 0;
                 return 1;
             }
-            func_ov002_021ae400((int)self,0x121); break;
-        case 0x1616: func_ov002_021ae400((int)self,0x5e); break;
+            func_ov002_021ae400(self,0x121); break;
+        case 0x1616: func_ov002_021ae400(self,0x5e); break;
         case 0x1712: case 0x1818: case 0x198e:
-            func_ov002_021ae400((int)self,0x11d); break;
-        case 0x1796: func_ov002_021ae400((int)self,0x16); break;
-        case 0x14c2: case 0x19c0: func_ov002_021ae400((int)self,0x56); break;
+            func_ov002_021ae400(self,0x11d); break;
+        case 0x1796: func_ov002_021ae400(self,0x16); break;
+        case 0x14c2: case 0x19c0: func_ov002_021ae400(self,0x56); break;
         }
         data_ov002_022d016c.phase++;
         return 0;
     case 1:
         switch (id) {
         case 0x132f: case 0x14c2: case 0x1717: case 0x1796: case 0x1818: case 0x19c0:
-            func_ov002_021af9d0((int)self,6,id,1); break;
-        case 0x13ed: func_ov002_021af9d0((int)self,0x4a,id,0); break;
+            func_ov002_021af9d0(self,6,id,1); break;
+        case 0x13ed: func_ov002_021af9d0(self,0x4a,id,0); break;
         case 0x14ee: case 0x1712:
             if (amount >= 0x20) amount = 0x20;
-            func_ov002_021af9d0((int)self,amount+6,id,0); break;
+            func_ov002_021af9d0(self,amount+6,id,0); break;
         case 0x15dd:
             if (amount >= 0x20) amount = 0x20;
-            func_ov002_021af9d0((int)self,amount+0x27,id,0); break;
+            func_ov002_021af9d0(self,amount+0x27,id,0); break;
         case 0x1522: case 0x1531: case 0x1616: case 0x166b: case 0x1746: case 0x17f4:
-            func_ov002_021af9d0((int)self,6,id,amount); break;
+            func_ov002_021af9d0(self,6,id,amount); break;
         case 0x198e:
             value = func_ov002_022536e8(self,id,amount);
-            if (value >= func_ov002_021bc618((int)self)) value = func_ov002_021bc618((int)self);
+            if (value >= func_ov002_021bc618(self)) value = func_ov002_021bc618(self);
             if (value >= 0x20) value = 0x20;
-            func_ov002_021af9d0((int)self,value+6,id,amount); break;
+            func_ov002_021af9d0(self,value+6,id,amount); break;
         }
         data_ov002_022d016c.phase++;
         return 0;

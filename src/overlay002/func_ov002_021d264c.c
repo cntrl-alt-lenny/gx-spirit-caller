@@ -9,7 +9,7 @@ extern char data_ov002_022cf288[];
 extern char data_ov002_022d016c[];
 extern int data_ov002_022cd73c[];
 extern unsigned int func_0202b878(int id);
-extern int func_ov002_021b0c04(void *self,int arg1);
+extern int func_ov002_021b0c04(int self,int arg1);
 extern void func_ov002_021b1f20(int,int,int,int,int);
 extern void func_ov002_021b91c4(int *dst,const int *src);
 extern void func_ov002_021b9368(int,int,int *,int);
@@ -69,7 +69,7 @@ void func_ov002_021d264c(void) {
                 }
             }
             func_ov002_0229ade0(0x1c,player,kind,0);
-            if(player==data_ov002_022cd73c[1]) func_ov002_021b0c04((void *)0x1d,1);
+            if(player==data_ov002_022cd73c[1]) func_ov002_021b0c04(0x1d,1);
         } else {
             if(func_0202b878(card)==0x17) func_ov002_021b1f20(player,11,1,0x198a,1);
             func_ov002_0229ade0(0x43,player,card,2);

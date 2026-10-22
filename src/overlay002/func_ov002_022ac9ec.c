@@ -23,7 +23,7 @@ extern int func_0202b920(int unused0);
 extern int func_0202de9c(int unused0);
 extern int func_0202e234(int x);
 extern void Task_InvokeLocked(void *p);
-extern int Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void *Task_PostLocked(int size, int align, int flags);
 extern void func_ov002_022a10fc(State *, int);
 extern void func_ov002_022ac67c(State *);
 void func_ov002_022ac9ec(State *p, int mode) {
@@ -71,7 +71,7 @@ void func_ov002_022ac9ec(State *p, int mode) {
         }
         break;
     }
-    p->f6c = (ent_t *)Task_PostLocked((void *)((p->f24 / 2 + 1) * 4),4,0);
+    p->f6c = Task_PostLocked(((p->f24 / 2 + 1) * 4),4,0);
     func_ov002_022ac8f0((state_ov002_022ac8f0_t *)p,0,p->f24-1);
     for (i = 0; i < p->f24; i++) p->f68[i].w = (unsigned short)p->f68[i].w;
     Task_InvokeLocked(p->f6c);

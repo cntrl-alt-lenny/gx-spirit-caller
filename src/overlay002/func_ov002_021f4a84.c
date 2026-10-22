@@ -13,7 +13,7 @@ extern int func_ov002_021fdc08(struct Card *self);
 extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_02257b48(void *p, void *q);
 extern int func_ov002_0227ddf8(struct Card *self);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern void func_ov002_0226b094(int arg0, int arg1);
 extern void func_ov002_021df62c(int arg0, int arg1, int idx);
 int func_ov002_021f4a84(struct Card *self, void *arg) {

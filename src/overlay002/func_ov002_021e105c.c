@@ -12,7 +12,7 @@ extern int func_ov002_021ca51c();
 extern int func_ov002_021ca5bc(int a);
 extern void func_ov002_021d479c(u16 a,u16 b,u16 c,u16 d);
 extern void func_ov002_021df62c(int a,int b,int c);
-extern void func_ov002_021e276c(void *self,int a,int b,int c);
+extern void func_ov002_021e276c(int self,int a,int b,int c);
 /* The assembly leaves the unused argument unset. */
 extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c();
@@ -48,7 +48,7 @@ void func_ov002_021e105c(int player,int count,int arg2,int flags) {
             case 0x14a5:
                 func_ov002_021df62c(p->side,14,p->side+(p->index<<1));
             case 0x16f9:
-                func_ov002_021e276c((void *)p->side,(u16)p->id,1,(u16)(p->side+(p->index<<1)));
+                func_ov002_021e276c(p->side,(u16)p->id,1,(u16)(p->side+(p->index<<1)));
                 break;
             case 0x106d: case 0x1653: case 0x1655:
                 if (!arg2) break;

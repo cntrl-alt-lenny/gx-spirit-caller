@@ -5,10 +5,10 @@
  *   bl func_ov002_021b0b54(self, arg1 + helper1_ret)
  */
 
-extern int func_ov002_021b0b0c(void *self);
-extern int func_ov002_021b0b54(void *self, int n);
+extern int func_ov002_021b0b0c(int self);
+extern int func_ov002_021b0b54(int self, int n);
 
-int func_ov002_021b0c04(void *self, int arg1) {
+int func_ov002_021b0c04(int self, int arg1) {
     int n = func_ov002_021b0b0c(self);
     return func_ov002_021b0b54(self, arg1 + n);
 }

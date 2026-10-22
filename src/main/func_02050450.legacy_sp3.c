@@ -2,7 +2,7 @@ extern void *func_020498f0(void);
 extern int func_0204682c(void);
 extern void *func_020467e4(int i);
 extern void *func_02046760(int i);
-extern void func_02050054(void *a0, void *a1);
+extern void func_02050054(int a0, int a1);
 extern void func_02050118(void);
 extern void func_0204c40c(int state);
 extern int func_020acca0(char *s, int end, int base);
@@ -29,7 +29,7 @@ void func_02050450(int unused, Obj020624cc *obj, int a, int b, int amount, char 
     slot = func_0204682c();
     if (slot == -1) {
         func_02062784(obj,data_020ffa6c,-1);
-        func_02050054((void *)6,(void *)0xfffeabc4);
+        func_02050054(6,0xfffeabc4);
         return;
     }
     base = func_020498f0();
@@ -49,7 +49,7 @@ void func_02050450(int unused, Obj020624cc *obj, int a, int b, int amount, char 
     WORD(base,0x18c) = 0;
     WORD(base,0x190) = 0;
     if (!func_02062790(obj,*(void **)((char *)func_020498f0()+8))) {
-        func_02050054((void *)6,(void *)0xfffec5e6);
+        func_02050054(6,0xfffec5e6);
         return;
     }
     func_02050118();
