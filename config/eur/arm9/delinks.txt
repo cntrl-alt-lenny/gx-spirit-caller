@@ -1666,7 +1666,7 @@ src/main/func_0200c824.c:
     complete
     .text start:0x0200c824 end:0x0200c874
 
-src/main/func_0200c874.s:
+src/main/func_0200c874.c:
     complete
     .text start:0x0200c874 end:0x0200cb50
 
