@@ -8493,3 +8493,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022aa7b8	ov002	916	default	factory	shipped	100	n/a		factory-1021-E2	
 0x022aa7b8	ov002	916	legacy_sp3	factory	parked	26.1	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
 0x022aa7b8	ov002	916	legacy	factory	parked	26	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02259b4c	ov002	924	default	factory	shipped	100	n/a		factory-1021-E2	
+0x02259b4c	ov002	924	legacy	factory	parked	0.4	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
+0x02259b4c	ov002	924	legacy_sp3	factory	parked	0.4	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
