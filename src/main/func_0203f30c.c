@@ -1,0 +1,8 @@
+int func_0203f30c(unsigned int c) {
+    if (c >= 0x41 && c <= 0x5a) return c - 0x41;
+    if (c >= 0x61 && c <= 0x7a) return (int)(c - 0x61) + 0x1a;
+    if (c >= 0x30 && c <= 0x39) return (int)(c - 0x30) + 0x34;
+    if (c == 0x2b) return 0x3e;
+    if (c == 0x2f) return 0x3f;
+    return -(c != 0x3d);
+}
