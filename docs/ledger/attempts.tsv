@@ -8439,3 +8439,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020501cc	main	644	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
 0x020501cc	main	644	default	factory	parked	97.5	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
 0x020501cc	main	644	legacy	factory	parked	6.4	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x0205cbb8	main	648	default	factory	parked	8.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x0205cbb8	main	648	legacy	factory	parked	8.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x0205cbb8	main	648	legacy_sp3	factory	parked	26.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
