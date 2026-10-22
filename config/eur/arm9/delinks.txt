@@ -17540,7 +17540,7 @@ src/main/func_020953e4.legacy.c:
     complete
     .text start:0x020953e4 end:0x02095418
 
-src/main/func_02095418.s:
+src/main/func_02095418.legacy.c:
     complete
     .text start:0x02095418 end:0x02095484
 
