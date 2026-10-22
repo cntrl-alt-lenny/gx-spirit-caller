@@ -4532,7 +4532,7 @@ src/main/func_02022608.c:
     complete
     .text start:0x02022608 end:0x02022644
 
-src/main/func_02022644.s:
+src/main/func_02022644.c:
     complete
     .text start:0x02022644 end:0x0202290c
 
