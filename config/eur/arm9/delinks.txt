@@ -15493,7 +15493,7 @@ src/main/func_020894e0.s:
     complete
     .text start:0x020894e0 end:0x020896cc
 
-src/main/func_020896cc.s:
+src/main/func_020896cc.c:
     complete
     .text start:0x020896cc end:0x02089748
 
