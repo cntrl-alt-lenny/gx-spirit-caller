@@ -8467,3 +8467,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d3f44	ov004	192	legacy_sp3	factory	parked	10.4	unknown	UNCLASSIFIED:unknown	factory-1021-E9	
 0x021d3f44	ov004	192	legacy	factory	parked	15.7	unknown	UNCLASSIFIED:unknown	factory-1021-E9	
 0x021b2d3c	ov007	196	default	factory	shipped	100	n/a		factory-1021-E9	
+0x021ae2cc	ov000	200	default	factory	shipped	100	n/a		factory-1021-E9	
+0x021ae2cc	ov000	200	legacy_sp3	factory	parked	28	unknown	UNCLASSIFIED:unknown	factory-1021-E9	
+0x021ae2cc	ov000	200	legacy	factory	parked	13.7	unknown	UNCLASSIFIED:unknown	factory-1021-E9	
