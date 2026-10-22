@@ -19723,7 +19723,7 @@ src/main/func_020b0384.c:
 
 
 
-src/main/func_020b0390.s:
+src/main/func_020b0390.c:
     complete
     .text start:0x020b0390 end:0x020b03fc
 
