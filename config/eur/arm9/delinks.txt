@@ -19784,7 +19784,7 @@ src/main/func_020b1840.c:
     complete
     .text start:0x020b1840 end:0x020b1854
 
-src/main/func_020b1854.s:
+src/main/func_020b1854.c:
     complete
     .text start:0x020b1854 end:0x020b18c4
 
