@@ -12662,7 +12662,7 @@ src/overlay002/func_ov002_02295ec4.c:
     complete
     .text start:0x02295ec4 end:0x02295efc
 
-src/overlay002/func_ov002_02295efc.s:
+src/overlay002/func_ov002_02295efc.legacy_sp3.c:
     complete
     .text start:0x02295efc end:0x02295fb8
 
