@@ -42,7 +42,7 @@ src/overlay014/func_ov014_021b2908.s:
     complete
     .text start:0x021b2908 end:0x021b2eec
 
-src/overlay014/func_ov014_021b2eec.s:
+src/overlay014/func_ov014_021b2eec.c:
     complete
     .text start:0x021b2eec end:0x021b2fb8
 
