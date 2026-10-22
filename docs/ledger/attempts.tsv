@@ -10055,3 +10055,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b2754	main	540	default	factory	parked	1.5	asm-int	PROVISIONAL:inline-asm	factory-1022-F1	
 0x020b2754	main	540	legacy	factory	parked	1.3	asm-int	PROVISIONAL:inline-asm	factory-1022-F1	
 0x020b2754	main	540	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1022-F1	
+0x0208610c	main	552	default	factory	parked	7	register-numbering-permutation-cascade	P-30	factory-1022-F1	
+0x0208610c	main	552	legacy	factory	parked	18.9	register-numbering-permutation-cascade	P-30	factory-1022-F1	
+0x0208610c	main	552	legacy_sp3	factory	parked	63	register-numbering-permutation-cascade	P-30	factory-1022-F1	
