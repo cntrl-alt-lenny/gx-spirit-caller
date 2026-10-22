@@ -6185,7 +6185,7 @@ src/main/func_020327c0.c:
     complete
     .text start:0x020327c0 end:0x020327e4
 
-src/main/func_020327e4.s:
+src/main/func_020327e4.c:
     complete
     .text start:0x020327e4 end:0x02032864
 
