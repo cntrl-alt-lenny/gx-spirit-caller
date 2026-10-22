@@ -2183,7 +2183,7 @@ src/main/func_02014c3c.c:
     complete
     .text start:0x02014c3c end:0x02014e6c
 
-src/main/func_02014e6c.s:
+src/main/func_02014e6c.c:
     complete
     .text start:0x02014e6c end:0x02015190
 
