@@ -8486,3 +8486,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a9960	main	1272	default	factory	shipped	100	n/a		factory-1021-E6	
 0x020a9960	main	1272	legacy	factory	parked	11.4	unknown	UNCLASSIFIED:unknown	factory-1021-E6	
 0x020a9960	main	1272	legacy_sp3	factory	parked	13	unknown	UNCLASSIFIED:unknown	factory-1021-E6	
+0x020278dc	main	1280	default	factory	parked	57.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
+0x020278dc	main	1280	legacy	factory	parked	7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
+0x020278dc	main	1280	legacy_sp3	factory	parked	7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
