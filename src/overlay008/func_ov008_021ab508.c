@@ -1,0 +1,94 @@
+typedef struct {
+    void *task;
+    int pad04;
+    int x, y;
+    short param;
+    short pad12;
+    unsigned short mode:4;
+    unsigned short enabled:1;
+    unsigned short rest:11;
+    unsigned short low16:15;
+    unsigned short flag:1;
+    unsigned int low:14;
+    unsigned int priority:3;
+    unsigned int high:15;
+    unsigned int a:8;
+    unsigned int b:8;
+    unsigned int spare:16;
+    int tail[2];
+} Obj;
+extern int func_0201d47c(Obj *o);
+extern int func_0201e5b8(Obj *o);
+extern void *func_02006c0c(void *, int, int);
+extern void *func_0202be4c(int);
+extern void Task_Invoke(void *);
+extern void func_ov008_021ab3ac(void);
+extern void func_ov008_021ac35c(int, int);
+extern unsigned short data_ov008_021b2c80[];
+extern char data_ov008_021b2510[], data_ov008_021b2528[], data_ov008_021b2548[];
+extern char data_ov008_021b2568[], data_ov008_021b2588[], data_ov008_021b259c[];
+extern char data_ov008_021b25c0[], data_ov008_021b25dc[], data_ov008_021b25fc[];
+extern char data_ov008_021b261c[], data_ov008_021b263c[], data_ov008_021b2658[];
+void func_ov008_021ab508(void) {
+    Obj o;
+    int i;
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b2510,4,0);
+    o.mode=3; o.y=0x800; o.x=0; o.enabled=1; o.priority=3;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b2528,4,0);
+    o.mode=6; o.y=0x2f00; o.x=0; o.param=0; o.enabled=0; o.priority=0;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b2548,4,0);
+    o.mode=8; o.y=0x2f00; o.x=0; o.flag=1; o.enabled=0; o.priority=7; o.param=-1;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b2568,4,0);
+    o.mode=7; o.y=0; o.param=-1; o.enabled=0; o.x=0; o.priority=7;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b2588,4,0);
+    o.mode=9; o.flag=1; o.param=0; o.enabled=1;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b259c,4,0);
+    o.mode=9; o.y=0x12100; o.param=0;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b25c0,4,0);
+    o.mode=9; o.y=0x13000; o.priority=7;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b25dc,4,0);
+    o.mode=9; o.y=0x13500; o.priority=7;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b25fc,4,0);
+    o.mode=9; o.y=0x13f00; o.priority=7;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b261c,4,0);
+    o.mode=9; o.y=0x14200; o.priority=7;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b263c,4,0);
+    o.mode=9; o.y=0x14400; o.priority=7;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_02006c0c(data_ov008_021b2658,4,0);
+    o.mode=9; o.flag=1; o.param=0x20;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    func_0201d47c(&o);
+    o.task = func_0202be4c(0);
+    o.mode=9; o.flag=1; o.enabled=1; o.param=0x200;
+    func_0201e5b8(&o); Task_Invoke(o.task);
+    for(i=0;i<(data_ov008_021b2c80[45]>6?7:data_ov008_021b2c80[45]);i++)
+        func_ov008_021ac35c(i,i);
+    func_ov008_021ab3ac();
+}
+
+
+
+
