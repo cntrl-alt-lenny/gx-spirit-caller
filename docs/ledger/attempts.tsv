@@ -8496,3 +8496,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d02a4	ov011	1292	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1021-E6	
 0x021d02a4	ov011	1292	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1021-E6	
 0x020a11e4	main	1296	legacy	factory	shipped	100	n/a		factory-1021-E6	
+0x021ce4a8	ov004	1296	default	factory	parked	3.1	structural	PROVISIONAL:structural	factory-1021-E6	
+0x021ce4a8	ov004	1296	legacy	factory	parked	15.4	structural	PROVISIONAL:structural	factory-1021-E6	
+0x021ce4a8	ov004	1296	legacy_sp3	factory	parked	22.8	structural	PROVISIONAL:structural	factory-1021-E6	
