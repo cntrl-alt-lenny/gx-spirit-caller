@@ -27,7 +27,7 @@ extern int func_ov002_0229ade0(int cmd, int a, int b, int c);
 extern int func_ov002_0229c7f8(int cmd);
 extern PackedVal *func_ov002_021afb90(int i);
 extern void func_ov002_021b1fe8(int a, int b, int c, int combined);
-extern int func_ov002_021b0c04(void *self, int arg1);
+extern int func_ov002_021b0c04(int self, int arg1);
 
 void func_ov002_021d2f84(void) {
     int bit15 = (data_ov002_022ce950.f0 & 0x8000) ? 1 : 0;
@@ -69,7 +69,7 @@ state_default:
         return;
     }
     if (bit15 == data_ov002_022cd73c.f4) {
-        func_ov002_021b0c04((void *)0x23, 1);
+        func_ov002_021b0c04(0x23, 1);
     }
     data_ov002_022ce950.f80c = 0;
 }

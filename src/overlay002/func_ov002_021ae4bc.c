@@ -6,9 +6,9 @@ struct SlotU16 {
 
 extern char data_ov002_022d0250[];
 extern int func_0202b100(int a0);
-extern int func_ov002_0229ce5c(void *buf, void *self, int result);
+extern int func_ov002_0229ce5c(void *buf, int self, int result);
 
-int func_ov002_021ae4bc(void *self, int idx)
+int func_ov002_021ae4bc(int self, int idx)
 {
     char buf[256];
     struct SlotU16 *slot = (struct SlotU16 *)(data_ov002_022d0250 + idx * 4);

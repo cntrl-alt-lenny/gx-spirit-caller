@@ -10,7 +10,7 @@ extern unsigned int func_ov002_021b00d0(unsigned int x);
 extern int func_ov002_021b0b0c(int arg0);
 extern void func_ov002_021b0b54(int id,int value);
 extern int func_ov002_021b0bdc(void *self,int arg);
-extern int func_ov002_021b0c04(void *self,int arg1);
+extern int func_ov002_021b0c04(int self,int arg1);
 extern int func_ov002_021b3ecc(int arg0,int arg1,int arg2);
 extern int func_ov002_021bae7c(int player,int id,int except);
 extern void func_ov002_021d479c(u16 a0,u16 a1,u16 a2,u16 a3);

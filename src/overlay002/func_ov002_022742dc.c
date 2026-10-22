@@ -21,7 +21,7 @@ extern struct { u32 phase:8; u32 rest:24; } data_ov002_022cd318;
 extern int data_ov002_022cd744[];
 extern struct { char pad[0xd44]; int result; } data_ov002_022d016c;
 extern int func_ov002_0226eb5c(int a, int b, int c, int d);
-extern int func_ov002_021ae4bc(void *self, int idx);
+extern int func_ov002_021ae4bc(int self, int idx);
 extern int func_ov002_02271ab4(void);
 int func_ov002_022742dc(void) {
     int mask;
@@ -33,7 +33,7 @@ int func_ov002_022742dc(void) {
                 if (data_ov002_022cd744[data_ov002_022cd300.side] == 1)
                     data_ov002_022d016c.result = 1;
                 else
-                    func_ov002_021ae4bc((void *)0x72, data_ov002_022cd300.index);
+                    func_ov002_021ae4bc(0x72, data_ov002_022cd300.index);
             } else data_ov002_022d016c.result = 1;
         } else data_ov002_022d016c.result = 0;
         data_ov002_022cd318.phase++;

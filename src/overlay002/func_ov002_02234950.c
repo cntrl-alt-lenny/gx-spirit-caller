@@ -22,7 +22,7 @@ extern int func_ov002_0225764c(int, int, int);
 extern int func_ov002_022593f4(void);
 extern int func_ov002_021d8414(int, int, int, int, int, int, int);
 extern void func_ov002_021d5d58(int, int, int, int);
-extern int func_ov002_021b0c04(void *, int);
+extern int func_ov002_021b0c04(int, int);
 #define PLAYER (((Bits *)((char *)self + 2))->bit0)
 int func_ov002_02234950(struct Node0223def4 *self) {
     char buf[0x100];
@@ -46,7 +46,7 @@ int func_ov002_02234950(struct Node0223def4 *self) {
             int slot = func_ov002_021bd030(PLAYER);
             func_ov002_021d8414(PLAYER, 0xe, id, PLAYER, slot, 1, 0);
             func_ov002_021d5d58(PLAYER, (u16)((u8)PLAYER | ((u8)slot << 8)), (u16)((u8)a | ((u8)sum << 8)), 0xb);
-            if (PLAYER == data_ov002_022cd73c.player) func_ov002_021b0c04((void *)0x30, 1);
+            if (PLAYER == data_ov002_022cd73c.player) func_ov002_021b0c04(0x30, 1);
             return 0;
         }
         return 0x7f;

@@ -23,7 +23,7 @@
 
 extern void Task_Invoke(void *p);
 
-void func_ov010_021b35a4(void **a, void **b) {
+void func_ov010_021b35a4(void **a, void **b, int unused2, int unused3) {
     if (*a != 0) {
         Task_Invoke(*a);
         *a = 0;

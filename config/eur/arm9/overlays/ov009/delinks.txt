@@ -8,7 +8,7 @@
 src/overlay009/ov009_stubs_aa4a0.c:
     complete
     .text start:0x021aa4a0 end:0x021aa4a8
-src/overlay009/func_ov009_021aa4a8.s:
+src/overlay009/func_ov009_021aa4a8.c:
     complete
     .text start:0x021aa4a8 end:0x021aa59c
 
@@ -25,7 +25,7 @@ src/overlay009/func_ov009_021aa4a8.s:
 src/overlay009/func_ov009_021aa59c.c:
     complete
     .text start:0x021aa59c end:0x021aa5d8
-src/overlay009/func_ov009_021aa5d8.s:
+src/overlay009/func_ov009_021aa5d8.c:
     complete
     .text start:0x021aa5d8 end:0x021aaaec
 src/overlay009/func_ov009_021aaaec.s:

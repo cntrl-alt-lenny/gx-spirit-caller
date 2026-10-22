@@ -1,14 +1,14 @@
 extern int func_0204bd8c(void);
-extern void func_0204525c(void *a0, void *a1);
+extern void func_0204525c(int a0, int a1);
 extern void func_02049038(int a0, void *a1, int a2);
 extern void *func_020498f0(void);
 extern int func_02049120(int v);
 extern void func_0204f280(void);
 extern int data_020ff9c4;
 
-typedef void (*FnPtr)(void *, int, int, int, int, int);
+typedef void (*FnPtr)(int, int, int, int, int, int);
 
-void func_02050054(void *a0, void *a1) {
+void func_02050054(int a0, int a1) {
     void *obj;
     int r7, r8;
     void *saved;

@@ -15,7 +15,7 @@ extern unsigned char data_02101d7c[];
 extern void func_020a978c(rec_02068b1c_t *out, unsigned char *src);
 extern void func_02068b54(void *p0, void *p1, void *rec);
 
-void func_02068b1c(void *p0, void *p1) {
+void func_02068b1c(void *p0, void *p1, int unused2) {
     rec_02068b1c_t rec;
     func_020a978c(&rec, data_02101d7c);
     func_02068b54(p0, p1, &rec);

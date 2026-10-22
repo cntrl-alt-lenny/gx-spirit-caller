@@ -16,7 +16,7 @@ extern struct { char pad[0xcec]; int side; } data_ov002_022d016c;
 extern unsigned int func_0202b878(int id);
 extern unsigned int func_0202b8c0(int id);
 extern void func_ov002_021b0b54(int id, int value);
-extern int func_ov002_021b0c04(void *self, int arg1);
+extern int func_ov002_021b0c04(int self, int arg1);
 
 void func_ov002_021b0c54(struct Record *p, int n) {
     int flag;
@@ -25,7 +25,7 @@ void func_ov002_021b0c54(struct Record *p, int n) {
     if (func_0202b878(p->id) == 0x17) {
         func_ov002_021b0b54(0x3a, 1);
         if (p->mode != 0) return;
-        func_ov002_021b0c04((void *)0x21, 1);
+        func_ov002_021b0c04(0x21, 1);
         if (func_0202b8c0(p->id) != 1) return;
         flag = 0;
         if (n > 0 && p[-1].owner != p->owner) {
@@ -41,14 +41,14 @@ void func_ov002_021b0c54(struct Record *p, int n) {
                 break;
             }
         }
-        if (flag) func_ov002_021b0c04((void *)0x22, 1);
+        if (flag) func_ov002_021b0c04(0x22, 1);
     } else if (func_0202b878(p->id) == 0x16) {
         func_ov002_021b0b54(0x39, 1);
         if (p->mode != 0) return;
-        func_ov002_021b0c04((void *)0x1f, 1);
+        func_ov002_021b0c04(0x1f, 1);
         if (data_ov002_022d016c.side != (data_ov002_022cd73c.side ^ 1)) return;
         if (func_0202b8c0(p->id) != 5) return;
-        func_ov002_021b0c04((void *)0x20, 1);
+        func_ov002_021b0c04(0x20, 1);
     }
 }
 
