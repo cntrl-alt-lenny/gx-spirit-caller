@@ -10048,3 +10048,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a2f58	ov002	2156	default	factory	parked	19.2	structural	PROVISIONAL:structural	factory-1022-F6	
 0x022a2f58	ov002	2156	legacy	factory	parked	2.1	structural	PROVISIONAL:structural	factory-1022-F6	
 0x022a2f58	ov002	2156	legacy_sp3	factory	parked	6.6	structural	PROVISIONAL:structural	factory-1022-F6	
+0x0228300c	ov002	2160	default	factory	shipped	100	n/a		factory-1022-F6	
+0x0228300c	ov002	2160	legacy_sp3	factory	parked	2	unknown	UNCLASSIFIED:unknown	factory-1022-F6	
+0x0228300c	ov002	2160	legacy	factory	parked	2	unknown	UNCLASSIFIED:unknown	factory-1022-F6	
