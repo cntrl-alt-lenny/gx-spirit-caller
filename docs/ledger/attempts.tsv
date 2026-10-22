@@ -8434,3 +8434,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cb290	ov004	648	default	factory	parked	85.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E4	
 0x021cb290	ov004	648	legacy	factory	parked	1.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E4	
 0x021cb290	ov004	648	legacy_sp3	factory	parked	1.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E4	
+0x021ca450	ov012	652	default	factory	parked	99.4	asm-int	PROVISIONAL:inline-asm	factory-1021-E4	
+0x021ca450	ov012	652	legacy	factory	parked	12.9	asm-int	PROVISIONAL:inline-asm	factory-1021-E4	
+0x021ca450	ov012	652	legacy_sp3	factory	parked	12.9	asm-int	PROVISIONAL:inline-asm	factory-1021-E4	
