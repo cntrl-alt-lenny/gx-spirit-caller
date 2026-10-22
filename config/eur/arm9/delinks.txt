@@ -19155,7 +19155,7 @@ src/main/func_020a553c.s:
     complete
     .text start:0x020a553c end:0x020a55e0
 
-src/main/func_020a55e0.s:
+src/main/func_020a55e0.legacy.c:
     complete
     .text start:0x020a55e0 end:0x020a5654
 
