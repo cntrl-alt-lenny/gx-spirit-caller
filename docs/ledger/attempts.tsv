@@ -8458,3 +8458,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a2cf8	main	676	legacy	factory	shipped	100	n/a		factory-1021-E3	
 0x020a2cf8	main	676	default	factory	parked	18.9	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
 0x020a2cf8	main	676	legacy_sp3	factory	parked	69.8	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x020b0cbc	main	676	default	factory	parked	41.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x020b0cbc	main	676	legacy	factory	parked	0.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x020b0cbc	main	676	legacy_sp3	factory	parked	5.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
