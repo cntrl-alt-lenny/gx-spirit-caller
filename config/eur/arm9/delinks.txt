@@ -12909,7 +12909,7 @@ src/main/func_020711b0.s:
     complete
     .text start:0x020711b0 end:0x020713ac
 
-src/main/func_020713ac.s:
+src/main/func_020713ac.legacy.c:
     complete
     .text start:0x020713ac end:0x020716bc
 
