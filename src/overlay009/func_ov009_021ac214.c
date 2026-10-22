@@ -1,0 +1,78 @@
+typedef struct {
+    void *data;
+    int f4;
+    int f8;
+    int fc;
+    unsigned short f10;
+    unsigned short f12;
+    unsigned short mode : 4;
+    unsigned short flag : 1;
+    unsigned short rest : 11;
+    char pad16[6];
+    unsigned int a : 8;
+    unsigned int b : 8;
+    int tail[2];
+} Obj;
+typedef struct { int f0, f4, f8, fc; } Req;
+typedef struct { int f0, f4; } Out;
+extern int func_0201d47c(Obj *o);
+extern void *func_02006c0c(void *data, int align, int flags);
+extern int func_0201e5b8(Obj *o);
+extern void Task_Invoke(void *p);
+extern void func_0201e7e0(void);
+extern void func_0201ef90(int *a0, int *a1, int *a2, int a3, int s0, int s1, Req *r, int s3, int s4, Out *out);
+extern char data_ov009_021adb08[], data_ov009_021adb28[], data_ov009_021adb44[], data_ov009_021adb60[], data_ov009_021adb7c[];
+extern Req data_ov009_021ad858;
+int func_ov009_021ac214(int *self) {
+    Obj obj;
+    Req req;
+    func_0201d47c(&obj);
+    obj.data = func_02006c0c(data_ov009_021adb08, 4, 0);
+    obj.fc = 0;
+    obj.mode = 8;
+    obj.flag = 0;
+    obj.f10 = 0;
+    obj.f8 = 0;
+    func_0201e5b8(&obj);
+    Task_Invoke(obj.data);
+    func_0201d47c(&obj);
+    obj.data = func_02006c0c(data_ov009_021adb28, 4, 0);
+    obj.mode = 6;
+    obj.flag = 0;
+    obj.fc = 0x2bc0;
+    obj.f10 = 0x100;
+    obj.f8 = -1;
+    func_0201e5b8(&obj);
+    Task_Invoke(obj.data);
+    func_0201d47c(&obj);
+    obj.data = func_02006c0c(data_ov009_021adb44, 4, 0);
+    obj.mode = 9;
+    obj.flag = 0;
+    obj.fc = 0;
+    obj.f10 = 0;
+    func_0201e5b8(&obj);
+    Task_Invoke(obj.data);
+    func_0201d47c(&obj);
+    obj.data = func_02006c0c(data_ov009_021adb60, 4, 0);
+    obj.mode = 9;
+    obj.flag = 0;
+    obj.fc = 0x600;
+    obj.f10 = 0x20;
+    func_0201e5b8(&obj);
+    Task_Invoke(obj.data);
+    func_0201d47c(&obj);
+    obj.data = func_02006c0c(data_ov009_021adb7c, 4, 0);
+    obj.mode = 9;
+    obj.flag = 0;
+    obj.fc = 0x1600;
+    obj.f10 = 0x40;
+    func_0201e5b8(&obj);
+    Task_Invoke(obj.data);
+    req = data_ov009_021ad858;
+    func_0201e7e0();
+    func_0201ef90(self + 1, self + 2, self + 3, 0x2200, 0, 2, &req, 1, 0x200, (Out *)(self + 4));
+    return 1;
+}
+
+
+
