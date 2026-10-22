@@ -1,0 +1,26 @@
+struct Player { char pad[0x18]; unsigned int count; char pad2[0x384]; int slots[306]; };
+struct Count { unsigned int count; char pad[0x864]; };
+extern struct Player data_ov002_022cf16c[];
+extern struct Count data_ov002_022cf184[];
+extern void func_ov002_021b91c4(int *dst, const int *src);
+extern int func_ov002_021b91f8(int *a, int *b);
+int func_ov002_021ba524(int player, int *value) {
+    unsigned int index = 0;
+    player &= 1;
+    if (index < data_ov002_022cf184[player].count) {
+        do {
+            if (func_ov002_021b91f8(&data_ov002_022cf16c[player].slots[index], value)) {
+                --data_ov002_022cf184[player].count;
+                if (index < data_ov002_022cf184[player].count) {
+                    do {
+                        func_ov002_021b91c4(&data_ov002_022cf16c[player].slots[index], &data_ov002_022cf16c[player].slots[index + 1]);
+                        ++index;
+                    } while (index < data_ov002_022cf16c[player].count);
+                }
+                return 1;
+            }
+            ++index;
+        } while (index < data_ov002_022cf16c[player].count);
+    }
+    return 0;
+}
