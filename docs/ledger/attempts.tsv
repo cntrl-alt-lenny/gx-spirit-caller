@@ -8446,3 +8446,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204717c	main	652	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
 0x0204b8d0	main	652	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
 0x0207a544	main	656	legacy	factory	shipped	100	n/a		factory-1021-E3	
+0x020590f0	main	668	default	factory	parked	18.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x020590f0	main	668	legacy	factory	parked	32.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x020590f0	main	668	legacy_sp3	factory	parked	46.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
