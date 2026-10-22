@@ -2300,7 +2300,7 @@ src/main/func_02017df0.c:
     complete
     .text start:0x02017df0 end:0x02017ea8
 
-src/main/func_02017ea8.s:
+src/main/func_02017ea8.c:
     complete
     .text start:0x02017ea8 end:0x0201816c
 
