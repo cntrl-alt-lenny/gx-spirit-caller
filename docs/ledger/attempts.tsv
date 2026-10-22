@@ -10078,3 +10078,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02054ad0	main	48	default	factory	parked	8.3	structural	PROVISIONAL:structural	factory-1022-F8	
 0x02054ad0	main	48	legacy	factory	parked	29.4	structural	PROVISIONAL:structural	factory-1022-F8	
 0x02054ad0	main	48	legacy_sp3	factory	parked	46.7	structural	PROVISIONAL:structural	factory-1022-F8	
+0x0201bf80	main	52	default	factory	parked	92.3	structural	PROVISIONAL:structural	factory-1022-F8	
+0x0201bf80	main	52	legacy	factory	parked	78.6	structural	PROVISIONAL:structural	factory-1022-F8	
+0x0201bf80	main	52	legacy_sp3	factory	parked	92.3	structural	PROVISIONAL:structural	factory-1022-F8	
