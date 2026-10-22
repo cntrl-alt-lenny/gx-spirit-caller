@@ -8475,3 +8475,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021ced48	ov002	1412	default	factory	shipped	100	n/a		factory-1021-E5	
 0x0221bfb0	ov002	1416	default	factory	shipped	100	n/a		factory-1021-E5	
 0x021cf2cc	ov002	1424	default	factory	parked	84	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E5	
+0x0224848c	ov002	1424	default	factory	shipped	100	n/a		factory-1021-E5	
