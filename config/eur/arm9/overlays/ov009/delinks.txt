@@ -8,7 +8,7 @@
 src/overlay009/ov009_stubs_aa4a0.c:
     complete
     .text start:0x021aa4a0 end:0x021aa4a8
-src/overlay009/func_ov009_021aa4a8.s:
+src/overlay009/func_ov009_021aa4a8.c:
     complete
     .text start:0x021aa4a8 end:0x021aa59c
 
