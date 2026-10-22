@@ -8429,3 +8429,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b33d0	main	632	default	factory	parked	0.6	asm-int	PROVISIONAL:inline-asm	factory-1021-E3	
 0x020b33d0	main	632	legacy	factory	parked	1.9	asm-int	PROVISIONAL:inline-asm	factory-1021-E3	
 0x020b33d0	main	632	legacy_sp3	factory	parked	0.6	asm-int	PROVISIONAL:inline-asm	factory-1021-E3	
+0x020a037c	main	636	default	factory	parked	6.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x020a037c	main	636	legacy	factory	parked	98.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
+0x020a037c	main	636	legacy_sp3	factory	parked	8.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E3	
