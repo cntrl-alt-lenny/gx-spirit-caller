@@ -8498,3 +8498,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02093014	main	112	legacy	factory	shipped	100	n/a		factory-1021-E7	
 0x02093014	main	112	default	factory	parked	34.5	unknown	UNCLASSIFIED:unknown	factory-1021-E7	
 0x02093014	main	112	legacy_sp3	factory	parked	92.9	unknown	UNCLASSIFIED:unknown	factory-1021-E7	
+0x0209d4ec	main	112	default	factory	parked	10.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
+0x0209d4ec	main	112	legacy	factory	parked	21.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
+0x0209d4ec	main	112	legacy_sp3	factory	parked	21.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E7	
