@@ -8494,3 +8494,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206f48c	main	112	legacy	factory	shipped	100	n/a		factory-1021-E7	
 0x02082494	main	112	legacy_sp3	factory	shipped	100	n/a		factory-1021-E7	
 0x02082494	main	112	default	factory	parked	67.9	unknown	UNCLASSIFIED:unknown	factory-1021-E7	
+0x02092748	main	112	legacy	factory	shipped	100	n/a		factory-1021-E7	
