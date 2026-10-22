@@ -3112,7 +3112,7 @@ src/overlay002/func_ov002_021f09e8.c:
 src/overlay002/func_ov002_021f0a54.s:
     complete
     .text start:0x021f0a54 end:0x021f0df4
-src/overlay002/func_ov002_021f0df4.s:
+src/overlay002/func_ov002_021f0df4.c:
     complete
     .text start:0x021f0df4 end:0x021f0eb4
 src/overlay002/func_ov002_021f0eb4.c:
