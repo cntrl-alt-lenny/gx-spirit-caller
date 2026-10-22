@@ -3,7 +3,7 @@ typedef unsigned int u32;
 typedef struct { u32 attr; u16 tile, pad; } Sprite;
 extern char data_ov002_022d0f7c[];
 extern int func_0207f05c(void *, void *, int);
-extern void func_0208e2f4(volatile u16 *ptr, int a, int brightness);
+extern void func_0208e2f4(u16 *ptr, int a, int brightness);
 void func_ov002_022b4df0(int *p) {
     Sprite s;
     int offset, row, col, tile, x, y;

@@ -1,6 +1,6 @@
 typedef unsigned int u32;
 typedef unsigned short u16;
-extern void func_0208e2f4(volatile u16 *, int, int);
+extern void func_0208e2f4(u16 *, int, int);
 extern void func_02094504(u32, void *, u32);
 extern void func_0200592c(void);
 extern void func_0208d1e4(int);

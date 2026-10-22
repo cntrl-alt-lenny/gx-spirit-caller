@@ -19,7 +19,7 @@ extern char data_ov010_021b9260[];
 extern State data_ov010_021b9270;
 extern Widget data_ov010_021b9294;
 extern char data_ov010_021b9484[];
-extern int func_0208c844(volatile u16 *value);
+extern int func_0208c844(u16 *value);
 extern void func_0208c884(u16 *a0, int a1);
 extern void func_0207ed94(State *s);
 extern void func_0207ec68(State *s);

@@ -3,7 +3,7 @@ typedef unsigned short u16;
 struct Mtx22 { int _[4]; };
 extern void func_0208b0f0(int, int, int);
 extern void func_0208e318(int *, int, int, int, int);
-extern void func_0208e2f4(volatile u16 *, int, int);
+extern void func_0208e2f4(u16 *, int, int);
 extern void G2x_SetBGyAffine_(u32, const struct Mtx22 *, int, int, int, int);
 /* The original passes two arguments to this no-prototype SDK stub. */
 extern void func_ov002_022aacbc();

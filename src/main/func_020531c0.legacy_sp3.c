@@ -1,6 +1,6 @@
 typedef struct {
-    volatile unsigned int f_0;
-    volatile unsigned int f_4;
+    unsigned int f_0;
+    unsigned int f_4;
 } obj_t;
 typedef struct {
     unsigned long long a;

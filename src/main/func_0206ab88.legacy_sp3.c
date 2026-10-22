@@ -1,6 +1,6 @@
 typedef unsigned int u32;
 struct S {
- int state; char pad4[8]; char name[0x24]; char name2[0x44]; char key[8]; volatile int mem; int pos;
+ int state; char pad4[8]; char name[0x24]; char name2[0x44]; char key[8]; int mem; int pos;
  char pad84[0x420]; int f4a4; char pad4a8[8]; int socket; int f4b4; int f4b8;
  char pad4bc[0x108]; u32 flags; int f5c8;
 };

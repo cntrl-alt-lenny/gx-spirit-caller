@@ -15,7 +15,7 @@ extern void Fill32(int value, void *dest, int size);
 extern void *Vram_GetBankBaseCD(void);
 extern signed char *func_0202c0c0(int id);
 extern int func_020a978c(char *dst, const signed char *fmt, ...);
-extern char *func_020a6afc(char *dst, volatile signed char *src);
+extern char *func_020a6afc(char *dst, signed char *src);
 extern void func_02001d0c(state_t *p, int a, int b);
 extern void func_02001d68(int arg);
 extern int func_020054a4(char *text, int a);

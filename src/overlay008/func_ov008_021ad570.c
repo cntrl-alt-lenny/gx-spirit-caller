@@ -58,7 +58,7 @@ int func_ov008_021ad570(void) {
         }
     } else if (data_02104bac.pressed & 1) {
         data_ov008_021b2dc0.selected = (unsigned short)(data_ov008_021b2dc0.lo + data_ov008_021b2dc0.hi);
-        if (data_ov008_021b279c[((volatile State *)&data_ov008_021b2dc0)->selected].count != 0) {
+        if (data_ov008_021b279c[((State *)&data_ov008_021b2dc0)->selected].count != 0) {
             func_02037208(0x3a, -1, 0, 1); return 1;
         } else { func_02037208(0x43, -1, 0, 1); }
     } else if (data_02104bac.pressed & 2) {

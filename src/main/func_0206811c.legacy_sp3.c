@@ -1,6 +1,6 @@
 typedef struct {
     int f_0;
-    volatile int f_4;
+    int f_4;
     int f_8;
 } state_3vc_t;
 extern void func_02068368(state_3vc_t *p);

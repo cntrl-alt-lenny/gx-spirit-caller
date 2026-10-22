@@ -34,17 +34,17 @@ int func_020a0bd8(void) {
     int j;
     if (data_021a98fc[0x1524] == 0) return 21;
     for (i = 0; i < 16; i++) {
-        base = *(u8 *volatile *)&data_021a98fc;
+        base = *(u8 **)&data_021a98fc;
         base[0x1525] = (base[0x1525] + 1) % 16;
-        base = *(u8 *volatile *)&data_021a98fc;
+        base = *(u8 **)&data_021a98fc;
         idx = base[0x1525];
         if ((base + idx * 0x5d4)[0x1d52] && *(u16 *)(base + idx * 0x5d4 + 0x1d4c)) break;
     }
     if (i == 16) return 21;
     func_020a09c8(idx);
-    base = *(u8 *volatile *)&data_021a98fc;
+    base = *(u8 **)&data_021a98fc;
     if (!func_020a202c(&result, base + 0x1d2c + base[0x1525] * 0x5d4, *(u16 *)(base + base[0x1525] * 0x5d4 + 0x1d48), base + 0x1788 + base[0x1525] * 0x5d4)) return 21;
-    base = *(u8 *volatile *)&data_021a98fc;
+    base = *(u8 **)&data_021a98fc;
     cmd.type = 4;
     cmd.slot = base[0x1525];
     cmd.item = *(u16 *)(base + base[0x1525] * 0x5d4 + 0x1d48);
@@ -74,7 +74,7 @@ int func_020a0bd8(void) {
         }
         return 21;
     }
-    base = *(u8 *volatile *)&data_021a98fc;
+    base = *(u8 **)&data_021a98fc;
     return func_020a2cbc(result.len + 6, *(u16 *)(base + base[0x1525] * 0x5d4 + 0x1d4c), (int)base);
 }
 

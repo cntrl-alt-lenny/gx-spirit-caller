@@ -72,7 +72,7 @@ void func_0204abfc(void) {
  if (I(func_020498f0(),0x1a0) != 4 && I(func_020498f0(),0x1a0) != 3) return;
  t=data_0219dc84;
  if (B(func_020498f0(),0xd)<t->participant-1) return;
- if (t->stage == 0 && (t=*(Timer * volatile *)&data_0219dc84, func_020b3808((func_020930b0()-t->start)<<6,0x82ea) >= t->delay)) {
+ if (t->stage == 0 && (t=*(Timer * *)&data_0219dc84, func_020b3808((func_020930b0()-t->start)<<6,0x82ea) >= t->delay)) {
  } else {
   if (t->stage==0) return;
   t=data_0219dc84;
