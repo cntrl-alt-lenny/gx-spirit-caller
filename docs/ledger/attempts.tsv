@@ -10089,3 +10089,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201a134	main	60	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1022-F8	
 0x020689e4	main	60	legacy_sp3	factory	shipped	100	n/a		factory-1022-F8	
 0x0207845c	main	60	legacy	factory	shipped	100	n/a		factory-1022-F8	
+0x02099be8	main	60	default	factory	parked	6.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F8	
+0x02099be8	main	60	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F8	
+0x02099be8	main	60	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F8	
