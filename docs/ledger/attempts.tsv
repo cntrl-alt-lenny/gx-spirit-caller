@@ -8482,3 +8482,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0226a928	ov002	876	default	factory	shipped	100	n/a		factory-1021-E2	
 0x022726b4	ov002	880	default	factory	shipped	100	n/a		factory-1021-E2	
 0x0226e0ec	ov002	896	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b809c	ov002	904	default	factory	shipped	100	n/a		factory-1021-E2	
+0x022b809c	ov002	904	legacy_sp3	factory	parked	11	unknown	UNCLASSIFIED:unknown	factory-1021-E2	
