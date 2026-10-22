@@ -8465,3 +8465,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02055f84	main	104	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1021-E7	
 0x0207845c	main	60	legacy	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1021-E7	
 0x02055a18	main	108	legacy_sp3	factory	shipped	100	n/a		factory-1021-E7	
+0x02055c04	main	108	legacy_sp3	factory	shipped	100	n/a		factory-1021-E7	
