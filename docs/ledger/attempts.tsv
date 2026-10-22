@@ -8483,3 +8483,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d5dc8	ov004	1264	default	factory	shipped	100	n/a		factory-1021-E6	
 0x021d5dc8	ov004	1264	legacy_sp3	factory	parked	16.1	unknown	UNCLASSIFIED:unknown	factory-1021-E6	
 0x021d5dc8	ov004	1264	legacy	factory	parked	18.9	unknown	UNCLASSIFIED:unknown	factory-1021-E6	
+0x020a9960	main	1272	default	factory	shipped	100	n/a		factory-1021-E6	
+0x020a9960	main	1272	legacy	factory	parked	11.4	unknown	UNCLASSIFIED:unknown	factory-1021-E6	
+0x020a9960	main	1272	legacy_sp3	factory	parked	13	unknown	UNCLASSIFIED:unknown	factory-1021-E6	

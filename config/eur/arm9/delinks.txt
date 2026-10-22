@@ -19541,7 +19541,7 @@ src/main/func_020a9950.c:
     complete
     .text start:0x020a9950 end:0x020a9960
 
-src/main/func_020a9960.s:
+src/main/func_020a9960.c:
     complete
     .text start:0x020a9960 end:0x020a9e58
 
