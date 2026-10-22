@@ -8532,3 +8532,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02077018	main	116	default	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1021-E7	
 0x02077018	main	116	legacy	factory	parked	93.5	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1021-E7	
 0x02077018	main	116	legacy_sp3	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1021-E7	
+0x02084218	main	116	default	factory	parked	0	register-numbering-permutation-cascade	P-30	factory-1021-E7	
+0x02084218	main	116	legacy	factory	parked	56.7	register-numbering-permutation-cascade	P-30	factory-1021-E7	
+0x02084218	main	116	legacy_sp3	factory	parked	65.5	register-numbering-permutation-cascade	P-30	factory-1021-E7	
