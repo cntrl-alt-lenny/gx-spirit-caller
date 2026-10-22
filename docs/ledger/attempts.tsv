@@ -8484,3 +8484,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a0bd8	main	708	legacy	factory	shipped	100	n/a		factory-1021-E3	
 0x02022644	main	712	default	factory	shipped	100	n/a		factory-1021-E3	
 0x0202c9c0	main	716	default	factory	shipped	100	n/a		factory-1021-E3	
+0x0203fe78	main	724	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
