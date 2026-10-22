@@ -10042,3 +10042,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b52f0	ov019	1032	default	factory	parked	99.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F5	
 0x021b52f0	ov019	1032	legacy	factory	parked	10.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F5	
 0x021b52f0	ov019	1032	legacy_sp3	factory	parked	10.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F5	
+0x020354bc	main	1040	default	factory	shipped	100	n/a		factory-1022-F5	
