@@ -8478,3 +8478,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02023f7c	main	112	default	factory	parked	92.9	structural	PROVISIONAL:structural	factory-1021-E7	
 0x02023f7c	main	112	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1021-E7	
 0x02023f7c	main	112	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1021-E7	
+0x02031c1c	main	112	default	factory	parked	78.6	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E7	
+0x02031c1c	main	112	legacy	factory	parked	19.4	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E7	
+0x02031c1c	main	112	legacy_sp3	factory	parked	20	reg-alloc	PROVISIONAL:register-allocation	factory-1021-E7	
