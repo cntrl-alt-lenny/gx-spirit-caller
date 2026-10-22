@@ -8489,3 +8489,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020278dc	main	1280	default	factory	parked	57.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
 0x020278dc	main	1280	legacy	factory	parked	7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
 0x020278dc	main	1280	legacy_sp3	factory	parked	7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1021-E6	
+0x02025fe4	main	1292	default	factory	parked	94.4	frame-shape	PROVISIONAL:frame/epilogue	factory-1021-E6	
+0x02025fe4	main	1292	legacy	factory	parked	9.3	frame-shape	PROVISIONAL:frame/epilogue	factory-1021-E6	
+0x02025fe4	main	1292	legacy_sp3	factory	parked	10	frame-shape	PROVISIONAL:frame/epilogue	factory-1021-E6	
