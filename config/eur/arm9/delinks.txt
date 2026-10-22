@@ -4556,7 +4556,7 @@ src/main/func_02022d54.c:
     complete
     .text start:0x02022d54 end:0x02022ee4
 
-src/main/func_02022ee4.s:
+src/main/func_02022ee4.c:
     complete
     .text start:0x02022ee4 end:0x02023188
 
