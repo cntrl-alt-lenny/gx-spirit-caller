@@ -19442,7 +19442,7 @@ src/main/func_020a7268.s:
     complete
     .text start:0x020a7268 end:0x020a72f0
 
-src/main/func_020a72f0.s:
+src/main/func_020a72f0.c:
     complete
     .text start:0x020a72f0 end:0x020a7368
 
