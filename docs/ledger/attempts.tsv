@@ -8436,3 +8436,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02099928	main	640	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
 0x02099928	main	640	legacy	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
 0x02099928	main	640	legacy_sp3	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1021-E3	
+0x020501cc	main	644	legacy_sp3	factory	shipped	100	n/a		factory-1021-E3	
+0x020501cc	main	644	default	factory	parked	97.5	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
+0x020501cc	main	644	legacy	factory	parked	6.4	unknown	UNCLASSIFIED:unknown	factory-1021-E3	
