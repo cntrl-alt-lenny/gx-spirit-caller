@@ -10172,3 +10172,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cf638	ov004	1356	default	factory	shipped	100	n/a		factory-1022-F5	
 0x021cf638	ov004	1356	legacy_sp3	factory	parked	23.8	unknown	UNCLASSIFIED:unknown	factory-1022-F5	
 0x021cf638	ov004	1356	legacy	factory	parked	23.8	unknown	UNCLASSIFIED:unknown	factory-1022-F5	
+0x02083dd8	main	1088	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1022-F5	
