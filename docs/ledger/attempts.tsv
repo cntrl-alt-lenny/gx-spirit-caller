@@ -10148,3 +10148,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201c6a0	main	764	default	factory	parked	99.5	asm-int	PROVISIONAL:inline-asm	factory-1022-F1	
 0x0201c6a0	main	764	legacy	factory	parked	1	asm-int	PROVISIONAL:inline-asm	factory-1022-F1	
 0x0201c6a0	main	764	legacy_sp3	factory	parked	1	asm-int	PROVISIONAL:inline-asm	factory-1022-F1	
+0x0203b3b8	main	764	default	factory	parked	9.6	structural	PROVISIONAL:structural	factory-1022-F1	
+0x0203b3b8	main	764	legacy	factory	parked	1.5	structural	PROVISIONAL:structural	factory-1022-F1	
+0x0203b3b8	main	764	legacy_sp3	factory	parked	1.5	structural	PROVISIONAL:structural	factory-1022-F1	
