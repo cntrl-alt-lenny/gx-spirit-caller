@@ -10156,3 +10156,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c3714	ov006	740	legacy_sp3	factory	parked	2	unknown	UNCLASSIFIED:unknown	factory-1022-F3	
 0x021c3714	ov006	740	legacy	factory	parked	2	unknown	UNCLASSIFIED:unknown	factory-1022-F3	
 0x021d3578	ov004	672	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1022-F3	
+0x021d9134	ov004	740	default	factory	parked	86.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F3	
+0x021d9134	ov004	740	legacy	factory	parked	11	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F3	
+0x021d9134	ov004	740	legacy_sp3	factory	parked	11	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F3	
