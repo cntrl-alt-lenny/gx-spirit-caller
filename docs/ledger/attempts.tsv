@@ -10129,3 +10129,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021dfa80	ov002	2940	default	factory	parked	11.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
 0x021dfa80	ov002	2940	legacy	factory	parked	2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
 0x021dfa80	ov002	2940	legacy_sp3	factory	parked	2.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
+0x022ab3e4	ov002	2980	default	factory	parked	95.4	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F6	
+0x022ab3e4	ov002	2980	legacy	factory	parked	1	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F6	
+0x022ab3e4	ov002	2980	legacy_sp3	factory	parked	1.3	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F6	
