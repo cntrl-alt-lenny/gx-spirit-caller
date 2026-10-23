@@ -4957,7 +4957,6 @@ eur	src/overlay002/data_ov002_022ca790.c	missing-reloc	.rodata+0x40 original ABS
 eur	src/overlay002/data_ov002_022ca790.c	missing-reloc	.rodata+0x48 original ABS32 data_ov002_022cc9e0+0x0 built none
 eur	src/overlay002/data_ov002_022ca790.c	missing-reloc	.rodata+0x50 original ABS32 data_ov002_022cc9fc+0x0 built none
 eur	src/overlay002/data_ov002_022ca790.c	missing-reloc	.rodata+0x8 original ABS32 data_ov002_022cc954+0x0 built none
-eur	src/overlay002/func_ov002_021b4be4.s	missing-reloc	.text+0xcdc original PC24 .text-0x8 built none
 eur	src/overlay002/func_ov002_021c4c9c.s	missing-reloc	.text+0xb78 original PC24 .text-0x8 built none
 eur	src/overlay002/func_ov002_021c8e38.s	missing-reloc	.text+0x100 original PC24 .text-0x8 built none
 eur	src/overlay002/func_ov002_021d479c.c	wrong-target	.text+0x88 original ABS32 data_ov002_022ce958+0x0 built ABS32 data_ov002_022ce950+0x8
