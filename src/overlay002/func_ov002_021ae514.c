@@ -1,6 +1,6 @@
 typedef unsigned int u32;
 struct Slot { u32 id:13; u32 pad:1; u32 flag:1; u32 rest:17; };
-struct State { int a, b, active; volatile int count; };
+struct State { int a, b, active; int count; };
 extern char data_ov002_022cdc78[];
 extern char data_ov002_022cdc88[];
 extern int func_ov002_0229ade0(int, int, int, int);

@@ -1,7 +1,7 @@
 typedef struct {
     char _pad[4];
-    volatile unsigned int f_4;
-    volatile unsigned int f_8;
+    unsigned int f_4;
+    unsigned int f_8;
 } state_v_t;
 typedef struct { char pad[0x24]; int f_24; } context_t;
 /* The existing void signature omits the pointer forwarded in r0. */

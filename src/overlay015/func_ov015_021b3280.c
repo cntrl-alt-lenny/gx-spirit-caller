@@ -32,7 +32,7 @@ int func_ov015_021b3280(Obj *o, int dt, State *s, Entry **out) {
  if (o->timer > 0) {
   o->timer -= dt;
   if (o->timer < 0) o->timer = 0;
-  remaining = *(volatile int *)&o->timer;
+  remaining = *(int *)&o->timer;
   elapsed = 0x5000 - remaining;
   switch (o->mode) {
   case 2:

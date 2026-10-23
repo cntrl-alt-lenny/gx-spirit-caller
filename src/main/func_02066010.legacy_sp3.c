@@ -1,7 +1,7 @@
 typedef struct { unsigned char b[0x800]; int len; } Buffer;
 typedef struct {
  int sock; char text[0x80]; unsigned char id[0x24];
- int f_a8; volatile int f_ac; int f_b0; int f_b4; char pad_b8[8];
+ int f_a8; int f_ac; int f_b0; int f_b4; char pad_b8[8];
  int f_c0; int f_c4; int f_c8; char addr[8]; char pad_d4[0x30];
  int f_104; unsigned short f_108;
 } Conn;
