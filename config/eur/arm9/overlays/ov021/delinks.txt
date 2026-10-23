@@ -117,7 +117,7 @@ src/overlay021/ov021_stubs_aaf54.c:
 
 
 
-src/overlay021/func_ov021_021aaf5c.s:
+src/overlay021/func_ov021_021aaf5c.c:
     complete
     .text start:0x021aaf5c end:0x021ab05c
 
