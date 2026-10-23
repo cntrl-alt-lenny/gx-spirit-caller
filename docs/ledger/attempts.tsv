@@ -10128,3 +10128,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02020ff8	main	108	default	factory	parked	14.8	structural	PROVISIONAL:structural	factory-1022-F8	
 0x02020ff8	main	108	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1022-F8	
 0x02020ff8	main	108	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1022-F8	
+0x0209226c	main	108	default	factory	parked	88.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F8	
+0x0209226c	main	108	legacy	factory	parked	77.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F8	
+0x0209226c	main	108	legacy_sp3	factory	parked	77.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F8	
