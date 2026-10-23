@@ -9322,7 +9322,7 @@ src/main/func_020506b0.s:
     complete
     .text start:0x020506b0 end:0x020507b4
 
-src/main/func_020507b4.s:
+src/main/func_020507b4.legacy_sp3.c:
     complete
     .text start:0x020507b4 end:0x02051168
 
