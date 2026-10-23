@@ -10127,3 +10127,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02216dd0	ov002	204	legacy_sp3	factory	parked	96.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F9	
 0x0222196c	ov002	204	default	factory	shipped	100	n/a		factory-1022-F9	
 0x0223252c	ov002	204	default	factory	shipped	100	n/a		factory-1022-F9	
+0x0223a2e4	ov002	204	default	factory	shipped	100	n/a		factory-1022-F9	
