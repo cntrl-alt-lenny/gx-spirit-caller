@@ -2096,7 +2096,7 @@ src/overlay006/ov006_021cac30.c:
 
 
 
-src/overlay006/func_ov006_021cac38.s:
+src/overlay006/func_ov006_021cac38.c:
     complete
     .text start:0x021cac38 end:0x021cad34
 

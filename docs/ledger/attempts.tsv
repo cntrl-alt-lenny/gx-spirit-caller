@@ -10173,3 +10173,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021abcc4	ov005	244	default	factory	shipped	100	n/a		factory-1022-F10	
 0x021abcc4	ov005	244	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1022-F10	
 0x021abcc4	ov005	244	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1022-F10	
+0x021cac38	ov006	252	default	factory	shipped	100	n/a		factory-1022-F10	
