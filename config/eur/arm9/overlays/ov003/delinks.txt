@@ -80,7 +80,7 @@ src/overlay003/func_ov003_021cce58.c:
     complete
     .text start:0x021cce58 end:0x021ccea4
 
-src/overlay003/func_ov003_021ccea4.s:
+src/overlay003/func_ov003_021ccea4.c:
     complete
     .text start:0x021ccea4 end:0x021cd358
 

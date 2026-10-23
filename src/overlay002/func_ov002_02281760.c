@@ -3,7 +3,7 @@ extern char data_ov002_022cf16c[];
 extern int func_ov002_022575c8(int a0, int a1, int a2);
 extern int func_ov002_022815a4(int id, int flag);
 
-int func_ov002_02281760(int a0, int player) {
+int func_ov002_02281760(int a0, int player, int unused2) {
     int i;
     int result = 0;
     char *row = data_ov002_022cf16c + (player & 1) * 0x868;

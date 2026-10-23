@@ -25,7 +25,7 @@ typedef struct P {
 extern P *func_ov002_021c93f0(int a);
 extern void func_ov002_021fca38(S *s);
 
-int func_ov002_021c2850(int a, int n) {
+int func_ov002_021c2850(int a, int n, int unused2) {
     P *p;
     S s;
     u16 ta, tn;

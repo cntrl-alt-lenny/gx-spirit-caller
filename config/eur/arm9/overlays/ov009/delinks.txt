@@ -123,14 +123,14 @@ src/overlay009/func_ov009_021ab910.c:
 src/overlay009/func_ov009_021ab9f8.s:
     complete
     .text start:0x021ab9f8 end:0x021ac214
-src/overlay009/func_ov009_021ac214.s:
+src/overlay009/func_ov009_021ac214.c:
     complete
     .text start:0x021ac214 end:0x021ac458
 src/overlay009/func_ov009_021ac458.c:
     complete
     .text start:0x021ac458 end:0x021ac4d0
 
-src/overlay009/func_ov009_021ac4d0.s:
+src/overlay009/func_ov009_021ac4d0.c:
     complete
     .text start:0x021ac4d0 end:0x021ace60
 src/overlay009/func_ov009_021ace60.c:

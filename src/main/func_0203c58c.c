@@ -10,7 +10,7 @@
 
 extern int func_0203c46c(void *p);
 
-int func_0203c58c(void **p) {
+int func_0203c58c(void **p, int unused1) {
     void *t = *p;
     if (t == 0) return (int)t;
     return func_0203c46c(t);
