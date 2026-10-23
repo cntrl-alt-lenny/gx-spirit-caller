@@ -10166,3 +10166,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209c364	main	796	default	factory	parked	0.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
 0x0209c364	main	796	legacy	factory	parked	98	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
 0x0209c364	main	796	legacy_sp3	factory	parked	9.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
+0x02041978	main	816	default	factory	parked	8.3	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F1	
+0x02041978	main	816	legacy	factory	parked	8.7	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F1	
+0x02041978	main	816	legacy_sp3	factory	parked	94.6	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F1	
