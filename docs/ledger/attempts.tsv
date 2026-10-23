@@ -10140,3 +10140,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0226f4dc	ov002	3240	default	factory	parked	80	register-numbering-permutation-cascade	P-30	factory-1022-F6	
 0x0226f4dc	ov002	3240	legacy	factory	parked	3	register-numbering-permutation-cascade	P-30	factory-1022-F6	
 0x0226f4dc	ov002	3240	legacy_sp3	factory	parked	2.6	register-numbering-permutation-cascade	P-30	factory-1022-F6	
+0x0225d628	ov002	3332	default	factory	parked	84.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
+0x0225d628	ov002	3332	legacy	factory	parked	1.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
+0x0225d628	ov002	3332	legacy_sp3	factory	parked	0.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
