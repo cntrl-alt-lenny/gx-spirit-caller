@@ -10154,3 +10154,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204cf7c	main	776	default	factory	parked	3.6	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F1	
 0x0204cf7c	main	776	legacy	factory	parked	17.4	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F1	
 0x0204cf7c	main	776	legacy_sp3	factory	parked	14.6	reg-alloc	PROVISIONAL:register-allocation	factory-1022-F1	
+0x0200cb50	main	780	default	factory	parked	79.5	register-numbering-permutation-cascade	P-30	factory-1022-F1	
+0x0200cb50	main	780	legacy	factory	parked	2.8	register-numbering-permutation-cascade	P-30	factory-1022-F1	
+0x0200cb50	main	780	legacy_sp3	factory	parked	2.8	register-numbering-permutation-cascade	P-30	factory-1022-F1	
