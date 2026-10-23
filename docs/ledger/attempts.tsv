@@ -10113,3 +10113,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021de678	ov002	644	legacy_sp3	factory	parked	9.3	unknown	UNCLASSIFIED:unknown	factory-1022-F2	
 0x021de678	ov002	644	legacy	factory	parked	9.3	unknown	UNCLASSIFIED:unknown	factory-1022-F2	
 0x022b867c	ov002	584	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1022-F2	
+0x021d2a18	ov002	648	default	factory	parked	30.9	structural	PROVISIONAL:structural	factory-1022-F2	
+0x021d2a18	ov002	648	legacy	factory	parked	1.2	structural	PROVISIONAL:structural	factory-1022-F2	
+0x021d2a18	ov002	648	legacy_sp3	factory	parked	1.2	structural	PROVISIONAL:structural	factory-1022-F2	
