@@ -6,7 +6,7 @@ typedef struct {
  char pad18c[6]; short amount, duration, step; char pad198[2];
  unsigned short b0:1, b1:1, b2:1;
 } Obj;
-extern int Task_PostLocked(void *arg0, int arg1, int arg2);
+extern void *Task_PostLocked(int size, int align, int flags);
 extern void Task_InvokeLocked(void *p);
 extern int func_02029c80(Obj *o, void *buffer, int dest, int size);
 extern int func_020b3870(int numerator, int denominator);
@@ -22,7 +22,7 @@ int func_02029f74(Obj *o) {
   n = o->kind2 == 1 ? 0x100 : 0x10;
  }
  size = n * 2;
- out = (unsigned short *)Task_PostLocked((void *)size, 4, 0);
+ out = Task_PostLocked(size, 4, 0);
 
  i = 0;
  half = o->duration / 2;

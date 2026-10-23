@@ -11,7 +11,7 @@ extern InAddr data_0219eb70[];
 extern char data_021016f4[], data_02101700[], data_0210170c[], data_02101714[], data_02101718[], data_0210171c[], data_0210172c[], data_02101738[], data_02101744[];
 extern void func_02066ea0(Buffer *, unsigned char, const unsigned char *);
 extern void func_02067294(Buffer *, char *);
-extern void func_020672f4(int, int);
+extern void func_020672f4(Buffer *, int);
 extern void func_02066a88(int, int, int, unsigned char *, int, unsigned char *, int, unsigned char *);
 extern int func_02054ca8(int, void *, int, int, void *, int);
 extern int func_02055330(void);
@@ -30,20 +30,20 @@ void func_02066010(Conn *c, int mode) {
   func_02067294(&b, func_0206e778(data_0219eb70[i]));
  }
  func_02067294(&b, data_02101700);
- func_020672f4((int)&b, c->f_c0);
+ func_020672f4(&b, c->f_c0);
  func_02067294(&b, data_0210170c);
  func_02067294(&b, c->f_c8 ? data_02101714 : data_02101718);
  if (mode != 0) {
   func_02067294(&b, data_0210171c);
-  func_020672f4((unsigned int)&b, mode);
+  func_020672f4(&b, mode);
  }
  func_02067294(&b, data_0210172c);
  func_02067294(&b, c->text);
  if(c->f_a8 != 0) {
   func_02067294(&b, data_02101738);
-  func_020672f4((long)&b, c->f_104);
+  func_020672f4(&b, c->f_104);
   func_02067294(&b, data_02101744);
-  func_020672f4((unsigned long)&b, c->f_108);
+  func_020672f4(&b, c->f_108);
  }
  if(mode != 2) {
   func_02066a88((int)c, (int)(unsigned long)&b, 255, 0, 255, 0, 255, 0);

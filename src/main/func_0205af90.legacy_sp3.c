@@ -21,7 +21,7 @@ extern int func_0205d6f8(char **pp,int key);
 extern int func_0205b9ac(void *,int,int *,int *,int *);
 extern int func_020552dc(void *self);
 extern int func_02059e5c(void *,void *,Src *);
-extern int func_020453e8(int a);
+extern void *func_020453e8(int a);
 extern int func_0205ffc0(int *p,int b);
 extern void func_0205b7a8(Src *src,Dst *dst);
 extern int func_02058528(Owner **pp,Pair key,int a3,Item *src,int a5);
@@ -120,7 +120,7 @@ int func_0205af90(Owner **pp,Item *item,char *line) {
     if(o->active) func_02059e5c(pp,(void *)found,&src);
     callback=item->callback;
     if(callback.a) {
-        dst=(Dst *)func_020453e8(0x204);
+        dst=func_020453e8(0x204);
         if(!dst) { func_0205ffc0((int *)pp,(int)data_02100780); return 1; }
         func_0205b7a8(&src,dst);
         dst->kind=0; dst->key=key;
