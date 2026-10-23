@@ -10155,3 +10155,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021e3dac	ov002	3580	default	factory	parked	57.8	structural	PROVISIONAL:structural	factory-1022-F6	
 0x021e3dac	ov002	3580	legacy	factory	parked	1.4	structural	PROVISIONAL:structural	factory-1022-F6	
 0x021e3dac	ov002	3580	legacy_sp3	factory	parked	3.6	structural	PROVISIONAL:structural	factory-1022-F6	
+0x02284b3c	ov002	3656	default	factory	parked	45.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
+0x02284b3c	ov002	3656	legacy	factory	parked	0.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
+0x02284b3c	ov002	3656	legacy_sp3	factory	parked	0.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F6	
