@@ -26,7 +26,7 @@ extern int func_0202f578(void *);
 extern int func_ov002_021bbf50(int);
 extern int func_ov002_02257ab8(int,int);
 extern int func_ov002_021f4260(int,int);
-extern void func_ov002_021ae514(int,int,int,int,int,int);
+extern int func_ov002_021ae514(int,int,int,int,int,int);
 extern int func_ov002_0226b0d0(int,int,int);
 extern void func_ov002_021df62c(int,int,int);
 extern void func_ov002_021df780(int,int);

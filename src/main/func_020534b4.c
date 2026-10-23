@@ -19,7 +19,7 @@
 
 extern int func_020534d4(void *self);
 
-asm void *func_020534b4(void *self) {
+asm void *func_020534b4(void *self, int unused1) {
     nofralloc
     stmdb sp!, {r4, lr}
     mov r4, r0

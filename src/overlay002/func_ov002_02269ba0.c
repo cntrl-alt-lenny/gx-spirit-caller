@@ -4,7 +4,7 @@ extern void func_ov002_021ae400(int a, int b);
 extern void func_ov002_021ae430(int a, const char *src);
 extern int func_ov002_021ae484(int x);
 extern int func_ov002_021ae4bc(int self, int idx);
-extern void func_ov002_021ae514(int,int,int,int,int,int);
+extern int func_ov002_021ae514(int,int,int,int,int,int);
 extern int func_ov002_021b97d4(int a, unsigned int b);
 extern int func_ov002_021bbf50(int arg0);
 extern int func_ov002_021f4260(int,int);
