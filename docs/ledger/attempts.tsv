@@ -10127,3 +10127,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6e4c	main	688	default	factory	parked	96.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
 0x020a6e4c	main	688	legacy	factory	parked	11.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
 0x020a6e4c	main	688	legacy_sp3	factory	parked	14.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
+0x02074194	main	700	default	factory	parked	5.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
+0x02074194	main	700	legacy	factory	parked	70.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
+0x02074194	main	700	legacy_sp3	factory	parked	34.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
