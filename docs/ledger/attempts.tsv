@@ -10136,3 +10136,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209a534	main	704	default	factory	parked	5.1	structural	PROVISIONAL:structural	factory-1022-F1	
 0x0209a534	main	704	legacy	factory	parked	76.7	structural	PROVISIONAL:structural	factory-1022-F1	
 0x0209a534	main	704	legacy_sp3	factory	parked	9.1	structural	PROVISIONAL:structural	factory-1022-F1	
+0x020a7d0c	main	736	default	factory	parked	6.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
+0x020a7d0c	main	736	legacy	factory	parked	1.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
+0x020a7d0c	main	736	legacy_sp3	factory	parked	1.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F1	
