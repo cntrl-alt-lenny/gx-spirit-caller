@@ -10082,3 +10082,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202884c	main	2488	default	factory	parked	32.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F7	
 0x0202884c	main	2488	legacy	factory	parked	5.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F7	
 0x0202884c	main	2488	legacy_sp3	factory	parked	5.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1022-F7	
+0x021aa4d0	ov005	2520	default	factory	parked	26.7	structural	PROVISIONAL:structural	factory-1022-F7	
+0x021aa4d0	ov005	2520	legacy	factory	parked	2.5	structural	PROVISIONAL:structural	factory-1022-F7	
+0x021aa4d0	ov005	2520	legacy_sp3	factory	parked	14.8	structural	PROVISIONAL:structural	factory-1022-F7	
