@@ -16408,7 +16408,7 @@ libs/nitro/GX_SendFifo48B.legacy.c:
     complete
     .text start:0x020903b0 end:0x020903d4
 
-src/main/func_020903d4.s:
+src/main/func_020903d4.legacy.c:
     complete
     .text start:0x020903d4 end:0x02090454
 
