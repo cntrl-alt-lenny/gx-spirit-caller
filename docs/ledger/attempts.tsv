@@ -10176,3 +10176,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02023478	main	128	default	factory	parked	31.2	structural	PROVISIONAL:structural	factory-1022-F8	
 0x02023478	main	128	legacy	factory	parked	62.5	structural	PROVISIONAL:structural	factory-1022-F8	
 0x02023478	main	128	legacy_sp3	factory	parked	59.4	structural	PROVISIONAL:structural	factory-1022-F8	
+0x02074dcc	main	128	default	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1022-F8	
+0x02074dcc	main	128	legacy	factory	parked	91.4	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1022-F8	
+0x02074dcc	main	128	legacy_sp3	factory	parked	69.7	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1022-F8	
