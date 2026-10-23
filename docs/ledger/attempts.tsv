@@ -10174,3 +10174,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02080280	main	816	legacy	factory	parked	8	asm-int	PROVISIONAL:inline-asm	factory-1022-F1	
 0x02080280	main	816	legacy_sp3	factory	parked	8.1	asm-int	PROVISIONAL:inline-asm	factory-1022-F1	
 0x02008888	main	576	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1022-F1	
+0x02008fb8	main	572	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1022-F1	
