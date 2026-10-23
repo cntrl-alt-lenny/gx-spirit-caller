@@ -1281,7 +1281,7 @@ src/overlay006/func_ov006_021c358c.c:
     complete
     .text start:0x021c358c end:0x021c3714
 
-src/overlay006/func_ov006_021c3714.s:
+src/overlay006/func_ov006_021c3714.c:
     complete
     .text start:0x021c3714 end:0x021c39f8
 
