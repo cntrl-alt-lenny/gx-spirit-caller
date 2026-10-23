@@ -10151,3 +10151,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b2ae8	ov019	1344	default	factory	shipped	100	n/a		factory-1022-F5	
 0x021b2ae8	ov019	1344	legacy_sp3	factory	parked	7.1	unknown	UNCLASSIFIED:unknown	factory-1022-F5	
 0x021b2ae8	ov019	1344	legacy	factory	parked	7	unknown	UNCLASSIFIED:unknown	factory-1022-F5	
+0x020b3c78	main	1348	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1022-F5	
+0x020b3c78	main	1348	legacy	factory	parked	0.3	asm-int	PROVISIONAL:inline-asm	factory-1022-F5	
+0x020b3c78	main	1348	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1022-F5	
