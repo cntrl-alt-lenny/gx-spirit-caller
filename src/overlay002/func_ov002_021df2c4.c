@@ -1,7 +1,6 @@
 typedef unsigned int u32;
 typedef unsigned short u16;
 struct Raw { u32 value; };
-extern void *memset(void *, int, unsigned int);
 typedef struct { u32 id:13; u32 side:1; u32 unused:8; u32 index:8; u32 rest:2; u16 f4, f6, f8, fa; u32 tail[2]; } Obj;
 typedef struct S { int pad0[2]; int f8, fc, f10; int pad14[8]; int f34; } S;
 typedef struct { unsigned long low:9; unsigned long side:1; unsigned long index:4; unsigned long flag:1; unsigned long one:1; unsigned long gap:1; unsigned long other:1; unsigned long owner:1; unsigned long type:4; unsigned long zero:1; unsigned long high:8; } Event;
