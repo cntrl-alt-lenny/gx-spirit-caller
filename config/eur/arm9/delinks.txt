@@ -6680,7 +6680,7 @@ src/main/func_020339d4.c:
     complete
     .text start:0x020339d4 end:0x02033a48
 
-src/main/func_02033a48.s:
+src/main/func_02033a48.c:
     complete
     .text start:0x02033a48 end:0x02033a80
 
@@ -7841,7 +7841,7 @@ src/main/func_0203db70.legacy_sp3.c:
     complete
     .text start:0x0203db70 end:0x0203dc10
 
-src/main/func_0203dc10.s:
+src/main/func_0203dc10.legacy_sp3.c:
     complete
     .text start:0x0203dc10 end:0x0203dc94
 
@@ -9549,7 +9549,7 @@ src/main/func_02052ecc.legacy_sp3.c:
     complete
     .text start:0x02052ecc end:0x02052f04
 
-src/main/func_02052f04.s:
+src/main/func_02052f04.c:
     complete
     .text start:0x02052f04 end:0x02052f88
 
@@ -11114,7 +11114,7 @@ src/main/func_020639a0.c:
     complete
     .text start:0x020639a0 end:0x020639c8
 
-src/main/func_020639c8.s:
+src/main/func_020639c8.legacy_sp3.c:
     complete
     .text start:0x020639c8 end:0x02063a4c
 
@@ -11869,7 +11869,7 @@ src/main/func_020689dc.c:
 
 
 
-src/main/func_020689e4.s:
+src/main/func_020689e4.legacy_sp3.c:
     complete
     .text start:0x020689e4 end:0x02068a20
 
@@ -14797,7 +14797,7 @@ src/main/func_02083aa8.s:
 src/main/func_02083dd8.s:
     complete
     .text start:0x02083dd8 end:0x02084218
-src/main/func_02084218.s:
+src/main/func_02084218.legacy_sp3.c:
     complete
     .text start:0x02084218 end:0x0208428c
 
@@ -16408,7 +16408,7 @@ libs/nitro/GX_SendFifo48B.legacy.c:
     complete
     .text start:0x020903b0 end:0x020903d4
 
-src/main/func_020903d4.s:
+src/main/func_020903d4.legacy.c:
     complete
     .text start:0x020903d4 end:0x02090454
 
