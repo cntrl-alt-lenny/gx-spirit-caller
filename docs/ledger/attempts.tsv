@@ -10192,3 +10192,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d1a38	ov004	208	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1022-F10	
 0x021d7118	ov004	212	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1022-F10	
 0x021d9ef0	ov004	212	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1022-F10	
+0x021ac920	ov000	264	default	factory	shipped	100	n/a		factory-1022-F10	
+0x021ac920	ov000	264	legacy_sp3	factory	parked	24.2	unknown	UNCLASSIFIED:unknown	factory-1022-F10	
+0x021ac920	ov000	264	legacy	factory	parked	24.2	unknown	UNCLASSIFIED:unknown	factory-1022-F10	
