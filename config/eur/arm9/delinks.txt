@@ -13373,7 +13373,7 @@ src/main/func_020770bc.legacy.c:
     complete
     .text start:0x020770bc end:0x020771bc
 
-src/main/func_020771bc.s:
+src/main/func_020771bc.legacy.c:
     complete
     .text start:0x020771bc end:0x02077398
 
