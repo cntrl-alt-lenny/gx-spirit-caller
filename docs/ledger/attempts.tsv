@@ -11417,3 +11417,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cf640	ov011	1040	default	factory	parked	98.5	asm-int	PROVISIONAL:inline-asm	factory-1027-G14	
 0x021cf640	ov011	1040	legacy	factory	parked	0.4	asm-int	PROVISIONAL:inline-asm	factory-1027-G14	
 0x021cf640	ov011	1040	legacy_sp3	factory	parked	1.5	asm-int	PROVISIONAL:inline-asm	factory-1027-G14	
+0x021b7740	ov017	1052	default	factory	parked	12.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G14	
+0x021b7740	ov017	1052	legacy	factory	parked	10.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G14	
+0x021b7740	ov017	1052	legacy_sp3	factory	parked	10.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G14	
