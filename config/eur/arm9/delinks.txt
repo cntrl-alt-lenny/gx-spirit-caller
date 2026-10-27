@@ -5822,7 +5822,7 @@ src/main/func_02030608.c:
     complete
     .text start:0x02030608 end:0x02030808
 
-src/main/func_02030808.s:
+src/main/func_02030808.c:
     complete
     .text start:0x02030808 end:0x02030b84
 
