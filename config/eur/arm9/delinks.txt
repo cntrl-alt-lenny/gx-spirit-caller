@@ -488,7 +488,7 @@ src/main/func_02001448.c:
     complete
     .text start:0x02001448 end:0x02001540
 
-src/main/func_02001540.s:
+src/main/func_02001540.c:
     complete
     .text start:0x02001540 end:0x020018d4
 
