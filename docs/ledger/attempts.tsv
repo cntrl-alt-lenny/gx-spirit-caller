@@ -11433,3 +11433,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02267fd4	ov002	5472	default	factory	parked	7.2	structural	PROVISIONAL:structural	factory-1027-G7	
 0x02267fd4	ov002	5472	legacy	factory	parked	1.1	structural	PROVISIONAL:structural	factory-1027-G7	
 0x02267fd4	ov002	5472	legacy_sp3	factory	parked	0.5	structural	PROVISIONAL:structural	factory-1027-G7	
+0x0220eb00	ov002	5636	default	factory	parked	77.2	register-numbering-permutation-cascade	P-30	factory-1027-G7	
+0x0220eb00	ov002	5636	legacy	factory	parked	1.7	register-numbering-permutation-cascade	P-30	factory-1027-G7	
+0x0220eb00	ov002	5636	legacy_sp3	factory	parked	4.3	register-numbering-permutation-cascade	P-30	factory-1027-G7	
