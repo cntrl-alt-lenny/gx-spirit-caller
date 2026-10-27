@@ -11446,3 +11446,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02097848	main	444	legacy	factory	shipped	100	n/a		factory-1027-G6	
 0x02097848	main	444	default	factory	parked	0.9	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
 0x02097848	main	444	legacy_sp3	factory	parked	24.3	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
+0x02095678	main	448	legacy	factory	shipped	100	n/a		factory-1027-G6	
+0x02095678	main	448	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
+0x02095678	main	448	legacy_sp3	factory	parked	8.9	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
