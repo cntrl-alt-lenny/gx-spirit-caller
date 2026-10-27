@@ -11463,3 +11463,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02096848	main	960	default	factory	parked	2.5	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G2	
 0x02096848	main	960	legacy	factory	parked	30	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G2	
 0x02096848	main	960	legacy_sp3	factory	parked	8.3	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G2	
+0x021b799c	ov010	964	default	factory	parked	14.9	structural	PROVISIONAL:structural	factory-1027-G2	
+0x021b799c	ov010	964	legacy	factory	parked	4.4	structural	PROVISIONAL:structural	factory-1027-G2	
+0x021b799c	ov010	964	legacy_sp3	factory	parked	4.4	structural	PROVISIONAL:structural	factory-1027-G2	
