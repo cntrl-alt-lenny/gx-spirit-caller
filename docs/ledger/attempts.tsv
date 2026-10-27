@@ -11487,3 +11487,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020830ac	main	1644	default	factory	parked	2.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
 0x020830ac	main	1644	legacy	factory	parked	71.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
 0x020830ac	main	1644	legacy_sp3	factory	parked	76.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
+0x02078624	main	1704	legacy	factory	shipped	100	n/a		factory-1027-G1	
