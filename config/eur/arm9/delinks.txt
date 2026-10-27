@@ -18819,7 +18819,7 @@ src/main/func_0209fe94.legacy.c:
     complete
     .text start:0x0209fe94 end:0x0209ffa8
 
-src/main/func_0209ffa8.s:
+src/main/func_0209ffa8.legacy.c:
     complete
     .text start:0x0209ffa8 end:0x020a0328
 
