@@ -11475,3 +11475,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021aed8c	ov000	1452	default	factory	parked	46.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
 0x021aed8c	ov000	1452	legacy	factory	parked	2.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
 0x021aed8c	ov000	1452	legacy_sp3	factory	parked	2.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
+0x021cb574	ov011	1520	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1027-G4	
+0x021cb574	ov011	1520	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1027-G4	
+0x021cb574	ov011	1520	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1027-G4	
