@@ -11443,3 +11443,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d1514	ov011	880	legacy	factory	parked	2.5	unknown	UNCLASSIFIED:unknown	factory-1027-G2	
 0x021d1514	ov011	880	legacy_sp3	factory	parked	9.7	unknown	UNCLASSIFIED:unknown	factory-1027-G2	
 0x02030808	main	892	default	factory	shipped	100	n/a		factory-1027-G2	
+0x02045d0c	main	892	default	factory	parked	9	structural	PROVISIONAL:structural	factory-1027-G2	
+0x02045d0c	main	892	legacy	factory	parked	6.5	structural	PROVISIONAL:structural	factory-1027-G2	
+0x02045d0c	main	892	legacy_sp3	factory	parked	40.4	structural	PROVISIONAL:structural	factory-1027-G2	
