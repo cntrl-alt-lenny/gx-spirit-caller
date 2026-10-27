@@ -11453,3 +11453,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02060000	main	464	default	factory	parked	48.3	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
 0x02060000	main	464	legacy	factory	parked	19	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
 0x02069c14	main	464	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x022140cc	ov002	464	default	factory	shipped	100	n/a		factory-1027-G5	
