@@ -11423,3 +11423,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020645e0	main	432	legacy	factory	shipped	100	n/a		factory-1027-G6	
 0x020645e0	main	432	default	factory	parked	17.6	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
 0x020645e0	main	432	legacy_sp3	factory	parked	88.9	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
+0x021b0a14	ov008	432	default	factory	shipped	100	n/a		factory-1027-G6	
+0x021b0a14	ov008	432	legacy	factory	parked	5.4	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
+0x021b0a14	ov008	432	legacy_sp3	factory	parked	5.5	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
