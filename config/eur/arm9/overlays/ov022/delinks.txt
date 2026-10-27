@@ -24,7 +24,7 @@ src/overlay022/func_ov022_021aa758.s:
     complete
     .text start:0x021aa758 end:0x021aaa34
 
-src/overlay022/func_ov022_021aaa34.s:
+src/overlay022/func_ov022_021aaa34.c:
     complete
     .text start:0x021aaa34 end:0x021aabe8
 
