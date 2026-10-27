@@ -11502,3 +11502,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022447f4	ov002	496	legacy_sp3	factory	parked	17.7	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
 0x022447f4	ov002	496	legacy	factory	parked	19.2	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
 0x020667e8	main	476	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1027-G6	
+0x02250044	ov002	496	default	factory	parked	11.3	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G6	
+0x02250044	ov002	496	legacy	factory	parked	2.3	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G6	
+0x02250044	ov002	496	legacy_sp3	factory	parked	3.1	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G6	
