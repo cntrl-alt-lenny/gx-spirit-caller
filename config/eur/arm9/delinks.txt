@@ -1746,7 +1746,7 @@ src/main/func_0200f4b4.s:
     complete
     .text start:0x0200f4b4 end:0x0200f684
 
-src/main/func_0200f684.s:
+src/main/func_0200f684.c:
     complete
     .text start:0x0200f684 end:0x0200f854
 
