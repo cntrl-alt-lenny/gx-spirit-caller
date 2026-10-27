@@ -11432,3 +11432,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02090c44	main	2248	default	factory	parked	0.5	structural	PROVISIONAL:structural	factory-1027-G12	
 0x02090c44	main	2248	legacy	factory	parked	11.2	structural	PROVISIONAL:structural	factory-1027-G12	
 0x02090c44	main	2248	legacy_sp3	factory	parked	11.2	structural	PROVISIONAL:structural	factory-1027-G12	
+0x021c82ac	ov006	2248	default	factory	parked	92.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G12	
+0x021c82ac	ov006	2248	legacy	factory	parked	7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G12	
+0x021c82ac	ov006	2248	legacy_sp3	factory	parked	7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G12	
