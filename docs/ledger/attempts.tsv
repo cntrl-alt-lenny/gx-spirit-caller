@@ -11493,3 +11493,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b3c78	main	1348	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1027-G10	
 0x020b3c78	main	1348	legacy	factory	parked	0.3	asm-int	PROVISIONAL:inline-asm	factory-1027-G10	
 0x020b3c78	main	1348	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1027-G10	
+0x02011c6c	main	1352	default	factory	parked	30.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G10	
+0x02011c6c	main	1352	legacy	factory	parked	19.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G10	
+0x02011c6c	main	1352	legacy_sp3	factory	parked	18.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G10	
