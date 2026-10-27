@@ -11450,3 +11450,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202884c	main	2488	default	factory	parked	98.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1027-G12	
 0x0202884c	main	2488	legacy	factory	parked	3.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1027-G12	
 0x0202884c	main	2488	legacy_sp3	factory	parked	3.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1027-G12	
+0x021aa4d0	ov005	2520	default	factory	parked	12.3	structural	PROVISIONAL:structural	factory-1027-G12	
+0x021aa4d0	ov005	2520	legacy	factory	parked	2	structural	PROVISIONAL:structural	factory-1027-G12	
+0x021aa4d0	ov005	2520	legacy_sp3	factory	parked	4.1	structural	PROVISIONAL:structural	factory-1027-G12	
