@@ -4776,7 +4776,7 @@ src/main/func_02027144.c:
     complete
     .text start:0x02027144 end:0x02027180
 
-src/main/func_02027180.s:
+src/main/func_02027180.c:
     complete
     .text start:0x02027180 end:0x02027738
 
