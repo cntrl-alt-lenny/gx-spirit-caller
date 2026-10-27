@@ -95,7 +95,7 @@ src/overlay004/func_ov004_021cb940.c:
     complete
     .text start:0x021cb940 end:0x021cb9e4
 
-src/overlay004/func_ov004_021cb9e4.s:
+src/overlay004/func_ov004_021cb9e4.c:
     complete
     .text start:0x021cb9e4 end:0x021cbf38
 
