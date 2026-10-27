@@ -11484,3 +11484,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0229a49c	ov002	496	legacy	factory	parked	6.9	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
 0x02058334	main	500	default	factory	shipped	100	n/a		factory-1027-G5	
 0x02058334	main	500	legacy_sp3	factory	parked	73.6	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02065590	main	504	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x02065590	main	504	default	factory	parked	10.3	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02065590	main	504	legacy	factory	parked	6.9	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
