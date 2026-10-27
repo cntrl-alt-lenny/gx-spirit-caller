@@ -11436,3 +11436,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b1e88	main	868	legacy	factory	parked	1.7	asm-int	PROVISIONAL:inline-asm	factory-1027-G3	
 0x020b1e88	main	868	legacy_sp3	factory	parked	1.2	asm-int	PROVISIONAL:inline-asm	factory-1027-G3	
 0x021aaac8	ov000	876	default	factory	shipped	100	n/a		factory-1027-G3	
+0x021ae95c	ov000	892	default	factory	shipped	100	n/a		factory-1027-G3	
+0x021ae95c	ov000	892	legacy_sp3	factory	parked	0.5	unknown	UNCLASSIFIED:unknown	factory-1027-G3	
+0x021ae95c	ov000	892	legacy	factory	parked	0.9	unknown	UNCLASSIFIED:unknown	factory-1027-G3	
