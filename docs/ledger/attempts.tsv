@@ -11453,3 +11453,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206f688	main	960	legacy_sp3	factory	parked	17.1	unknown	UNCLASSIFIED:unknown	factory-1027-G4	
 0x020111e4	main	964	default	factory	shipped	100	n/a		factory-1027-G4	
 0x0202f620	main	968	default	factory	shipped	100	n/a		factory-1027-G4	
+0x0204a4f0	main	972	legacy_sp3	factory	shipped	100	n/a		factory-1027-G4	
+0x0204a4f0	main	972	default	factory	parked	0.8	unknown	UNCLASSIFIED:unknown	factory-1027-G4	
+0x0204a4f0	main	972	legacy	factory	parked	12.8	unknown	UNCLASSIFIED:unknown	factory-1027-G4	
