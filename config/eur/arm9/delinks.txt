@@ -1818,7 +1818,7 @@ src/main/func_02010a98.c:
     complete
     .text start:0x02010a98 end:0x02010b08
 
-src/main/func_02010b08.s:
+src/main/func_02010b08.c:
     complete
     .text start:0x02010b08 end:0x02010eb4
 
