@@ -11474,3 +11474,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b423c	ov016	1420	default	factory	shipped	100	n/a		factory-1027-G1	
 0x021b423c	ov016	1420	legacy_sp3	factory	parked	1.9	unknown	UNCLASSIFIED:unknown	factory-1027-G1	
 0x021b423c	ov016	1420	legacy	factory	parked	0.8	unknown	UNCLASSIFIED:unknown	factory-1027-G1	
+0x021afba0	ov005	1516	default	factory	parked	68.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
+0x021afba0	ov005	1516	legacy	factory	parked	5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
+0x021afba0	ov005	1516	legacy_sp3	factory	parked	4.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
