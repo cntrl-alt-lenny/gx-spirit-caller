@@ -13007,7 +13007,7 @@ src/main/func_02072924.legacy.c:
     complete
     .text start:0x02072924 end:0x02072a14
 
-src/main/func_02072a14.s:
+src/main/func_02072a14.legacy.c:
     complete
     .text start:0x02072a14 end:0x02072bcc
 
