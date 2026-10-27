@@ -11429,3 +11429,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cfe08	ov004	864	default	factory	parked	93.1	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G3	
 0x021cfe08	ov004	864	legacy	factory	parked	8.5	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G3	
 0x021cfe08	ov004	864	legacy_sp3	factory	parked	8.5	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G3	
+0x0206627c	main	868	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G3	
+0x0206627c	main	868	legacy	factory	parked	6.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G3	
+0x0206627c	main	868	legacy_sp3	factory	parked	99.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G3	
