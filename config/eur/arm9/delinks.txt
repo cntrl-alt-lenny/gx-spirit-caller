@@ -17818,7 +17818,7 @@ src/main/func_02097810.legacy.c:
     complete
     .text start:0x02097810 end:0x02097848
 
-src/main/func_02097848.s:
+src/main/func_02097848.legacy.c:
     complete
     .text start:0x02097848 end:0x02097a04
 
