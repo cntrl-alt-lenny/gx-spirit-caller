@@ -11490,3 +11490,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021f6c60	ov002	1344	default	factory	parked	96.1	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G10	
 0x021f6c60	ov002	1344	legacy	factory	parked	3	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G10	
 0x021f6c60	ov002	1344	legacy_sp3	factory	parked	20.5	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G10	
+0x020b3c78	main	1348	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1027-G10	
+0x020b3c78	main	1348	legacy	factory	parked	0.3	asm-int	PROVISIONAL:inline-asm	factory-1027-G10	
+0x020b3c78	main	1348	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1027-G10	
