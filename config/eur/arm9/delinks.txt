@@ -19643,7 +19643,7 @@ src/main/FindU16InArray.c:
     complete
     .text start:0x020ace98 end:0x020acec0
 
-src/main/func_020acec0.s:
+src/main/func_020acec0.c:
     complete
     .text start:0x020acec0 end:0x020ad438
 
