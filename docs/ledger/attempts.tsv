@@ -11492,3 +11492,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a7ac0	main	588	default	factory	parked	74.8	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G13	
 0x020a7ac0	main	588	legacy	factory	parked	2.6	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G13	
 0x020a7ac0	main	588	legacy_sp3	factory	parked	2.6	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G13	
+0x020b0138	main	588	default	factory	parked	25.3	structural	PROVISIONAL:structural	factory-1027-G13	
+0x020b0138	main	588	legacy	factory	parked	8.6	structural	PROVISIONAL:structural	factory-1027-G13	
+0x020b0138	main	588	legacy_sp3	factory	parked	10.7	structural	PROVISIONAL:structural	factory-1027-G13	
