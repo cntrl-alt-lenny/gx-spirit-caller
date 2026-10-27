@@ -10610,7 +10610,7 @@ src/main/func_0205ffc0.c:
 src/main/func_0205ffd4.legacy_sp3.c:
     complete
     .text start:0x0205ffd4 end:0x02060000
-src/main/func_02060000.s:
+src/main/func_02060000.legacy_sp3.c:
     complete
     .text start:0x02060000 end:0x020601d0
 
