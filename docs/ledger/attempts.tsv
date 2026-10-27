@@ -11446,3 +11446,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201da1c	main	912	default	factory	shipped	100	n/a		factory-1027-G3	
 0x0201da1c	main	912	legacy_sp3	factory	parked	13.2	unknown	UNCLASSIFIED:unknown	factory-1027-G3	
 0x0201da1c	main	912	legacy	factory	parked	3.5	unknown	UNCLASSIFIED:unknown	factory-1027-G3	
+0x021ad32c	ov009	912	default	factory	parked	96	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
+0x021ad32c	ov009	912	legacy	factory	parked	16.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
+0x021ad32c	ov009	912	legacy_sp3	factory	parked	16.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
