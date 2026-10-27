@@ -1686,7 +1686,7 @@ src/main/func_0200cf88.s:
     complete
     .text start:0x0200cf88 end:0x0200da18
 
-src/main/func_0200da18.s:
+src/main/func_0200da18.c:
     complete
     .text start:0x0200da18 end:0x0200dd58
 
