@@ -11486,3 +11486,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020771bc	main	476	legacy	factory	shipped	100	n/a		factory-1027-G6	
 0x020771bc	main	476	default	factory	parked	4.2	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
 0x020771bc	main	476	legacy_sp3	factory	parked	19.3	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
+0x020b31e4	main	480	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1027-G6	
+0x020b31e4	main	480	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1027-G6	
+0x020b31e4	main	480	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1027-G6	
