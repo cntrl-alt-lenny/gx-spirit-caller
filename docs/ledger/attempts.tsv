@@ -11420,3 +11420,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02016cd8	main	832	default	factory	shipped	100	n/a		factory-1027-G2	
 0x02016cd8	main	832	legacy	factory	parked	0.4	unknown	UNCLASSIFIED:unknown	factory-1027-G2	
 0x02016cd8	main	832	legacy_sp3	factory	parked	0.4	unknown	UNCLASSIFIED:unknown	factory-1027-G2	
+0x0205bf18	main	832	default	factory	parked	41.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G2	
+0x0205bf18	main	832	legacy	factory	parked	21.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G2	
+0x0205bf18	main	832	legacy_sp3	factory	parked	92.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G2	
