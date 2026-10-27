@@ -11478,3 +11478,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020690fc	main	468	legacy_sp3	factory	shipped	100	n/a		factory-1027-G6	
 0x020690fc	main	468	default	factory	parked	17.1	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
 0x020690fc	main	468	legacy	factory	parked	87.5	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
+0x0208c66c	main	468	legacy	factory	shipped	100	n/a		factory-1027-G6	
