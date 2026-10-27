@@ -11417,3 +11417,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02080d38	main	520	default	factory	parked	24.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
 0x02080d38	main	520	legacy	factory	parked	3.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
 0x02080d38	main	520	legacy_sp3	factory	parked	7.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x021aabe8	ov022	520	default	factory	parked	81.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x021aabe8	ov022	520	legacy	factory	parked	1.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x021aabe8	ov022	520	legacy_sp3	factory	parked	1.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
