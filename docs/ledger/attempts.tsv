@@ -11457,3 +11457,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021abcdc	ov008	912	default	factory	parked	33.8	structural	PROVISIONAL:structural	factory-1027-G2	
 0x021abcdc	ov008	912	legacy	factory	parked	27.6	structural	PROVISIONAL:structural	factory-1027-G2	
 0x021abcdc	ov008	912	legacy_sp3	factory	parked	27.6	structural	PROVISIONAL:structural	factory-1027-G2	
+0x021b7240	ov006	944	default	factory	parked	11.9	structural	PROVISIONAL:structural	factory-1027-G2	
+0x021b7240	ov006	944	legacy	factory	parked	6	structural	PROVISIONAL:structural	factory-1027-G2	
+0x021b7240	ov006	944	legacy_sp3	factory	parked	6	structural	PROVISIONAL:structural	factory-1027-G2	
