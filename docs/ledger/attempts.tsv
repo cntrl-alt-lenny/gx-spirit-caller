@@ -11492,3 +11492,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201261c	main	1708	legacy	factory	parked	2.4	register-numbering-permutation-cascade	P-30	factory-1027-G1	
 0x0201261c	main	1708	legacy_sp3	factory	parked	2.9	register-numbering-permutation-cascade	P-30	factory-1027-G1	
 0x0202f9e8	main	1748	default	factory	shipped	100	n/a		factory-1027-G1	
+0x021b35dc	ov019	1812	default	factory	shipped	100	n/a		factory-1027-G1	
