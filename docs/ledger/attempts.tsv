@@ -11474,3 +11474,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02008fb8	main	572	default	factory	shipped	100	n/a		factory-1027-G13	
 0x02008fb8	main	572	legacy_sp3	factory	parked	8.3	unknown	UNCLASSIFIED:unknown	factory-1027-G13	
 0x02008fb8	main	572	legacy	factory	parked	8.2	unknown	UNCLASSIFIED:unknown	factory-1027-G13	
+0x021cd940	ov011	572	default	factory	parked	90.9	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
+0x021cd940	ov011	572	legacy	factory	parked	4	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
+0x021cd940	ov011	572	legacy_sp3	factory	parked	4.8	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
