@@ -11455,3 +11455,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020ad96c	main	920	default	factory	parked	90	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
 0x020ad96c	main	920	legacy	factory	parked	1.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
 0x020ad96c	main	920	legacy_sp3	factory	parked	1.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
+0x021cab44	ov004	920	default	factory	parked	89.1	structural	PROVISIONAL:structural	factory-1027-G3	
+0x021cab44	ov004	920	legacy	factory	parked	42.9	structural	PROVISIONAL:structural	factory-1027-G3	
+0x021cab44	ov004	920	legacy_sp3	factory	parked	48.5	structural	PROVISIONAL:structural	factory-1027-G3	
