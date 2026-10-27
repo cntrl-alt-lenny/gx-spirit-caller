@@ -11421,3 +11421,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02088968	main	856	default	factory	parked	2.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
 0x02088968	main	856	legacy	factory	parked	25.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
 0x02088968	main	856	legacy_sp3	factory	parked	94.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
+0x021b4660	ov019	860	default	factory	parked	23	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G4	
+0x021b4660	ov019	860	legacy	factory	parked	22.6	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G4	
+0x021b4660	ov019	860	legacy_sp3	factory	parked	22.7	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G4	
