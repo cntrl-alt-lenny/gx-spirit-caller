@@ -11479,3 +11479,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021bf294	ov002	3180	legacy	factory	parked	3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G9	
 0x021bf294	ov002	3180	legacy_sp3	factory	parked	6.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G9	
 0x0226f4dc	ov002	3240	default	factory	shipped	100	n/a		factory-1027-G9	
+0x021dbf98	ov002	3248	default	factory	shipped	100	n/a		factory-1027-G9	
+0x021dbf98	ov002	3248	legacy_sp3	factory	parked	4.8	unknown	UNCLASSIFIED:unknown	factory-1027-G9	
+0x021dbf98	ov002	3248	legacy	factory	parked	1.7	unknown	UNCLASSIFIED:unknown	factory-1027-G9	
