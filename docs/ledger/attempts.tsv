@@ -11440,3 +11440,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cd628	ov003	436	legacy_sp3	factory	parked	47.7	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G6	
 0x02072a14	main	440	legacy	factory	shipped	100	n/a		factory-1027-G6	
 0x0207bcd8	main	440	legacy	factory	shipped	100	n/a		factory-1027-G6	
+0x021b43a8	ov019	440	default	factory	shipped	100	n/a		factory-1027-G6	
+0x021b43a8	ov019	440	legacy	factory	parked	1.7	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
+0x021b43a8	ov019	440	legacy_sp3	factory	parked	14.3	unknown	UNCLASSIFIED:unknown	factory-1027-G6	
