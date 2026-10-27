@@ -11432,3 +11432,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cada4	ov011	1140	default	factory	parked	79.3	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1027-G14	
 0x021cada4	ov011	1140	legacy	factory	parked	20.7	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1027-G14	
 0x021cada4	ov011	1140	legacy_sp3	factory	parked	5.3	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1027-G14	
+0x021d2628	ov004	1156	default	factory	parked	5.2	structural	PROVISIONAL:structural	factory-1027-G14	
+0x021d2628	ov004	1156	legacy	factory	parked	13.2	structural	PROVISIONAL:structural	factory-1027-G14	
+0x021d2628	ov004	1156	legacy_sp3	factory	parked	13.2	structural	PROVISIONAL:structural	factory-1027-G14	
