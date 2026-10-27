@@ -11423,3 +11423,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a4b6c	main	2168	default	factory	parked	2.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G12	
 0x020a4b6c	main	2168	legacy	factory	parked	12.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G12	
 0x020a4b6c	main	2168	legacy_sp3	factory	parked	5.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G12	
+0x021b6688	ov016	2176	default	factory	parked	66.7	register-numbering-permutation-cascade	P-30	factory-1027-G12	
+0x021b6688	ov016	2176	legacy	factory	parked	4.4	register-numbering-permutation-cascade	P-30	factory-1027-G12	
+0x021b6688	ov016	2176	legacy_sp3	factory	parked	4.7	register-numbering-permutation-cascade	P-30	factory-1027-G12	
