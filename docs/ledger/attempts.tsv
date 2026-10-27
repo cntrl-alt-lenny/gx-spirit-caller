@@ -11454,3 +11454,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02083718	main	912	legacy_sp3	factory	shipped	100	n/a		factory-1027-G2	
 0x02083718	main	912	default	factory	parked	1.8	unknown	UNCLASSIFIED:unknown	factory-1027-G2	
 0x02083718	main	912	legacy	factory	parked	2.1	unknown	UNCLASSIFIED:unknown	factory-1027-G2	
+0x021abcdc	ov008	912	default	factory	parked	33.8	structural	PROVISIONAL:structural	factory-1027-G2	
+0x021abcdc	ov008	912	legacy	factory	parked	27.6	structural	PROVISIONAL:structural	factory-1027-G2	
+0x021abcdc	ov008	912	legacy_sp3	factory	parked	27.6	structural	PROVISIONAL:structural	factory-1027-G2	
