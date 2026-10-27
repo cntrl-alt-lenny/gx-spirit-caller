@@ -11433,3 +11433,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b3c20	ov014	932	legacy_sp3	factory	shipped	100	n/a		factory-1027-G4	
 0x021b3c20	ov014	932	default	factory	parked	92.3	unknown	UNCLASSIFIED:unknown	factory-1027-G4	
 0x021b3c20	ov014	932	legacy	factory	parked	5.2	unknown	UNCLASSIFIED:unknown	factory-1027-G4	
+0x021b5898	ov010	932	default	factory	parked	48.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
+0x021b5898	ov010	932	legacy	factory	parked	4.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
+0x021b5898	ov010	932	legacy_sp3	factory	parked	4.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
