@@ -11471,3 +11471,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b6898	ov006	560	default	factory	parked	58.9	structural	PROVISIONAL:structural	factory-1027-G13	
 0x021b6898	ov006	560	legacy	factory	parked	14	structural	PROVISIONAL:structural	factory-1027-G13	
 0x021b6898	ov006	560	legacy_sp3	factory	parked	14.1	structural	PROVISIONAL:structural	factory-1027-G13	
+0x02008fb8	main	572	default	factory	shipped	100	n/a		factory-1027-G13	
+0x02008fb8	main	572	legacy_sp3	factory	parked	8.3	unknown	UNCLASSIFIED:unknown	factory-1027-G13	
+0x02008fb8	main	572	legacy	factory	parked	8.2	unknown	UNCLASSIFIED:unknown	factory-1027-G13	
