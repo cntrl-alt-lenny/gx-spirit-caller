@@ -11,7 +11,7 @@ typedef struct {
     u32 w[5];
 } Cfg;
 
-extern void func_ov002_021c2084(Cfg *cfg, int a, int b, int c);
+extern int func_ov002_021c2084(Cfg *cfg, int a, int b, int c);
 
 void func_ov002_021c229c(int a, int b, u16 c, int d, int e)
 {

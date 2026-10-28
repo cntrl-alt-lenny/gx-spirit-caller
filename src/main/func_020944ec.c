@@ -4,7 +4,7 @@
  * asm for the same store-multiple-idiom reason as Copy32/Fill32.
  */
 
-asm void func_020944ec(void) {
+asm void func_020944ec(int unused0, int unused1, int unused2) {
     nofralloc
     add     ip, r0, r2
 loop_top:

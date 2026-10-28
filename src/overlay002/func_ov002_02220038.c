@@ -24,7 +24,7 @@ typedef struct { H h[32]; char tail[0x5e8]; } U;
 extern T data_ov002_022cf16c[];
 extern U data_ov002_022cf1a4[];
 extern int func_ov002_021d59cc(int arg0, int arg1, int arg2, int arg3, unsigned short arg4);
-int func_ov002_02220038(S *p) {
+int func_ov002_02220038(S *p, int unused1) {
     u16 side = p->side;
     u16 idx = p->idx;
     u16 val = p->val;

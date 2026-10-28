@@ -10,7 +10,7 @@ extern struct { char pad[0x5a8]; int state; int step; } data_ov002_022ce288;
 extern struct { char pad[0xd44]; int choice; } data_ov002_022d016c;
 extern unsigned int func_0202b878(int id);
 extern int func_0202e234(int x);
-extern void func_ov002_021ae514(int a, int b, int c, int d, int e, int f);
+extern int func_ov002_021ae514(int a, int b, int c, int d, int e, int f);
 extern int func_ov002_021c988c(int player, int kind, int extra);
 extern void func_ov002_021d87dc(int arg0);
 extern void func_ov002_021df73c(int arg0, int arg1);

@@ -4,7 +4,7 @@ extern struct F021b3804Pool data_ov006_0224f1fc;
 extern void func_0202111c(void);
 extern void func_0200ddc4(void);
 
-int func_ov006_021b3804(void) {
+int func_ov006_021b3804(int unused0, int unused1, int unused2, int unused3) {
     func_0202111c();
     if (data_ov006_0224f1fc.f8 != 0) {
         func_0200ddc4();

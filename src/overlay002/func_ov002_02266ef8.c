@@ -1,7 +1,7 @@
 extern int func_ov002_021baca8(int player, int idx, int arg);
 extern int func_ov002_021c3350(int player);
 extern void func_ov002_021df62c(int player, int idx, int val);
-extern void func_ov002_021df938(int player, int val, int a, int b);
+extern int func_ov002_021df938(int player, int val, int a, int b);
 
 extern char data_ov002_022d016c[];
 extern char data_ov002_022cf16c[];

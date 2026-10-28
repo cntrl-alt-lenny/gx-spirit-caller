@@ -31,7 +31,7 @@ extern int func_ov002_0226b0d0(int,int,int);
 extern void func_ov002_021df62c(int,int,int);
 extern void func_ov002_021df780(int,int);
 #define COUNT(sym,side) (*(int *)((sym)+((side)&1)*0x868))
-int func_ov002_021f781c(Self *self) {
+int func_ov002_021f781c(Self *self, int unused1) {
  int flags;
  int text;
  switch (data_ov002_022ce288.state) {

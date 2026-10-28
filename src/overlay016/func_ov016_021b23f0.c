@@ -12,7 +12,7 @@ extern void func_0200592c(void);
 extern void func_0208d1e4(int);
 extern int func_0208cc90(void);
 extern void func_0208e318(int *, int, int, int, int);
-extern void func_0208e2f4(volatile u16 *, int, int);
+extern void func_0208e2f4(u16 *, int, int);
 extern void func_0208c8cc(u32, u32, u32);
 extern void func_0208da2c(int);
 extern void func_0208d7ac(u16);

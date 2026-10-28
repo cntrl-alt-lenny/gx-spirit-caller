@@ -11,7 +11,7 @@ extern char data_ov002_022cf17c[];
 extern int data_ov002_022cd744[];
 extern int func_0202e234(int x);
 extern void func_ov002_021af9d0(int a, int b, int c, int d);
-extern void func_ov002_021ae514(int a, int b, int c, int d, int e, int f);
+extern int func_ov002_021ae514(int a, int b, int c, int d, int e, int f);
 extern void func_ov002_021d479c(unsigned short a0, unsigned short a1, unsigned short a2, unsigned short a3);
 extern int func_ov002_0226b0d0(int arg0, int arg1, int arg2);
 int func_ov002_02222aac(struct Self *self) {

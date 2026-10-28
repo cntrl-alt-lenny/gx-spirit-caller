@@ -2,6 +2,6 @@
 
 extern int func_020544c8(int v);
 
-int func_0205d674(int **p) {
+int func_0205d674(int **p, int unused1) {
     return func_020544c8(*(int *)((char *)*p + 0x428));
 }

@@ -6,7 +6,7 @@
 
 extern void *GetSystemWork(void);
 
-asm void func_020186b0(void) {
+asm void func_020186b0(int unused0) {
     nofralloc
     stmdb   sp!, {r3, lr}
     bl      GetSystemWork

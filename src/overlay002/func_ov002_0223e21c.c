@@ -4,7 +4,7 @@ extern int func_0202b100(int a0);
 extern char *func_0202b7ec(int idx);
 extern void func_ov002_0229ce5c(char *dst, const char *fmt, const char *str);
 extern void func_ov002_021ae400(int a, int b);
-void func_ov002_0223e21c(struct Node *self) {
+void func_ov002_0223e21c(struct Node *self, int unused1) {
     char buf[256];
     char tmp[256];
     int message;

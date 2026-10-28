@@ -48,7 +48,7 @@ void func_0207ed94(State *s) {
         if (valid_range(s)) {
             u32 base = s->index; base *= 0x540; base += (u32)data_021a08f4; base += 0x100;
             unsigned char *ptr = (unsigned char *)(base + s->start * 32);
-            u16 count = ((volatile State *)s)->end - s->start + 1;
+            u16 count = ((State *)s)->end - s->start + 1;
             u16 off = s->start << 5;
             u16 i;
             void (*copy)(void *, int, u32) = data_02102198[s->index];

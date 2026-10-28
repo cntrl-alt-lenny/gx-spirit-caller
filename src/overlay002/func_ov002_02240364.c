@@ -13,7 +13,7 @@ extern struct Request data_ov002_022d016c;
 extern char data_ov002_022cf16c[], data_ov002_022cf1a2[];
 extern int func_ov002_022577dc(void *self);
 extern int func_ov002_021c1ef0(Card *card, int side, int slot);
-extern void func_ov002_021ae514(int,int,int,int,int,int);
+extern int func_ov002_021ae514(int,int,int,int,int,int);
 extern void func_ov002_021ae400(int a,int b);
 extern void func_ov002_0223dcc0(struct Self *self,int side,int slot);
 extern int func_ov002_02280df4(Card *,int,int,int);

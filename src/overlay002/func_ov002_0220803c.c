@@ -23,7 +23,7 @@ extern Table data_ov002_022cf16c[];
 extern char data_ov002_022cf178[];
 /* This call passes a side bit in r0, despite the callee defining it as void *. */
 extern int func_ov002_022536e8(unsigned int side, int arg1, int arg2);
-int func_ov002_0220803c(Self *self) {
+int func_ov002_0220803c(Self *self, int unused1) {
     u32 i;
     if (self->flags.tag != 0x23) {
         i = 0;

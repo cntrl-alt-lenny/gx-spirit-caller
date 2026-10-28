@@ -11,7 +11,7 @@ extern int *func_ov002_021afb74(void);
 extern int func_ov002_021d8288();
 extern void func_ov002_0226b054(int arg0);
 extern int func_ov002_021e286c(int arg0);
-int func_ov002_022112f8(struct Self *self) {
+int func_ov002_022112f8(struct Self *self, int unused1) {
     int player = self->side ^ self->flag;
     switch (*(int *)(data_ov002_022ce288 + 0x5a8)) {
     case 0x80:

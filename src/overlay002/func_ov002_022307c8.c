@@ -18,7 +18,7 @@ extern int func_ov002_021de408(int a, int b);
 extern void func_ov002_0226af38(int arg0, int arg1, int arg2);
 extern int func_ov002_0226b0d0(int arg0, int arg1, int arg2);
 extern int func_ov002_021f4260(int id, int index);
-extern void func_ov002_021ae514(int id, int a, int b, int c, int d, int mask);
+extern int func_ov002_021ae514(int id, int a, int b, int c, int d, int mask);
 int func_ov002_022307c8(struct Ov002Self *self) {
  int mask, side, i;
  int a,b,c,d;

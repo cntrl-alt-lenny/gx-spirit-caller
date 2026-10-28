@@ -7,7 +7,7 @@ extern void func_020945f4(void *, int, unsigned int);
 extern void func_02094688(const void *, void *, unsigned int);
 extern void *func_020a5c80(void *, void *);
 extern int func_020a2cbc(int a, int b, int c);
-int func_020a0f38(void) {
+int func_020a0f38(int unused0) {
     s8 chosen = -1;
     u16 mask = 0;
     struct { u8 type; u16 id; u16 value; } command;

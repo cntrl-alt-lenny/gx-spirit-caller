@@ -10,7 +10,7 @@ extern struct Input data_ov002_022d0e6c;
 extern int data_ov002_022cd744[];
 extern void func_ov002_0226aff0(int arg0,int arg1,int arg2);
 extern void func_ov002_021c4c9c(int,int,struct Stats *);
-extern void func_ov002_021ae514(int,int,int,int,int,int);
+extern int func_ov002_021ae514(int,int,int,int,int,int);
 extern void func_ov002_021deb28(int a,int b);
 extern int func_ov002_0226b0d0(int arg0,int arg1,int arg2);
 int func_ov002_021f8de8(struct Obj *self) {

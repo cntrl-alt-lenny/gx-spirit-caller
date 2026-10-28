@@ -10,7 +10,7 @@ extern int func_ov002_0223df38(struct Node *self, int idx, int *out);
 extern u16 func_ov002_0223de94(struct node *arg0, int arg1);
 extern void func_ov002_021d479c(u16 a0, u16 a1, u16 a2, u16 a3);
 extern int func_ov002_0226b204(unsigned int arg);
-int func_ov002_022205f8(Self *self) {
+int func_ov002_022205f8(Self *self, int unused1) {
     switch (data_ov002_022ce288.state) {
     case 0x80:
         if (self->blocked) return 0;
