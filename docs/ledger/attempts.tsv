@@ -11580,3 +11580,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204757c	main	648	default	factory	parked	88.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
 0x0204757c	main	648	legacy	factory	parked	74.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
 0x0204757c	main	648	legacy_sp3	factory	parked	92.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x0205cbb8	main	648	default	factory	parked	7.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x0205cbb8	main	648	legacy	factory	parked	8.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x0205cbb8	main	648	legacy_sp3	factory	parked	30.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
