@@ -11513,3 +11513,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0224eeac	ov002	216	legacy	factory	parked	3.2	unknown	UNCLASSIFIED:unknown	factory-1027-G11	
 0x0224eeac	ov002	216	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G11	
 0x02257464	ov002	216	default	factory	shipped	100	n/a		factory-1027-G11	
+0x02280c40	ov002	216	default	factory	shipped	100	n/a		factory-1027-G11	
+0x02280c40	ov002	216	legacy_sp3	factory	parked	12.3	unknown	UNCLASSIFIED:unknown	factory-1027-G11	
+0x02280c40	ov002	216	legacy	factory	parked	12.1	unknown	UNCLASSIFIED:unknown	factory-1027-G11	
