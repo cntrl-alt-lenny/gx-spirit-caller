@@ -51,7 +51,7 @@ src/overlay003/func_ov003_021cc010.c:
     complete
     .text start:0x021cc010 end:0x021cc0d8
 
-src/overlay003/func_ov003_021cc0d8.s:
+src/overlay003/func_ov003_021cc0d8.c:
     complete
     .text start:0x021cc0d8 end:0x021cc8b8
 src/overlay003/func_ov003_021cc8b8.s:
