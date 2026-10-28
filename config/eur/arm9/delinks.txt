@@ -1746,7 +1746,7 @@ src/main/func_0200f4b4.c:
     complete
     .text start:0x0200f4b4 end:0x0200f684
 
-src/main/func_0200f684.s:
+src/main/func_0200f684.c:
     complete
     .text start:0x0200f684 end:0x0200f854
 
@@ -10227,7 +10227,7 @@ src/main/func_0205673c.legacy_sp3.c:
     complete
     .text start:0x0205673c end:0x02056884
 
-src/main/func_02056884.s:
+src/main/func_02056884.c:
     complete
     .text start:0x02056884 end:0x02056a34
 
@@ -10403,7 +10403,7 @@ src/main/func_0205b9ac.legacy_sp3.c:
     complete
     .text start:0x0205b9ac end:0x0205ba5c
 
-src/main/func_0205ba5c.s:
+src/main/func_0205ba5c.legacy_sp3.c:
     complete
     .text start:0x0205ba5c end:0x0205bc24
 
@@ -11214,7 +11214,7 @@ src/main/func_02064580.s:
     complete
     .text start:0x02064580 end:0x020645e0
 
-src/main/func_020645e0.s:
+src/main/func_020645e0.legacy.c:
     complete
     .text start:0x020645e0 end:0x02064790
 
@@ -12001,7 +12001,7 @@ src/main/func_0206904c.legacy_sp3.c:
     complete
     .text start:0x0206904c end:0x020690fc
 
-src/main/func_020690fc.s:
+src/main/func_020690fc.legacy_sp3.c:
     complete
     .text start:0x020690fc end:0x020692d0
 
@@ -13007,7 +13007,7 @@ src/main/func_02072924.legacy.c:
     complete
     .text start:0x02072924 end:0x02072a14
 
-src/main/func_02072a14.s:
+src/main/func_02072a14.legacy.c:
     complete
     .text start:0x02072a14 end:0x02072bcc
 
@@ -13373,7 +13373,7 @@ src/main/func_020770bc.legacy.c:
     complete
     .text start:0x020770bc end:0x020771bc
 
-src/main/func_020771bc.s:
+src/main/func_020771bc.legacy.c:
     complete
     .text start:0x020771bc end:0x02077398
 
@@ -13714,7 +13714,7 @@ src/main/func_0207bc20.legacy.c:
     complete
     .text start:0x0207bc20 end:0x0207bcd8
 
-src/main/func_0207bcd8.s:
+src/main/func_0207bcd8.legacy.c:
     complete
     .text start:0x0207bcd8 end:0x0207be90
 
@@ -14542,7 +14542,7 @@ src/main/func_020808f0.legacy_sp3.c:
     complete
     .text start:0x020808f0 end:0x02080b04
 
-src/main/func_02080b04.s:
+src/main/func_02080b04.legacy_sp3.c:
     complete
     .text start:0x02080b04 end:0x02080cdc
 
@@ -15859,7 +15859,7 @@ src/main/func_0208c490.legacy.c:
     complete
     .text start:0x0208c490 end:0x0208c66c
 
-src/main/func_0208c66c.s:
+src/main/func_0208c66c.legacy.c:
     complete
     .text start:0x0208c66c end:0x0208c840
 
@@ -17572,7 +17572,7 @@ src/main/func_020955e8.legacy.c:
     complete
     .text start:0x020955e8 end:0x02095678
 
-src/main/func_02095678.s:
+src/main/func_02095678.legacy.c:
     complete
     .text start:0x02095678 end:0x02095838
 
@@ -17818,7 +17818,7 @@ src/main/func_02097810.legacy.c:
     complete
     .text start:0x02097810 end:0x02097848
 
-src/main/func_02097848.s:
+src/main/func_02097848.legacy.c:
     complete
     .text start:0x02097848 end:0x02097a04
 
@@ -18468,7 +18468,7 @@ src/main/func_0209c7dc.legacy.c:
     complete
     .text start:0x0209c7dc end:0x0209c8d0
 
-src/main/func_0209c8d0.s:
+src/main/func_0209c8d0.legacy.c:
     complete
     .text start:0x0209c8d0 end:0x0209cacc
 
