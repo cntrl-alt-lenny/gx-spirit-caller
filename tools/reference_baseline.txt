@@ -4963,18 +4963,6 @@ eur	src/overlay002/func_ov002_021d479c.c	wrong-target	.text+0x88 original ABS32 
 eur	src/overlay002/func_ov002_021d479c.c	wrong-target	.text+0x8c original ABS32 data_ov002_022ce95a+0x0 built ABS32 data_ov002_022ce950+0xa
 eur	src/overlay002/func_ov002_021d479c.c	wrong-target	.text+0x90 original ABS32 data_ov002_022ce95c+0x0 built ABS32 data_ov002_022ce950+0xc
 eur	src/overlay002/func_ov002_021d479c.c	wrong-target	.text+0x94 original ABS32 data_ov002_022ce95e+0x0 built ABS32 data_ov002_022ce950+0xe
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0x448 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0x550 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0x674 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0x6bc original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0x78c original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0x854 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0x934 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0xa0c original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0xaf4 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0xba4 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0xc50 original PC24 .text-0x8 built none
-eur	src/overlay002/func_ov002_021dbf98.s	missing-reloc	.text+0xf8 original PC24 .text-0x8 built none
 eur	src/overlay002/func_ov002_021dd950.s	missing-reloc	.text+0x134 original PC24 .text-0x8 built none
 eur	src/overlay002/func_ov002_022476e8.c	missing-reloc	.text+0xb4 original ABS32 data_ov002_022cacc0+0x0 built none
 eur	src/overlay002/func_ov002_02247ad8.c	missing-reloc	.text+0x90 original ABS32 data_ov002_022cacc0+0x0 built none
