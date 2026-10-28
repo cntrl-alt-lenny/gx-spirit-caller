@@ -62,3 +62,11 @@ The other 204 new files by eye; USA and JPN; the lane prompts.
 ## Verdict
 
 Scope, ledger, baseline, ROM rebuild and all 264 touched units are clean. I would merge 68f960d85; SHOULD FIX 1 and 2 can follow.
+
+## Brain addendum (after review)
+
+Lane G13 finished after the reviewed commit and was merged on top (fc8c4e69b): 2 functions,
+`func_020121b4` and `func_ov002_022bd5a4`, both `fastmatch.py eur` 100.0%, no `volatile`,
+`goto`, `asm`, `union`, `register` or constant-sum address; ledger once-check clean
+(14 lanes, missing 0, extra 0). Both SHOULD FIX edits applied in e499adbb5, each 100.0%.
+The full three-region gate runs on the final commit.
