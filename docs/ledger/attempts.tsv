@@ -11553,3 +11553,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b33d0	main	632	default	factory	parked	1.3	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
 0x020b33d0	main	632	legacy	factory	parked	1.3	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
 0x020b33d0	main	632	legacy_sp3	factory	parked	1.3	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
+0x021aaddc	ov018	632	default	factory	parked	79.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x021aaddc	ov018	632	legacy	factory	parked	1.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x021aaddc	ov018	632	legacy_sp3	factory	parked	5.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
