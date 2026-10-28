@@ -11658,3 +11658,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0222b0dc	ov002	244	default	factory	shipped	100	n/a		factory-1027-G11	
 0x0222b0dc	ov002	244	legacy_sp3	factory	parked	21.3	unknown	UNCLASSIFIED:unknown	factory-1027-G11	
 0x0222b0dc	ov002	244	legacy	factory	parked	19.7	unknown	UNCLASSIFIED:unknown	factory-1027-G11	
+0x0223d9dc	ov002	244	default	factory	parked	83.6	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G11	
+0x0223d9dc	ov002	244	legacy	factory	parked	7.6	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G11	
+0x0223d9dc	ov002	244	legacy_sp3	factory	parked	73.8	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G11	
