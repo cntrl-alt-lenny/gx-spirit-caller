@@ -11503,3 +11503,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205a18c	main	2024	legacy_sp3	factory	shipped	100	n/a		factory-1027-G1	
 0x0205a18c	main	2024	default	factory	parked	35.6	unknown	UNCLASSIFIED:unknown	factory-1027-G1	
 0x0205a18c	main	2024	legacy	factory	parked	3.9	unknown	UNCLASSIFIED:unknown	factory-1027-G1	
+0x021b77cc	ov016	2032	default	factory	parked	1.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
+0x021b77cc	ov016	2032	legacy	factory	parked	0.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
+0x021b77cc	ov016	2032	legacy_sp3	factory	parked	0.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G1	
