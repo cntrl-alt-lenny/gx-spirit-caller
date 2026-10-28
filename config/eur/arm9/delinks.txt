@@ -1698,7 +1698,7 @@ src/main/func_0200ddc4.s:
     complete
     .text start:0x0200ddc4 end:0x0200e9c4
 
-src/main/func_0200e9c4.s:
+src/main/func_0200e9c4.c:
     complete
     .text start:0x0200e9c4 end:0x0200ed48
 
@@ -2251,7 +2251,7 @@ src/main/func_02016b60.c:
     complete
     .text start:0x02016b60 end:0x02016cd8
 
-src/main/func_02016cd8.s:
+src/main/func_02016cd8.c:
     complete
     .text start:0x02016cd8 end:0x02017018
 
@@ -4776,7 +4776,7 @@ src/main/func_02027144.c:
     complete
     .text start:0x02027144 end:0x02027180
 
-src/main/func_02027180.s:
+src/main/func_02027180.c:
     complete
     .text start:0x02027180 end:0x02027738
 
@@ -5822,7 +5822,7 @@ src/main/func_02030608.c:
     complete
     .text start:0x02030608 end:0x02030808
 
-src/main/func_02030808.s:
+src/main/func_02030808.c:
     complete
     .text start:0x02030808 end:0x02030b84
 
@@ -13608,7 +13608,7 @@ libs/nitro/OsCountZeroBits.legacy.c:
     complete
     .text start:0x02079e70 end:0x02079e78
 
-src/main/func_02079e78.s:
+src/main/func_02079e78.legacy.c:
     complete
     .text start:0x02079e78 end:0x0207a1dc
 
@@ -14786,7 +14786,7 @@ src/main/func_020830ac.s:
     complete
     .text start:0x020830ac end:0x02083718
 
-src/main/func_02083718.s:
+src/main/func_02083718.legacy_sp3.c:
     complete
     .text start:0x02083718 end:0x02083aa8
 
@@ -18819,7 +18819,7 @@ src/main/func_0209fe94.legacy.c:
     complete
     .text start:0x0209fe94 end:0x0209ffa8
 
-src/main/func_0209ffa8.s:
+src/main/func_0209ffa8.legacy.c:
     complete
     .text start:0x0209ffa8 end:0x020a0328
 
@@ -19643,7 +19643,7 @@ src/main/FindU16InArray.c:
     complete
     .text start:0x020ace98 end:0x020acec0
 
-src/main/func_020acec0.s:
+src/main/func_020acec0.c:
     complete
     .text start:0x020acec0 end:0x020ad438
 
