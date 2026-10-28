@@ -11523,3 +11523,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02274880	ov002	608	legacy	factory	parked	2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
 0x02274880	ov002	608	legacy_sp3	factory	parked	2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
 0x022bd5a4	ov002	608	default	factory	shipped	100	n/a		factory-1027-G13	
+0x020121b4	main	612	default	factory	shipped	100	n/a		factory-1027-G13	
+0x020121b4	main	612	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G13	
+0x020121b4	main	612	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G13	
