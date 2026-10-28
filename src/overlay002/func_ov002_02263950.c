@@ -6,7 +6,7 @@ extern char data_ov002_022cf16c[];
 extern Glob data_ov002_022d016c;
 extern int func_ov002_021baca8(int self, int idx, int arg);
 extern void func_ov002_021df62c(int self, int idx, int v);
-extern void func_ov002_021de940(int self, int idx, int a, int b);
+extern int func_ov002_021de940(int self, int idx, int a, int b);
 
 int func_ov002_02263950(int self) {
     unsigned i = data_ov002_022d016c.idx;

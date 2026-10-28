@@ -9,7 +9,7 @@ extern unsigned int func_0202b8c0(int id);
 extern unsigned int func_0202b878(int id);
 extern int func_ov002_02281920(int a, int b);
 
-int func_ov002_02291160(struct Card *self) {
+int func_ov002_02291160(struct Card *self, int unused1) {
     if (func_ov002_021bbd14(self->side, self->id) - (self->slot <= 10) <= 0)
         return 1;
     if (func_0202b8c0(self->id) == 4) {

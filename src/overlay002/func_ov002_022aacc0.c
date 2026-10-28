@@ -9,7 +9,7 @@ extern int func_0201d47c(Obj *o);
 extern int func_0201e5b8(Desc *);
 extern void Task_Invoke(void *p);
 extern char data_ov002_022cc418[], data_ov002_022cc434[], data_ov002_022cc44c[], data_ov002_022cc464[], data_ov002_022cc47c[];
-void func_ov002_022aacc0(void) {
+void func_ov002_022aacc0(int unused0) {
  Desc a,b,c,d,e;
  void *task;
  *(volatile unsigned int *)0x04001010 = 0;

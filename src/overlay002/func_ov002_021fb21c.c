@@ -13,7 +13,7 @@ extern int func_ov002_02257878();
 extern int func_ov002_021ff3bc(S021ff3bc *p, int unused1);
 extern int func_ov002_021ca3f0(int arg0, int arg1);
 extern int func_ov002_021f4260(int, int);
-extern void func_ov002_021ae514(int, int, int, int, int, int);
+extern int func_ov002_021ae514(int, int, int, int, int, int);
 extern int func_ov002_0226b0d0(int arg0, int arg1, int arg2);
 int func_ov002_021fb21c(S021ff3bc *self, int arg1) {
     int flags;

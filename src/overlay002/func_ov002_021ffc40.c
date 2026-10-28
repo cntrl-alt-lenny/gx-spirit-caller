@@ -16,7 +16,7 @@ struct State { char pad[0x30]; struct Entry entries[10]; char tail[0x770]; };
 extern struct State data_ov002_022cf16c[];
 extern u16 func_ov002_0223de94(struct node *arg0, int arg1);
 extern unsigned int func_0202b878(int id);
-extern void func_ov002_021fd668(int player, int index, int id);
+extern int func_ov002_021fd668(int player, int index, int id);
 int func_ov002_021ffc40(struct node *self, struct node *other) {
     int pair;
     int player, index;

@@ -4,7 +4,7 @@ extern char data_ov002_022cf1a4[];
 extern char data_ov002_022cf1ac[];
 extern int func_ov002_021b9ecc(int self, int arg1);
 
-int func_ov002_021c2330(int self, int arg1) {
+int func_ov002_021c2330(int self, int arg1, int unused2) {
     int off = (self & 1) * 0x868;
     unsigned short h = *(unsigned short *)(data_ov002_022cf1a4 + off + arg1 * 20);
     if (h == 0) {

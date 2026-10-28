@@ -7,7 +7,7 @@
 extern int func_0206b778(void);
 extern void func_0206b670(void);
 
-asm void func_02068d24(void) {
+asm void func_02068d24(int unused0, int unused1) {
     nofralloc
     stmdb sp!, {r4, lr}
     mov r4, r0

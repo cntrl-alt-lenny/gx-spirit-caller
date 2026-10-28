@@ -13,7 +13,7 @@ typedef struct {
 extern State data_021040ac;
 /* Original caller supplies r0=0x26 and r1=0 and consumes r0; callee C declares void(void). */
 extern int func_02011aec(int a, int b);
-void func_020125ac(void) {
+void func_020125ac(int unused0) {
     data_021040ac.f_ba0 = 0;
     data_021040ac.f_bbc = 1;
     data_021040ac.f_bc0 = 0x26;

@@ -8,7 +8,7 @@ extern int func_0209f168(int a0);
 extern int func_0209f0d8(int a0);
 extern int func_0209f030(int a0);
 extern void func_0207ab68(void *event);
-extern void func_02079e78(void *event);
+extern int func_02079e78(void *event);
 extern unsigned char *data_021a088c;
 
 int func_0207b62c(void) {

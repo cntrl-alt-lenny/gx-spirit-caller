@@ -19,7 +19,7 @@ extern int data_ov002_022cd744[];
 extern char data_ov002_022cf16c[];
 extern unsigned int func_0202b878(int id);
 extern int func_0202e234(int x);
-extern void func_ov002_021ae514(int,int,int,int,int,int);
+extern int func_ov002_021ae514(int,int,int,int,int,int);
 extern int func_ov002_021df818(Card *card,int side,int amount);
 extern int func_ov002_021e278c(int arg0,int arg1);
 extern int func_ov002_02257594(void *arg0,int arg1);

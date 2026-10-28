@@ -10,7 +10,7 @@ struct Ov002S {
 };
 
 extern int func_ov002_021b99b4(unsigned int bit, unsigned int field9);
-extern void func_ov002_021d7268(unsigned int bit, unsigned int field9, unsigned int k);
+extern int func_ov002_021d7268(unsigned int bit, unsigned int field9, unsigned int k);
 
 int func_ov002_02225420(struct Ov002S *self) {
     if (self->kind == 0x16) {

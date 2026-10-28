@@ -14,7 +14,7 @@ extern char data_ov002_022cf16c[];
 extern char data_ov002_022cf1a4[];
 extern int func_ov002_021c2f24(int player,int id);
 extern int func_ov002_021f4260(int id,int index);
-extern void func_ov002_021ae514(int kind,int a,int b,int c,int d,int mask);
+extern int func_ov002_021ae514(int kind,int a,int b,int c,int d,int mask);
 extern int func_ov002_0226b0d0(int arg0,int arg1,int arg2);
 extern int func_ov002_021d90c0(int flag,int arg1,int arg2);
 extern int func_ov002_0222a9d0(struct Node *self);

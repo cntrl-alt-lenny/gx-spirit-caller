@@ -1,6 +1,6 @@
 extern int data_ov002_022cd524;
 extern unsigned int func_ov002_022576d8(int a);
-extern void func_ov002_0228c584(int a, unsigned int b, int c, int d);
+extern int func_ov002_0228c584(int a, unsigned int b, int c, int d);
 
 void func_ov002_0228c81c(int a, int b, int c, int d, int e)
 {

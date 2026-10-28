@@ -1,5 +1,5 @@
 extern int *func_0202c93c(void);
-extern void func_ov002_022b84c0(void *a, void *b, void *c);
+extern int func_ov002_022b84c0(void *a, void *b, void *c);
 extern void OS_SPrintf(char *buf, const char *fmt, ...);
 extern int func_ov002_022a1784(void *p);
 extern void Fill32(int v, void *dst, int n);

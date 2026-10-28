@@ -3,7 +3,7 @@ typedef struct {
     int field4;
 } Obj02096040;
 
-void func_02096040(Obj02096040 *arg0) {
+void func_02096040(Obj02096040 *arg0, int unused1) {
     volatile Obj02096040 tmp;
     tmp.field0 = 0;
     tmp.field4 = 0;

@@ -1,6 +1,6 @@
 struct Ov016FadeState { int pad[14]; int phase; };
 extern struct Ov016FadeState data_021040ac;
-int func_ov016_021b5424(int i, unsigned short *dst, const unsigned short *src, int count) {
+int func_ov016_021b5424(int i, unsigned short *dst, const unsigned short *src, int count, int unused4) {
     int phase = data_021040ac.phase & 63;
     for (i = 0; i < count; i++) {
         unsigned short r, g, b;

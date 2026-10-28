@@ -10,7 +10,7 @@ extern int data_ov002_022d11bc[];
 extern char data_ov002_022d1af8[];
 extern int data_ov002_022d1400[];
 
-int func_ov002_0229c7f8(int arg) {
+int func_ov002_0229c7f8(int arg, int unused1, int unused2, int unused3) {
     switch (arg) {
     case 0: case 18: case 21: case 25:
         return func_ov002_022a6d1c(data_ov002_022d1410);

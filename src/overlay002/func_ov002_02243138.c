@@ -11,7 +11,7 @@ extern char data_ov002_022cf1a2[];
 struct S0223dad0;
 extern void func_ov002_0223dad0(struct S0223dad0 *self, unsigned short val);
 extern int func_ov002_0226b0d0(int arg0, int arg1, int arg2);
-extern void func_ov002_021ae514(int a, int b, int c, int d, int e, int f);
+extern int func_ov002_021ae514(int a, int b, int c, int d, int e, int f);
 int func_ov002_02243138(struct Self *self) {
     switch (data_ov002_022ce288.phase) {
     case 0:

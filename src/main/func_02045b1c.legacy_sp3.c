@@ -1,5 +1,5 @@
 extern int func_020aaddc(const char *s);
-extern void func_020aaec0(char *dst, char *src, int n);
+extern char * func_020aaec0(char *dst, char *src, int n);
 extern int func_020ab054(unsigned char *s1, unsigned char *s2, int n);
 extern char *Strchr(char *s, int c);
 

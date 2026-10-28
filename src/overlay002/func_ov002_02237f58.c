@@ -17,7 +17,7 @@ extern int func_ov002_021ea2b4(int,int,int);
 extern int func_ov002_021ff3bc(struct S021ff3bc *,int);
 extern int func_ov002_021ca3f0(int,int);
 extern int func_ov002_021f4260(int,int);
-extern void func_ov002_021ae514(int,int,int,int,int,int);
+extern int func_ov002_021ae514(int,int,int,int,int,int);
 extern int func_ov002_0226b0d0(int,int,int);
 extern int func_ov002_021d5a08(struct Ov002Self *,int,int,int,u16,u16);
 extern void func_ov002_021ae400(int,int);
