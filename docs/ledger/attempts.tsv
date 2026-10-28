@@ -11571,3 +11571,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02099928	main	640	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G13	
 0x02099928	main	640	legacy	factory	parked	0.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G13	
 0x02099928	main	640	legacy_sp3	factory	parked	0.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1027-G13	
+0x021c39f8	ov006	640	default	factory	parked	76.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x021c39f8	ov006	640	legacy	factory	parked	3.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
+0x021c39f8	ov006	640	legacy_sp3	factory	parked	3.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G13	
