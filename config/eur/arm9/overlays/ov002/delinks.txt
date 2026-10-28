@@ -6712,7 +6712,7 @@ src/overlay002/func_ov002_02224a14.c:
 src/overlay002/func_ov002_02224b90.c:
     complete
     .text start:0x02224b90 end:0x02224c18
-src/overlay002/func_ov002_02224c18.s:
+src/overlay002/func_ov002_02224c18.c:
     complete
     .text start:0x02224c18 end:0x02224cf4
 src/overlay002/func_ov002_02224cf4.s:
