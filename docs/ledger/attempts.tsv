@@ -11526,3 +11526,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020121b4	main	612	default	factory	shipped	100	n/a		factory-1027-G13	
 0x020121b4	main	612	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G13	
 0x020121b4	main	612	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G13	
+0x021cf3dc	ov011	612	default	factory	parked	99.3	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
+0x021cf3dc	ov011	612	legacy	factory	parked	43.5	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
+0x021cf3dc	ov011	612	legacy_sp3	factory	parked	45.8	asm-int	PROVISIONAL:inline-asm	factory-1027-G13	
