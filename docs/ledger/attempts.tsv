@@ -11816,3 +11816,93 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0223d1ec	ov002	2032	default	factory	parked	61.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
 0x0223d1ec	ov002	2032	legacy	factory	parked	0.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
 0x0223d1ec	ov002	2032	legacy_sp3	factory	parked	19.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G4	
+0x021ab1dc	ov020	392	default	factory	shipped	100	n/a		factory-1027-G5	
+0x021ab1dc	ov020	392	legacy	factory	parked	47.5	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x021ab1dc	ov020	392	legacy_sp3	factory	parked	48	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x020751e4	main	432	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x020a0f38	main	432	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x020b3658	main	432	default	factory	parked	2.5	asm-int	PROVISIONAL:inline-asm	factory-1027-G5	
+0x020b3658	main	432	legacy	factory	parked	4.6	asm-int	PROVISIONAL:inline-asm	factory-1027-G5	
+0x020b3658	main	432	legacy_sp3	factory	parked	0.9	asm-int	PROVISIONAL:inline-asm	factory-1027-G5	
+0x021c9030	ov006	432	default	factory	shipped	100	n/a		factory-1027-G5	
+0x021c9030	ov006	432	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x021c9030	ov006	432	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02059f38	main	436	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x02059f38	main	436	default	factory	parked	4.6	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0207b250	main	440	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x020560a8	main	444	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x021c40b0	ov006	444	default	factory	parked	91.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021c40b0	ov006	444	legacy	factory	parked	42.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021c40b0	ov006	444	legacy_sp3	factory	parked	42.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021c5b00	ov006	448	default	factory	shipped	100	n/a		factory-1027-G5	
+0x021c5b00	ov006	448	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x021c5b00	ov006	448	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x021cc7bc	ov004	448	default	factory	parked	97.3	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G5	
+0x021cc7bc	ov004	448	legacy	factory	parked	13.8	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G5	
+0x021cc7bc	ov004	448	legacy_sp3	factory	parked	33.3	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G5	
+0x0207947c	main	452	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x02085f48	main	452	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x02085f48	main	452	default	factory	parked	7.9	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x021acff8	ov009	452	default	factory	shipped	100	n/a		factory-1027-G5	
+0x021b2b2c	ov016	456	default	factory	parked	92.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021b2b2c	ov016	456	legacy	factory	parked	50.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021b2b2c	ov016	456	legacy_sp3	factory	parked	63.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x02067684	main	460	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x02067684	main	460	default	factory	parked	23.5	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02067684	main	460	legacy	factory	parked	52.6	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0207b250	main	440	legacy	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1027-G5	
+0x0200f4b4	main	464	default	factory	shipped	100	n/a		factory-1027-G5	
+0x0200f4b4	main	464	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0200f4b4	main	464	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02060000	main	464	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x02060000	main	464	default	factory	parked	48.3	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02060000	main	464	legacy	factory	parked	19	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02069c14	main	464	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x022140cc	ov002	464	default	factory	shipped	100	n/a		factory-1027-G5	
+0x021d1d30	ov011	468	default	factory	shipped	100	n/a		factory-1027-G5	
+0x02095e68	main	472	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x021b5dd0	ov016	472	default	factory	shipped	100	n/a		factory-1027-G5	
+0x021d5838	ov004	472	default	factory	shipped	100	n/a		factory-1027-G5	
+0x0208c490	main	476	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x021af8ec	ov005	476	default	factory	parked	86.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021af8ec	ov005	476	legacy	factory	parked	29.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021af8ec	ov005	476	legacy_sp3	factory	parked	29.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021aab7c	ov021	480	default	factory	shipped	100	n/a		factory-1027-G5	
+0x021b1388	ov005	480	default	factory	parked	98.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021b1388	ov005	480	legacy	factory	parked	11.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x021b1388	ov005	480	legacy_sp3	factory	parked	12	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x02068628	main	484	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x02068628	main	484	default	factory	parked	26.4	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02068628	main	484	legacy	factory	parked	9.4	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x021d4ba8	ov004	484	default	factory	shipped	100	n/a		factory-1027-G5	
+0x021d4ba8	ov004	484	legacy_sp3	factory	parked	1.6	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x021d4ba8	ov004	484	legacy	factory	parked	1.5	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x021cd754	ov011	492	default	factory	parked	66.7	structural	PROVISIONAL:structural	factory-1027-G5	
+0x021cd754	ov011	492	legacy	factory	parked	6.5	structural	PROVISIONAL:structural	factory-1027-G5	
+0x021cd754	ov011	492	legacy_sp3	factory	parked	3.2	structural	PROVISIONAL:structural	factory-1027-G5	
+0x022bccec	ov002	492	default	factory	shipped	100	n/a		factory-1027-G5	
+0x0208efd4	main	496	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x0208efd4	main	496	default	factory	parked	3.2	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0208efd4	main	496	legacy_sp3	factory	parked	0.8	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0229a49c	ov002	496	default	factory	shipped	100	n/a		factory-1027-G5	
+0x0229a49c	ov002	496	legacy_sp3	factory	parked	8.9	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0229a49c	ov002	496	legacy	factory	parked	6.9	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02058334	main	500	default	factory	shipped	100	n/a		factory-1027-G5	
+0x02058334	main	500	legacy_sp3	factory	parked	73.6	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02065590	main	504	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x02065590	main	504	default	factory	parked	10.3	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02065590	main	504	legacy	factory	parked	6.9	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02097af0	main	504	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x02240cec	ov002	504	default	factory	shipped	100	n/a		factory-1027-G5	
+0x0224f178	ov002	504	default	factory	parked	58.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x0224f178	ov002	504	legacy	factory	parked	5.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x0224f178	ov002	504	legacy_sp3	factory	parked	32.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G5	
+0x0226a730	ov002	504	default	factory	shipped	100	n/a		factory-1027-G5	
+0x0226a730	ov002	504	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0226a730	ov002	504	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0207ed94	main	508	legacy_sp3	factory	shipped	100	n/a		factory-1027-G5	
+0x0207ed94	main	508	default	factory	parked	22.1	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x0207ed94	main	508	legacy	factory	parked	0.7	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02099370	main	508	legacy	factory	shipped	100	n/a		factory-1027-G5	
+0x02099370	main	508	default	factory	parked	19.7	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
+0x02099370	main	508	legacy_sp3	factory	parked	8.5	unknown	UNCLASSIFIED:unknown	factory-1027-G5	
