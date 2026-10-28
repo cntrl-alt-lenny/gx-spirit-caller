@@ -11511,3 +11511,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d5228	ov002	1956	default	factory	parked	89.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
 0x021d5228	ov002	1956	legacy	factory	parked	6.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
 0x021d5228	ov002	1956	legacy_sp3	factory	parked	5.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1027-G3	
+0x022b95cc	ov002	2008	default	factory	shipped	100	n/a		factory-1027-G3	
+0x022b95cc	ov002	2008	legacy_sp3	factory	parked	7.7	unknown	UNCLASSIFIED:unknown	factory-1027-G3	
+0x022b95cc	ov002	2008	legacy	factory	parked	7.7	unknown	UNCLASSIFIED:unknown	factory-1027-G3	
