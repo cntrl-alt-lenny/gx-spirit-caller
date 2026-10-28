@@ -11502,3 +11502,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021ce59c	ov002	1964	default	factory	shipped	100	n/a		factory-1027-G4	
 0x021ce59c	ov002	1964	legacy	factory	parked	3	unknown	UNCLASSIFIED:unknown	factory-1027-G4	
 0x021ce59c	ov002	1964	legacy_sp3	factory	parked	2.4	unknown	UNCLASSIFIED:unknown	factory-1027-G4	
+0x021b34c4	ov017	2020	default	factory	parked	38.8	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G4	
+0x021b34c4	ov017	2020	legacy	factory	parked	19.7	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G4	
+0x021b34c4	ov017	2020	legacy_sp3	factory	parked	26.9	reg-alloc	PROVISIONAL:register-allocation	factory-1027-G4	
