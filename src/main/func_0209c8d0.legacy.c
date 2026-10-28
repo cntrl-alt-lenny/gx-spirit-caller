@@ -1,5 +1,5 @@
 typedef unsigned int u32;
-typedef struct { int *buffer; int command; char pad[0x10c]; volatile u32 flags; } Context;
+typedef struct { int *buffer; int command; char pad[0x10c]; u32 flags; } Context;
 typedef struct { char pad[0x64]; unsigned int flag; } ctx_020919d8_t;
 typedef struct Container { void *head; void *f04; } Container;
 typedef struct {

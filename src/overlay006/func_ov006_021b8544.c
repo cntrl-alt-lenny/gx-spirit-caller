@@ -52,7 +52,7 @@ int func_ov006_021b8544(char *base, int group) {
                     } else if (s[0] == 0x81 && s[1] == 0x77) s += 2;
                     else break;
                 }
-                category = func_ov006_021b9c98((int)base, (u16)(s[1]|(*(volatile u8 *)s<<8)));
+                category = func_ov006_021b9c98((int)base, (u16)(s[1]|(*s<<8)));
             } else category = func_ov006_021b9c98((int)base, *(u8 *)func_0202b100(p->id));
             break;
         case 1: category = func_0202de9c(p->id); break;
