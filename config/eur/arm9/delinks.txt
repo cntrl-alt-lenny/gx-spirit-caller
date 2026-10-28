@@ -1984,7 +1984,7 @@ src/main/func_02011c6c.s:
     complete
     .text start:0x02011c6c end:0x020121b4
 
-src/main/func_020121b4.s:
+src/main/func_020121b4.c:
     complete
     .text start:0x020121b4 end:0x02012418
 
