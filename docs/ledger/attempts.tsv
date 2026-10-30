@@ -12959,3 +12959,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020906dc	main	76	legacy	factory	parked	79	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J6	
 0x020906dc	main	76	legacy_sp3	factory	parked	42.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J6	
 0x02055f84	main	104	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x02077018	main	116	default	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1030-J6	
+0x02077018	main	116	legacy	factory	parked	93.5	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1030-J6	
+0x02077018	main	116	legacy_sp3	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1030-J6	
