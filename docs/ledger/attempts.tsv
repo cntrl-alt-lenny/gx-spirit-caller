@@ -12952,3 +12952,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200a488	main	516	default	factory	parked	27.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
 0x0200a488	main	516	legacy	factory	parked	0.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
 0x0200a488	main	516	legacy_sp3	factory	parked	0.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
+0x020a7ac0	main	588	default	factory	parked	89.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
+0x020a7ac0	main	588	legacy	factory	parked	2.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
+0x020a7ac0	main	588	legacy_sp3	factory	parked	2.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
