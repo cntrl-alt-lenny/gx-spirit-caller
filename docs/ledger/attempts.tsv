@@ -12959,3 +12959,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209b0f4	main	120	legacy	factory	parked	63.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J8	
 0x0209b0f4	main	120	legacy_sp3	factory	parked	36.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J8	
 0x0208d030	main	140	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J8	
+0x02093684	main	156	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J8	
