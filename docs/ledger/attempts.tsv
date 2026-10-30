@@ -12952,3 +12952,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02090690	main	76	default	factory	parked	42.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J9	
 0x02090690	main	76	legacy	factory	parked	79	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J9	
 0x02090690	main	76	legacy_sp3	factory	parked	42.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J9	
+0x02078e3c	main	128	default	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J9	
+0x02078e3c	main	128	legacy	factory	parked	48.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J9	
+0x02078e3c	main	128	legacy_sp3	factory	parked	50	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J9	
