@@ -12955,3 +12955,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d0e98	ov004	256	default	factory	parked	85.9	register-numbering-permutation-cascade	P-30	factory-1030-J13	
 0x021d0e98	ov004	256	legacy	factory	parked	9.3	register-numbering-permutation-cascade	P-30	factory-1030-J13	
 0x021d0e98	ov004	256	legacy_sp3	factory	parked	9.5	register-numbering-permutation-cascade	P-30	factory-1030-J13	
+0x021b421c	ov010	260	default	factory	parked	54.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J13	
+0x021b421c	ov010	260	legacy	factory	parked	47.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J13	
+0x021b421c	ov010	260	legacy_sp3	factory	parked	50	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J13	
