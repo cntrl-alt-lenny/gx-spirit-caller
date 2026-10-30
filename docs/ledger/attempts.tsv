@@ -12958,3 +12958,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b421c	ov010	260	default	factory	parked	54.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J13	
 0x021b421c	ov010	260	legacy	factory	parked	47.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J13	
 0x021b421c	ov010	260	legacy_sp3	factory	parked	50	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J13	
+0x021cfc64	ov004	264	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J13	
+0x021cfc64	ov004	264	legacy	factory	parked	40.3	unknown	UNCLASSIFIED:unknown	factory-1030-J13	
+0x021cfc64	ov004	264	legacy_sp3	factory	parked	45.5	unknown	UNCLASSIFIED:unknown	factory-1030-J13	
