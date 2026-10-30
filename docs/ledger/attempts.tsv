@@ -12952,3 +12952,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02074dcc	main	128	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1030-J7	
 0x02074dcc	main	128	legacy	factory	parked	91.4	structural	PROVISIONAL:structural	factory-1030-J7	
 0x02074dcc	main	128	legacy_sp3	factory	parked	69.7	structural	PROVISIONAL:structural	factory-1030-J7	
+0x020a7268	main	136	default	factory	parked	29.4	unknown	UNCLASSIFIED:unknown	factory-1030-J7	
+0x020a7268	main	136	legacy	factory	parked	51.4	unknown	UNCLASSIFIED:unknown	factory-1030-J7	
+0x020a7268	main	136	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J7	
