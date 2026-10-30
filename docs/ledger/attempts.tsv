@@ -12949,3 +12949,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02008fb8	main	572	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1027-G13	
 0x022b867c	ov002	584	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1027-G13	
 0x021d3578	ov004	672	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1027-G13	
+0x0200a488	main	516	default	factory	parked	27.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
+0x0200a488	main	516	legacy	factory	parked	0.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
+0x0200a488	main	516	legacy_sp3	factory	parked	0.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J10	
