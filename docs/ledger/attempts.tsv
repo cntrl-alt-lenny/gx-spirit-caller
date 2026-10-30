@@ -12955,3 +12955,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209d4ec	main	112	default	factory	parked	10.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J8	
 0x0209d4ec	main	112	legacy	factory	parked	21.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J8	
 0x0209d4ec	main	112	legacy_sp3	factory	parked	21.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J8	
+0x0209b0f4	main	120	default	factory	parked	23.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J8	
+0x0209b0f4	main	120	legacy	factory	parked	63.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J8	
+0x0209b0f4	main	120	legacy_sp3	factory	parked	36.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J8	
