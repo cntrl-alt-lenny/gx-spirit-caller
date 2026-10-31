@@ -13016,3 +13016,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c71e0	ov006	232	default	factory	parked	72.4	register-numbering-permutation-cascade	P-30	factory-1031-J12	
 0x021c71e0	ov006	232	legacy	factory	parked	12.7	register-numbering-permutation-cascade	P-30	factory-1031-J12	
 0x021c71e0	ov006	232	legacy_sp3	factory	parked	26.2	register-numbering-permutation-cascade	P-30	factory-1031-J12	
+0x021caa64	ov006	264	default	factory	parked	10.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J12	
+0x021caa64	ov006	264	legacy	factory	parked	1.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J12	
+0x021caa64	ov006	264	legacy_sp3	factory	parked	1.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J12	
