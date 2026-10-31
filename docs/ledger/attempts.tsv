@@ -13094,3 +13094,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205d15c	main	868	default	factory	parked	69.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
 0x0205d15c	main	868	legacy	factory	parked	4.8	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
 0x0205d15c	main	868	legacy_sp3	factory	parked	15.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
+0x0206627c	main	868	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
+0x0206627c	main	868	legacy	factory	parked	6.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
+0x0206627c	main	868	legacy_sp3	factory	parked	99.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
