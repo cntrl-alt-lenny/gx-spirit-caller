@@ -13030,3 +13030,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a215c	ov002	1860	default	factory	parked	4.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J4	
 0x022a215c	ov002	1860	legacy	factory	parked	1.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J4	
 0x022a215c	ov002	1860	legacy_sp3	factory	parked	3.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J4	
+0x021ea390	ov002	1880	default	factory	parked	87	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J4	
+0x021ea390	ov002	1880	legacy	factory	parked	1.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J4	
+0x021ea390	ov002	1880	legacy_sp3	factory	parked	6.1	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J4	
