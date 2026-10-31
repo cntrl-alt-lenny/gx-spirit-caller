@@ -12995,3 +12995,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02034d58	main	1148	default	factory	parked	62.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
 0x02034d58	main	1148	legacy	factory	parked	4.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
 0x02034d58	main	1148	legacy_sp3	factory	parked	30.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x020278dc	main	1280	default	factory	parked	71.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x020278dc	main	1280	legacy	factory	parked	12.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x020278dc	main	1280	legacy_sp3	factory	parked	12.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
