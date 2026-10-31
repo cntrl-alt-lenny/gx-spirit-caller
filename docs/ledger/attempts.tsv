@@ -12970,3 +12970,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d3578	ov004	672	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J15	
 0x021d3578	ov004	672	legacy	factory	parked	3.5	unknown	UNCLASSIFIED:unknown	factory-1030-J15	
 0x021d3578	ov004	672	legacy_sp3	factory	parked	6.5	unknown	UNCLASSIFIED:unknown	factory-1030-J15	
+0x021ab1c4	ov018	712	default	factory	parked	77	structural	PROVISIONAL:structural	factory-1030-J15	
+0x021ab1c4	ov018	712	legacy	factory	parked	28.3	structural	PROVISIONAL:structural	factory-1030-J15	
+0x021ab1c4	ov018	712	legacy_sp3	factory	parked	28.4	structural	PROVISIONAL:structural	factory-1030-J15	
