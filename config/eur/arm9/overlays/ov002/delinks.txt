@@ -6039,7 +6039,7 @@ src/overlay002/func_ov002_02215bc4.c:
     complete
     .text start:0x02215bc4 end:0x02215bf4
 
-src/overlay002/func_ov002_02215bf4.s:
+src/overlay002/func_ov002_02215bf4.c:
     complete
     .text start:0x02215bf4 end:0x02215cf4
 src/overlay002/func_ov002_02215cf4.c:
