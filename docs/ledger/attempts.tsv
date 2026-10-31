@@ -12976,3 +12976,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021dee94	ov002	668	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J3	
 0x021dee94	ov002	668	legacy	factory	parked	6.7	unknown	UNCLASSIFIED:unknown	factory-1030-J3	
 0x021dee94	ov002	668	legacy_sp3	factory	parked	5.7	unknown	UNCLASSIFIED:unknown	factory-1030-J3	
+0x021d05a4	ov002	700	default	factory	parked	84.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J3	
+0x021d05a4	ov002	700	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J3	
+0x021d05a4	ov002	700	legacy_sp3	factory	parked	1.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J3	
