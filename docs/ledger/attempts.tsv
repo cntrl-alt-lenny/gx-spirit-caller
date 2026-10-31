@@ -13074,3 +13074,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02024630	main	4168	default	factory	parked	12.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
 0x02024630	main	4168	legacy	factory	parked	5.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
 0x02024630	main	4168	legacy_sp3	factory	parked	5.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x020aeeac	main	4488	default	factory	parked	11.4	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
+0x020aeeac	main	4488	legacy	factory	parked	0.9	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
+0x020aeeac	main	4488	legacy_sp3	factory	parked	0.8	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
