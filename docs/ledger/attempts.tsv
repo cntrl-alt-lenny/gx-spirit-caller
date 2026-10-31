@@ -13142,3 +13142,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02055a84	main	384	default	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J9	
 0x02055a84	main	384	legacy	factory	parked	14.8	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J9	
 0x02055a84	main	384	legacy_sp3	factory	parked	70.8	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J9	
+0x020b0558	main	388	default	factory	parked	45.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
+0x020b0558	main	388	legacy	factory	parked	8.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
+0x020b0558	main	388	legacy_sp3	factory	parked	10	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
