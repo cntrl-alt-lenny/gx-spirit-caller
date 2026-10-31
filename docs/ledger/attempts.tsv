@@ -13120,3 +13120,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020028b8	main	900	legacy_sp3	factory	parked	2.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x020b0778	main	900	default	factory	shipped	100	n/a		factory-1031-J10	
 0x020b0778	main	900	legacy_sp3	factory	parked	5.8	unknown	UNCLASSIFIED:unknown	factory-1031-J10	
+0x020828b4	main	912	default	factory	parked	50	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
+0x020828b4	main	912	legacy	factory	parked	86.9	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
+0x020828b4	main	912	legacy_sp3	factory	parked	96.9	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
