@@ -18771,7 +18771,7 @@ src/main/func_0209f404.legacy.c:
     complete
     .text start:0x0209f404 end:0x0209f470
 
-src/main/func_0209f470.s:
+src/main/func_0209f470.legacy.c:
     complete
     .text start:0x0209f470 end:0x0209f514
 
