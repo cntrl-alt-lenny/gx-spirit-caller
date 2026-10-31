@@ -57,7 +57,7 @@ src/overlay004/func_ov004_021cab44.s:
     complete
     .text start:0x021cab44 end:0x021caedc
 
-src/overlay004/func_ov004_021caedc.s:
+src/overlay004/func_ov004_021caedc.c:
     complete
     .text start:0x021caedc end:0x021cb060
 
