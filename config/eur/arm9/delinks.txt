@@ -8747,7 +8747,7 @@ src/main/func_02047e88.c:
     .text start:0x02047e88 end:0x02047ea0
 
 
-src/main/func_02047ea0.s:
+src/main/func_02047ea0.legacy_sp3.c:
     complete
     .text start:0x02047ea0 end:0x02047fb8
 
