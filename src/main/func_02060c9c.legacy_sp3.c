@@ -14,7 +14,7 @@
 extern void *func_02060cbc(void);
 extern void *data_021013d8;
 
-void *func_02060c9c(void) {
+void *func_02060c9c(int unused0, int unused1) {
     void *r = func_02060cbc();
     if (r == 0) return &data_021013d8;
     return r;

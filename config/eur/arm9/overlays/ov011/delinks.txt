@@ -208,7 +208,7 @@ src/overlay011/func_ov011_021cb218.c:
     complete
     .text start:0x021cb218 end:0x021cb25c
 
-src/overlay011/func_ov011_021cb25c.s:
+src/overlay011/func_ov011_021cb25c.c:
     complete
     .text start:0x021cb25c end:0x021cb3b4
 
@@ -515,7 +515,7 @@ src/overlay011/func_ov011_021ce344.c:
     .text start:0x021ce344 end:0x021ce3a4
 
 
-src/overlay011/func_ov011_021ce3a4.s:
+src/overlay011/func_ov011_021ce3a4.c:
     complete
     .text start:0x021ce3a4 end:0x021ce4d4
 
@@ -527,7 +527,7 @@ src/overlay011/func_ov011_021ce50c.s:
     complete
     .text start:0x021ce50c end:0x021ceebc
 
-src/overlay011/func_ov011_021ceebc.s:
+src/overlay011/func_ov011_021ceebc.c:
     complete
     .text start:0x021ceebc end:0x021cef38
 
@@ -846,7 +846,7 @@ libs/nitro/func_ov011_021d12bc.legacy.c:
     complete
     .text start:0x021d12bc end:0x021d12c0
 
-src/overlay011/func_ov011_021d12c0.s:
+src/overlay011/func_ov011_021d12c0.c:
     complete
     .text start:0x021d12c0 end:0x021d1434
 
@@ -955,7 +955,7 @@ src/overlay011/ov011_021d2138.c:
 
 
 
-src/overlay011/func_ov011_021d2158.s:
+src/overlay011/func_ov011_021d2158.c:
     complete
     .text start:0x021d2158 end:0x021d2278
 

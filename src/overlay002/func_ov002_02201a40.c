@@ -18,6 +18,6 @@ struct F02201a40_Self {
 
 extern int func_ov002_022536e8(unsigned int bit0, unsigned int f0, unsigned int zero);
 
-int func_ov002_02201a40(struct F02201a40_Self *self) {
+int func_ov002_02201a40(struct F02201a40_Self *self, int unused1) {
     return func_ov002_022536e8(self->f2.bit0, self->f0, 0) >= 5;
 }

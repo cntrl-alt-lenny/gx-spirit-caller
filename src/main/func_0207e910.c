@@ -18,7 +18,7 @@ typedef struct {
     int   f_c;
 } state_0207e910_t;
 
-int func_0207e910(state_0207e910_t *p) {
+int func_0207e910(state_0207e910_t *p, int unused1) {
     int r = func_0207eae4(p);
     if (r != 0) {
         p->f_c = 0;

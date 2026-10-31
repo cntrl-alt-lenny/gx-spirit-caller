@@ -11,7 +11,7 @@ extern unsigned long long func_020930b0(void);
 
 #define B(off) (*(unsigned char *)((char *)func_020498f0() + (off)))
 #define I(off) (*(int *)((char *)func_020498f0() + (off)))
-int func_0204fcc0(void *a, int b) {
+int func_0204fcc0(void *a, int b, int unused2) {
     if (func_020469b4() != 5) return 0;
     if (B(0x15) == 2) return 1;
     if (a != 0) {

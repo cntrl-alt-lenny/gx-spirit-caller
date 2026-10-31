@@ -1,6 +1,6 @@
 typedef struct { char pad[0x38]; int f38; } GlobalState;
 extern GlobalState data_021040ac;
-void func_ov008_021ab008(unsigned short *dst, const unsigned short *src, int count) {
+void func_ov008_021ab008(unsigned short *dst, const unsigned short *src, int count, int unused3) {
     int i;
     int phase = data_021040ac.f38 & 0x3f;
     for (i = 0; i < count; i++) {
