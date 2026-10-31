@@ -13048,3 +13048,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a7d0c	main	736	default	factory	parked	6.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x020a7d0c	main	736	legacy	factory	parked	4.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x020a7d0c	main	736	legacy_sp3	factory	parked	4.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
+0x02001f18	main	744	default	factory	parked	2.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
+0x02001f18	main	744	legacy	factory	parked	2.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
+0x02001f18	main	744	legacy_sp3	factory	parked	1.6	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
