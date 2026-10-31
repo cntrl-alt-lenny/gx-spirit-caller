@@ -13169,3 +13169,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b65e4	ov010	520	default	factory	parked	98.5	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J15	
 0x021b65e4	ov010	520	legacy	factory	parked	11.4	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J15	
 0x021b65e4	ov010	520	legacy_sp3	factory	parked	4.6	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J15	
+0x021b50b8	ov015	524	default	factory	parked	97	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J15	
+0x021b50b8	ov015	524	legacy	factory	parked	7.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J15	
+0x021b50b8	ov015	524	legacy_sp3	factory	parked	7.8	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J15	
