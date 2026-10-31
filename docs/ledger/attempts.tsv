@@ -13086,3 +13086,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021ca03c	ov011	88	default	factory	parked	90.9	asm-int	PROVISIONAL:inline-asm	factory-1031-J13	
 0x021ca03c	ov011	88	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J13	
 0x021ca03c	ov011	88	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J13	
+0x021b8bf4	ov006	92	default	factory	parked	36	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J13	
+0x021b8bf4	ov006	92	legacy	factory	parked	26.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J13	
+0x021b8bf4	ov006	92	legacy_sp3	factory	parked	28	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J13	
