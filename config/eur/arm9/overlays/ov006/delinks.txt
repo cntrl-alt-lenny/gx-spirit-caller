@@ -1975,7 +1975,7 @@ src/overlay006/ov006_021c9ef4.c:
 
 
 
-src/overlay006/func_ov006_021c9efc.s:
+src/overlay006/func_ov006_021c9efc.c:
     complete
     .text start:0x021c9efc end:0x021ca264
 src/overlay006/func_ov006_021ca264.s:
