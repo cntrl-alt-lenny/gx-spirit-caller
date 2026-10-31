@@ -13047,3 +13047,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0202884c	main	2488	default	factory	parked	25.6	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
 0x0202884c	main	2488	legacy	factory	parked	5	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
 0x0202884c	main	2488	legacy_sp3	factory	parked	5	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
+0x02056d1c	main	2580	default	factory	parked	3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x02056d1c	main	2580	legacy	factory	parked	3.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x02056d1c	main	2580	legacy_sp3	factory	parked	9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
