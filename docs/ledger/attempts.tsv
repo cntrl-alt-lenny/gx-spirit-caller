@@ -13015,3 +13015,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02041e18	main	136	default	factory	parked	44.1	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
 0x020532f4	main	136	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
 0x020532f4	main	136	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020981a0	main	136	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x020981a0	main	136	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020981a0	main	136	legacy_sp3	factory	parked	38.2	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
