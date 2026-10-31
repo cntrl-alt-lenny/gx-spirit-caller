@@ -13004,3 +13004,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201afdc	main	1320	default	factory	parked	4.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
 0x0201afdc	main	1320	legacy	factory	parked	3.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
 0x0201afdc	main	1320	legacy_sp3	factory	parked	3.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x020b3c78	main	1348	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J11	
+0x020b3c78	main	1348	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J11	
+0x020b3c78	main	1348	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J11	
