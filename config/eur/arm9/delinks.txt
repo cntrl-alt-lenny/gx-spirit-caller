@@ -19750,7 +19750,7 @@ src/main/func_020b06dc.c:
     complete
     .text start:0x020b06dc end:0x020b0778
 
-src/main/func_020b0778.s:
+src/main/func_020b0778.c:
     complete
     .text start:0x020b0778 end:0x020b0afc
 src/main/func_020b0afc.s:
