@@ -19470,7 +19470,7 @@ src/main/func_020a7440.c:
     complete
     .text start:0x020a7440 end:0x020a7480
 
-src/main/func_020a7480.s:
+src/main/func_020a7480.c:
     complete
     .text start:0x020a7480 end:0x020a7530
 
