@@ -12,7 +12,7 @@ struct State { char pad[0x5b4]; int step; };
 extern struct State data_ov002_022ce288;
 extern char data_ov002_022d016c[];
 extern int data_ov002_022cd744[];
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 extern int func_ov002_021ae4bc(int self, int idx);
 extern void func_ov002_021df62c(int arg0, int arg1, int idx);
 extern int func_ov002_021decdc(void *arg0, int arg1, int arg2);
@@ -22,9 +22,9 @@ int func_ov002_021f9434(struct Node *self) {
  case 0:
   if (self->index != data_ov002_022cf16c[self->owner & 1].cards[self->slot].card.index * 2 + data_ov002_022cf16c[self->owner & 1].cards[self->slot].card.flag) return -1;
   if (data_ov002_022cd744[self->owner] == 1) {
-   *(int *)(data_ov002_022d016c + 0xd44) = func_ov002_022536e8((void *)self->owner, self->kind, 0) > 0;
+   *(int *)(data_ov002_022d016c + 0xd44) = func_ov002_022536e8(self->owner, self->kind, 0) > 0;
   } else {
-   if (func_ov002_022536e8((void *)self->owner, self->kind, 0) == 0)
+   if (func_ov002_022536e8(self->owner, self->kind, 0) == 0)
     func_ov002_021ae4bc(0x142, self->index);
    else func_ov002_021ae4bc(0xec, self->index);
   }

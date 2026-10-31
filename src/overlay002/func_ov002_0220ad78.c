@@ -7,7 +7,7 @@ extern int func_ov002_02257ab8(int a, int b);
 extern int func_ov002_021bb068(int id);
 /* This caller supplies only r0 to the four-argument thunk. */
 extern int func_ov002_021ca2b8();
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 int func_ov002_0220ad78(struct S *self) {
  unsigned i;
  if (func_ov002_02257ab8((int)self, 1-self->side)==0) return 0;

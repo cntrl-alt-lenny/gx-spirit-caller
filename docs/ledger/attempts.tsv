@@ -16045,3 +16045,7 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02006394	main	400	default	fastmatch-100-but-link-undefined-local-label-callee	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J7	
 0x020548f4	main	316	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
 0x02064dfc	main	392	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
+0x020a6924	main	172	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
+0x020678b8	main	204	default	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
+0x02059e5c	main	220	default	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
+0x02045d0c	main	892	legacy_sp3	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	

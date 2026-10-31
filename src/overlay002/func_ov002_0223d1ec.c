@@ -39,7 +39,7 @@ extern int func_ov002_0223b468(int);
 extern void func_ov002_0223b584(void);
 extern int func_ov002_0223b5cc(int,int);
 /* Original passes the player value as the opaque callback context. */
-extern int func_ov002_022536e8(void *,int,int);
+extern int func_ov002_022536e8(int self, int arg1, int arg2);
 extern void func_ov002_0226b054(int);
 extern int func_ov002_0226b0d0(int,int,int);
 extern int func_ov002_0227adb8(int,int,int,int);
@@ -52,7 +52,7 @@ int func_ov002_0223d1ec(struct Self *self,int arg1) {
  case 0x80:
  if (!data_ov002_022cf184[self->owner & 1].value) return 0;
  if (!data_ov002_022cf17c[self->owner & 1].value) return 0;
- if (func_ov002_022536e8((void *)player,self->id,0)==0) {
+ if (func_ov002_022536e8(player,self->id,0)==0) {
  func_ov002_021ae400(player,0x122); return 0x6e;
  }
  func_ov002_021ae400(self->owner,0x5b); return 0x7f;
@@ -79,7 +79,7 @@ int func_ov002_0223d1ec(struct Self *self,int arg1) {
  if (id==0x1a4e && data_ov002_022ce288.count>=2) {func_ov002_021af9d0(player,0x48,self->id,id);return 0x7b;}
  if (id==0x157e) {func_ov002_021af9d0(player,0xb,self->id,id);return 0x7b;}
  left=data_ov002_022ce288.total-data_ov002_022ce288.count;
- if (left==func_ov002_022536e8((void *)player,self->id,id)) {
+ if (left==func_ov002_022536e8(player,self->id,id)) {
  if (left>=0x20) left=0x20;
  func_ov002_021af9d0(player,left+6,self->id,data_ov002_022ce288.id); return 0x7b;
  } else func_ov002_021af9d0(player,6,self->id,data_ov002_022ce288.id);
@@ -100,7 +100,7 @@ int func_ov002_0223d1ec(struct Self *self,int arg1) {
  if (data_ov002_022ce288.id==0x1a4e) {
  if (data_ov002_022ce288.count==2 && data_ov002_022ce288.count-n<2) {
  data_ov002_022ce288.kinds[1]=7;
- if (func_ov002_022536e8((void *)player,self->id,data_ov002_022ce288.id)) return 0x7c;
+ if (func_ov002_022536e8(player,self->id,data_ov002_022ce288.id)) return 0x7c;
  }
  data_ov002_022ce288.total=data_ov002_022ce288.count;
  }
