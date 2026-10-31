@@ -13058,3 +13058,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200ac60	main	172	legacy	factory	parked	72.1	structural	PROVISIONAL:structural	factory-1031-J7	
 0x0200ac60	main	172	legacy_sp3	factory	parked	2.3	structural	PROVISIONAL:structural	factory-1031-J7	
 0x020a6924	main	172	legacy	factory	shipped	100	n/a		factory-1031-J7	
+0x0203aae8	main	176	default	factory	parked	97.8	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J7	
+0x0203aae8	main	176	legacy	factory	parked	2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J7	
+0x0203aae8	main	176	legacy_sp3	factory	parked	14.6	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J7	
