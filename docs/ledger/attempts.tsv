@@ -13057,3 +13057,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200cb50	main	780	default	factory	parked	9.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x0200cb50	main	780	legacy	factory	parked	0.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x0200cb50	main	780	legacy_sp3	factory	parked	2.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
+0x020b1964	main	792	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x020b1964	main	792	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x020b1964	main	792	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
