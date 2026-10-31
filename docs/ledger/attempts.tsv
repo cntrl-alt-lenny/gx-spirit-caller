@@ -13013,3 +13013,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b9e08	ov006	232	default	factory	shipped	100	n/a		factory-1031-J12	
 0x021b9e08	ov006	232	legacy_sp3	factory	parked	16.7	unknown	UNCLASSIFIED:unknown	factory-1031-J12	
 0x021b9e08	ov006	232	legacy	factory	parked	16.4	unknown	UNCLASSIFIED:unknown	factory-1031-J12	
+0x021c71e0	ov006	232	default	factory	parked	72.4	register-numbering-permutation-cascade	P-30	factory-1031-J12	
+0x021c71e0	ov006	232	legacy	factory	parked	12.7	register-numbering-permutation-cascade	P-30	factory-1031-J12	
+0x021c71e0	ov006	232	legacy_sp3	factory	parked	26.2	register-numbering-permutation-cascade	P-30	factory-1031-J12	
