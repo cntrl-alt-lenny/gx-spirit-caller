@@ -6470,7 +6470,7 @@ src/main/func_02033354.c:
     .text start:0x02033354 end:0x02033390
 
 
-src/main/func_02033390.s:
+src/main/func_02033390.c:
     complete
     .text start:0x02033390 end:0x02033488
 
