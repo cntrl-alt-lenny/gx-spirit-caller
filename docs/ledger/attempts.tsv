@@ -12994,3 +12994,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02008fb8	main	572	default	factory	shipped	100	n/a		factory-1031-J10	
 0x02008fb8	main	572	legacy_sp3	factory	parked	2.8	unknown	UNCLASSIFIED:unknown	factory-1031-J10	
 0x02008fb8	main	572	legacy	factory	parked	2.8	unknown	UNCLASSIFIED:unknown	factory-1031-J10	
+0x02008888	main	576	default	factory	parked	95.1	register-numbering-permutation-cascade	P-30	factory-1031-J10	
+0x02008888	main	576	legacy	factory	parked	37	register-numbering-permutation-cascade	P-30	factory-1031-J10	
+0x02008888	main	576	legacy_sp3	factory	parked	45.5	register-numbering-permutation-cascade	P-30	factory-1031-J10	
