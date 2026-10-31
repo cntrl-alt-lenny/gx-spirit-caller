@@ -1,0 +1,44 @@
+typedef struct { char pad[0x18]; unsigned int f18; char pad2[4]; unsigned int f20; } state_02001d98_t;
+extern void func_02001d68(int arg);
+extern void func_02001d84(void *p,int b,int c);
+extern void func_02001d98(state_02001d98_t *p,int v);
+extern void func_02004f58(int a,int b,int c,int d,int e,int f);
+extern int func_020054f0(int a0,int a1,int a2);
+extern int func_02005554(int a0,int a1,int a2);
+extern void *func_0208dd9c(void);
+extern void func_02094504(int a,void *b,int c);
+extern int func_0202c0c0(int id);
+extern int func_ov006_021b9dec(int unused,int x,int value);
+extern int func_ov006_021b9e08(int unused,unsigned char *out,int value);
+extern int OS_SPrintf(char *dst,const char *fmt,...);
+extern char data_ov006_0224f448[];
+extern unsigned short data_ov006_02257548[];
+extern struct { int pad; unsigned int mode:3; } data_02104f4c;
+int func_ov006_021bf2a4(char *obj) {
+    char text[64];
+    unsigned char number[32];
+    char *buf;
+    char *str = data_ov006_0224f448;
+    int count;
+    int width;
+    buf = func_0208dd9c();
+    count = data_ov006_02257548[0x36];
+    func_02094504(0,buf+0x40,0x800);
+    func_02001d68(data_02104f4c.mode);
+    if (data_02104f4c.mode == 0) func_02001d84(obj+4,9,0);
+    else func_02001d98((state_02001d98_t *)(obj+4),5);
+    if (data_02104f4c.mode != 0) str = (char *)func_0202c0c0(0x482);
+    else if (count == 0) str = (char *)func_0202c0c0(0x47f);
+    else if (count < 10) {
+        if (data_02104f4c.mode == 0) func_ov006_021b9e08((int)str,number,10-count < 0 ? -(10-count) : 10-count);
+        else func_ov006_021b9dec((int)str,(int)number,10-count < 0 ? -(10-count) : 10-count);
+        OS_SPrintf(text,(char *)func_0202c0c0(0x480),number);
+        str = text;
+    } else str = (char *)func_0202c0c0(0x481);
+    if (data_02104f4c.mode == 0) width = func_020054f0((int)str,10,9);
+    else width = func_02005554((int)str,10,5);
+    func_02004f58((int)(obj+4),(int)str,(int)(buf+0x40),164-width/2,4,10);
+    func_02001d84(obj+4,0,0);
+    func_02001d98((state_02001d98_t *)(obj+4),-1);
+    return 1;
+}
