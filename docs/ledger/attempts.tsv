@@ -13097,3 +13097,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206627c	main	868	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
 0x0206627c	main	868	legacy	factory	parked	6.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
 0x0206627c	main	868	legacy_sp3	factory	parked	99.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
+0x020b1e88	main	868	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
+0x020b1e88	main	868	legacy	factory	parked	0.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
+0x020b1e88	main	868	legacy_sp3	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
