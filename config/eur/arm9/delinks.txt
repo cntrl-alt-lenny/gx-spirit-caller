@@ -4436,7 +4436,7 @@ src/main/func_02021cbc.c:
     complete
     .text start:0x02021cbc end:0x02021cd8
 
-src/main/func_02021cd8.s:
+src/main/func_02021cd8.c:
     complete
     .text start:0x02021cd8 end:0x02022224
 
