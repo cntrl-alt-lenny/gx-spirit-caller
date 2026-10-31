@@ -13038,3 +13038,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204f8f0	main	168	default	factory	parked	38.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
 0x0204f8f0	main	168	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
 0x0204f8f0	main	168	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020384e8	main	172	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x020384e8	main	172	legacy	factory	parked	8.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x020384e8	main	172	legacy_sp3	factory	parked	41.9	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
