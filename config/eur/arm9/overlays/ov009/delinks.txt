@@ -28,7 +28,7 @@ src/overlay009/func_ov009_021aa59c.c:
 src/overlay009/func_ov009_021aa5d8.c:
     complete
     .text start:0x021aa5d8 end:0x021aaaec
-src/overlay009/func_ov009_021aaaec.s:
+src/overlay009/func_ov009_021aaaec.c:
     complete
     .text start:0x021aaaec end:0x021aacc4
 src/overlay009/func_ov009_021aacc4.s:

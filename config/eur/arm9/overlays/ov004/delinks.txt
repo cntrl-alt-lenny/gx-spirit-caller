@@ -57,7 +57,7 @@ src/overlay004/func_ov004_021cab44.s:
     complete
     .text start:0x021cab44 end:0x021caedc
 
-src/overlay004/func_ov004_021caedc.s:
+src/overlay004/func_ov004_021caedc.c:
     complete
     .text start:0x021caedc end:0x021cb060
 
@@ -280,7 +280,7 @@ src/overlay004/func_ov004_021cfe08.s:
     complete
     .text start:0x021cfe08 end:0x021d0168
 
-src/overlay004/func_ov004_021d0168.s:
+src/overlay004/func_ov004_021d0168.c:
     complete
     .text start:0x021d0168 end:0x021d02f4
 
@@ -630,7 +630,7 @@ src/overlay004/func_ov004_021d5b9c.c:
     complete
     .text start:0x021d5b9c end:0x021d5bdc
 
-src/overlay004/func_ov004_021d5bdc.s:
+src/overlay004/func_ov004_021d5bdc.c:
     complete
     .text start:0x021d5bdc end:0x021d5ce4
 
