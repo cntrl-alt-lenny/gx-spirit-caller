@@ -12963,3 +12963,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02077018	main	116	legacy	factory	parked	93.5	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1030-J6	
 0x02077018	main	116	legacy_sp3	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1030-J6	
 0x020532f4	main	136	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020981a0	main	136	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020981a0	main	136	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020981a0	main	136	legacy_sp3	factory	parked	38.2	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
