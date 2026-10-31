@@ -2227,7 +2227,7 @@ src/main/func_020161ac.c:
     complete
     .text start:0x020161ac end:0x020162d0
 
-src/main/func_020162d0.s:
+src/main/func_020162d0.c:
     complete
     .text start:0x020162d0 end:0x02016400
 
