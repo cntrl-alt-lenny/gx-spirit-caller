@@ -12964,3 +12964,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02063288	main	704	default	factory	parked	11.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J10	
 0x02063288	main	704	legacy	factory	parked	16.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J10	
 0x02063288	main	704	legacy_sp3	factory	parked	97.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J10	
+0x0209a534	main	704	default	factory	parked	5.1	structural	PROVISIONAL:structural	factory-1030-J10	
+0x0209a534	main	704	legacy	factory	parked	76.7	structural	PROVISIONAL:structural	factory-1030-J10	
+0x0209a534	main	704	legacy_sp3	factory	parked	9.1	structural	PROVISIONAL:structural	factory-1030-J10	
