@@ -13081,3 +13081,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b5818	ov015	396	default	factory	parked	82.8	register-numbering-permutation-cascade	P-30	factory-1031-J12	
 0x021b5818	ov015	396	legacy	factory	parked	9.6	register-numbering-permutation-cascade	P-30	factory-1031-J12	
 0x021b5818	ov015	396	legacy_sp3	factory	parked	9.7	register-numbering-permutation-cascade	P-30	factory-1031-J12	
+0x021aae04	ov008	416	default	factory	shipped	100	n/a		factory-1031-J12	
+0x021aae04	ov008	416	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J12	
+0x021aae04	ov008	416	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J12	
