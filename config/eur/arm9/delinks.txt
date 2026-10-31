@@ -1625,7 +1625,7 @@ src/main/func_0200c284.c:
     complete
     .text start:0x0200c284 end:0x0200c2f8
 
-src/main/func_0200c2f8.s:
+src/main/func_0200c2f8.c:
     complete
     .text start:0x0200c2f8 end:0x0200c428
 
