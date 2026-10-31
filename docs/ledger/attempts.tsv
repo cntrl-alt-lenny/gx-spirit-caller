@@ -13062,3 +13062,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b70fc	ov006	324	default	factory	parked	12.3	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J12	
 0x021b70fc	ov006	324	legacy	factory	parked	2	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J12	
 0x021b70fc	ov006	324	legacy_sp3	factory	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J12	
+0x021b3938	ov014	332	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J12	
+0x021b3938	ov014	332	legacy	factory	parked	13.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J12	
+0x021b3938	ov014	332	legacy_sp3	factory	parked	6	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J12	
