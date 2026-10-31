@@ -13054,3 +13054,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0221b3d8	ov002	280	default	factory	shipped	100	n/a		factory-1031-J1	
 0x0221b3d8	ov002	280	legacy_sp3	factory	parked	88.6	unknown	UNCLASSIFIED:unknown	factory-1031-J1	
 0x0221b3d8	ov002	280	legacy	factory	parked	40.8	unknown	UNCLASSIFIED:unknown	factory-1031-J1	
+0x02255f6c	ov002	280	default	factory	parked	75.7	register-numbering-permutation-cascade	P-30	factory-1031-J1	
+0x02255f6c	ov002	280	legacy	factory	parked	0	register-numbering-permutation-cascade	P-30	factory-1031-J1	
+0x02255f6c	ov002	280	legacy_sp3	factory	parked	0	register-numbering-permutation-cascade	P-30	factory-1031-J1	
