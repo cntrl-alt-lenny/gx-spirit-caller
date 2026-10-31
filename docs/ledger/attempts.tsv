@@ -13144,3 +13144,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02235b74	ov002	460	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J2	
 0x02235b74	ov002	460	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J2	
 0x0221bbd8	ov002	472	default	factory	shipped	100	n/a		factory-1031-J2	
+0x02254a84	ov002	480	default	factory	parked	0.8	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J2	
+0x02254a84	ov002	480	legacy	factory	parked	3.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J2	
+0x02254a84	ov002	480	legacy_sp3	factory	parked	6.5	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J2	
