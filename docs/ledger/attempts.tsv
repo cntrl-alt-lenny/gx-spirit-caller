@@ -13091,3 +13091,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d6b88	ov004	840	default	factory	parked	17.2	structural	PROVISIONAL:structural	factory-1031-J15	
 0x021d6b88	ov004	840	legacy	factory	parked	1.8	structural	PROVISIONAL:structural	factory-1031-J15	
 0x021d6b88	ov004	840	legacy_sp3	factory	parked	1.3	structural	PROVISIONAL:structural	factory-1031-J15	
+0x021b4320	ov010	856	default	factory	parked	8.3	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J15	
+0x021b4320	ov010	856	legacy	factory	parked	9.4	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J15	
+0x021b4320	ov010	856	legacy_sp3	factory	parked	9.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J15	
