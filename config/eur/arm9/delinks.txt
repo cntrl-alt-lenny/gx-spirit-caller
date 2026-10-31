@@ -2020,7 +2020,7 @@ src/main/func_02012cc8.s:
     complete
     .text start:0x02012cc8 end:0x020138b8
 
-src/main/func_020138b8.s:
+src/main/func_020138b8.c:
     complete
     .text start:0x020138b8 end:0x0201397c
 
