@@ -12970,3 +12970,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020aadf8	main	200	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1030-J7	
 0x020aadf8	main	200	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1030-J7	
 0x020b0bdc	main	224	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J7	
+0x020055b4	main	240	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J7	
+0x020055b4	main	240	legacy	factory	parked	6.7	unknown	UNCLASSIFIED:unknown	factory-1030-J7	
+0x020055b4	main	240	legacy_sp3	factory	parked	6.7	unknown	UNCLASSIFIED:unknown	factory-1030-J7	
