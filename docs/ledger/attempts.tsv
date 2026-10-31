@@ -13094,3 +13094,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b048c	main	204	legacy	factory	parked	5.9	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J8	
 0x020b048c	main	204	legacy_sp3	factory	parked	5.9	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J8	
 0x0203e540	main	208	legacy_sp3	factory	shipped	100	n/a		factory-1031-J8	
+0x020488f4	main	208	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
+0x020488f4	main	208	legacy	factory	parked	23.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
+0x020488f4	main	208	legacy_sp3	factory	parked	96.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
