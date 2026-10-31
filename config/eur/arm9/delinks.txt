@@ -3602,7 +3602,7 @@ src/main/func_0201c9b4.c:
 src/main/func_0201ca88.c:
     complete
     .text start:0x0201ca88 end:0x0201cab4
-src/main/func_0201cab4.s:
+src/main/func_0201cab4.c:
     complete
     .text start:0x0201cab4 end:0x0201cbd8
 
