@@ -13022,3 +13022,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0223d9dc	ov002	244	default	factory	shipped	100	n/a		factory-1031-J1	
 0x0223d9dc	ov002	244	legacy_sp3	factory	parked	73.8	unknown	UNCLASSIFIED:unknown	factory-1031-J1	
 0x0223d9dc	ov002	244	legacy	factory	parked	7.6	unknown	UNCLASSIFIED:unknown	factory-1031-J1	
+0x02202f78	ov002	252	default	factory	parked	98.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J1	
+0x02202f78	ov002	252	legacy	factory	parked	2.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J1	
+0x02202f78	ov002	252	legacy_sp3	factory	parked	9.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J1	
