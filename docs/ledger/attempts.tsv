@@ -13085,3 +13085,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021f5824	ov002	2116	default	factory	parked	98.7	register-numbering-permutation-cascade	P-30	factory-1031-J5	
 0x021f5824	ov002	2116	legacy	factory	parked	2	register-numbering-permutation-cascade	P-30	factory-1031-J5	
 0x021f5824	ov002	2116	legacy_sp3	factory	parked	3	register-numbering-permutation-cascade	P-30	factory-1031-J5	
+0x021c10e8	ov002	2156	default	factory	parked	93.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J5	
+0x021c10e8	ov002	2156	legacy	factory	parked	2.6	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J5	
+0x021c10e8	ov002	2156	legacy_sp3	factory	parked	3.3	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J5	
