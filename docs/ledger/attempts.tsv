@@ -13845,3 +13845,218 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0225c1d8	ov002	2184	default	factory	parked	17.6	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J5	
 0x0225c1d8	ov002	2184	legacy	factory	parked	0.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J5	
 0x0225c1d8	ov002	2184	legacy_sp3	factory	parked	0.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J5	
+0x02078eec	main	28	default	factory	parked	9.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J6	
+0x02078eec	main	28	legacy	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J6	
+0x02078eec	main	28	legacy_sp3	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J6	
+0x02099be8	main	60	default	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J6	
+0x02099be8	main	60	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J6	
+0x02099be8	main	60	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J6	
+0x020906dc	main	76	default	factory	parked	42.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J6	
+0x020906dc	main	76	legacy	factory	parked	79	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J6	
+0x020906dc	main	76	legacy_sp3	factory	parked	42.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J6	
+0x02055f84	main	104	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x02077018	main	116	default	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1030-J6	
+0x02077018	main	116	legacy	factory	parked	93.5	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1030-J6	
+0x02077018	main	116	legacy_sp3	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1030-J6	
+0x020532f4	main	136	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020981a0	main	136	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020981a0	main	136	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020981a0	main	136	legacy_sp3	factory	parked	38.2	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x0204f8f0	main	168	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020384e8	main	172	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020384e8	main	172	legacy	factory	parked	8.5	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020384e8	main	172	legacy_sp3	factory	parked	41.9	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x02062a20	main	204	default	factory	parked	19.6	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x02062a20	main	204	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x0209f7fc	main	204	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x020a2100	main	220	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x0200edb8	main	240	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J6	
+0x02020a24	main	256	default	factory	parked	10.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J6	
+0x02020a24	main	256	legacy	factory	parked	18.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J6	
+0x02020a24	main	256	legacy_sp3	factory	parked	18.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J6	
+0x020a9914	main	8	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x020a9914	main	8	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x020a9914	main	8	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x020b3814	main	60	default	factory	parked	5.3	structural	PROVISIONAL:structural	factory-1031-J6	
+0x020b3814	main	60	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x020b3814	main	60	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x020054a4	main	76	default	factory	parked	55	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020054a4	main	76	legacy	factory	parked	31.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020054a4	main	76	legacy_sp3	factory	parked	33.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02090048	main	88	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02090048	main	88	legacy	factory	parked	95.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02090048	main	88	legacy_sp3	factory	parked	54.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02049270	main	96	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x02055f84	main	104	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x0209226c	main	108	default	factory	parked	85.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0209226c	main	108	legacy	factory	parked	81.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0209226c	main	108	legacy_sp3	factory	parked	81.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02024574	main	116	default	factory	parked	34.5	structural	PROVISIONAL:structural	factory-1031-J6	
+0x02024574	main	116	legacy	factory	parked	14.3	structural	PROVISIONAL:structural	factory-1031-J6	
+0x02024574	main	116	legacy_sp3	factory	parked	15.2	structural	PROVISIONAL:structural	factory-1031-J6	
+0x020ace14	main	116	default	factory	parked	63.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x020ace14	main	116	legacy	factory	parked	82.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x020ace14	main	116	legacy_sp3	factory	parked	82.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x0206880c	main	132	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x0207d3ac	main	132	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x0207d3ac	main	132	default	factory	parked	30.3	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0207d3ac	main	132	legacy	factory	parked	38.2	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020a33a8	main	132	default	factory	parked	0	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x020a33a8	main	132	legacy	factory	parked	57.6	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x020a33a8	main	132	legacy_sp3	factory	parked	39.4	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x0203eca4	main	136	default	factory	parked	82.3	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x0203eca4	main	136	legacy	factory	parked	18.4	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x0203eca4	main	136	legacy_sp3	factory	parked	94.1	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x02041e18	main	136	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x02041e18	main	136	default	factory	parked	44.1	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020532f4	main	136	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x020532f4	main	136	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020981a0	main	136	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x020981a0	main	136	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020981a0	main	136	legacy_sp3	factory	parked	38.2	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020a5c80	main	136	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x020a5c80	main	136	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020a5c80	main	136	legacy_sp3	factory	parked	8.8	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020940ac	main	144	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x0201f4d4	main	148	default	factory	shipped	100	n/a		factory-1031-J6	
+0x0201f4d4	main	148	legacy_sp3	factory	parked	43.2	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0201f4d4	main	148	legacy	factory	parked	17.5	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0202befc	main	148	default	factory	shipped	100	n/a		factory-1031-J6	
+0x020945f4	main	148	default	factory	parked	62.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020945f4	main	148	legacy	factory	parked	48.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020945f4	main	148	legacy_sp3	factory	parked	48.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02097364	main	152	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x02049270	main	96	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J6	
+0x02055f84	main	104	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J6	
+0x0206eb4c	main	156	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x0208c348	main	156	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x020a1da0	main	156	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x0204f8f0	main	168	default	factory	parked	38.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0204f8f0	main	168	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0204f8f0	main	168	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020384e8	main	172	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x020384e8	main	172	legacy	factory	parked	8.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x020384e8	main	172	legacy_sp3	factory	parked	41.9	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x02091768	main	172	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x02064158	main	176	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x02064158	main	176	default	factory	parked	6.8	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0207108c	main	176	default	factory	parked	6.8	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x0207108c	main	176	legacy	factory	parked	81.8	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x0207108c	main	176	legacy_sp3	factory	parked	61.4	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x0201ce94	main	192	default	factory	parked	62.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x0201ce94	main	192	legacy	factory	parked	3.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x0201ce94	main	192	legacy_sp3	factory	parked	6	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x02043a78	main	192	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x02043a78	main	192	default	factory	parked	85.4	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0209b384	main	196	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x020330e4	main	204	default	factory	shipped	100	n/a		factory-1031-J6	
+0x02062a20	main	204	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x02062a20	main	204	default	factory	parked	19.6	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020678b8	main	204	default	factory	shipped	100	n/a		factory-1031-J6	
+0x0209f7fc	main	204	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x0201a9d0	main	208	default	factory	shipped	100	n/a		factory-1031-J6	
+0x02023d88	main	208	default	factory	shipped	100	n/a		factory-1031-J6	
+0x02005a60	main	216	default	factory	parked	92.6	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x02005a60	main	216	legacy	factory	parked	49.1	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x02005a60	main	216	legacy_sp3	factory	parked	51.9	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020a2100	main	220	default	factory	parked	10.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020a2100	main	220	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020a2100	main	220	legacy_sp3	factory	parked	3.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020b0afc	main	224	default	factory	shipped	100	n/a		factory-1031-J6	
+0x02060520	main	228	default	factory	parked	16.4	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x02060520	main	228	legacy	factory	parked	8.5	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x02060520	main	228	legacy_sp3	factory	parked	70.2	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x0205c258	main	232	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x020a70fc	main	232	default	factory	shipped	100	n/a		factory-1031-J6	
+0x0200edb8	main	240	default	factory	shipped	100	n/a		factory-1031-J6	
+0x0204bb5c	main	240	default	factory	shipped	100	n/a		factory-1031-J6	
+0x020585d4	main	244	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x020886a0	main	256	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x020948f0	main	256	default	factory	parked	21.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x020948f0	main	256	legacy	factory	parked	2.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x020948f0	main	256	legacy_sp3	factory	parked	2.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x020b1c7c	main	260	default	factory	parked	9.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x020b1c7c	main	260	legacy	factory	parked	1.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x020b1c7c	main	260	legacy_sp3	factory	parked	1.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x0209e91c	main	264	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x0200a7a4	main	268	default	factory	parked	16.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0200a7a4	main	268	legacy	factory	parked	1.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0200a7a4	main	268	legacy_sp3	factory	parked	1.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0202abdc	main	272	default	factory	parked	5.9	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0202abdc	main	272	legacy	factory	parked	5.8	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0202abdc	main	272	legacy_sp3	factory	parked	5.8	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0208a8f8	main	276	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x02019940	main	280	default	factory	parked	81.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02019940	main	280	legacy	factory	parked	8.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02019940	main	280	legacy_sp3	factory	parked	8.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02047ea0	main	280	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x020932a4	main	280	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x0205c258	main	232	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J6	
+0x0200962c	main	288	default	factory	parked	93.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x0200962c	main	288	legacy	factory	parked	17.3	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x0200962c	main	288	legacy_sp3	factory	parked	87.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x020214ac	main	300	default	factory	shipped	100	n/a		factory-1031-J6	
+0x020214ac	main	300	legacy_sp3	factory	parked	50	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020214ac	main	300	legacy	factory	parked	47.5	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x02092b48	main	304	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x02092b48	main	304	legacy	factory	parked	39.5	structural	PROVISIONAL:structural	factory-1031-J6	
+0x02092b48	main	304	legacy_sp3	factory	parked	7.9	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0206b0c4	main	308	default	factory	parked	11.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x0206b0c4	main	308	legacy	factory	parked	51.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x0206b0c4	main	308	legacy_sp3	factory	parked	66.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02081348	main	308	default	factory	parked	7.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02081348	main	308	legacy	factory	parked	12.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02081348	main	308	legacy_sp3	factory	parked	20.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020321b0	main	312	default	factory	parked	39.7	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x020321b0	main	312	legacy	factory	parked	23.8	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x020321b0	main	312	legacy_sp3	factory	parked	7.7	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x02073318	main	312	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x0203d888	main	316	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x0203d888	main	316	default	factory	parked	13.9	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020548f4	main	316	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x020548f4	main	316	default	factory	parked	97.5	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0201ff98	main	320	default	factory	parked	95	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0201ff98	main	320	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0201ff98	main	320	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x02061150	main	320	default	factory	parked	5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02061150	main	320	legacy	factory	parked	82.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02061150	main	320	legacy_sp3	factory	parked	97.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x0208571c	main	328	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x0208571c	main	328	default	factory	parked	61	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0208571c	main	328	legacy	factory	parked	72	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0206cb6c	main	336	default	factory	parked	6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0206cb6c	main	336	legacy	factory	parked	97.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0206cb6c	main	336	legacy_sp3	factory	parked	90.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0200c0e4	main	344	default	factory	parked	58.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0200c0e4	main	344	legacy	factory	parked	4.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0200c0e4	main	344	legacy_sp3	factory	parked	43.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0207f138	main	348	default	factory	parked	19.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0207f138	main	348	legacy	factory	parked	38.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0207f138	main	348	legacy_sp3	factory	parked	20.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0205d7e4	main	352	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x0205d7e4	main	352	default	factory	parked	95.5	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x02041248	main	360	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x0209cea4	main	372	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0209cea4	main	372	legacy	factory	parked	8.6	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0209cea4	main	372	legacy_sp3	factory	parked	8.6	structural	PROVISIONAL:structural	factory-1031-J6	
+0x02051618	main	392	default	factory	parked	54.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02051618	main	392	legacy	factory	parked	9.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02051618	main	392	legacy_sp3	factory	parked	98	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020450d0	main	396	default	factory	parked	27.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020450d0	main	396	legacy	factory	parked	46	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x020450d0	main	396	legacy_sp3	factory	parked	51.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02027738	main	420	default	factory	shipped	100	n/a		factory-1031-J6	
+0x0203a370	main	432	default	factory	shipped	100	n/a		factory-1031-J6	
+0x0203a370	main	432	legacy	factory	parked	2.7	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x0203a370	main	432	legacy_sp3	factory	parked	2.7	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020a9914	main	8	default	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x020a9914	main	8	legacy	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x020a9914	main	8	legacy_sp3	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x02078eec	main	28	default	factory	parked	9.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x02078eec	main	28	legacy	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x02078eec	main	28	legacy_sp3	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x020b3850	main	32	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020b3850	main	32	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x02054ad0	main	48	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J6	
+0x02054ad0	main	48	legacy	factory	parked	29.4	asm-int	PROVISIONAL:inline-asm	factory-1031-J6	
+0x02054ad0	main	48	legacy_sp3	factory	parked	46.7	asm-int	PROVISIONAL:inline-asm	factory-1031-J6	
