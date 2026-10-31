@@ -13068,3 +13068,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204d97c	main	3820	default	factory	parked	29.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J11	
 0x0204d97c	main	3820	legacy	factory	parked	4.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J11	
 0x0204d97c	main	3820	legacy_sp3	factory	parked	42.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J11	
+0x020421d8	main	3984	default	factory	parked	7.3	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
+0x020421d8	main	3984	legacy	factory	parked	1.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
+0x020421d8	main	3984	legacy_sp3	factory	parked	6.4	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
