@@ -11301,7 +11301,7 @@ src/main/func_020653a0.legacy_sp3.c:
     complete
     .text start:0x020653a0 end:0x02065470
 
-src/main/func_02065470.s:
+src/main/func_02065470.legacy_sp3.c:
     complete
     .text start:0x02065470 end:0x0206553c
 
