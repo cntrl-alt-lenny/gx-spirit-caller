@@ -13104,3 +13104,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020055b4	main	240	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J7	
 0x020055b4	main	240	legacy	factory	parked	6.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J7	
 0x020055b4	main	240	legacy_sp3	factory	parked	6.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J7	
+0x020416f8	main	240	legacy_sp3	factory	shipped	100	n/a		factory-1031-J7	
