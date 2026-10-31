@@ -13002,3 +13002,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021da36c	ov004	1244	default	factory	shipped	100	n/a		factory-1031-J16	
 0x021da36c	ov004	1244	legacy_sp3	factory	parked	7.3	unknown	UNCLASSIFIED:unknown	factory-1031-J16	
 0x021da36c	ov004	1244	legacy	factory	parked	7.3	unknown	UNCLASSIFIED:unknown	factory-1031-J16	
+0x021b5544	ov016	1252	default	factory	parked	10.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J16	
+0x021b5544	ov016	1252	legacy	factory	parked	8.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J16	
+0x021b5544	ov016	1252	legacy_sp3	factory	parked	8.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J16	
