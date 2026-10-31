@@ -13067,3 +13067,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a2100	main	220	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
 0x020a2100	main	220	legacy_sp3	factory	parked	3.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
 0x020b0afc	main	224	default	factory	shipped	100	n/a		factory-1031-J6	
+0x02060520	main	228	default	factory	parked	16.4	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x02060520	main	228	legacy	factory	parked	8.5	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x02060520	main	228	legacy_sp3	factory	parked	70.2	register-numbering-permutation-cascade	P-30	factory-1031-J6	
