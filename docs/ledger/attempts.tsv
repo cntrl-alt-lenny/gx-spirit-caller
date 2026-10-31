@@ -13117,3 +13117,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021aa4d0	ov005	2520	default	factory	parked	4.1	structural	PROVISIONAL:structural	factory-1031-J16	
 0x021aa4d0	ov005	2520	legacy	factory	parked	3.4	structural	PROVISIONAL:structural	factory-1031-J16	
 0x021aa4d0	ov005	2520	legacy_sp3	factory	parked	4.7	structural	PROVISIONAL:structural	factory-1031-J16	
+0x021c91e0	ov006	2536	default	factory	parked	20.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J16	
+0x021c91e0	ov006	2536	legacy	factory	parked	2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J16	
+0x021c91e0	ov006	2536	legacy_sp3	factory	parked	2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J16	
