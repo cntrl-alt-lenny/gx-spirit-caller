@@ -13051,3 +13051,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02001f18	main	744	default	factory	parked	2.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
 0x02001f18	main	744	legacy	factory	parked	2.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
 0x02001f18	main	744	legacy_sp3	factory	parked	1.6	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J10	
+0x0201c6a0	main	764	default	factory	parked	99.5	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x0201c6a0	main	764	legacy	factory	parked	1	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x0201c6a0	main	764	legacy_sp3	factory	parked	1	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
