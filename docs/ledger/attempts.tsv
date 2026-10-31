@@ -13102,3 +13102,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020214ac	main	300	default	factory	shipped	100	n/a		factory-1031-J6	
 0x020214ac	main	300	legacy_sp3	factory	parked	50	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
 0x020214ac	main	300	legacy	factory	parked	47.5	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x02092b48	main	304	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
+0x02092b48	main	304	legacy	factory	parked	39.5	structural	PROVISIONAL:structural	factory-1031-J6	
+0x02092b48	main	304	legacy_sp3	factory	parked	7.9	structural	PROVISIONAL:structural	factory-1031-J6	
