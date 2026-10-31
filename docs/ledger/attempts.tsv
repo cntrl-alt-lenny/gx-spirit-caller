@@ -12988,3 +12988,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b2754	main	540	default	factory	parked	1.5	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
 0x020b2754	main	540	legacy	factory	parked	0.7	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
 0x020b2754	main	540	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x0208610c	main	552	default	factory	parked	7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
+0x0208610c	main	552	legacy	factory	parked	18.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
+0x0208610c	main	552	legacy_sp3	factory	parked	18.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
