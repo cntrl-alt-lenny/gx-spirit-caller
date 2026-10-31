@@ -13036,3 +13036,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020590f0	main	668	default	factory	parked	18.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x020590f0	main	668	legacy	factory	parked	33.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x020590f0	main	668	legacy_sp3	factory	parked	47.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
+0x020b0cbc	main	676	default	factory	parked	61.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
+0x020b0cbc	main	676	legacy	factory	parked	11.6	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
+0x020b0cbc	main	676	legacy_sp3	factory	parked	1.8	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
