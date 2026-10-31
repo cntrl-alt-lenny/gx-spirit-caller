@@ -19769,7 +19769,7 @@ src/main/func_020b0f60.s:
     complete
     .text start:0x020b0f60 end:0x020b10e0
 
-src/main/func_020b10e0.s:
+src/main/func_020b10e0.c:
     complete
     .text start:0x020b10e0 end:0x020b1188
 
