@@ -8208,7 +8208,7 @@ src/main/func_02041dbc.legacy_sp3.c:
     complete
     .text start:0x02041dbc end:0x02041e18
 
-src/main/func_02041e18.s:
+src/main/func_02041e18.legacy_sp3.c:
     complete
     .text start:0x02041e18 end:0x02041ea0
 
