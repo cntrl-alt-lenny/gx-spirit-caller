@@ -10545,7 +10545,7 @@ src/main/func_0205d6f8.legacy_sp3.c:
     complete
     .text start:0x0205d6f8 end:0x0205d7e4
 
-src/main/func_0205d7e4.s:
+src/main/func_0205d7e4.legacy_sp3.c:
     complete
     .text start:0x0205d7e4 end:0x0205d944
 
