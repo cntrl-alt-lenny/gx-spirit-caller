@@ -12980,3 +12980,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a85ec	main	1892	default	factory	parked	32.5	structural	PROVISIONAL:structural	factory-1030-J11	
 0x020a85ec	main	1892	legacy	factory	parked	5.7	structural	PROVISIONAL:structural	factory-1030-J11	
 0x020a85ec	main	1892	legacy_sp3	factory	parked	5.5	structural	PROVISIONAL:structural	factory-1030-J11	
+0x020a41f8	main	2204	default	factory	parked	3.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J11	
+0x020a41f8	main	2204	legacy	factory	parked	25.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J11	
+0x020a41f8	main	2204	legacy_sp3	factory	parked	7.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J11	
