@@ -12982,3 +12982,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206be1c	main	12	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J7	
 0x0206be1c	main	12	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J7	
 0x0206be1c	main	12	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J7	
+0x02074e4c	main	12	default	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J7	
+0x02074e4c	main	12	legacy	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J7	
+0x02074e4c	main	12	legacy_sp3	factory	parked	0	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1031-J7	
