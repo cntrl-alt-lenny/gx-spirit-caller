@@ -8,7 +8,7 @@ src/overlay018/func_ov018_021aa4a0.c:
     complete
     .text start:0x021aa4a0 end:0x021aa5fc
 
-src/overlay018/func_ov018_021aa5fc.s:
+src/overlay018/func_ov018_021aa5fc.c:
     complete
     .text start:0x021aa5fc end:0x021aa794
 

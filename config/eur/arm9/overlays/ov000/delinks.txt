@@ -639,7 +639,7 @@ src/overlay000/func_ov000_021add24.c:
     complete
     .text start:0x021add24 end:0x021add44
 
-src/overlay000/func_ov000_021add44.s:
+src/overlay000/func_ov000_021add44.c:
     complete
     .text start:0x021add44 end:0x021adf18
 
@@ -823,7 +823,7 @@ src/overlay000/func_ov000_021af5c0.c:
     complete
     .text start:0x021af5c0 end:0x021af5e0
 
-src/overlay000/func_ov000_021af5e0.s:
+src/overlay000/func_ov000_021af5e0.c:
     complete
     .text start:0x021af5e0 end:0x021af720
 
