@@ -13147,3 +13147,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02254a84	ov002	480	default	factory	parked	0.8	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J2	
 0x02254a84	ov002	480	legacy	factory	parked	3.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J2	
 0x02254a84	ov002	480	legacy_sp3	factory	parked	6.5	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J2	
+0x021d6e70	ov002	484	default	factory	parked	28.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J2	
+0x021d6e70	ov002	484	legacy	factory	parked	4.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J2	
+0x021d6e70	ov002	484	legacy_sp3	factory	parked	8.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J2	
