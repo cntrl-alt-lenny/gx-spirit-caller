@@ -13020,3 +13020,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201de34	main	1688	default	factory	parked	95.3	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J11	
 0x0201de34	main	1688	legacy	factory	parked	4.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J11	
 0x0201de34	main	1688	legacy_sp3	factory	parked	4.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J11	
+0x02035954	main	1696	default	factory	parked	8	structural	PROVISIONAL:structural	factory-1031-J11	
+0x02035954	main	1696	legacy	factory	parked	3.5	structural	PROVISIONAL:structural	factory-1031-J11	
+0x02035954	main	1696	legacy_sp3	factory	parked	3.5	structural	PROVISIONAL:structural	factory-1031-J11	
