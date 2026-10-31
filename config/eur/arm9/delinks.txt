@@ -10482,7 +10482,7 @@ src/main/func_0205cab4.c:
     complete
     .text start:0x0205cab4 end:0x0205cb14
 
-src/main/func_0205cb14.s:
+src/main/func_0205cb14.legacy_sp3.c:
     complete
     .text start:0x0205cb14 end:0x0205cbb8
 
