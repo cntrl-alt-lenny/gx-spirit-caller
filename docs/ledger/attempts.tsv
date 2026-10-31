@@ -13024,3 +13024,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a037c	main	636	default	factory	parked	6.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x020a037c	main	636	legacy	factory	parked	83.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
 0x020a037c	main	636	legacy_sp3	factory	parked	8.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J10	
+0x02099928	main	640	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x02099928	main	640	legacy	factory	parked	0.5	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x02099928	main	640	legacy_sp3	factory	parked	0.5	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
