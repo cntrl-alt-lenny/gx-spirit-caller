@@ -201,7 +201,7 @@ src/overlay004/func_ov004_021ce1ec.s:
     complete
     .text start:0x021ce1ec end:0x021ce364
 
-src/overlay004/func_ov004_021ce364.s:
+src/overlay004/func_ov004_021ce364.c:
     complete
     .text start:0x021ce364 end:0x021ce4a8
 
