@@ -13051,3 +13051,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021f6544	ov002	264	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J2	
 0x021f6544	ov002	264	legacy	factory	parked	16.2	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J2	
 0x021f6544	ov002	264	legacy_sp3	factory	parked	6.1	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J2	
+0x0222fa9c	ov002	268	default	factory	parked	3	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J2	
+0x0222fa9c	ov002	268	legacy	factory	parked	10.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J2	
+0x0222fa9c	ov002	268	legacy_sp3	factory	parked	15.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J2	
