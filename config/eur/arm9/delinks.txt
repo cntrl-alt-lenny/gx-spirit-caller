@@ -9131,7 +9131,7 @@ src/main/func_0204bf00.legacy_sp3.c:
     complete
     .text start:0x0204bf00 end:0x0204bf44
 
-src/main/func_0204bf44.s:
+src/main/func_0204bf44.legacy_sp3.c:
     complete
     .text start:0x0204bf44 end:0x0204c04c
 
