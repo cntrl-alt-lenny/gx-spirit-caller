@@ -13169,3 +13169,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02062600	main	388	legacy	factory	parked	12.3	unknown	UNCLASSIFIED:unknown	factory-1031-J8	
 0x02008ac8	main	328	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J8	
 0x02046094	main	360	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J8	
+0x020b3648	main	16	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J8	
+0x020b3648	main	16	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J8	
+0x020b3648	main	16	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J8	
