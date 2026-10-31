@@ -13087,3 +13087,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02002ffc	main	1028	default	factory	parked	19.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
 0x02002ffc	main	1028	legacy	factory	parked	5.8	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
 0x02002ffc	main	1028	legacy_sp3	factory	parked	7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J11	
+0x02010408	main	1076	default	factory	parked	41	structural	PROVISIONAL:structural	factory-1031-J11	
+0x02010408	main	1076	legacy	factory	parked	3.1	structural	PROVISIONAL:structural	factory-1031-J11	
+0x02010408	main	1076	legacy_sp3	factory	parked	3.1	structural	PROVISIONAL:structural	factory-1031-J11	
