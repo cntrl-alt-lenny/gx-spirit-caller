@@ -16043,3 +16043,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021af2dc	ov005	1064	legacy	factory	parked	1.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J16	
 0x021af2dc	ov005	1064	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J16	
 0x02006394	main	400	default	fastmatch-100-but-link-undefined-local-label-callee	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J7	
+0x020548f4	main	316	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
+0x02064dfc	main	392	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
