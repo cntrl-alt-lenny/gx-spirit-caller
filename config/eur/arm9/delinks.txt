@@ -6193,7 +6193,7 @@ src/main/func_02032864.c:
     complete
     .text start:0x02032864 end:0x02032888
 
-src/main/func_02032888.s:
+src/main/func_02032888.c:
     complete
     .text start:0x02032888 end:0x02032998
 
