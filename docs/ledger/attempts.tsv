@@ -13132,3 +13132,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207f934	main	940	default	factory	parked	3.4	structural	PROVISIONAL:structural	factory-1031-J10	
 0x0207f934	main	940	legacy	factory	parked	0.8	structural	PROVISIONAL:structural	factory-1031-J10	
 0x0207f934	main	940	legacy_sp3	factory	parked	0.8	structural	PROVISIONAL:structural	factory-1031-J10	
+0x020b23a0	main	948	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x020b23a0	main	948	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
+0x020b23a0	main	948	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1031-J10	
