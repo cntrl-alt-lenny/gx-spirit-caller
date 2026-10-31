@@ -13098,3 +13098,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206c61c	main	268	legacy	factory	shipped	100	n/a		factory-1031-J9	
 0x0207bec8	main	268	legacy	factory	shipped	100	n/a		factory-1031-J9	
 0x020964a0	main	268	legacy	factory	shipped	100	n/a		factory-1031-J9	
+0x02020914	main	272	default	factory	parked	10.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J9	
+0x02020914	main	272	legacy	factory	parked	9.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J9	
+0x02020914	main	272	legacy_sp3	factory	parked	10.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J9	
