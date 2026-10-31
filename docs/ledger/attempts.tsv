@@ -12964,3 +12964,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02025fe4	main	1292	default	factory	parked	42	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J11	
 0x02025fe4	main	1292	legacy	factory	parked	9.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J11	
 0x02025fe4	main	1292	legacy_sp3	factory	parked	9.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J11	
+0x0209b5e0	main	1408	legacy	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J11	
