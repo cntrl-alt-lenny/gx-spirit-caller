@@ -12997,3 +12997,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022b867c	ov002	584	default	factory	shipped	100	n/a		factory-1031-J3	
 0x022b867c	ov002	584	legacy_sp3	factory	parked	13.4	unknown	UNCLASSIFIED:unknown	factory-1031-J3	
 0x022b867c	ov002	584	legacy	factory	parked	5.3	unknown	UNCLASSIFIED:unknown	factory-1031-J3	
+0x02274880	ov002	608	default	factory	parked	71	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J3	
+0x02274880	ov002	608	legacy	factory	parked	2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J3	
+0x02274880	ov002	608	legacy_sp3	factory	parked	2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J3	
