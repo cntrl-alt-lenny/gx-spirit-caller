@@ -13149,3 +13149,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020450d0	main	396	default	factory	parked	27.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
 0x020450d0	main	396	legacy	factory	parked	46	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
 0x020450d0	main	396	legacy_sp3	factory	parked	51.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02027738	main	420	default	factory	shipped	100	n/a		factory-1031-J6	

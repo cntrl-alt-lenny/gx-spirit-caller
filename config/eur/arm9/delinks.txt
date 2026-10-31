@@ -4780,7 +4780,7 @@ src/main/func_02027180.c:
     complete
     .text start:0x02027180 end:0x02027738
 
-src/main/func_02027738.s:
+src/main/func_02027738.c:
     complete
     .text start:0x02027738 end:0x020278dc
 
