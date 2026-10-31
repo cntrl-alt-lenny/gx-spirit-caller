@@ -13029,3 +13029,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02058a08	main	1768	legacy_sp3	factory	shipped	100	n/a		factory-1031-J11	
 0x02058a08	main	1768	default	factory	parked	5.9	unknown	UNCLASSIFIED:unknown	factory-1031-J11	
 0x02058a08	main	1768	legacy	factory	parked	5.8	unknown	UNCLASSIFIED:unknown	factory-1031-J11	
+0x02003f70	main	1812	default	factory	parked	51.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x02003f70	main	1812	legacy	factory	parked	3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
+0x02003f70	main	1812	legacy_sp3	factory	parked	3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J11	
