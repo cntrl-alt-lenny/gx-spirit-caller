@@ -13164,3 +13164,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200a488	main	516	default	factory	parked	27.9	structural	PROVISIONAL:structural	factory-1031-J10	
 0x0200a488	main	516	legacy	factory	parked	0.7	structural	PROVISIONAL:structural	factory-1031-J10	
 0x0200a488	main	516	legacy_sp3	factory	parked	0.7	structural	PROVISIONAL:structural	factory-1031-J10	
+0x02023274	main	516	default	factory	parked	83	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
+0x02023274	main	516	legacy	factory	parked	36.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
+0x02023274	main	516	legacy_sp3	factory	parked	39.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J10	
