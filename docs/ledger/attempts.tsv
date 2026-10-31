@@ -13059,3 +13059,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200ddc4	main	3072	default	factory	parked	50.1	register-numbering-permutation-cascade	P-30	factory-1031-J11	
 0x0200ddc4	main	3072	legacy	factory	parked	0.3	register-numbering-permutation-cascade	P-30	factory-1031-J11	
 0x0200ddc4	main	3072	legacy_sp3	factory	parked	0.3	register-numbering-permutation-cascade	P-30	factory-1031-J11	
+0x02007278	main	3092	default	factory	parked	1.8	structural	PROVISIONAL:structural	factory-1031-J11	
+0x02007278	main	3092	legacy	factory	parked	0.1	structural	PROVISIONAL:structural	factory-1031-J11	
+0x02007278	main	3092	legacy_sp3	factory	parked	0.1	structural	PROVISIONAL:structural	factory-1031-J11	
