@@ -10599,7 +10599,7 @@ src/main/func_0205fd94.legacy_sp3.c:
 src/main/func_0205fe18.c:
     complete
     .text start:0x0205fe18 end:0x0205febc
-src/main/func_0205febc.s:
+src/main/func_0205febc.legacy_sp3.c:
     complete
     .text start:0x0205febc end:0x0205ffc0
 
