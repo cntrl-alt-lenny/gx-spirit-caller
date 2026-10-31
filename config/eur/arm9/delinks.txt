@@ -12013,7 +12013,7 @@ src/main/func_0206931c.legacy_sp3.c:
     complete
     .text start:0x0206931c end:0x02069454
 
-src/main/func_02069454.s:
+src/main/func_02069454.legacy.c:
     complete
     .text start:0x02069454 end:0x0206950c
 
