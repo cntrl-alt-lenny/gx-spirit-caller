@@ -13025,3 +13025,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b10e0	main	168	default	factory	shipped	100	n/a		factory-1031-J9	
 0x02063664	main	172	legacy_sp3	factory	shipped	100	n/a		factory-1031-J9	
 0x0209cc90	main	172	legacy	factory	shipped	100	n/a		factory-1031-J9	
+0x020a3190	main	172	default	factory	parked	16.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J9	
+0x020a3190	main	172	legacy	factory	parked	15.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J9	
+0x020a3190	main	172	legacy_sp3	factory	parked	37.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J9	
