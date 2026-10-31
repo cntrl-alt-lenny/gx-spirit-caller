@@ -3327,7 +3327,7 @@ src/main/func_0201afdc.s:
     complete
     .text start:0x0201afdc end:0x0201b504
 
-src/main/func_0201b504.s:
+src/main/func_0201b504.c:
     complete
     .text start:0x0201b504 end:0x0201b5d0
 
