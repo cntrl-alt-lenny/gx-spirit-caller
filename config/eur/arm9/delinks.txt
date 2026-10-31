@@ -6980,7 +6980,7 @@ src/main/func_02034bd8.c:
     complete
     .text start:0x02034bd8 end:0x02034c34
 
-src/main/func_02034c34.s:
+src/main/func_02034c34.c:
     complete
     .text start:0x02034c34 end:0x02034d58
 
