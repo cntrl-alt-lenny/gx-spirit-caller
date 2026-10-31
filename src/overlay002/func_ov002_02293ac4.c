@@ -1,0 +1,32 @@
+typedef struct { unsigned short id; unsigned short side:1; } Card;
+struct Entry { char pad[48]; unsigned id:13; unsigned rest:19; unsigned short h34, h36; };
+struct Player { char pad[48]; struct Entry cards[5]; char tail[2004]; };
+extern char data_ov002_022cf16c[];
+extern int func_ov002_02259f74(int x);
+extern int func_ov002_021bbf50(int arg0);
+extern int func_ov002_021c8470(int a, int b);
+extern void func_ov002_021c4c9c(int a, int b, int *out);
+int func_ov002_02293ac4(Card *self) {
+ int out[11];
+ int limit;
+ int i;
+ if (func_ov002_02259f74(self->side)==0) return 0;
+ if (func_ov002_021bbf50(1-self->side)>0) {
+  limit=0;
+  for (i=0;i<5;i++) {
+   struct Entry *e=(struct Entry *)(data_ov002_022cf16c + (self->side & 1)*0x868 + i*0x14);
+   if (e->id && e->h36==0) {
+    limit=limit>func_ov002_021c8470(self->side,i)?limit:func_ov002_021c8470(self->side,i);
+   }
+  }
+  for (i=0;i<5;i++) {
+   struct Entry *e=(struct Entry *)(data_ov002_022cf16c + ((1-self->side) & 1)*0x868 + i*0x14);
+   if (e->id && e->h36==0) {
+    func_ov002_021c4c9c(1-self->side,i,out);
+    if (out[5]>=limit && out[6]<limit) return 1;
+   }
+  }
+ }
+ return 0;
+}
+
