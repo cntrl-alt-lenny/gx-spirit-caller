@@ -13055,3 +13055,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021afa34	ov008	376	default	factory	shipped	100	n/a		factory-1031-J13	
 0x021d6a10	ov004	376	default	factory	shipped	100	n/a		factory-1031-J13	
 0x021b3174	ov016	380	default	factory	shipped	100	n/a		factory-1031-J13	
+0x021cb158	ov006	384	default	factory	parked	11.5	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J13	
+0x021cb158	ov006	384	legacy	factory	parked	15.2	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J13	
+0x021cb158	ov006	384	legacy_sp3	factory	parked	15.3	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J13	
