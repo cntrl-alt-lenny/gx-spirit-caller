@@ -12985,3 +12985,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209085c	main	12	default	factory	parked	33.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
 0x0209085c	main	12	legacy	factory	parked	33.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
 0x0209085c	main	12	legacy_sp3	factory	parked	33.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
+0x020947b8	main	14	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
+0x020947b8	main	14	legacy	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
+0x020947b8	main	14	legacy_sp3	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J8	
