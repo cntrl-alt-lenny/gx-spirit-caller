@@ -13108,3 +13108,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206b0c4	main	308	default	factory	parked	11.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
 0x0206b0c4	main	308	legacy	factory	parked	51.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
 0x0206b0c4	main	308	legacy_sp3	factory	parked	66.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x02081348	main	308	default	factory	parked	7.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02081348	main	308	legacy	factory	parked	12.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x02081348	main	308	legacy_sp3	factory	parked	20.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
