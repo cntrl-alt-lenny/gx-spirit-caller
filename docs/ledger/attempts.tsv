@@ -13084,3 +13084,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205bf18	main	832	default	factory	parked	15.9	unknown	UNCLASSIFIED:unknown	factory-1031-J10	
 0x0205bf18	main	832	legacy	factory	parked	23.9	unknown	UNCLASSIFIED:unknown	factory-1031-J10	
 0x0205bf18	main	832	legacy_sp3	factory	parked	92.8	unknown	UNCLASSIFIED:unknown	factory-1031-J10	
+0x0203bdec	main	848	default	factory	parked	26.6	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
+0x0203bdec	main	848	legacy	factory	parked	4.1	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
+0x0203bdec	main	848	legacy_sp3	factory	parked	4.6	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J10	
