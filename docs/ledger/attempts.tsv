@@ -13130,3 +13130,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02057d5c	main	260	legacy_sp3	factory	shipped	100	n/a		factory-1031-J7	
 0x0205febc	main	260	legacy_sp3	factory	shipped	100	n/a		factory-1031-J7	
 0x02071fb0	main	260	legacy	factory	shipped	100	n/a		factory-1031-J7	
+0x0207fda4	main	260	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J7	
+0x0207fda4	main	260	legacy	factory	parked	10.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J7	
+0x0207fda4	main	260	legacy_sp3	factory	parked	75.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J7	
