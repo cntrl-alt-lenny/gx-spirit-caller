@@ -8188,7 +8188,7 @@ src/main/func_020417e8.s:
     complete
     .text start:0x020417e8 end:0x020418ac
 
-src/main/func_020418ac.s:
+src/main/func_020418ac.legacy_sp3.c:
     complete
     .text start:0x020418ac end:0x02041978
 
