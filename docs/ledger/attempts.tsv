@@ -13010,3 +13010,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201a044	main	116	default	factory	parked	51.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
 0x0201a044	main	116	legacy	factory	parked	17.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
 0x0201a044	main	116	legacy_sp3	factory	parked	17.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
+0x0209b0f4	main	120	default	factory	parked	23.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
+0x0209b0f4	main	120	legacy	factory	parked	63.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
+0x0209b0f4	main	120	legacy_sp3	factory	parked	36.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
