@@ -18002,7 +18002,7 @@ src/main/FS_StopOverlay.legacy.c:
     complete
     .text start:0x02098788 end:0x020987a4
 
-src/main/func_020987a4.s:
+src/main/func_020987a4.legacy.c:
     complete
     .text start:0x020987a4 end:0x020988a8
 
