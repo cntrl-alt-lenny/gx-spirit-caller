@@ -13077,3 +13077,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02089864	main	188	default	factory	parked	87.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
 0x02089864	main	188	legacy	factory	parked	43.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
 0x02089864	main	188	legacy_sp3	factory	parked	61.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
+0x0203671c	main	192	default	factory	shipped	100	n/a		factory-1031-J7	
