@@ -13054,3 +13054,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02067e94	main	168	legacy_sp3	factory	shipped	100	n/a		factory-1031-J8	
 0x0209256c	main	168	legacy	factory	shipped	100	n/a		factory-1031-J8	
 0x020a6924	main	172	legacy	factory	shipped	100	n/a		factory-1031-J8	
+0x02009dec	main	176	default	factory	parked	88.6	register-numbering-permutation-cascade	P-30	factory-1031-J8	
+0x02009dec	main	176	legacy	factory	parked	12.5	register-numbering-permutation-cascade	P-30	factory-1031-J8	
+0x02009dec	main	176	legacy_sp3	factory	parked	12.8	register-numbering-permutation-cascade	P-30	factory-1031-J8	
