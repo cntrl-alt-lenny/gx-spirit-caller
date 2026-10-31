@@ -12958,3 +12958,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02027048	main	136	default	factory	parked	5.9	structural	PROVISIONAL:structural	factory-1030-J9	
 0x02027048	main	136	legacy	factory	parked	8.8	structural	PROVISIONAL:structural	factory-1030-J9	
 0x02027048	main	136	legacy_sp3	factory	parked	5.9	structural	PROVISIONAL:structural	factory-1030-J9	
+0x020947d0	main	148	default	factory	parked	5.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
+0x020947d0	main	148	legacy	factory	parked	13.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
+0x020947d0	main	148	legacy_sp3	factory	parked	2.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
