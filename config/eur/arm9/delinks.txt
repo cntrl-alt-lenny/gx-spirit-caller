@@ -7732,7 +7732,7 @@ src/main/func_0203c900.legacy.c:
     complete
     .text start:0x0203c900 end:0x0203c968
 
-src/main/func_0203c968.s:
+src/main/func_0203c968.legacy_sp3.c:
     complete
     .text start:0x0203c968 end:0x0203ca78
 
