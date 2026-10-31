@@ -13099,3 +13099,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200962c	main	288	default	factory	parked	93.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
 0x0200962c	main	288	legacy	factory	parked	17.3	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
 0x0200962c	main	288	legacy_sp3	factory	parked	87.7	frame-shape	PROVISIONAL:frame/epilogue	factory-1031-J6	
+0x020214ac	main	300	default	factory	shipped	100	n/a		factory-1031-J6	
+0x020214ac	main	300	legacy_sp3	factory	parked	50	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
+0x020214ac	main	300	legacy	factory	parked	47.5	unknown	UNCLASSIFIED:unknown	factory-1031-J6	

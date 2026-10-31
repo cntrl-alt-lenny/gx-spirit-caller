@@ -4330,7 +4330,7 @@ src/main/func_0202147c.c:
     complete
     .text start:0x0202147c end:0x020214ac
 
-src/main/func_020214ac.s:
+src/main/func_020214ac.c:
     complete
     .text start:0x020214ac end:0x020215d8
 
