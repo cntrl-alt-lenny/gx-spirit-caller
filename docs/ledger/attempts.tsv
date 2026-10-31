@@ -13047,3 +13047,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207108c	main	176	default	factory	parked	6.8	register-numbering-permutation-cascade	P-30	factory-1031-J6	
 0x0207108c	main	176	legacy	factory	parked	81.8	register-numbering-permutation-cascade	P-30	factory-1031-J6	
 0x0207108c	main	176	legacy_sp3	factory	parked	61.4	register-numbering-permutation-cascade	P-30	factory-1031-J6	
+0x0201ce94	main	192	default	factory	parked	62.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x0201ce94	main	192	legacy	factory	parked	3.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x0201ce94	main	192	legacy_sp3	factory	parked	6	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
