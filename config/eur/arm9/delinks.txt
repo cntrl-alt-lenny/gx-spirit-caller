@@ -19418,7 +19418,7 @@ src/main/func_020a6e4c.s:
     complete
     .text start:0x020a6e4c end:0x020a70fc
 
-src/main/func_020a70fc.s:
+src/main/func_020a70fc.c:
     complete
     .text start:0x020a70fc end:0x020a71e4
 
