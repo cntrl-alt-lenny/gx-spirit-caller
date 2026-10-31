@@ -13043,3 +13043,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209c280	main	156	default	factory	parked	12.8	unknown	UNCLASSIFIED:unknown	factory-1031-J7	
 0x0209c280	main	156	legacy_sp3	factory	parked	20.5	unknown	UNCLASSIFIED:unknown	factory-1031-J7	
 0x0201c5b4	main	152	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J7	
+0x0207845c	main	60	legacy	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-J7	
