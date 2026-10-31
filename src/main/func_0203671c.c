@@ -1,0 +1,50 @@
+typedef struct { int f_0, f_4; unsigned short f_8, f_a; } state_021_4set_t;
+extern void func_020385bc(state_021_4set_t *p, int v);
+typedef struct {
+ int f0, f4, f8;
+ state_021_4set_t fc;
+ unsigned short h18,h1a,h1c,h1e;
+ unsigned char b20,b21;
+ short h22;
+ unsigned char b24,b25,b26,b27,b28,b29,b2a,b2b;
+ char pad2c[8];
+ int f34,f38,f3c;
+ state_021_4set_t f40;
+ char pad4c[12];
+ unsigned short h58,h5a;
+ int f5c,f60,f64;
+ unsigned short h68;
+ char pad6a[8];
+ unsigned char b72,b73;
+ unsigned short h74;
+} Entry;
+void func_0203671c(Entry *p, int a, int b) {
+ unsigned int flags;
+ p->f38=0;
+ p->f0=0;
+ func_020385bc(&p->f40,127);
+ p->f34=a;
+ p->h74=b;
+ flags=0x4000;
+ if(p->h68 & 0x2000) flags |= p->h68 & ~0x2000;
+ else p->f5c=0;
+ p->b72=0;
+ p->h58=0;
+ p->h22=-1;
+ p->h1c=0;
+ p->h18=0;
+ p->h1a=0;
+ p->b24=p->b25=64;
+ func_020385bc(&p->fc,0);
+ p->b2a=0;
+ p->b29=0;
+ p->b26=p->b27=p->b28=127;
+ p->f8=0;
+ p->b20=0;
+ p->b21=0;
+ p->h1e=1;
+ p->b2b=0;
+ p->b73=0;
+ p->h68=flags;
+}
+
