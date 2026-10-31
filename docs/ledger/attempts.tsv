@@ -13036,3 +13036,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201d620	main	148	legacy	factory	parked	2.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
 0x0201d620	main	148	legacy_sp3	factory	parked	10.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
 0x020a26f0	main	148	legacy	factory	shipped	100	n/a		factory-1031-J7	
+0x0201c5b4	main	152	default	factory	shipped	100	n/a		factory-1031-J7	
