@@ -8003,7 +8003,7 @@ src/main/func_0203f030.c:
     complete
     .text start:0x0203f030 end:0x0203f094
 
-src/main/func_0203f094.s:
+src/main/func_0203f094.legacy_sp3.c:
     complete
     .text start:0x0203f094 end:0x0203f198
 
