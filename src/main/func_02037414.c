@@ -11,7 +11,7 @@ extern unsigned int func_02034a84(unsigned int x);
 extern void func_0203624c(struct S0203624c *p, int v);
 extern void func_0203671c(u8 *, int, int);
 extern void func_02036c68(void);
-extern void func_0203724c(void);
+extern int func_0203724c(void);
 extern u8 *func_02036d7c(int idArg, int slot, int value, int flagsArg);
 extern int func_02037328(ent_02037328_t *self);
 #define H(p,o) (*(u16 *)((p)+(o)))

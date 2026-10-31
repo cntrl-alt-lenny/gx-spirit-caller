@@ -19,7 +19,7 @@ extern int func_02032efc(void *self, int idx, void *ptr);
  * 0203268c singleton) at data_02105b70, and finally re-registers 60 more
  * sub-slots walking data_ov004_0220b500+0x128+0x3c00 in 0x54-byte strides.
  */
-int func_ov004_021d3c8c(void) {
+int func_ov004_021d3c8c(int unused0) {
     char *base = data_ov004_0220b500;
 
     if (func_0203309c(data_02105b70, 0x4159584a) == 1) {

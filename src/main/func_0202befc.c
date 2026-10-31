@@ -1,4 +1,4 @@
-typedef struct { volatile int field_0; int field_4, field_8, field_c, field_10; char pad[4]; int field_18; volatile int field_1c; } Obj_t;
+typedef struct { int field_0; int field_4, field_8, field_c, field_10; char pad[4]; int field_18; int field_1c; } Obj_t;
 typedef struct { char pad[0x24]; int lo, hi, cur; } obj_t;
 typedef struct { char pad[0x2c]; int pos; } strm_t;
 extern unsigned short func_0202b0b4(int id);

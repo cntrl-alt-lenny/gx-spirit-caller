@@ -1,7 +1,7 @@
 static inline void clear_addr(void *p) { int *dst = p; dst[0] = 0; dst[1] = 0; }
 typedef struct { unsigned char b[8]; } SockAddr;
 typedef struct { char *name; char **aliases; unsigned short addrtype, length; unsigned int **addr_list; } Host;
-typedef struct { char pad0[0x10c]; int mode; char pad1[0xc4]; volatile int sock; int state; char pad2[0x28]; volatile int listener; int port; } Owner;
+typedef struct { char pad0[0x10c]; int mode; char pad1[0xc4]; int sock; int state; char pad2[0x28]; int listener; int port; } Owner;
 typedef struct { int f[5]; int active; } Node;
 extern int func_02054e8c(int unused0, int unused1, int unused2);
 extern int func_02055250(void *self, int flag);

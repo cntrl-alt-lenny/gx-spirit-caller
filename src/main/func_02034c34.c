@@ -1,5 +1,5 @@
 typedef struct { int f_0, f_4; unsigned short f_8, f_a; } state_021_4set_t;
-typedef struct { int f_0; volatile int f_4; int f_8, f_c; } state_021_4clear_t;
+typedef struct { int f_0; int f_4; int f_8, f_c; } state_021_4clear_t;
 typedef struct { state_021_4set_t state; short f_c; short pad; } Entry;
 typedef struct { char pad0[4]; int f4; char pad8[0x2c]; int f34; char pad38[0x32]; signed char f6a; char pad6b[2]; signed char f6d, f6e, f6f; char pad70[8]; } Item;
 typedef struct { char pad0[4]; short f4, f6, f8; char pada[0x3e]; int f48; char pad4c[8]; int f54; } Global;

@@ -2,7 +2,7 @@
  * subsystem B; return 1. */
 #include "ov016_core.h"
 extern void func_ov016_021b7fbc(void *a);
-int func_ov016_021b6324(void) {
+int func_ov016_021b6324(int unused0) {
     char *reg = (char *)0x04000014;
     *(int *)reg = 0;
     *(int *)(reg + 4) = 0;

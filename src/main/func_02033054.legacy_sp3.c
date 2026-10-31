@@ -26,7 +26,7 @@ typedef void (*finish_02033054_t)(void *p);
 extern int func_02052bd4(void);
 extern int data_020fe468;
 
-int func_02033054(alloc_02033054_t alloc, finish_02033054_t finish) {
+int func_02033054(alloc_02033054_t alloc, finish_02033054_t finish, int unused2) {
     void *p = alloc(0x700, 0x20);
     int x;
     if (p == 0) return -1;

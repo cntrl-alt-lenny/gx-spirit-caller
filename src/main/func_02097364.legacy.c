@@ -1,6 +1,6 @@
 typedef struct {
     char pad[0x1c];
-    volatile unsigned int flags;
+    unsigned int flags;
     char pad20[12];
     int f2c;
     int f30;

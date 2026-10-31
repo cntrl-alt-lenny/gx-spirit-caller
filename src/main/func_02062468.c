@@ -2,7 +2,7 @@
 struct Func02062468Target { char pad[12]; int f12; int f16; };
 extern int func_02064864(void);
 
-int func_02062468(int arg0, struct Func02062468Target **pp) {
+int func_02062468(int arg0, struct Func02062468Target **pp, int unused2, int unused3) {
     int r = func_02064864();
     if (r) return r;
     (*pp)->f12 = 0;

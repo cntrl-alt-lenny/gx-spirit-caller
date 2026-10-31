@@ -1,4 +1,4 @@
-typedef struct { int f_0; volatile int f_4; int f_8; int f_c; } state_021_4clear_t;
+typedef struct { int f_0; int f_4; int f_8; int f_c; } state_021_4clear_t;
 typedef struct { unsigned short flag; unsigned short pad; int value; } Entry;
 extern unsigned short data_021a83cc;
 extern int data_021a83e4[4];

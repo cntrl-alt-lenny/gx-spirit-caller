@@ -3,7 +3,7 @@ struct Ov016Row { char data[10]; };
 extern struct Ov016Row data_ov016_021b9184[];
 extern int func_ov016_021b28f4(void *p);
 
-int func_ov016_021b5244(void) {
+int func_ov016_021b5244(int unused0) {
     int i;
     for (i = 0; i < 14; i++) {
         if (func_ov016_021b28f4(&data_ov016_021b9184[i + 1]))

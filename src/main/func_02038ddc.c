@@ -15,7 +15,7 @@ typedef struct {
 
 extern Elem02038dac data_0219d00c[];
 
-Elem02038dac *func_02038ddc(int key) {
+Elem02038dac *func_02038ddc(int key, int unused1) {
     int i;
     Elem02038dac *p = data_0219d00c;
     Elem02038dac *slot = 0;
