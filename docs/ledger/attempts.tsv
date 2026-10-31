@@ -13126,3 +13126,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02228890	ov002	524	default	factory	parked	84	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J3	
 0x02228890	ov002	524	legacy	factory	parked	1.4	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J3	
 0x02228890	ov002	524	legacy_sp3	factory	parked	37.6	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J3	
+0x022a68ec	ov002	528	default	factory	parked	62.1	unknown	UNCLASSIFIED:unknown	factory-1031-J3	
+0x022a68ec	ov002	528	legacy	factory	parked	15.9	unknown	UNCLASSIFIED:unknown	factory-1031-J3	
+0x022a68ec	ov002	528	legacy_sp3	factory	parked	15.9	unknown	UNCLASSIFIED:unknown	factory-1031-J3	
