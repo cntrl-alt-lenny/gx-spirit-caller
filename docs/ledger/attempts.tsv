@@ -13166,3 +13166,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020294c0	main	356	default	factory	parked	70.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
 0x020294c0	main	356	legacy	factory	parked	7.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
 0x020294c0	main	356	legacy_sp3	factory	parked	9.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J7	
+0x020b0f60	main	384	default	factory	parked	99	structural	PROVISIONAL:structural	factory-1031-J7	
+0x020b0f60	main	384	legacy	factory	parked	10.4	structural	PROVISIONAL:structural	factory-1031-J7	
+0x020b0f60	main	384	legacy_sp3	factory	parked	10.4	structural	PROVISIONAL:structural	factory-1031-J7	
