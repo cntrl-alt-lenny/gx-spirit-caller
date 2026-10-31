@@ -13081,3 +13081,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02093b00	main	240	default	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
 0x02093b00	main	240	legacy	factory	parked	4.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
 0x02093b00	main	240	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
+0x020a1c48	main	252	legacy	factory	shipped	100	n/a		factory-1031-J9	
