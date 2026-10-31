@@ -13033,3 +13033,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021ea390	ov002	1880	default	factory	parked	87	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J4	
 0x021ea390	ov002	1880	legacy	factory	parked	1.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J4	
 0x021ea390	ov002	1880	legacy_sp3	factory	parked	6.1	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J4	
+0x02247b6c	ov002	1892	default	factory	parked	77.8	register-numbering-permutation-cascade	P-30	factory-1031-J4	
+0x02247b6c	ov002	1892	legacy	factory	parked	0.8	register-numbering-permutation-cascade	P-30	factory-1031-J4	
+0x02247b6c	ov002	1892	legacy_sp3	factory	parked	0.4	register-numbering-permutation-cascade	P-30	factory-1031-J4	
