@@ -8286,7 +8286,7 @@ src/main/func_02043a6c.c:
 
 
 
-src/main/func_02043a78.s:
+src/main/func_02043a78.legacy_sp3.c:
     complete
     .text start:0x02043a78 end:0x02043b38
 

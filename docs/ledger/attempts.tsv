@@ -13050,3 +13050,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201ce94	main	192	default	factory	parked	62.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
 0x0201ce94	main	192	legacy	factory	parked	3.7	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
 0x0201ce94	main	192	legacy_sp3	factory	parked	6	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J6	
+0x02043a78	main	192	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x02043a78	main	192	default	factory	parked	85.4	unknown	UNCLASSIFIED:unknown	factory-1031-J6	
