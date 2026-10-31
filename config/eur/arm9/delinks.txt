@@ -2312,7 +2312,7 @@ src/main/func_020181d0.c:
     complete
     .text start:0x020181d0 end:0x02018358
 
-src/main/func_02018358.s:
+src/main/func_02018358.c:
     complete
     .text start:0x02018358 end:0x020186b0
 
