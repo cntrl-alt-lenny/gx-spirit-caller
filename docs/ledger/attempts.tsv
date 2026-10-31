@@ -13075,3 +13075,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200edb8	main	240	default	factory	shipped	100	n/a		factory-1031-J6	
 0x0204bb5c	main	240	default	factory	shipped	100	n/a		factory-1031-J6	
 0x020585d4	main	244	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
+0x020886a0	main	256	legacy_sp3	factory	shipped	100	n/a		factory-1031-J6	
