@@ -13040,3 +13040,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a5a94	main	176	default	factory	parked	0	register-numbering-permutation-cascade	P-30	factory-1031-J9	
 0x020a5a94	main	176	legacy	factory	parked	86.4	register-numbering-permutation-cascade	P-30	factory-1031-J9	
 0x020a5a94	main	176	legacy_sp3	factory	parked	15.9	register-numbering-permutation-cascade	P-30	factory-1031-J9	
+0x0208d204	main	184	default	factory	parked	13	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
+0x0208d204	main	184	legacy	factory	parked	95.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
+0x0208d204	main	184	legacy_sp3	factory	parked	73.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J9	
