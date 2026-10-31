@@ -13083,3 +13083,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b1c7c	main	260	legacy	factory	parked	1.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
 0x020b1c7c	main	260	legacy_sp3	factory	parked	1.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
 0x0209e91c	main	264	legacy	factory	shipped	100	n/a		factory-1031-J6	
+0x0200a7a4	main	268	default	factory	parked	16.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0200a7a4	main	268	legacy	factory	parked	1.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0200a7a4	main	268	legacy_sp3	factory	parked	1.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
