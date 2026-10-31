@@ -12973,3 +12973,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02097528	main	200	legacy_sp3	factory	parked	46	unknown	UNCLASSIFIED:unknown	factory-1030-J8	
 0x0203e540	main	208	legacy_sp3	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J8	
 0x02059e5c	main	220	default	fastmatch-100-rejected-by-honesty-checks	parked	unknown	unknown	UNCLASSIFIED:unknown	factory-1030-J8	
+0x02044528	main	232	default	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J8	
+0x02044528	main	232	legacy	factory	parked	26.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J8	
+0x02044528	main	232	legacy_sp3	factory	parked	75.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1030-J8	
