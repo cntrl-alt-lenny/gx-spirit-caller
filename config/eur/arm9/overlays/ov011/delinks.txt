@@ -178,7 +178,7 @@ src/overlay011/func_ov011_021caafc.c:
     complete
     .text start:0x021caafc end:0x021cabbc
 
-src/overlay011/func_ov011_021cabbc.s:
+src/overlay011/func_ov011_021cabbc.c:
     complete
     .text start:0x021cabbc end:0x021cacec
 
