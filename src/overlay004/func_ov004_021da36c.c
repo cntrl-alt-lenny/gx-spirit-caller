@@ -1,0 +1,166 @@
+typedef unsigned int u32;
+typedef unsigned short u16;
+typedef struct Obj {
+    int resource, unused, dest, offset;
+    u16 size;
+    u16 pad;
+    u16 flags;
+    char tail[18];
+} Obj;
+struct Ov000Curve;
+extern void Fill32(unsigned int value, void *dest, int size_bytes);
+extern void func_02001bc8(unsigned short *out, unsigned short c1, unsigned short c2);
+extern void func_02001d68(int arg);
+extern int func_02006c0c(void *, int, int);
+extern void Task_Invoke(void *p);
+extern int func_0201d47c(Obj *o);
+extern int func_0201d760(int arg);
+extern int func_0201e5b8(Obj *o);
+extern int func_0202c0c0(void *p);
+extern void func_0208c940(void);
+extern void *func_0208dd9c(void);
+extern int func_0208de4c(void);
+extern int func_0208e0a0(void);
+extern int OS_SPrintf(signed char *, const signed char *, ...);
+extern void func_02094504(int, int, int);
+extern void func_02094550(int *src, int *dst, unsigned int count);
+extern void func_ov000_021abd50(struct Ov000Curve *p, int start, int base, int type, int a, int b, int c, int hi, int margin);
+extern void func_ov004_021c9fcc(void *rec, int a, int b, int c, int d);
+extern void func_ov004_021ca4f8(void);
+extern void func_ov004_021d9fc4(int,int,int);
+extern void func_ov004_021da874(void *self);
+extern int func_ov004_021d8648(char *self);
+extern char data_ov004_02200e00[];
+extern char data_ov004_0220b500[];
+extern struct { u32 first; unsigned int mode:3; unsigned int rest:29; } data_02104f4c;
+extern signed char data_ov004_0220a1b4[],data_ov004_0220a1c8[],data_ov004_0220a1e0[],data_ov004_0220a1f4[],data_ov004_0220a20c[],data_ov004_0220a22c[],data_ov004_0220a240[];
+extern char data_ov004_022105d8[],data_ov004_022915e8[];
+#define STATE(o) (*(int *)(self + (o)))
+static inline void layers(volatile u32 *reg, u32 mask, int on) {
+    u32 bits = (*reg & 0x1f00) >> 8;
+    if (on) *reg = (*reg & ~0x1f00) | ((bits | mask) << 8);
+    else *reg = (*reg & ~0x1f00) | ((bits & ~mask) << 8);
+}
+void func_ov004_021da36c(void) {
+    Obj a;
+    signed char name[32];
+    Obj b;
+    Obj c;
+    u16 colors[16];
+    Obj d;
+    char *self;
+    int resource;
+    int i;
+    unsigned int clear;
+
+
+
+    self = data_ov004_0220b500;
+
+
+    func_02001d68(data_02104f4c.mode);
+    *(volatile u16 *)0x0400100c = (*(volatile u16 *)0x0400100c & ~3) | 3;
+    *(volatile u32 *)0x04001018 = 0;
+    *(volatile u16 *)0x0400100c = (*(volatile u16 *)0x0400100c & 0x43) | 0x4408;
+    func_02094504(0,func_0208de4c(),0x20);
+    func_02094504(0,func_0208e0a0(),0x1000);
+    resource = func_02006c0c(data_ov004_0220a1b4,4,0);
+    func_0201d47c(&a);
+    a.resource = resource;
+    a.flags = (a.flags & ~15) | 7;
+    a.offset = 0x5040;
+    a.dest = (int)data_ov004_022105d8;
+    a.size = 0x80;
+    func_0201e5b8(&a);
+    Task_Invoke((void *)resource);
+    for (i=0;i<2;i++) {
+        OS_SPrintf(name,data_ov004_0220a1c8,i ? 6 : 2);
+        resource = func_02006c0c(name,4,0);
+        func_0201d47c(&a);
+        a.resource = resource;
+        a.flags = (a.flags & ~15) | 7;
+        a.size = (i+5)*32;
+        a.offset = -1;
+        a.dest = -1;
+        func_0201e5b8(&a);
+        Task_Invoke((void *)resource);
+    }
+    resource = func_02006c0c(data_ov004_0220a1e0,4,0);
+    func_0201d47c(&a);
+    a.resource = resource;
+    a.flags = (a.flags & ~15) | 7;
+    a.offset = 0x7040;
+    a.dest = (int)(self+0x5258);
+    a.size = 0x80;
+    func_0201e5b8(&a);
+    Task_Invoke((void *)resource);
+    *(volatile u16 *)0x0400100e = (*(volatile u16 *)0x0400100e & ~3) | 3;
+    *(volatile u32 *)0x0400101c = 0;
+    *(volatile u16 *)0x0400100e = (*(volatile u16 *)0x0400100e & 0x43) | 0x604;
+    func_02094504(0,(int)func_0208dd9c(),0x40);
+    resource = func_02006c0c(data_ov004_0220a1f4,4,0);
+    func_0201d47c(&b);
+    b.resource = resource;
+    b.flags = (b.flags & ~15) | 8;
+    b.offset = 0x40;
+    b.dest = 0;
+    b.flags &= ~16;
+    b.size = 0x100;
+    func_0201e5b8(&b);
+    Task_Invoke((void *)resource);
+    resource = func_02006c0c(data_ov004_0220a20c,4,0);
+    func_0201d47c(&c);
+    c.resource = resource;
+    c.flags = (c.flags & ~15) | 9;
+    c.offset = -1;
+    c.flags |= 16;
+    c.size = 0x400;
+    func_0201e5b8(&c);
+    Task_Invoke((void *)resource);
+    func_02001bc8(colors,0x7fff,0x3128);
+    func_02094550((int *)colors,(int *)0x05000640,0x20);
+    func_02001bc8(colors,0x3860,0x779b);
+    func_02094550((int *)colors,(int *)0x05000660,0x20);
+    func_ov004_021da874(0);
+
+    layers((volatile u32 *)0x04001000,12,1);
+
+    for (i=0;i<4;i++) func_ov004_021d9fc4(i+6,func_0202c0c0(((char **)(data_ov004_02200e00+0xc8))[i]+0x3b6),0x80);
+    resource = func_02006c0c(data_ov004_0220a22c,4,0);
+    func_0201d47c(&d);
+    d.flags = (d.flags & ~15) | 9;
+    d.offset = 0xc00;
+    d.resource = resource;
+    d.dest = 0;
+    d.size = 0x20;
+    func_0201e5b8(&d);
+    func_02094550((int *)func_0201d760(resource),(int *)(self+0x5ed8),0x20);
+    Task_Invoke((void *)resource);
+    func_ov004_021c9fcc(self+0x5f90,(int)data_ov004_0220a240,2,0x8480,1);
+
+
+   Fill32(0,self+0x158,0xa0);
+    clear=0;
+    STATE(0x54)=clear;
+    STATE(0x90)=clear-1; STATE(0xa8)=clear-1; STATE(0xac)=clear-1; STATE(0xb0)=clear-1; STATE(0x88)=clear-1;
+    STATE(0x98)=2;
+    STATE(0xa0)=clear; STATE(0x3c90)=clear; STATE(0x3c94)=clear;
+    func_ov000_021abd50((struct Ov000Curve *)(self+0x1f8),0xe4,0x22,0x1a,0x9d,0x14,0x14,STATE(0x98)*6,0x14);
+
+
+}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
