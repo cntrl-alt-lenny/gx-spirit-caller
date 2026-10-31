@@ -13036,3 +13036,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02247b6c	ov002	1892	default	factory	parked	77.8	register-numbering-permutation-cascade	P-30	factory-1031-J4	
 0x02247b6c	ov002	1892	legacy	factory	parked	0.8	register-numbering-permutation-cascade	P-30	factory-1031-J4	
 0x02247b6c	ov002	1892	legacy_sp3	factory	parked	0.4	register-numbering-permutation-cascade	P-30	factory-1031-J4	
+0x02290500	ov002	1948	default	factory	parked	70.4	structural	PROVISIONAL:structural	factory-1031-J4	
+0x02290500	ov002	1948	legacy	factory	parked	2.8	structural	PROVISIONAL:structural	factory-1031-J4	
+0x02290500	ov002	1948	legacy_sp3	factory	parked	2.9	structural	PROVISIONAL:structural	factory-1031-J4	
