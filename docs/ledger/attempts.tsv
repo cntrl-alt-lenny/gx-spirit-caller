@@ -13000,3 +13000,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02280a1c	ov002	188	default	factory	parked	91.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J1	
 0x02280a1c	ov002	188	legacy	factory	parked	58.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J1	
 0x02280a1c	ov002	188	legacy_sp3	factory	parked	68.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J1	
+0x02249090	ov002	204	default	factory	parked	92.2	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J1	
+0x02249090	ov002	204	legacy	factory	parked	13	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J1	
+0x02249090	ov002	204	legacy_sp3	factory	parked	50	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J1	
