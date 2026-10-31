@@ -5391,7 +5391,7 @@ src/main/func_0202bcb0.c:
     complete
     .text start:0x0202bcb0 end:0x0202be4c
 
-src/main/func_0202be4c.s:
+src/main/func_0202be4c.c:
     complete
     .text start:0x0202be4c end:0x0202befc
 src/main/func_0202befc.s:
