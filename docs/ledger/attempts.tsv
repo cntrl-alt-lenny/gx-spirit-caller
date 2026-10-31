@@ -13134,3 +13134,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200c0e4	main	344	default	factory	parked	58.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
 0x0200c0e4	main	344	legacy	factory	parked	4.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
 0x0200c0e4	main	344	legacy_sp3	factory	parked	43.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0207f138	main	348	default	factory	parked	19.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0207f138	main	348	legacy	factory	parked	38.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
+0x0207f138	main	348	legacy_sp3	factory	parked	20.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J6	
