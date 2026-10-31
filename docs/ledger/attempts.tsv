@@ -13048,3 +13048,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021dd950	ov002	2020	default	factory	parked	26.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J4	
 0x021dd950	ov002	2020	legacy	factory	parked	4.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J4	
 0x021dd950	ov002	2020	legacy_sp3	factory	parked	12.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J4	
+0x0223d1ec	ov002	2032	default	factory	shipped	100	n/a		factory-1031-J4	
+0x0223d1ec	ov002	2032	legacy	factory	parked	3.2	unknown	UNCLASSIFIED:unknown	factory-1031-J4	
+0x0223d1ec	ov002	2032	legacy_sp3	factory	parked	28.5	unknown	UNCLASSIFIED:unknown	factory-1031-J4	

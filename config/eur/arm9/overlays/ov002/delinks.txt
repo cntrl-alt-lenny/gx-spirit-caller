@@ -7870,7 +7870,7 @@ src/overlay002/func_ov002_0223d144.c:
     complete
     .text start:0x0223d144 end:0x0223d1ec
 
-src/overlay002/func_ov002_0223d1ec.s:
+src/overlay002/func_ov002_0223d1ec.c:
     complete
     .text start:0x0223d1ec end:0x0223d9dc
 
