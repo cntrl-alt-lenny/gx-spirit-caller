@@ -268,7 +268,7 @@ src/overlay004/func_ov004_021cfbec.legacy_sp3.c:
     complete
     .text start:0x021cfbec end:0x021cfc64
 
-src/overlay004/func_ov004_021cfc64.s:
+src/overlay004/func_ov004_021cfc64.c:
     complete
     .text start:0x021cfc64 end:0x021cfd6c
 
