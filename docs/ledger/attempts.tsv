@@ -12961,3 +12961,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020947d0	main	148	default	factory	parked	5.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
 0x020947d0	main	148	legacy	factory	parked	13.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
 0x020947d0	main	148	legacy_sp3	factory	parked	2.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
+0x020acca0	main	152	default	factory	parked	97.4	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
+0x020acca0	main	152	legacy	factory	parked	35.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
+0x020acca0	main	152	legacy_sp3	factory	parked	31.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1030-J9	
