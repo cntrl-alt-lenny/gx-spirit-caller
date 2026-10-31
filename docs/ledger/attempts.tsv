@@ -13119,3 +13119,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020987a4	main	260	legacy	factory	shipped	100	n/a		factory-1031-J8	
 0x020987a4	main	260	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1031-J8	
 0x020987a4	main	260	legacy_sp3	factory	parked	30.8	unknown	UNCLASSIFIED:unknown	factory-1031-J8	
+0x0204e9b8	main	280	default	factory	parked	7.1	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J8	
+0x0204e9b8	main	280	legacy	factory	parked	31.5	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J8	
+0x0204e9b8	main	280	legacy_sp3	factory	parked	60	reg-alloc	PROVISIONAL:register-allocation	factory-1031-J8	
