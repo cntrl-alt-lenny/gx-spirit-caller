@@ -13105,3 +13105,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02092b48	main	304	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1031-J6	
 0x02092b48	main	304	legacy	factory	parked	39.5	structural	PROVISIONAL:structural	factory-1031-J6	
 0x02092b48	main	304	legacy_sp3	factory	parked	7.9	structural	PROVISIONAL:structural	factory-1031-J6	
+0x0206b0c4	main	308	default	factory	parked	11.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x0206b0c4	main	308	legacy	factory	parked	51.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
+0x0206b0c4	main	308	legacy_sp3	factory	parked	66.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1031-J6	
