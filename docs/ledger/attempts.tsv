@@ -13130,3 +13130,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022568a8	ov002	424	legacy_sp3	factory	parked	18	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J2	
 0x02230324	ov002	432	default	factory	shipped	100	n/a		factory-1031-J2	
 0x02213244	ov002	440	default	factory	shipped	100	n/a		factory-1031-J2	
+0x02242900	ov002	444	default	factory	shipped	100	n/a		factory-1031-J2	

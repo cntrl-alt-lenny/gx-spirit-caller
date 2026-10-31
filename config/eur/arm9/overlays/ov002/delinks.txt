@@ -8059,7 +8059,7 @@ src/overlay002/func_ov002_022426a4.c:
 src/overlay002/func_ov002_022427ec.c:
     complete
     .text start:0x022427ec end:0x02242900
-src/overlay002/func_ov002_02242900.s:
+src/overlay002/func_ov002_02242900.c:
     complete
     .text start:0x02242900 end:0x02242abc
 src/overlay002/func_ov002_02242abc.c:
