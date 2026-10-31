@@ -13060,3 +13060,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d9418	ov004	780	default	factory	parked	80	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J15	
 0x021d9418	ov004	780	legacy	factory	parked	7.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J15	
 0x021d9418	ov004	780	legacy_sp3	factory	parked	7.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J15	
+0x021ab6c0	ov021	784	default	factory	shipped	100	n/a		factory-1031-J15	
