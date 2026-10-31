@@ -13133,3 +13133,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02051c4c	main	312	default	factory	parked	3.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J8	
 0x02051c4c	main	312	legacy	factory	parked	8.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J8	
 0x02051c4c	main	312	legacy_sp3	factory	parked	82	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J8	
+0x0201e964	main	316	default	factory	parked	73.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J8	
+0x0201e964	main	316	legacy	factory	parked	5.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J8	
+0x0201e964	main	316	legacy_sp3	factory	parked	5.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1031-J8	
