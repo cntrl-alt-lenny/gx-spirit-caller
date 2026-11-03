@@ -16073,3 +16073,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b3850	main	32	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
 0x020b3850	main	32	legacy	factory	parked	8.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
 0x020b3850	main	32	legacy_sp3	factory	parked	9.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
+0x02099be8	main	60	default	factory	parked	6.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K5	
+0x02099be8	main	60	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K5	
+0x02099be8	main	60	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K5	
