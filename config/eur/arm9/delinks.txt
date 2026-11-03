@@ -12033,7 +12033,7 @@ src/main/func_020698fc.legacy_sp3.c:
     complete
     .text start:0x020698fc end:0x020699f4
 
-src/main/func_020699f4.s:
+src/main/func_020699f4.legacy_sp3.c:
     complete
     .text start:0x020699f4 end:0x02069a84
 
