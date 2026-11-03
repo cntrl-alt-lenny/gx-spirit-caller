@@ -16067,3 +16067,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207845c	main	60	legacy	factory	shipped	100	n/a		factory-1103-K4	
 0x02049270	main	96	legacy_sp3	factory	shipped	100	n/a		factory-1103-K4	
 0x02055f84	main	104	legacy_sp3	factory	shipped	100	n/a		factory-1103-K4	
+0x02077018	main	116	default	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
+0x02077018	main	116	legacy	factory	parked	93.5	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
+0x02077018	main	116	legacy_sp3	factory	parked	17.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
