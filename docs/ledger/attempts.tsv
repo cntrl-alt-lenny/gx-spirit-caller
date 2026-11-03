@@ -16049,3 +16049,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020678b8	main	204	default	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
 0x02059e5c	main	220	default	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
 0x02045d0c	main	892	legacy_sp3	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1031-integration	
+0x0207708c	main	8	default	factory	parked	50	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
+0x0207708c	main	8	legacy	factory	parked	50	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
+0x0207708c	main	8	legacy_sp3	factory	parked	50	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
