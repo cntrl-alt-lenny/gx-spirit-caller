@@ -16058,3 +16058,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02080d38	main	520	default	factory	parked	23.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K8	
 0x02080d38	main	520	legacy	factory	parked	3.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K8	
 0x02080d38	main	520	legacy_sp3	factory	parked	34.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K8	
+0x020b3870	main	524	default	factory	parked	2.3	asm-int	PROVISIONAL:inline-asm	factory-1103-K8	
+0x020b3870	main	524	legacy	factory	parked	3.8	asm-int	PROVISIONAL:inline-asm	factory-1103-K8	
+0x020b3870	main	524	legacy_sp3	factory	parked	3.8	asm-int	PROVISIONAL:inline-asm	factory-1103-K8	
