@@ -16052,3 +16052,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200a488	main	516	default	factory	shipped	100	n/a		factory-1103-K8	
 0x0200a488	main	516	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K8	
 0x0200a488	main	516	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K8	
+0x02023274	main	516	default	factory	parked	96.9	structural	PROVISIONAL:structural	factory-1103-K8	
+0x02023274	main	516	legacy	factory	parked	36.6	structural	PROVISIONAL:structural	factory-1103-K8	
+0x02023274	main	516	legacy_sp3	factory	parked	39.9	structural	PROVISIONAL:structural	factory-1103-K8	
