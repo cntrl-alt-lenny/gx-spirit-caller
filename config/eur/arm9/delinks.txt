@@ -4090,7 +4090,7 @@ src/main/func_020200d8.c:
     complete
     .text start:0x020200d8 end:0x02020130
 
-src/main/func_02020130.s:
+src/main/func_02020130.c:
     complete
     .text start:0x02020130 end:0x02020188
 
