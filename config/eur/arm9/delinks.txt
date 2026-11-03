@@ -11040,7 +11040,7 @@ src/main/func_02062c74.legacy_sp3.c:
     complete
     .text start:0x02062c74 end:0x02062cfc
 
-src/main/func_02062cfc.s:
+src/main/func_02062cfc.legacy_sp3.c:
     complete
     .text start:0x02062cfc end:0x02062d88
 
