@@ -16193,3 +16193,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02020914	main	272	legacy_sp3	factory	parked	28.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1104-K3	
 0x0202abdc	main	272	default	factory	parked	47.1	structural	PROVISIONAL:structural	factory-1104-K3	
 0x0202abdc	main	272	legacy	factory	parked	6.9	structural	PROVISIONAL:structural	factory-1104-K3	
+0x02019940	main	280	default	factory	parked	81.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K3	
+0x02019940	main	280	legacy	factory	parked	8.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K3	
+0x02019940	main	280	legacy_sp3	factory	parked	8.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K3	
