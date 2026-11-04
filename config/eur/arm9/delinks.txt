@@ -18959,7 +18959,7 @@ src/main/func_020a21dc.legacy.c:
     complete
     .text start:0x020a21dc end:0x020a2394
 
-src/main/func_020a2394.s:
+src/main/func_020a2394.legacy.c:
     complete
     .text start:0x020a2394 end:0x020a2418
 
