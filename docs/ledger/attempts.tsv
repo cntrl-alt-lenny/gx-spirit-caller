@@ -16132,3 +16132,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022b1570	ov002	816	default	factory	parked	28.9	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K7	
 0x022b1570	ov002	816	legacy	factory	parked	18.6	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K7	
 0x022b1570	ov002	816	legacy_sp3	factory	parked	21.9	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K7	
+0x021ccd78	ov002	832	default	factory	parked	2.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
+0x021ccd78	ov002	832	legacy	factory	parked	5.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
+0x021ccd78	ov002	832	legacy_sp3	factory	parked	3.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
