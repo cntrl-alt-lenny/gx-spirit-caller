@@ -1130,7 +1130,7 @@ extern int func_02062918(int, void *, int);
 extern void func_02063710(void *);
 extern void func_020639a0(void *);
 extern int func_02063c90(void *, void *);
-extern int func_02063e0c(void *, int, int);
+extern int func_02063e0c(void *, void *, int);
 extern int func_02063fe4(void *, void *, int);
 extern int func_020643ac(void *);
 extern int func_020643d8(int, int, int, int);
