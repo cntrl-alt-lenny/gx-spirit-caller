@@ -8806,7 +8806,7 @@ src/main/func_02048880.s:
     complete
     .text start:0x02048880 end:0x020488f4
 
-src/main/func_020488f4.s:
+src/main/func_020488f4.legacy_sp3.c:
     complete
     .text start:0x020488f4 end:0x020489c4
 
