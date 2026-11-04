@@ -16196,3 +16196,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02094a20	main	260	default	factory	parked	4.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x02094a20	main	260	legacy	factory	parked	1.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x02094a20	main	260	legacy_sp3	factory	parked	1.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x0209fae4	main	260	default	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x0209fae4	main	260	legacy	factory	parked	32.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x0209fae4	main	260	legacy_sp3	factory	parked	4.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
