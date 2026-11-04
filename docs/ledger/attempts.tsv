@@ -16179,3 +16179,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209d018	main	224	legacy	factory	parked	67.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x0209d018	main	224	legacy_sp3	factory	parked	46.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x020ac37c	main	224	default	factory	parked	94.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1104-K5	
+0x020b0bdc	main	224	default	factory	shipped	100	n/a		factory-1104-K5	
+0x020b0bdc	main	224	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1104-K5	
+0x020b0bdc	main	224	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1104-K5	

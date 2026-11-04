@@ -19757,7 +19757,7 @@ src/main/func_020b0afc.c:
     complete
     .text start:0x020b0afc end:0x020b0bdc
 
-src/main/func_020b0bdc.s:
+src/main/func_020b0bdc.c:
     complete
     .text start:0x020b0bdc end:0x020b0cbc
 
