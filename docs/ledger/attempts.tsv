@@ -16152,3 +16152,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208d204	main	184	default	factory	parked	4.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x0208d204	main	184	legacy	factory	parked	87	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x0208d204	main	184	legacy_sp3	factory	parked	65.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x02089864	main	188	default	factory	parked	87.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x02089864	main	188	legacy	factory	parked	39.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x02089864	main	188	legacy_sp3	factory	parked	42.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
