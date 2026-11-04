@@ -16097,3 +16097,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209226c	main	108	default	factory	parked	88.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
 0x0209226c	main	108	legacy	factory	parked	77.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
 0x0209226c	main	108	legacy_sp3	factory	parked	13.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
+0x0209d4ec	main	112	default	factory	parked	25	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
+0x0209d4ec	main	112	legacy	factory	parked	92.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
+0x0209d4ec	main	112	legacy_sp3	factory	parked	25	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
