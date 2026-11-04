@@ -16156,3 +16156,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02041978	main	816	default	factory	parked	8.3	register-numbering-permutation-cascade	P-30	factory-1104-K8	
 0x02041978	main	816	legacy	factory	parked	8.2	register-numbering-permutation-cascade	P-30	factory-1104-K8	
 0x02041978	main	816	legacy_sp3	factory	parked	87.8	register-numbering-permutation-cascade	P-30	factory-1104-K8	
+0x02080280	main	816	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1104-K8	
