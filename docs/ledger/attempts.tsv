@@ -16190,3 +16190,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020988a8	main	256	default	factory	parked	10.9	register-numbering-permutation-cascade	P-30	factory-1104-K5	
 0x020988a8	main	256	legacy	factory	parked	84.4	register-numbering-permutation-cascade	P-30	factory-1104-K5	
 0x020988a8	main	256	legacy_sp3	factory	parked	34.4	register-numbering-permutation-cascade	P-30	factory-1104-K5	
+0x0209c0dc	main	256	default	factory	parked	21.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K5	
+0x0209c0dc	main	256	legacy	factory	parked	92.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K5	
+0x0209c0dc	main	256	legacy_sp3	factory	parked	54.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K5	
