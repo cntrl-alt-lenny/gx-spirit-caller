@@ -23,7 +23,7 @@ extern void OS_RestoreIrq(int saved);
 extern int func_0206cf10(struct S0206cf *a, int *out8, u16 *out4, u16 *out6, int *outC);
 extern void func_02094688(int a, int b, int c);
 
-int func_0206cfa0(struct S0206cf *a, int b, int c, u16 *d, int *e) {
+int func_0206cfa0(struct S0206cf *a, int b, int c, u16 *d, unsigned int *e) {
     int local8, localC;
     u16 local4, local6;
     int saved = OS_DisableIrq();

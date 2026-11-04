@@ -4,14 +4,14 @@ typedef struct {
 } obj_t;
 
 extern int func_02063dc8(void *a0);
-extern int func_02063e0c(void *a0, int a2, int a3);
+extern int func_02063e0c(void *a0, void *a2, int a3);
 extern int func_02063e78(void *a0);
-extern int func_02063ed0(void *a0, int a2, int a3);
-extern int func_02063fe4(void *a0, int a2, int a3);
-extern int func_020640c0(void *a0, int a2, int a3);
-extern int func_02064158(void *a0, int a2, int a3);
+extern int func_02063ed0(void *a0, char *a2, int a3);
+extern int func_02063fe4(void *a0, void *a2, int a3);
+extern int func_020640c0(void *a0, void *a2, int a3);
+extern int func_02064158(void *a0, void *a2, int a3);
 
-int func_02063ca4(void *a0, int a1, int a2, int a3) {
+int func_02063ca4(void *a0, int a1, void *a2, int a3) {
     ((obj_t *)a0)->f_66++;
 
     if (a1 == 0) {

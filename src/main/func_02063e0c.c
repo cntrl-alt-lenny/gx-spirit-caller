@@ -19,9 +19,9 @@ typedef struct {
 extern int func_020643d8(Obj_02063e0c *);
 extern void func_02061fa4(Obj_02063e0c *);
 extern int func_020628fc(Obj_02063e0c *);
-extern int func_02061c5c(Obj_02063e0c *, int, int, int);
+extern int func_02061c5c(Obj_02063e0c *, int, void *, int);
 
-int func_02063e0c(Obj_02063e0c *p, int b, int c) {
+int func_02063e0c(Obj_02063e0c *p, void *b, int c) {
     if (p->fC != 1) {
         return func_020643d8(p) != 0;
     }

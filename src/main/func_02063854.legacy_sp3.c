@@ -15,13 +15,13 @@ struct F020639a0 {
 };
 extern void func_020639a0(struct F020639a0 *self);
 extern int func_020639c8(void *self);
-extern int func_02063ae0(Obj_02063ae0_t *a, int b, int c, unsigned char *d, int arg5, int *out);
-extern int func_02063ca4(void *a0, int a1, unsigned char *a2, int a3);
+extern int func_02063ae0(Obj_02063ae0_t *a, int b, int c, void *d, int arg5, int *out);
+extern int func_02063ca4(void *a0, int a1, void *a2, int a3);
 extern int func_0206429c(void *self, int value);
 extern int func_020643ac(void *self);
 extern int func_020643d8(void *self, int unused1, unsigned char *unused2, int d);
 extern int func_02064480(int a, int b);
-extern int func_020644a4(unsigned char *data, int offset);
+extern unsigned int func_020644a4(unsigned char *data, int offset);
 
 int func_02063854(Obj_02063ae0_t *self, int type, unsigned char *data, int len) {
     int seq;

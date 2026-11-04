@@ -15,8 +15,7 @@ extern int func_02062438(Obj *a, int **pp, int b, int c);
 extern int func_020628b0(void *self, int b, short c);
 extern int func_020628fc(int *p);
 extern int func_02064208(int *o, void *a, int b);
-/* original passes only the first argument; no parameter list on purpose */
-extern int func_020643d8();
+extern int func_020643d8(void *self);
 extern int func_02063854(int *self, int type, unsigned char *data, int len);
 extern int func_02063548(int *o, int kind, unsigned char *p, int len);
 extern int func_020a7440(void *a, void *b, int n);
