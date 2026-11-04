@@ -16105,3 +16105,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02061290	main	172	legacy	factory	parked	4.7	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
 0x0207108c	main	176	legacy	factory	shipped	100	n/a		factory-1103-K4	
 0x0206d404	main	188	legacy	factory	shipped	100	n/a		factory-1103-K4	
+0x02089864	main	188	legacy_sp3	factory	shipped	100	n/a		factory-1103-K4	
+0x02089864	main	188	default	factory	parked	61.7	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
+0x02089864	main	188	legacy	factory	parked	58.3	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
