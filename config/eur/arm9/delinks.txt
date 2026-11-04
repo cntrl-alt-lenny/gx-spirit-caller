@@ -14343,7 +14343,7 @@ src/main/func_0207ef90.legacy_sp3.c:
     complete
     .text start:0x0207ef90 end:0x0207f05c
 
-src/main/func_0207f05c.s:
+src/main/func_0207f05c.legacy_sp3.c:
     complete
     .text start:0x0207f05c end:0x0207f138
 
