@@ -16140,3 +16140,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021bd948	ov002	844	default	factory	shipped	100	n/a		factory-1104-K7	
 0x021bd948	ov002	844	legacy	factory	parked	14	unknown	UNCLASSIFIED:unknown	factory-1104-K7	
 0x021bd948	ov002	844	legacy_sp3	factory	parked	0.5	unknown	UNCLASSIFIED:unknown	factory-1104-K7	
+0x0228d544	ov002	852	default	factory	parked	41.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
+0x0228d544	ov002	852	legacy	factory	parked	3.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
+0x0228d544	ov002	852	legacy_sp3	factory	parked	1.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
