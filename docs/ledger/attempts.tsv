@@ -16186,3 +16186,148 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021e25f0	ov002	380	default	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K1	
 0x021e25f0	ov002	380	legacy	factory	parked	7.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K1	
 0x021e25f0	ov002	380	legacy_sp3	factory	parked	16.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K1	
+0x02280a1c	ov002	188	default	factory	parked	91.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02280a1c	ov002	188	legacy	factory	parked	47.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02280a1c	ov002	188	legacy_sp3	factory	parked	59.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x0223cf18	ov002	212	default	factory	shipped	100	n/a		factory-1103-K2	
+0x0223cf18	ov002	212	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x0223cf18	ov002	212	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02255d70	ov002	228	default	factory	shipped	100	n/a		factory-1103-K2	
+0x02255d70	ov002	228	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02255d70	ov002	228	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02237704	ov002	236	default	factory	parked	93.2	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02237704	ov002	236	legacy	factory	parked	37.1	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02237704	ov002	236	legacy_sp3	factory	parked	54.2	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02235a78	ov002	252	default	factory	shipped	100	n/a		factory-1103-K2	
+0x02235a78	ov002	252	legacy_sp3	factory	parked	57.1	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02235a78	ov002	252	legacy	factory	parked	9.1	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x0224ce18	ov002	252	default	factory	shipped	100	n/a		factory-1103-K2	
+0x0224ce18	ov002	252	legacy_sp3	factory	parked	23.1	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x0224ce18	ov002	252	legacy	factory	parked	5.8	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x022643e8	ov002	252	default	factory	parked	60.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x022643e8	ov002	252	legacy	factory	parked	38.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x022643e8	ov002	252	legacy_sp3	factory	parked	61.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02249818	ov002	256	default	factory	shipped	100	n/a		factory-1103-K2	
+0x02249818	ov002	256	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02249818	ov002	256	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02250a28	ov002	268	default	factory	shipped	100	n/a		factory-1103-K2	
+0x02250a28	ov002	268	legacy_sp3	factory	parked	28.6	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02250a28	ov002	268	legacy	factory	parked	5.3	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x022561e0	ov002	272	default	factory	parked	86.8	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x022561e0	ov002	272	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x022561e0	ov002	272	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02294828	ov002	272	default	factory	parked	89.7	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K2	
+0x02294828	ov002	272	legacy	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K2	
+0x02294828	ov002	272	legacy_sp3	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K2	
+0x02255e54	ov002	280	default	factory	parked	85.7	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02255e54	ov002	280	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02255e54	ov002	280	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02255f6c	ov002	280	default	factory	parked	85.7	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02255f6c	ov002	280	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02255f6c	ov002	280	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x0228b0a0	ov002	280	default	factory	parked	88.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x0228b0a0	ov002	280	legacy	factory	parked	1.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x0228b0a0	ov002	280	legacy_sp3	factory	parked	2.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02233778	ov002	312	default	factory	parked	93.6	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02233778	ov002	312	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02233778	ov002	312	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x02263a1c	ov002	312	default	factory	parked	92.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02263a1c	ov002	312	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02263a1c	ov002	312	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02255ac8	ov002	316	default	factory	shipped	100	n/a		factory-1103-K2	
+0x02255ac8	ov002	316	legacy_sp3	factory	parked	41.8	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02255ac8	ov002	316	legacy	factory	parked	2.4	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x0225ac68	ov002	316	default	factory	shipped	100	n/a		factory-1103-K2	
+0x022b0198	ov002	316	default	factory	shipped	100	n/a		factory-1103-K2	
+0x022b0198	ov002	316	legacy_sp3	factory	parked	1.3	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x022b0198	ov002	316	legacy	factory	parked	2.4	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02231dec	ov002	320	default	factory	shipped	100	n/a		factory-1103-K2	
+0x02231dec	ov002	320	legacy_sp3	factory	parked	52.5	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02231dec	ov002	320	legacy	factory	parked	4.8	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02245dd4	ov002	324	default	factory	shipped	100	n/a		factory-1103-K2	
+0x02245dd4	ov002	324	legacy_sp3	factory	parked	79	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02245dd4	ov002	324	legacy	factory	parked	19.1	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x0224d938	ov002	324	default	factory	parked	85.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x0224d938	ov002	324	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x0224d938	ov002	324	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02285a9c	ov002	324	default	factory	parked	69.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02285a9c	ov002	324	legacy	factory	parked	6.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x02285a9c	ov002	324	legacy_sp3	factory	parked	6.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K2	
+0x0224e518	ov002	328	default	factory	shipped	100	n/a		factory-1103-K2	
+0x0224e518	ov002	328	legacy	factory	parked	1.1	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x0224e518	ov002	328	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x022519c4	ov002	336	default	factory	shipped	100	n/a		factory-1103-K2	
+0x022519c4	ov002	336	legacy_sp3	factory	parked	70.2	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x022519c4	ov002	336	legacy	factory	parked	29.1	unknown	UNCLASSIFIED:unknown	factory-1103-K2	
+0x02286c9c	ov002	340	default	factory	shipped	100	n/a		factory-1103-K2	
+0x0223cfec	ov002	344	default	factory	parked	95.3	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x0223cfec	ov002	344	legacy	factory	parked	6.6	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x0223cfec	ov002	344	legacy_sp3	factory	parked	52.3	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K2	
+0x022565c4	ov002	348	default	factory	parked	95.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K2	
+0x022565c4	ov002	348	legacy	factory	parked	1.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K2	
+0x022565c4	ov002	348	legacy_sp3	factory	parked	1.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K2	
+0x02266844	ov002	348	default	factory	parked	92	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02266844	ov002	348	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02266844	ov002	348	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02264b84	ov002	352	default	factory	parked	88.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02264b84	ov002	352	legacy	factory	parked	4.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02264b84	ov002	352	legacy_sp3	factory	parked	6.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022938fc	ov002	352	default	factory	parked	73.9	register-numbering-permutation-cascade	P-30	factory-1104-K2	
+0x022938fc	ov002	352	legacy	factory	parked	8.7	register-numbering-permutation-cascade	P-30	factory-1104-K2	
+0x022938fc	ov002	352	legacy_sp3	factory	parked	16.5	register-numbering-permutation-cascade	P-30	factory-1104-K2	
+0x0224aeb8	ov002	356	default	factory	parked	24.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0224aeb8	ov002	356	legacy	factory	parked	6.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0224aeb8	ov002	356	legacy_sp3	factory	parked	7.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0226be44	ov002	356	default	factory	parked	69.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0226be44	ov002	356	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0226be44	ov002	356	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022377f0	ov002	368	default	factory	shipped	100	n/a		factory-1104-K2	
+0x022aab4c	ov002	368	default	factory	parked	64.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022aab4c	ov002	368	legacy	factory	parked	20.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022aab4c	ov002	368	legacy_sp3	factory	parked	20.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02241e74	ov002	376	default	factory	parked	91.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02241e74	ov002	376	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02241e74	ov002	376	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0224fb58	ov002	380	default	factory	parked	13.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0224fb58	ov002	380	legacy	factory	parked	1.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0224fb58	ov002	380	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02285be0	ov002	392	default	factory	parked	11.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02285be0	ov002	392	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02285be0	ov002	392	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022a0654	ov002	416	default	factory	parked	53.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022a0654	ov002	416	legacy	factory	parked	8.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022a0654	ov002	416	legacy_sp3	factory	parked	8.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022a04b0	ov002	420	default	factory	parked	74.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022a04b0	ov002	420	legacy	factory	parked	14.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022a04b0	ov002	420	legacy_sp3	factory	parked	62	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022568a8	ov002	424	default	factory	parked	13.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022568a8	ov002	424	legacy	factory	parked	12.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022568a8	ov002	424	legacy_sp3	factory	parked	17.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02298dcc	ov002	428	default	factory	parked	63.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02298dcc	ov002	428	legacy	factory	parked	11	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02298dcc	ov002	428	legacy_sp3	factory	parked	29.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0229f7e8	ov002	444	default	factory	parked	54	structural	PROVISIONAL:structural	factory-1104-K2	
+0x0229f7e8	ov002	444	legacy	factory	parked	26.8	structural	PROVISIONAL:structural	factory-1104-K2	
+0x0229f7e8	ov002	444	legacy_sp3	factory	parked	10.8	structural	PROVISIONAL:structural	factory-1104-K2	
+0x022bdb88	ov002	444	default	factory	shipped	100	n/a		factory-1104-K2	
+0x0223976c	ov002	456	default	factory	parked	8.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0223976c	ov002	456	legacy	factory	parked	3.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0223976c	ov002	456	legacy_sp3	factory	parked	5.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02235b74	ov002	460	default	factory	parked	10.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02235b74	ov002	460	legacy	factory	parked	2.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02235b74	ov002	460	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0225085c	ov002	460	default	factory	parked	33	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0225085c	ov002	460	legacy	factory	parked	1.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0225085c	ov002	460	legacy_sp3	factory	parked	2.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0227332c	ov002	468	default	factory	parked	54.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K2	
+0x0227332c	ov002	468	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K2	
+0x0227332c	ov002	468	legacy_sp3	factory	parked	0.8	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K2	
+0x02254a84	ov002	480	default	factory	parked	3.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02254a84	ov002	480	legacy	factory	parked	3.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02254a84	ov002	480	legacy_sp3	factory	parked	7.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x022a6e04	ov002	488	default	factory	shipped	100	n/a		factory-1104-K2	
+0x0223c72c	ov002	492	default	factory	parked	82.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0223c72c	ov002	492	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0223c72c	ov002	492	legacy_sp3	factory	parked	1.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x02250044	ov002	496	default	factory	shipped	100	n/a		factory-1104-K2	
+0x02250044	ov002	496	default	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1104-K2	
