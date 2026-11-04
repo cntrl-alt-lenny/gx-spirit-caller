@@ -16173,3 +16173,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020055b4	main	240	default	factory	parked	98.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
 0x020055b4	main	240	legacy	factory	parked	1.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
 0x020055b4	main	240	legacy_sp3	factory	parked	1.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
+0x0203e0a0	main	248	legacy_sp3	factory	shipped	100	n/a		factory-1104-K3	
+0x0203e0a0	main	248	default	factory	parked	12.9	unknown	UNCLASSIFIED:unknown	factory-1104-K3	
+0x0203e0a0	main	248	legacy	factory	parked	54	unknown	UNCLASSIFIED:unknown	factory-1104-K3	
