@@ -16157,3 +16157,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020580a0	main	264	legacy_sp3	factory	shipped	100	n/a		factory-1103-K4	
 0x020580a0	main	264	default	factory	parked	86.4	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
 0x0206429c	main	272	legacy_sp3	factory	shipped	100	n/a		factory-1103-K4	
+0x0204e9b8	main	280	default	factory	parked	7.1	register-numbering-permutation-cascade	P-30	factory-1103-K4	
+0x0204e9b8	main	280	legacy	factory	parked	65.8	register-numbering-permutation-cascade	P-30	factory-1103-K4	
+0x0204e9b8	main	280	legacy_sp3	factory	parked	84.3	register-numbering-permutation-cascade	P-30	factory-1103-K4	
