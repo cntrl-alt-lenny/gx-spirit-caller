@@ -4,7 +4,7 @@ extern char data_02101324[];
 extern char data_02101330[];
 extern int func_020ab054(void *a, void *h, unsigned int n);
 extern int func_020602c4(char *line, char *key, char *out, int size);
-extern int func_020ace00(int a0);
+extern int func_020ace00(const char *s);
 extern char *func_020ab0c4(char *haystack, char *needle);
 extern void func_020585d4(void *a0, int a1, int a2);
 
@@ -15,7 +15,7 @@ int func_020603cc(char **ctx, char *line, int check) {
 
     if (func_020ab054(line, data_02101314, 7) == 0) {
         if (func_020602c4(line, data_0210131c, buf, 0x10) != 0) {
-            *(int *)(st + 0x418) = func_020ace00((int)buf);
+            *(int *)(st + 0x418) = func_020ace00(buf);
         }
         if (func_020602c4(line, data_02101324, st, 0x100) == 0) {
             *st = 0;

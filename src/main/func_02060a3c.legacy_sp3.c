@@ -1,5 +1,5 @@
-extern int func_02060c9c(void *a0, void *a1);
-extern int func_020ace00(int a0);
+extern char *func_02060c9c(char *s, char *name);
+extern int func_020ace00(const char *s);
 extern int func_02060b84(int a0, int a1, int a2);
 extern int *func_020540d0(void *a0, int a1);
 extern int func_02060604(int a0, int a1, int a2, int a3, int a4);

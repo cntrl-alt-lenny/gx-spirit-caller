@@ -22,8 +22,7 @@ extern void *func_020a7368(void *dst, signed char *src, int count);
 extern signed char *func_020a7388(signed char *dst, signed char *src, int n);
 extern int func_020ab054(unsigned char *s1, unsigned char *s2, int n);
 extern unsigned char *func_020ab0c4(unsigned char *haystack, const unsigned char *needle);
-/* This caller supplies only r0, unlike the four-argument C thunk definition. */
-extern int func_020ace00();
+extern int func_020ace00(const char *s);
 extern char data_020ffe54[], data_020ffe58[];
 extern unsigned char data_020ffe84[], data_020ffe8c[], data_020ffea8[], data_020ffeb0[], data_020ffed8[], data_020ffee0[], data_020ffee8[], data_020fff18[];
 extern char data_020ffe98[];
@@ -68,7 +67,7 @@ int func_02056264(int *ctx) {
             {
                 unsigned char *q = func_020ab0c4(p, data_020ffea8);
                 if (q != 0) {
-                    int key = func_020ace00((int)(q + 4));
+                    int key = func_020ace00((char *)q + 4);
                     if (func_0205bd0c((Root2 **)ctx, &node, key) == 0) {
                         func_020604a4((int)ctx, data_020ffeb0, key);
                     } else {

@@ -6,8 +6,7 @@ extern int func_0205ae8c(int *a, int b, int c);
 extern int func_0205ffc0(void *p, char *msg);
 extern void func_020604b0(char *dst, char *src, int n);
 extern int func_020aaddc(const char *s);
-/* The original caller supplies only r0 to this four-argument parser thunk. */
-extern int func_020ace00();
+extern int func_020ace00(const char *s);
 extern unsigned char data_020c36d4[];
 extern char data_021007c8[];
 extern char data_021007e4[];
@@ -118,11 +117,11 @@ int func_0205a18c(int *self, int key, char *value) {
         if (result) return result;
         break;
     case 0x70d:
-        result = func_0205a974(self, 0x70d, func_020ace00((int)value));
+        result = func_0205a974(self, 0x70d, func_020ace00(value));
         if (result) return result;
         break;
     case 0x70e:
-        result = func_0205a974(self, 0x70e, func_020ace00((int)value));
+        result = func_0205a974(self, 0x70e, func_020ace00(value));
         if (result) return result;
         break;
     case 0x70f:
@@ -131,7 +130,7 @@ int func_0205a18c(int *self, int key, char *value) {
         if (result) return result;
         break;
     case 0x710:
-        result = func_0205a974(self, 0x710, func_020ace00((int)value));
+        result = func_0205a974(self, 0x710, func_020ace00(value));
         if (result) return result;
         break;
     case 0x711:
@@ -140,15 +139,15 @@ int func_0205a18c(int *self, int key, char *value) {
         if (result) return result;
         break;
     case 0x712:
-        result = func_0205a974(self, 0x712, func_020ace00((int)value));
+        result = func_0205a974(self, 0x712, func_020ace00(value));
         if (result) return result;
         break;
     case 0x714:
-        result = func_0205a974(self, 0x714, func_020ace00((int)value));
+        result = func_0205a974(self, 0x714, func_020ace00(value));
         if (result) return result;
         break;
     case 0x715:
-        result = func_0205a974(self, 0x715, func_020ace00((int)value));
+        result = func_0205a974(self, 0x715, func_020ace00(value));
         if (result) return result;
         break;
     case 0x716:

@@ -23,8 +23,7 @@ extern int func_020a978c(char *,char *,...);
 extern int func_020aaddc(const char *s);
 extern int func_020ab054(unsigned char *s1,unsigned char *s2,int n);
 extern unsigned char *func_020ab0c4(unsigned char *haystack,const unsigned char *needle);
-/* The original prepares only r0, leaving the thunk's extra arguments unspecified. */
-extern int func_020ace00();
+extern int func_020ace00(const char *s);
 extern char data_021003c0[],data_021003c8[],data_021003d0[],data_021003d8[];
 extern char data_02100408[],data_02100414[],data_0210041c[],data_02100428[];
 extern char data_02100458[],data_02100464[],data_0210046c[],data_02100478[];

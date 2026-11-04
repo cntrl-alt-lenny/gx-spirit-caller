@@ -10,8 +10,8 @@ extern int func_020ab054(unsigned char *s1,unsigned char *s2,int n);
 extern void func_0205ffd4(int *a0,int a1,int a2);
 extern void func_020585d4(void *,int,int);
 extern int func_020602c4(char *,char *,char *,int);
+extern int func_020ace00(const char *s);
 /* These thunks receive only r0 here, fewer arguments than their C definitions. */
-extern int func_020ace00();
 extern int func_020453b4();
 extern int func_020ac45c();
 extern float func_020b1c7c(int);

@@ -10,8 +10,7 @@ extern int func_020aaddc(const char *s);
 extern int func_020aaf40(const unsigned char *,const unsigned char *);
 extern int func_020ab054(unsigned char *,unsigned char *,int);
 extern unsigned char *func_020ab0c4(unsigned char *,const unsigned char *);
-/* This caller only supplies the input string to the atoi thunk. */
-extern int func_020ace00();
+extern int func_020ace00(const char *s);
 extern char data_02100b64[],data_02100cb8[],data_02100cd0[],data_02100cf0[],data_02100cf8[],data_02100d00[],data_02100d08[],data_02100d10[],data_02100d18[],data_02100d20[],data_02100d28[];
 int func_0205cf10(int *ctx, Req *req) {
     char *base = (char *)*ctx;
