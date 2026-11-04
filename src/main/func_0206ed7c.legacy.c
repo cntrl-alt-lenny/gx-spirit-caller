@@ -4,13 +4,13 @@ typedef struct Address {
     unsigned short port;
     unsigned int addr;
 } Address;
-extern int func_0206d1f0(void *self, int a, int b, int c, int d, int flags);
+extern int func_0206d1f0(void *self, int a, int b, unsigned short *port, unsigned int *addr, int flags);
 int func_0206ed7c(void *self, int a, int b, int flags, void *out) {
     unsigned short port;
     unsigned int addr;
     int ret;
     Address *dst;
-    ret = func_0206d1f0(self, a, b, (int)&port, (int)&addr, flags);
+    ret = func_0206d1f0(self, a, b, &port, &addr, flags);
     if (ret < 0) return ret;
     dst = out;
     if (dst == 0) return ret;

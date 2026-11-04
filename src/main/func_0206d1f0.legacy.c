@@ -4,13 +4,13 @@ extern int func_02093808(void); /* Assembly wrapper returns processor mode in r0
 extern int func_0209268c(Obj *o);
 extern void func_020927b8(char *self);
 extern void func_02092748(void *self);
-extern int func_0206d148(void *self, int u1, int u2, int u3, int a5, int a6, int flags);
+extern int func_0206d148(void *self, int u1, int u2, unsigned short *port, unsigned int *addr, int a6, int flags);
 static inline int is_valid(void *self) {
     int valid = 0;
     if (self) valid = ((*(short *)((char *)self + 0x70) & 1) != 0);
     return valid;
 }
-int func_0206d1f0(void *self, int a, int b, int c, int d, int flags) {
+int func_0206d1f0(void *self, int a, int b, unsigned short *port, unsigned int *addr, int flags) {
     char *p;
     int mode;
     int ret;
@@ -37,7 +37,7 @@ int func_0206d1f0(void *self, int a, int b, int c, int d, int flags) {
     } else {
         func_020927b8(p + 0xe0);
     }
-    ret = func_0206d148(self, a, b, c, d, mode, flags);
+    ret = func_0206d148(self, a, b, port, addr, mode, flags);
     func_02092748(p + 0xe0);
     return ret;
 }
