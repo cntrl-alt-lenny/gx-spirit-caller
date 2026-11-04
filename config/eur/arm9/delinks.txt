@@ -19618,7 +19618,7 @@ src/main/func_020ac854.s:
     complete
     .text start:0x020ac854 end:0x020acca0
 
-src/main/func_020acca0.s:
+src/main/func_020acca0.c:
     complete
     .text start:0x020acca0 end:0x020acd38
 
