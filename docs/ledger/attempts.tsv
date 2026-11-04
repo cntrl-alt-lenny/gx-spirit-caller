@@ -16130,3 +16130,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d3f9c	ov002	276	default	factory	parked	65.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K1	
 0x021d3f9c	ov002	276	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K1	
 0x021d3f9c	ov002	276	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K1	
+0x021f30a8	ov002	276	default	factory	shipped	100	n/a		factory-1104-K1	
+0x021f30a8	ov002	276	legacy	factory	parked	2.5	unknown	UNCLASSIFIED:unknown	factory-1104-K1	
+0x021f30a8	ov002	276	legacy_sp3	factory	parked	7.9	unknown	UNCLASSIFIED:unknown	factory-1104-K1	
