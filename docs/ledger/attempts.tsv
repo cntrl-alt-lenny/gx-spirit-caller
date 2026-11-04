@@ -16163,3 +16163,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a3b84	ov002	960	default	factory	parked	95.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K7	
 0x022a3b84	ov002	960	legacy	factory	parked	16.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K7	
 0x022a3b84	ov002	960	legacy_sp3	factory	parked	47.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K7	
+0x022b3fbc	ov002	964	default	factory	parked	2.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
+0x022b3fbc	ov002	964	legacy	factory	parked	0.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
+0x022b3fbc	ov002	964	legacy_sp3	factory	parked	0.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
