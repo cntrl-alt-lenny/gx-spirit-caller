@@ -16139,3 +16139,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02001f18	main	744	default	factory	parked	1.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
 0x02001f18	main	744	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
 0x02001f18	main	744	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
+0x0201c6a0	main	764	default	factory	parked	99.5	structural	PROVISIONAL:structural	factory-1104-K8	
