@@ -16226,3 +16226,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02044cb8	main	416	default	factory	parked	25.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x02044cb8	main	416	legacy	factory	parked	16.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x02044cb8	main	416	legacy_sp3	factory	parked	80.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x02048314	main	428	legacy_sp3	factory	shipped	100	n/a		factory-1104-K4	
+0x02048314	main	428	default	factory	parked	3.7	unknown	UNCLASSIFIED:unknown	factory-1104-K4	
+0x02048314	main	428	legacy	factory	parked	3.6	unknown	UNCLASSIFIED:unknown	factory-1104-K4	

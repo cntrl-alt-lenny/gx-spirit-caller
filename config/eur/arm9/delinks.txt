@@ -8790,7 +8790,7 @@ src/main/func_02048300.c:
 
 
 
-src/main/func_02048314.s:
+src/main/func_02048314.legacy_sp3.c:
     complete
     .text start:0x02048314 end:0x020484c0
 
