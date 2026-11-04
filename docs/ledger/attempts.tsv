@@ -16138,3 +16138,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022938fc	ov002	352	default	factory	parked	73.9	register-numbering-permutation-cascade	P-30	factory-1104-K2	
 0x022938fc	ov002	352	legacy	factory	parked	8.7	register-numbering-permutation-cascade	P-30	factory-1104-K2	
 0x022938fc	ov002	352	legacy_sp3	factory	parked	16.5	register-numbering-permutation-cascade	P-30	factory-1104-K2	
+0x0224aeb8	ov002	356	default	factory	parked	24.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0224aeb8	ov002	356	legacy	factory	parked	6.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
+0x0224aeb8	ov002	356	legacy_sp3	factory	parked	7.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K2	
