@@ -1,7 +1,7 @@
 #include <nitro/types.h>
 extern char data_020ffc10[], data_020ffc40[], data_020ffc4c[], data_020ffd04[], data_020ffd14[], data_020ffd20[], data_020ffd30[];
 extern void func_02058038(void *a0, void *a1, int unused2);
-extern void func_02058070(int a, int b, int c);
+extern int func_02058070(void *ctx, void *buf, char *s);
 extern int func_0205ffc0(void *p, char *msg);
 extern void func_020604b0(char *dst, char *src, int n);
 typedef struct State {
@@ -12,13 +12,13 @@ typedef struct State {
     char pad2[0x3c];
     int status;
 } State;
-int func_02055a84(int *self, int mode, char *path) {
-    int state;
+int func_02055a84(State **self, int mode, char *path) {
+    State *state;
     char a[0x401];
     char *p;
     if (self == 0 || (state = *self) == 0) return 2;
-    if (((State *)state)->busy != 0) return 0;
-    if (((State *)state)->status == 4) {
+    if (state->busy != 0) return 0;
+    if (state->status == 4) {
         func_0205ffc0(self, data_020ffc10);
         return 2;
     }
@@ -33,13 +33,13 @@ int func_02055a84(int *self, int mode, char *path) {
             if (*p == '\\') *p = '/';
         } while (*++p);
     }
-    func_02058070((int)self, state + 0x1f4, (int)data_020ffd14);
-    func_02058070((int)self, state + 0x1f4, (int)data_020ffc40);
-    func_02058038(self, (void *)(state + 0x1f4), ((State *)state)->value);
-    func_02058070((int)self, state + 0x1f4, (int)data_020ffd20);
-    func_02058038(self, (void *)(state + 0x1f4), mode);
-    func_02058070((int)self, state + 0x1f4, (int)data_020ffd30);
-    func_02058070((int)self, state + 0x1f4, (int)a);
-    func_02058070((int)self, state + 0x1f4, (int)data_020ffc4c);
+    func_02058070(self, (char *)state + 0x1f4, data_020ffd14);
+    func_02058070(self, (char *)state + 0x1f4, data_020ffc40);
+    func_02058038(self, (char *)state + 0x1f4, state->value);
+    func_02058070(self, (char *)state + 0x1f4, data_020ffd20);
+    func_02058038(self, (char *)state + 0x1f4, mode);
+    func_02058070(self, (char *)state + 0x1f4, data_020ffd30);
+    func_02058070(self, (char *)state + 0x1f4, a);
+    func_02058070(self, (char *)state + 0x1f4, data_020ffc4c);
     return 0;
 }

@@ -14,7 +14,7 @@
 
 extern unsigned char data_021001c8[];
 extern void func_020a978c(void *dst, const void *src);
-extern void func_02058070(void *a0, void *a1, void *rec);
+extern int func_02058070(void *ctx, void *buf, char *s);
 
 void func_02058038(void *a0, void *a1, int unused2) {
     unsigned char buf[0x14];

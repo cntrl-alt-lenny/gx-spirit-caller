@@ -3,7 +3,7 @@ typedef struct {
     int f_198;
 } obj_t;
 
-extern void func_02058070(void *self, void *buf, void *key);
+extern int func_02058070(void *ctx, void *buf, char *s);
 extern void func_02058038(void *self, void *buf, int value);
 
 extern char data_02100790[];

@@ -3,7 +3,7 @@ typedef struct { int status; int pad4; int sock; int result; int pad10[2]; struc
 extern int func_02057b00(int *ctx, int sock, struct Buffer *buf, int *out, int *done, char *name);
 extern void func_020a6d54(int a,int b,int c,int d);
 extern void func_02054868(int a0,int a1,int a2);
-extern void func_02058070(int a,int b,int c);
+extern int func_02058070(void *ctx, void *buf, char *s);
 extern int func_020602c4(char *,char *,char *,int);
 extern int func_020a978c(char *,char *,...);
 extern int func_020aaddc(const char *s);
@@ -36,13 +36,13 @@ int func_0205cf10(int *ctx, Req *req) {
             func_020a978c(text,data_02100d18,base+0x177,*(int *)(base+0x1a0),value);
             func_02054868((int)text,func_020aaddc(text),(int)digest);
             if (func_020aaf40((unsigned char *)received,(unsigned char *)digest) != 0) {
-                func_02058070((int)ctx,(int)req + 0x28,(int)data_02100d20);
-                func_02058070((int)ctx,(int)req->queue,(int)data_02100cf0);
+                func_02058070(ctx,(char *)req + 0x28,data_02100d20);
+                func_02058070(ctx,req->queue,data_02100cf0);
                 req->status = 0x6a;
                 return 0;
             } else {
-                func_02058070((int)ctx,(int)req + 0x28,(int)data_02100d28);
-                func_02058070((int)ctx,(int)req->queue,(int)data_02100cf0);
+                func_02058070(ctx,(char *)req + 0x28,data_02100d28);
+                func_02058070(ctx,req->queue,data_02100cf0);
                 req->status = 0x69;
                 req->result = value;
             }

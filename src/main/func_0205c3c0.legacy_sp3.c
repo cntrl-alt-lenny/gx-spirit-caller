@@ -5,7 +5,7 @@ extern char data_02100b54[], data_02100b64[], data_02100ba4[], data_02100bb4[], 
 extern void func_020a6d54(int a, int b, int c, int d);
 extern int func_020aaddc(const char *s);
 /* This caller consumes r0 from both wrappers; func_02058038 also forwards a third formatting argument. */
-extern int func_02058070(void *a, void *b, const char *c);
+extern int func_02058070(void *ctx, void *buf, char *s);
 extern int func_02058038(void *a0, void *a1, int value);
 extern int func_020580a0(void *ctx, StrBuf *buf, const char *s, int len);
 extern int func_020581a8(void *ctx, StrBuf *b, char c);

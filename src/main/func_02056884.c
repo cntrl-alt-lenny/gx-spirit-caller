@@ -3,7 +3,7 @@ typedef struct Item { int value; int pad; Inner *inner; } Item;
 typedef struct Owner { char pad[0x198]; int value; char pad2[0x58]; char buf[0x23c]; volatile int count; } Owner;
 extern int func_0205d6bc(void **pp, int val, int *out);
 extern int func_0205ffc0(void *p, char *msg);
-extern void func_02058070(int a, int b, int c);
+extern int func_02058070(void *ctx, void *buf, char *s);
 extern void func_02058038(void *a0, void *a1, int unused2);
 /* The original passes only one argument to this thunk. */
 extern int func_020453b4();
@@ -18,12 +18,12 @@ int func_02056884(Owner **pp, int key) {
  Owner *o = *pp;
  Item *items[2];
  if (!func_0205d6bc((void **)pp,key,(int *)&items[0])) { func_0205ffc0(pp,data_020fff64); return 2; }
- func_02058070((int)pp,(int)o->buf,(int)data_020fff78);
- func_02058070((int)pp,(int)o->buf,(int)data_020fff84);
+ func_02058070(pp,o->buf,data_020fff78);
+ func_02058070(pp,o->buf,data_020fff84);
  func_02058038(pp,o->buf,o->value);
- func_02058070((int)pp,(int)o->buf,(int)data_020fff90);
+ func_02058070(pp,o->buf,data_020fff90);
  func_02058038(pp,o->buf,items[0]->value);
- func_02058070((int)pp,(int)o->buf,(int)data_020fffa0);
+ func_02058070(pp,o->buf,data_020fffa0);
  if (items[0]->inner != 0) {
  n = items[0]->inner->value;
  if (n < 0) func_020a6d54((int)data_020fffa8,(int)data_020fffb4,0,0x1fd);

@@ -19,10 +19,10 @@
  *     pop   {r4, r5, r6, pc}
  */
 
-extern int func_02058070(int *a, int p, int n);
+extern int func_02058070(void *ctx, void *buf, char *s);
 
-int func_0205ae8c(int *a, int b, int c) {
-    int base = *a;
+int func_0205ae8c(char **a, char *b, char *c) {
+    char *base = *a;
     int r = func_02058070(a, base + 0x440, b);
     if (r != 0) return r;
     r = func_02058070(a, base + 0x440, c);
