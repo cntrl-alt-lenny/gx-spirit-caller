@@ -16188,3 +16188,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0200a7a4	main	268	default	factory	parked	20.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
 0x0200a7a4	main	268	legacy	factory	parked	6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
 0x0200a7a4	main	268	legacy_sp3	factory	parked	6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
+0x02020914	main	272	default	factory	parked	83.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1104-K3	
+0x02020914	main	272	legacy	factory	parked	27.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1104-K3	
+0x02020914	main	272	legacy_sp3	factory	parked	28.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1104-K3	
