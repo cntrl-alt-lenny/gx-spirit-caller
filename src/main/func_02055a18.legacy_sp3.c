@@ -8,7 +8,7 @@ typedef struct {
 } Conn;
 
 extern int func_02056a58(Conn **pp, int key);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern char data_020ffc10[];
 
 int func_02055a18(Conn **pp, int key) {
@@ -20,7 +20,7 @@ int func_02055a18(Conn **pp, int key) {
         return 0;
     }
     if (c->x1d8 == 4) {
-        func_0205ffc0((int *)pp, (int)data_020ffc10);
+        func_0205ffc0(pp, data_020ffc10);
         return 2;
     }
     return func_02056a58(pp, key);

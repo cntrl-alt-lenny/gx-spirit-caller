@@ -12,7 +12,7 @@ extern int func_0205938c(char **,char *);
 extern void func_0205bd58(Owner **pp,Item *item);
 extern void func_0205d688(T_0205d688 **p,int a1);
 extern int func_0205d6f8(char **pp,int key);
-extern int func_0205ffc0(int *p,int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205ffd4(int *a0,int a1,int a2);
 extern int func_020602c4(char *,char *,char *,int);
 extern int func_020603cc(char **ctx,char *line,int check);
@@ -114,7 +114,7 @@ int func_02058a08(char **ctx,char *entry,char *line) {
         if(work.key.a) {
             obj=(char *)func_020453e8(0x20);
             if(!obj) {
-                func_0205ffc0((int *)ctx,(int)data_02100504);
+                func_0205ffc0(ctx,data_02100504);
                 return 1;
             }
             func_020a73d4((int)obj,0,0x20);

@@ -16,7 +16,7 @@ extern int func_02054db8(int socket, void *addr, int size);
 extern int func_02054e8c(int domain, int type, int protocol);
 extern int func_02055250(void *self, int flag);
 extern void func_020585d4(int *self, int state, int flag);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205ffd4(int *a0, int a1, int a2);
 extern hostent_0206ebe8_t *func_0206ebe8(char *name);
 extern void func_020a6d54(int a, int b, int c, int d);
@@ -29,7 +29,7 @@ int func_0205fb88(int *self, Req *req) {
     s->size = 0x1000;
     s->buf = func_020453e8(s->size + 1);
     if (s->buf == 0) {
-        func_0205ffc0(self, (int)data_02100e20);
+        func_0205ffc0(self, data_02100e20);
         return 1;
     }
     s->socket = func_02054e8c(2, 1, 0);

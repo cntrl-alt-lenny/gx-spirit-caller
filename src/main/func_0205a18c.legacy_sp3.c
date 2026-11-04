@@ -3,7 +3,7 @@ extern char *func_02055298(char *str);
 extern int func_0205a974(int *self, int key, int value);
 extern int func_0205ae4c(int *a, int b, int c);
 extern int func_0205ae8c(int *a, int b, int c);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_020604b0(char *dst, char *src, int n);
 extern int func_020aaddc(const char *s);
 /* The original caller supplies only r0 to this four-argument parser thunk. */
@@ -42,26 +42,26 @@ int func_0205a18c(int *self, int key, char *value) {
     char buf[256];
     int result;
     if (!value) {
-        func_0205ffc0(self, (int)data_021007e4);
+        func_0205ffc0(self, data_021007e4);
         return 2;
     }
     switch (key) {
     case 0x700:
-        if (!*value) { func_0205ffc0(self, (int)data_021007e4); return 2; }
+        if (!*value) { func_0205ffc0(self, data_021007e4); return 2; }
         func_020604b0(buf, value, 31);
         func_020604b0((char *)(base + 0x110), buf, 31);
         result = func_0205ae8c(self, (int)data_021007f4, (int)buf);
         if (result) return result;
         break;
     case 0x701:
-        if (!*value) { func_0205ffc0(self, (int)data_021007e4); return 2; }
+        if (!*value) { func_0205ffc0(self, data_021007e4); return 2; }
         func_020604b0(buf, value, 21);
         func_020604b0((char *)(base + 0x12f), buf, 21);
         result = func_0205ae8c(self, (int)data_021007fc, (int)buf);
         if (result) return result;
         break;
     case 0x702:
-        if (!*value) { func_0205ffc0(self, (int)data_021007e4); return 2; }
+        if (!*value) { func_0205ffc0(self, data_021007e4); return 2; }
         func_020604b0(buf, value, 51);
         func_02055298(buf);
         func_020604b0((char *)(base + 0x144), buf, 51);
@@ -69,7 +69,7 @@ int func_0205a18c(int *self, int key, char *value) {
         if (result) return result;
         break;
     case 0x703:
-        if (!*value) { func_0205ffc0(self, (int)data_021007e4); return 2; }
+        if (!*value) { func_0205ffc0(self, data_021007e4); return 2; }
         func_020604b0(buf, value, 31);
         func_020604b0((char *)(base + 0x177), buf, 31);
         result = func_0205ae4c(self, (int)data_02100814, (int)buf);
@@ -96,7 +96,7 @@ int func_0205a18c(int *self, int key, char *value) {
         if (result) return result;
         break;
     case 0x709:
-        if (func_020aaddc(value) != 2) { func_0205ffc0(self, (int)data_02100850); return 2; }
+        if (func_020aaddc(value) != 2) { func_0205ffc0(self, data_02100850); return 2; }
         func_020604b0(buf, value, 3);
         result = func_0205ae8c(self, (int)data_02100868, (int)buf);
         if (result) return result;
@@ -197,7 +197,7 @@ int func_0205a18c(int *self, int key, char *value) {
         if (result) return result;
         break;
     default:
-        func_0205ffc0(self, (int)data_021007c8);
+        func_0205ffc0(self, data_021007c8);
         return 2;
     }
     return 0;

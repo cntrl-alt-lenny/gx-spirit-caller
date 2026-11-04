@@ -15,7 +15,7 @@ typedef struct {
 } Stream;
 
 extern int func_020453e8(int a);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_020a73d4(void *ptr, int val, int size);
 extern char data_02100e20[];
 
@@ -23,7 +23,7 @@ int func_0205fac4(void *pp, Stream **out, int id) {
     Stream *s = (Stream *)func_020453e8(0x144);
 
     if (s == 0) {
-        func_0205ffc0((int *)pp, (int)data_02100e20);
+        func_0205ffc0(pp, data_02100e20);
         return 1;
     }
     func_020a73d4(s, 0, 0x144);
@@ -43,6 +43,6 @@ int func_0205fac4(void *pp, Stream **out, int id) {
         *out = s;
         return 0;
     }
-    func_0205ffc0((int *)pp, (int)data_02100e20);
+    func_0205ffc0(pp, data_02100e20);
     return 1;
 }

@@ -1,6 +1,6 @@
 extern int func_0205ae4c(int *a, int b, int c);
 extern int func_0205ae8c(int *a, int b, int c);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern int func_020a978c(char *dst, const char *fmt, ...);
 extern char data_021007c4[];
 extern char data_021007c8[];
@@ -33,7 +33,7 @@ int func_0205a974(int *self, int key, int value) {
     switch (key) {
     case 0x708:
         if (value < 0) {
-            func_0205ffc0(self, (int)data_0210090c);
+            func_0205ffc0(self, data_0210090c);
             return 2;
         }
         func_020a978c(buf, data_021007c4, value);
@@ -55,7 +55,7 @@ int func_0205a974(int *self, int key, int value) {
             if (result) return result;
             break;
         default:
-            func_0205ffc0(self, (int)data_02100920);
+            func_0205ffc0(self, data_02100920);
             return 2;
         }
         break;
@@ -156,7 +156,7 @@ int func_0205a974(int *self, int key, int value) {
         if (result) return result;
         break;
     default:
-        func_0205ffc0(self, (int)data_021007c8);
+        func_0205ffc0(self, data_021007c8);
         return 2;
     }
     return 0;

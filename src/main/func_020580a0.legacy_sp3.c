@@ -5,7 +5,7 @@ typedef struct {
 } StrBuf;
 
 extern int func_020453cc(int x, int y);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_020a6d54(int a, int b, int c, int d);
 extern void *func_020a7368(void *dst, signed char *src, int count);
 extern char data_02100240[];
@@ -37,7 +37,7 @@ int func_020580a0(int *ctx, StrBuf *b, signed char *src, int count) {
         cap += count < 0x800 ? 0x800 : count;
         data = (char *)func_020453cc((int)data, cap + 1);
         if (data == 0) {
-            func_0205ffc0(ctx, (int)data_02100154);
+            func_0205ffc0(ctx, data_02100154);
             return 1;
         }
     }

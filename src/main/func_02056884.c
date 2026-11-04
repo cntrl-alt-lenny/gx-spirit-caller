@@ -2,7 +2,7 @@ typedef struct Inner { int value; int pad; int a; int b; } Inner;
 typedef struct Item { int value; int pad; Inner *inner; } Item;
 typedef struct Owner { char pad[0x198]; int value; char pad2[0x58]; char buf[0x23c]; volatile int count; } Owner;
 extern int func_0205d6bc(void **pp, int val, int *out);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_02058070(int a, int b, int c);
 extern void func_02058038(void *a0, void *a1, int unused2);
 /* The original passes only one argument to this thunk. */
@@ -17,7 +17,7 @@ int func_02056884(Owner **pp, int key) {
  int n;
  Owner *o = *pp;
  Item *items[2];
- if (!func_0205d6bc((void **)pp,key,(int *)&items[0])) { func_0205ffc0((int *)pp,(int)data_020fff64); return 2; }
+ if (!func_0205d6bc((void **)pp,key,(int *)&items[0])) { func_0205ffc0(pp,data_020fff64); return 2; }
  func_02058070((int)pp,(int)o->buf,(int)data_020fff78);
  func_02058070((int)pp,(int)o->buf,(int)data_020fff84);
  func_02058038(pp,o->buf,o->value);

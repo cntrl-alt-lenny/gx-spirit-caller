@@ -7,8 +7,8 @@
  *  .L_0205ffd0: .word func_020604b0
  */
 
-extern int func_020604b0(int a, int b, int c);
+extern int func_020604b0(char *dst, char *src, int n);
 
-int func_0205ffc0(int *p, int b) {
-    return func_020604b0(*p, b, 0x100);
+int func_0205ffc0(void *p, char *msg) {
+    return func_020604b0(*(char **)p, msg, 0x100);
 }

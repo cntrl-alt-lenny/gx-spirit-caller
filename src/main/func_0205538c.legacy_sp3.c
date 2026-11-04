@@ -5,7 +5,7 @@ typedef struct {
     int x1d8;
 } Conn;
 
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern int func_02056b38(Conn **pp, int a1, int a2, int a3);
 extern char data_020ffc10[];
 extern char data_020ffc64[];
@@ -20,11 +20,11 @@ int func_0205538c(Conn **pp, int a1, int a2) {
         return 0;
     }
     if (c->x1d8 == 4) {
-        func_0205ffc0((int *)pp, (int)data_020ffc10);
+        func_0205ffc0(pp, data_020ffc10);
         return 2;
     }
     if (a2 == 0) {
-        func_0205ffc0((int *)pp, (int)data_020ffc64);
+        func_0205ffc0(pp, data_020ffc64);
         return 2;
     }
     return func_02056b38(pp, a1, 1, a2);

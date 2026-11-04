@@ -22,7 +22,7 @@ typedef struct {
 extern int func_020453e8(int a);
 /* Original call sets only r0; the thunk has unused tail arguments. */
 extern int func_020453b4();
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205bd58(Owner **pp, Item *item);
 extern int func_0205dba4(Owner **pp, Item *item);
 extern void func_020a6d54(int a, int b, int c, int d);
@@ -38,7 +38,7 @@ int func_0205da48(Owner **pp) {
     if (o->count > 0) {
         array = (Item **)func_020453e8(o->count * 4);
         if (array == 0) {
-            func_0205ffc0((int *)pp, (int)data_02100e20);
+            func_0205ffc0(pp, data_02100e20);
             return 1;
         }
         item = o->items;

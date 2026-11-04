@@ -10,7 +10,7 @@ typedef struct {
     int x134;
 } Entry;
 
-extern int func_0205ffc0(void *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern int func_0205fac4(void *pp, Entry **out, int id);
 extern int func_0205fa30(void *pp, Entry *e, int a, int b, int c);
 extern void func_020604b0(char *dst, char *src, int n);
@@ -23,7 +23,7 @@ int func_0205f844(void *pp, char *a, char *b, char *c, char *d, char *e, int f, 
 
     if ((a == 0 || *a == 0) && (c == 0 || *c == 0) && (d == 0 || *d == 0) &&
         (e == 0 || *e == 0) && f == 0 && (b == 0 || *b == 0)) {
-        func_0205ffc0(pp, (int)data_021010d4);
+        func_0205ffc0(pp, data_021010d4);
         return 2;
     }
     r = func_0205fac4(pp, &ent, 1);

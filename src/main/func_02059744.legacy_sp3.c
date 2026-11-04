@@ -8,7 +8,7 @@ extern void func_020586c8(Owner **pp, int flag);
 extern int func_0205999c(Owner **pp, Node *node);
 extern int func_0205be60(void *obj, int a1, int a2, void **out, int a4, int a5, int a6);
 extern int func_0205bf18(Owner **pp, Node *node);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_020604b0(char *dst, char *src, int n);
 extern int func_020a73d4(int x, int unused1, int unused2);
 extern char data_021005bc[], data_021005d0[], data_02100504[];
@@ -22,13 +22,13 @@ int func_02059744(Owner **pp, char *name, char *text, char *path, char *extra, c
         if (result != 0) return result;
     }
     if (ctx->state != 0) {
-        func_0205ffc0((int *)pp, (int)data_021005bc);
+        func_0205ffc0(pp, data_021005bc);
         return 2;
     }
     switch (mode) {
     case 1: ctx->mode = 1; break;
     case 0: ctx->mode = 0; break;
-    default: func_0205ffc0((int *)pp, (int)data_021005d0); return 2;
+    default: func_0205ffc0(pp, data_021005d0); return 2;
     }
     ctx->mode = 1;
     func_020604b0(ctx->name, name, 0x1f);
@@ -37,7 +37,7 @@ int func_02059744(Owner **pp, char *name, char *text, char *path, char *extra, c
     func_020604b0(ctx->extra, extra, 0x1f);
     func_02055298(ctx->path);
     buf = (char *)func_020453e8(0x308);
-    if (buf == 0) { func_0205ffc0((int *)pp, (int)data_02100504); return 1; }
+    if (buf == 0) { func_0205ffc0(pp, data_02100504); return 1; }
     func_020a73d4((int)buf, 0, 0x308);
     *(int *)(buf + 0x304) = flag;
     if (*(signed char *)a != 0 && *(signed char *)b != 0) {

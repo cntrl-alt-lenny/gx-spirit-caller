@@ -12,7 +12,7 @@ typedef struct {
 
 typedef void (*StatusCb)(Conn **pp, Status *st, void *user);
 
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern int func_0205f844(Conn **pp, int a1, int a2, int a3, int a4, int a5, int a6, int a7,
                          int a8, StatusCb cb, void *user);
 extern char data_020ffc54[];
@@ -25,7 +25,7 @@ int func_02055d58(Conn **pp, int a1, int a2, int a3, int a4, int a5, int a6, int
         return 2;
     }
     if (cb == 0) {
-        func_0205ffc0((int *)pp, (int)data_020ffc54);
+        func_0205ffc0(pp, data_020ffc54);
         return 2;
     }
     if (c->x108 != 0) {

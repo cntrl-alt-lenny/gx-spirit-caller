@@ -34,7 +34,7 @@ extern char data_02100d30[], data_02100d28[], data_02100d54[], data_02100c68[], 
 
 extern int func_0205c54c(void *pp, Node *node);
 extern int func_020601d0(void *pp, int sock, int *out);
-extern int func_0205ffc0(void *pp, char *msg);
+extern int func_0205ffc0(void *p, char *msg);
 extern int func_0205d6bc(void *pp, int val, Conn **out);
 extern void func_02058070(void *pp, void *buf, char *s);
 extern void func_02058038(void *pp, void *buf, int v);

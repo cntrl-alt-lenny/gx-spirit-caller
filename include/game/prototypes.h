@@ -1099,7 +1099,7 @@ extern void func_0205d688(void *, int);
 extern void func_0205d9a0(void *);
 extern int func_0205da1c(void *, void *);
 extern int func_0205da2c(void *);
-extern int func_0205ffc0(void *, int);
+extern int func_0205ffc0(void *, char *);
 extern void func_0205ffd4(void *, int, int);
 extern void func_02060c90(void *);
 extern void * func_02060c9c(void);

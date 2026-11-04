@@ -14,7 +14,7 @@ extern int func_0205aecc(Session **pp, void *out);
 extern int func_0205bc24(int *ctx, Node2 *node, unsigned char *line);
 extern int func_0205bccc(Owner **pp);
 extern int func_0205bd0c(Root2 **pp, Node2 **out, int key);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205ffd4(int *a0, int a1, int a2);
 extern int func_020603cc(char **ctx, char *line, int check);
 extern void func_020604a4(int a, ...);
@@ -25,7 +25,8 @@ extern unsigned char *func_020ab0c4(unsigned char *haystack, const unsigned char
 /* This caller supplies only r0, unlike the four-argument C thunk definition. */
 extern int func_020ace00();
 extern char data_020ffe54[], data_020ffe58[];
-extern unsigned char data_020ffe84[], data_020ffe8c[], data_020ffe98[], data_020ffea8[], data_020ffeb0[], data_020ffed8[], data_020ffee0[], data_020ffee8[], data_020fff18[];
+extern unsigned char data_020ffe84[], data_020ffe8c[], data_020ffea8[], data_020ffeb0[], data_020ffed8[], data_020ffee0[], data_020ffee8[], data_020fff18[];
+extern char data_020ffe98[];
 int func_02056264(int *ctx) {
     Node2 *node;
     int length;
@@ -55,7 +56,7 @@ int func_02056264(int *ctx) {
                 s->capacity += growth;
                 newbuf = (unsigned char *)func_020453cc((int)s->line, s->capacity + 1);
                 if (newbuf == 0) {
-                    func_0205ffc0(ctx, (int)data_020ffe98);
+                    func_0205ffc0(ctx, data_020ffe98);
                     return 1;
                 }
                 s->line = newbuf;

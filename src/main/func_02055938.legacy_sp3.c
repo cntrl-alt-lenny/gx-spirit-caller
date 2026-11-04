@@ -17,7 +17,7 @@ extern void func_020453b4(void *x);
 extern int func_0205d4c0(item_t *item);
 extern void func_0205d674(void *arg0, item_t *item);
 extern int func_0205d6bc(void *arg0, int junk, item_t **out);
-extern int func_0205ffc0(void *arg0, void *key);
+extern int func_0205ffc0(void *p, char *msg);
 
 extern char data_020ffc10[];
 

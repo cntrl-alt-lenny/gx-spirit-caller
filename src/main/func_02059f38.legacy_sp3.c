@@ -25,7 +25,7 @@ extern void func_0205b7a8(CopySrc *src, Dst *dst);
 extern void func_0205bd58(Owner **pp, Item *item);
 extern int func_0205be60(void *obj, int a1, int a2, void **out, int a4, int a5, int a6);
 extern int func_0205d6bc(void **pp, int val, int *out);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern char data_02100780[];
 int func_02059f38(Owner **pp, int value, int mode, int wait, int a, int b) {
     Owner *o = *pp;
@@ -40,7 +40,7 @@ int func_02059f38(Owner **pp, int value, int mode, int wait, int a, int b) {
     if (a != 0 && enabled != 0 && func_0205d6bc((void **)pp, value, (int *)&found) != 0 && found->src != 0) {
         copy = (Dst *)func_020453e8(0x204);
         if (copy == 0) {
-            func_0205ffc0((int *)pp, (int)data_02100780);
+            func_0205ffc0(pp, data_02100780);
             return 1;
         }
         func_0205b7a8(found->src, copy);

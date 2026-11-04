@@ -2,7 +2,7 @@
 extern char data_020ffc10[], data_020ffc40[], data_020ffc4c[], data_020ffd04[], data_020ffd14[], data_020ffd20[], data_020ffd30[];
 extern void func_02058038(void *a0, void *a1, int unused2);
 extern void func_02058070(int a, int b, int c);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_020604b0(char *dst, char *src, int n);
 typedef struct State {
     char pad0[0x108];
@@ -19,11 +19,11 @@ int func_02055a84(int *self, int mode, char *path) {
     if (self == 0 || (state = *self) == 0) return 2;
     if (((State *)state)->busy != 0) return 0;
     if (((State *)state)->status == 4) {
-        func_0205ffc0((int *)self, (int)data_020ffc10);
+        func_0205ffc0(self, data_020ffc10);
         return 2;
     }
     if (path == 0) {
-        func_0205ffc0((int *)self, (int)data_020ffd04);
+        func_0205ffc0(self, data_020ffd04);
         return 2;
     }
     func_020604b0(a, path, 0x401);

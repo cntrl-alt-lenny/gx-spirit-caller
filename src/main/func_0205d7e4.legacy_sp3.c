@@ -10,7 +10,7 @@ extern int func_020453e8(int a);
 extern int func_02058528(Owner **pp, Pair key, int a3, Src *src, int a5);
 extern void func_020585d4(Owner **pp, int arg, int kind);
 extern void func_0205bd58(Owner **pp, Item *item);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205ffd4(int *a0, int a1, int a2);
 extern int func_020602c4(char *line, char *key, char *out, int size);
 extern int func_020603cc(char **ctx, char *line, int check);
@@ -40,7 +40,7 @@ int func_0205d7e4(Owner **pp, Item *item, char *line) {
     if (key.a != 0) {
         data = (Data *)func_020453e8(8);
         if (data == 0) {
-            func_0205ffc0((int *)pp, (int)data_02100dd0);
+            func_0205ffc0(pp, data_02100dd0);
             return 1;
         }
         data->value = value;

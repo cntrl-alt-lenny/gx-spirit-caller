@@ -13,7 +13,7 @@ struct S02057730_A0;
 struct S02057730_A1;
 
 extern int func_0205d6bc(void **pp, int val, int *out);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern int func_02057730(struct S02057730_A0 *a0, struct S02057730_A1 *a1);
 extern int func_020453b4(int a);
 extern int func_0205d4c0(void *self);
@@ -26,11 +26,11 @@ int func_02056a58(Conn **pp, int key) {
     int r;
 
     if (func_0205d6bc((void **)pp, key, (int *)&e) == 0) {
-        func_0205ffc0((int *)pp, (int)data_020fff64);
+        func_0205ffc0(pp, data_020fff64);
         return 2;
     }
     if (e->buf == 0) {
-        func_0205ffc0((int *)pp, (int)data_020fff64);
+        func_0205ffc0(pp, data_020fff64);
         return 2;
     }
     r = func_02057730((struct S02057730_A0 *)pp, (struct S02057730_A1 *)e);

@@ -5,7 +5,7 @@ typedef struct Item Item;
 struct Item { char _pad0[0x20]; Item *next; };
 typedef struct { int x0; int x4; int x8; Pair key; } Entry;
 extern int func_020453e8(int a);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205ffd4(int *a0, int a1, int a2);
 extern int func_020603cc(char **ctx, char *line, int check);
 extern int func_020ab054(unsigned char *s1, unsigned char *s2, int n);
@@ -30,7 +30,7 @@ int func_0205febc(Owner **pp, Entry *entry, char *line) {
     if (key.a != 0) {
         p = (int *)func_020453e8(4);
         if (p == 0) {
-            func_0205ffc0((int *)pp, (int)data_02101224);
+            func_0205ffc0(pp, data_02101224);
             return 1;
         }
         *p = 0;
