@@ -4,8 +4,8 @@
  * trailing "return 1" reached from every non-failing path. */
 
 extern void func_02061fa4(void *a0);
-extern int func_02061c5c(void *a0, int a1, void *a2, int a3);
-extern int func_02061a8c(void *a0, int a1);
+extern int func_02061c5c(void *a0, void *a1, void *a2, int a3);
+extern int func_02061a8c(void *a0, void *a1);
 
 struct S020643ec_A0 {
     unsigned char _pad_00[0xc];
@@ -14,7 +14,7 @@ struct S020643ec_A0 {
     int f_14;       /* +0x14 */
 };
 
-int func_020643ec(struct S020643ec_A0 *a0, int a1, int a2) {
+int func_020643ec(struct S020643ec_A0 *a0, void *a1, void *a2) {
     int state = a0->f_c;
 
     if (state < 5) {
