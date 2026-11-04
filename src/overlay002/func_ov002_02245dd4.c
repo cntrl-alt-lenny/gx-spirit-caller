@@ -9,9 +9,8 @@ extern int func_ov002_021b9ecc(int player, int slot);
 extern int func_ov002_021fbf74(int player, int side, int slot, Card *other);
 extern int func_ov002_021fc0c8(int player, int index, Card *other);
 extern int func_ov002_022451b8(int side, int card);
-extern int func_ov002_022536e8(void *self, int arg1, int arg2);
-int func_ov002_02245dd4(void *self, int flag) {
-    int player = (int)self;
+extern int func_ov002_022536e8(int player, int arg1, int arg2);
+int func_ov002_02245dd4(int player, int flag) {
     int side, slot, id;
     struct Entry *card;
     struct Player *p;
@@ -37,5 +36,5 @@ int func_ov002_02245dd4(void *self, int flag) {
             card++;
         } while (i < p->count);
     }
-    return func_ov002_022536e8(self, 0xfffe, 14) != 0;
+    return func_ov002_022536e8(player, 0xfffe, 14) != 0;
 }
