@@ -16241,3 +16241,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02068194	main	468	default	factory	parked	10.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
 0x02068194	main	468	legacy	factory	parked	13.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
 0x02068194	main	468	legacy_sp3	factory	parked	79.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
+0x0204f0a8	main	472	default	factory	parked	16.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
+0x0204f0a8	main	472	legacy	factory	parked	80.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
+0x0204f0a8	main	472	legacy_sp3	factory	parked	98.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
