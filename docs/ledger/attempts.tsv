@@ -16264,3 +16264,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020711b0	main	508	default	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x020711b0	main	508	legacy	factory	parked	96.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x020711b0	main	508	legacy_sp3	factory	parked	23.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x0204a2ec	main	512	legacy_sp3	factory	shipped	100	n/a		factory-1104-K4	
+0x0204a2ec	main	512	default	factory	parked	0.8	unknown	UNCLASSIFIED:unknown	factory-1104-K4	
