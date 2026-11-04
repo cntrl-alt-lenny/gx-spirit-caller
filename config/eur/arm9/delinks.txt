@@ -19293,7 +19293,7 @@ src/main/func_020a6444.legacy.c:
     complete
     .text start:0x020a6444 end:0x020a6514
 
-src/main/func_020a6514.s:
+src/main/func_020a6514.legacy.c:
     complete
     .text start:0x020a6514 end:0x020a6600
 
