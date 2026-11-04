@@ -16115,3 +16115,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02285e28	ov002	744	default	factory	parked	43.9	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K7	
 0x02285e28	ov002	744	legacy	factory	parked	4.9	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K7	
 0x02285e28	ov002	744	legacy_sp3	factory	parked	4.9	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K7	
+0x022bc798	ov002	744	default	factory	parked	76.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
+0x022bc798	ov002	744	legacy	factory	parked	11.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
