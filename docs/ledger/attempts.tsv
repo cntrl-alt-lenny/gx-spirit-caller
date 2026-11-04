@@ -16151,3 +16151,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020506b0	main	260	default	factory	parked	6.2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
 0x020506b0	main	260	legacy	factory	parked	19.7	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
 0x020506b0	main	260	legacy_sp3	factory	parked	96.9	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1103-K4	
+0x0207fda4	main	260	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K4	
+0x0207fda4	main	260	legacy	factory	parked	12.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K4	
+0x0207fda4	main	260	legacy_sp3	factory	parked	93.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K4	
