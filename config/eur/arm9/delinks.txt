@@ -4090,7 +4090,7 @@ src/main/func_020200d8.c:
     complete
     .text start:0x020200d8 end:0x02020130
 
-src/main/func_02020130.s:
+src/main/func_02020130.c:
     complete
     .text start:0x02020130 end:0x02020188
 
@@ -4560,7 +4560,7 @@ src/main/func_02022ee4.c:
     complete
     .text start:0x02022ee4 end:0x02023188
 
-src/main/func_02023188.s:
+src/main/func_02023188.c:
     complete
     .text start:0x02023188 end:0x02023214
 
