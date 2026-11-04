@@ -16175,3 +16175,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02088968	main	856	default	factory	parked	22	register-numbering-permutation-cascade	P-30	factory-1104-K8	
 0x02088968	main	856	legacy	factory	parked	19.7	register-numbering-permutation-cascade	P-30	factory-1104-K8	
 0x02088968	main	856	legacy_sp3	factory	parked	71	register-numbering-permutation-cascade	P-30	factory-1104-K8	
+0x0205d15c	main	868	legacy_sp3	factory	shipped	100	n/a		factory-1104-K8	
+0x0205d15c	main	868	default	factory	parked	41.5	unknown	UNCLASSIFIED:unknown	factory-1104-K8	
+0x0205d15c	main	868	legacy	factory	parked	12.4	unknown	UNCLASSIFIED:unknown	factory-1104-K8	
