@@ -16123,3 +16123,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x022a8e40	ov002	772	default	factory	parked	19.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
 0x022a8e40	ov002	772	legacy	factory	parked	5.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
 0x022a8e40	ov002	772	legacy_sp3	factory	parked	7.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K7	
+0x02258d4c	ov002	780	default	factory	shipped	100	n/a		factory-1104-K7	
