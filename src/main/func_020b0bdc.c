@@ -45,7 +45,7 @@ int func_020b0bdc(Key *a, Key *b)
                     return 1;
                 }
                 i++;
-            } while (i < ((volatile Key *)b)->len);
+            } while (i < ((Key *)b)->len);
         }
         return 0;
     }
