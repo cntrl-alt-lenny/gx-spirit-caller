@@ -16180,3 +16180,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0205d15c	main	868	legacy	factory	parked	12.4	unknown	UNCLASSIFIED:unknown	factory-1104-K8	
 0x0206627c	main	868	default	factory	parked	0.5	unknown	UNCLASSIFIED:unknown	factory-1104-K8	
 0x0206627c	main	868	legacy_sp3	factory	parked	27.6	unknown	UNCLASSIFIED:unknown	factory-1104-K8	
+0x0201b82c	main	888	default	factory	parked	19.8	structural	PROVISIONAL:structural	factory-1104-K8	
+0x0201b82c	main	888	legacy	factory	parked	13.4	structural	PROVISIONAL:structural	factory-1104-K8	
+0x0201b82c	main	888	legacy_sp3	factory	parked	19.3	structural	PROVISIONAL:structural	factory-1104-K8	
