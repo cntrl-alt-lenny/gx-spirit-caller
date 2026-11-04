@@ -16121,3 +16121,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02023188	main	140	default	factory	shipped	100	n/a		factory-1103-K3	
 0x02023188	main	140	legacy	factory	parked	17.9	unknown	UNCLASSIFIED:unknown	factory-1103-K3	
 0x02023188	main	140	legacy_sp3	factory	parked	18.4	unknown	UNCLASSIFIED:unknown	factory-1103-K3	
+0x0201d620	main	148	default	factory	parked	81.1	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K3	
+0x0201d620	main	148	legacy	factory	parked	2.5	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K3	
+0x0201d620	main	148	legacy_sp3	factory	parked	10.5	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K3	
