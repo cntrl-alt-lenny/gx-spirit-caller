@@ -16230,3 +16230,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02098478	main	416	legacy	factory	parked	76.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x02098478	main	416	legacy_sp3	factory	parked	30.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x020b3658	main	432	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1104-K5	
+0x020b31e4	main	480	default	factory	parked	0.8	asm-int	PROVISIONAL:inline-asm	factory-1104-K5	
