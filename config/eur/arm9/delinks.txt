@@ -18073,7 +18073,7 @@ src/main/func_020996c8.c:
     complete
     .text start:0x020996c8 end:0x02099718
 
-src/main/func_02099718.s:
+src/main/func_02099718.legacy.c:
     complete
     .text start:0x02099718 end:0x02099914
 src/main/func_02099928.s:
