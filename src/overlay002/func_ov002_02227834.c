@@ -14,8 +14,7 @@ extern int func_ov002_021b0c04(int self, int arg1);
 extern int func_ov002_021b3ecc(int arg0, int arg1, int arg2);
 extern int func_ov002_021bc6c4(int arg0);
 extern int func_ov002_021bd030(int self);
-/* The original supplies only r0 to the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021d59cc(int arg0, int arg1, int arg2, int arg3, u16 arg4);
 extern int func_ov002_021d5d58(int, int, int, int);
 extern int func_ov002_021ded54(int arg0, int arg1, int arg2, int arg3, int arg4);

@@ -13,7 +13,7 @@ extern int func_ov002_021b947c(int);
 extern int func_ov002_021b99b4(int player, int id);
 extern void func_ov002_021c2c54(int, u16);
 extern int func_ov002_0229ade0(int,int,int,int);
-extern int func_ov002_0229c7f8(int);
+extern int func_ov002_0229c7f8(int arg);
 static inline int pack(u16 hi, u16 lo) { return lo | (hi << 16); }
 void func_ov002_021d2d88(void) {
     int flag = (data_ov002_022ce950.f0 & 0x8000) ? 1 : 0;

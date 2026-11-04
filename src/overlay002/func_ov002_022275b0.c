@@ -11,8 +11,7 @@ extern struct State data_ov002_022ce288;
 extern int func_ov002_021bc618(int);
 extern int func_ov002_021bc6c4(int);
 extern void func_ov002_021c4c9c(int, int, struct Card *);
-/* Original caller supplies only r0 to the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 /* Original caller supplies two arguments to the constant-return stub. */
 extern int func_ov002_021ca2c8(int, int);
 extern int func_ov002_021ca2d0(int, int);

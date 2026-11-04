@@ -4,7 +4,7 @@ extern char data_ov002_022d016c[];
 extern int data_ov002_022cd73c[];
 struct B968 { char pad[0x300]; unsigned f0 : 1; };
 extern struct B968 data_ov002_022cd968;
-extern int func_ov002_0229c7f8(int);
+extern int func_ov002_0229c7f8(int arg);
 extern int func_ov002_021b1cf0(void);
 
 int func_ov002_021ca6f8(int idx) {

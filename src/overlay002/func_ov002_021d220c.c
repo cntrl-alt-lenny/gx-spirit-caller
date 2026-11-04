@@ -2,7 +2,7 @@ extern struct { unsigned short f0; unsigned short f2; char pad[0x80c - 4]; int f
 extern char data_ov002_022cf288[];
 extern void func_ov002_021c9b2c(int, int, int);
 extern void func_ov002_0229ade0(int, int, int, int);
-extern int func_ov002_0229c7f8(int);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d220c(void)
 {

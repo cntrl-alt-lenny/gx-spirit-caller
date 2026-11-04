@@ -8,8 +8,7 @@ struct State {
     int step;
 };
 extern struct State data_ov002_022ce288;
-/* The original passes fewer arguments than the four-argument thunk definition. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ded1c(int a, int b);
 extern int func_ov002_022576d8(int arg0);
 extern int func_ov002_02211b64(struct Self *self, int unused);
@@ -17,7 +16,7 @@ extern int func_ov002_02211b64(struct Self *self, int unused);
 int func_ov002_02239160(struct Self *self, int unused) {
     int result;
     if (data_ov002_022ce288.step == 0x80) {
-        if (func_ov002_021ca2b8(self->player, unused) == 0)
+        if (func_ov002_021ca2b8(self->player) == 0)
             return 0;
         if (func_ov002_021ded1c((int)self, func_ov002_022576d8((int)self)) != 0)
             return 0x7f;

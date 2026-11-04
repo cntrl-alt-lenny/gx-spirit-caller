@@ -10,7 +10,7 @@ extern Flags data_ov002_022cd968;
 extern Work data_ov002_022ce950;
 extern Entry data_ov002_022ce958[];
 extern Mode data_ov002_022cd73c;
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 extern int func_ov002_0229cd70(int a, int b, int c);
 extern int func_ov002_021d4e10(void);
 extern void func_ov002_021d48f4(void);

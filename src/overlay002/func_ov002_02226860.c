@@ -14,8 +14,7 @@ extern unsigned int func_0202b8a8(int id);
 extern int func_ov002_021bc618(int);
 extern int func_ov002_021bc6c4(int);
 extern int func_ov002_021c1e44(Card021c1e44 *,int,int);
-/* This caller supplies only r0 to the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca3f0(int,int);
 extern int func_ov002_021b9ecc(int,int);
 extern void func_ov002_021c4c9c(int,int,int *);

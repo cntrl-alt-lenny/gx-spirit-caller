@@ -7,8 +7,7 @@ struct Record { u32 card:13; u32 bit:1; u32 pad:8; u32 value:8; u32 pad2:2; };
 struct Player { char pad[0x418]; struct Record records[0x114]; };
 extern struct Player data_ov002_022cf16c[];
 extern int func_ov002_021bc618(int arg0);
-/* The original supplies only r0 to this four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0223def4(struct Node0223def4 *self, int idx);
 extern int func_ov002_021b947c(u32 key);
 extern int func_ov002_021c33e4(int a, int b, int c);

@@ -9,8 +9,8 @@ extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021af9d0(int, int, int, int);
 extern u32 *func_ov002_021b004c(int id);
 extern int func_ov002_021bc618(int arg0);
+extern int func_ov002_021ca2b8(int a);
 /* Original supplies fewer arguments than these definitions' unused slots. */
-extern int func_ov002_021ca2b8();
 extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c();
 extern int func_ov002_021e286c(int arg0);

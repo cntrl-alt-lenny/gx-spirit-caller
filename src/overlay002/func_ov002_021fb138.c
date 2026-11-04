@@ -14,7 +14,7 @@ struct Func021fb138Self {
 };
 
 extern int func_ov002_021ff2b8(struct Func021fb138Self *self, int key);
-extern int func_ov002_021ca2b8(unsigned int key);
+extern int func_ov002_021ca2b8(int a);
 
 int func_ov002_021fb138(struct Func021fb138Self *self) {
     int key = self->f2.bit0 ^ self->f2.bit14;

@@ -21,7 +21,7 @@ extern void *func_ov002_021c93f0(int player,int kind,int extra);
 extern int func_ov002_021c97f8(int player,int kind,int extra);
 extern int func_ov002_021c988c(int player,int kind,int extra);
 extern int func_ov002_0229ade0(int a,int b,int c,int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021ced48(void) {
     int player = (data_ov002_022ce950.flags & 0x8000) ? 1 : 0;
     int kind = data_ov002_022ce950.kind;

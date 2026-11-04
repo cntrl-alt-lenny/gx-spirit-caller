@@ -11,7 +11,7 @@ struct Func022000e4Self {
     struct Func022000e4F2 f2;
 };
 
-extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021ca2b8(int a);
 extern char data_ov002_022cf178[];
 
 int func_ov002_022000e4(struct Func022000e4Self *self) {

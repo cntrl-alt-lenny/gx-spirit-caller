@@ -14,7 +14,7 @@ extern int func_ov002_021b0bdc(void *self,int arg);
 extern int func_ov002_021b0c04(int self,int arg1);
 extern void func_ov002_021b1f20(int,int,int,int,int);
 extern int func_ov002_0229ade0(int,int,int,int);
-extern int func_ov002_0229c7f8(int);
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021d40b0(int arg) {
  int offset,side;
  char *base;

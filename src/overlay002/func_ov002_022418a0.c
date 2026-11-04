@@ -8,8 +8,7 @@ extern char data_ov002_022d016c[];
 extern char data_ov002_022d0e6c[];
 extern char data_ov002_022cf16c[];
 extern int func_ov002_021bc618(int arg0);
-/* Original caller supplies only r0 to the forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_022536e8(void *self, int arg1, int arg2);
 extern int func_ov002_0226b174(int arg0, int arg1, int arg2);
 extern int func_ov002_021b99b4(int player, int id);

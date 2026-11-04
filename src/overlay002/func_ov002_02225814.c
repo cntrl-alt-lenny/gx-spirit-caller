@@ -17,8 +17,7 @@ extern void func_ov002_021ae430(int a, const char *src);
 extern int func_ov002_021ba5e0(int idx);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c988c(int player, int kind, int extra);
-/* Original caller supplies only r0 to this thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca440(int arg0, int arg1);
 extern void func_ov002_021d87dc(int arg0);
 extern int func_ov002_021df708(int arg0, int arg1);

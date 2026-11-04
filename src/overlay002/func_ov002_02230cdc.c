@@ -10,8 +10,7 @@ extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021ae4bc(int self, int idx);
 extern int func_ov002_021ba294(int player, int arg1);
 extern int func_ov002_021bc618(int arg0);
-/* This caller supplies only r0; the thunk definition includes unused argument registers. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021e286c(int arg0);
 extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);

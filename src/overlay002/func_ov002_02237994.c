@@ -9,8 +9,7 @@ extern int func_ov002_02220038(void *self, int arg);
 extern int func_ov002_0220e518(void *self);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021bc6c4(int arg0);
-/* The C definition takes four arguments; this caller supplies only the side. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca3f0(int arg0, int arg1);
 extern int func_ov002_021d59cc(int arg0, int arg1, int arg2, int arg3, unsigned short arg4);
 extern int func_ov002_0227adb8(int side, void *p, int c, int d);

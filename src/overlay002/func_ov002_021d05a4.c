@@ -15,8 +15,7 @@ extern int func_ov002_021ba4ec(int arg0);
 extern int func_ov002_021c988c(int player,int kind,int extra);
 extern void func_ov002_021c9b2c(int arg0,int arg1,int arg2);
 extern int func_ov002_0229ade0(int cmd,...);
-/* Original caller supplies only the command; the definition has three unused parameters. */
-extern int func_ov002_0229c7f8();
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021d05a4(void) {
  int player, f2, offset;
  struct Packed b,a;

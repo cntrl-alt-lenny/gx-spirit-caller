@@ -43,7 +43,7 @@ struct Func02200378Self {
     struct Func02200378F2 f2;
 };
 
-extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca3f0(unsigned int bit, int code);
 
 int func_ov002_02200378(struct Func02200378Self *self) {

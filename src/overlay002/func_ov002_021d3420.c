@@ -9,7 +9,7 @@ typedef struct {
 
 extern state_ov002_021d3420_t data_ov002_022ce950;
 extern int func_ov002_0229ade0(int cmd, int a, int b, int c);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d3420(void) {
     int flag = (data_ov002_022ce950.f_0 & 0x8000) ? 1 : 0;

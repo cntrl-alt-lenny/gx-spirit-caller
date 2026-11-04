@@ -12,8 +12,7 @@ extern void func_ov002_021af9d0(int player,int phase,int card,int arg);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c9df0(int arg);
-/* The original supplies only r0 to this four-argument forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021e286c(int arg0);
 extern int func_ov002_0223f6c4(Card *card);
 extern int func_ov002_0225368c(int ctx,int card_id,int arg2);

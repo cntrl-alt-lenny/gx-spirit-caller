@@ -12,8 +12,7 @@ extern void func_ov002_021af9d0(int,int,int,int);
 extern u32 *func_ov002_021b004c(int id);
 extern u32 func_ov002_021b4618(u32 x);
 extern int func_ov002_021bc618(int arg0);
-/* Original caller supplies only r0 to this four-parameter thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021de408(int a,int b);
 extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);

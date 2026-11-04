@@ -1,7 +1,7 @@
 #include "ov002_core.h"
 
 extern int func_ov002_021ba310(int player, int arg1);
-extern int func_ov002_021ca2b8(int a, int _unused, int c, int d);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 

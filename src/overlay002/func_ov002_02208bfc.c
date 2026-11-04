@@ -14,7 +14,7 @@ struct SA0 {
 
 extern char data_ov002_022cf17c[];
 extern int func_ov002_021c23ac(int bit0, int field1_5);
-extern int func_ov002_021ca2b8(int bit0);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0223f6c4(struct SA0 *self);
 extern int func_ov002_022536e8(int bit0, u16 val0, int c);
 

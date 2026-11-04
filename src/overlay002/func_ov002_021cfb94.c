@@ -7,7 +7,7 @@ extern Ctx data_ov002_022ce950;
 extern Player data_ov002_022cf16c[];
 extern int func_0202e234(int x);
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021cfb94(void) {
     int flag = (data_ov002_022ce950.f0 & 0x8000) != 0;
     int id = data_ov002_022ce950.f2;

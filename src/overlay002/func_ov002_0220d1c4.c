@@ -22,8 +22,7 @@ extern struct Entry data_ov002_022d0250[];
 extern int func_0202ed90(int a0);
 extern int func_ov002_022536e8(void *self, int arg1, int arg2);
 extern int func_ov002_021bc618(int arg0);
-/* The original caller supplies only r0 to the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 int func_ov002_0220d1c4(struct Card *self) {
     if (self->kind == 0x1b && self->side9 == self->side && self->field10 <= 4 && self->side18 != self->side && !self->bit16 && self->bit15 && self->nib == 0xe && func_0202ed90(data_ov002_022d0250[self->idx].id)) {
         if (func_ov002_022536e8((void *)self->side, self->id, 0) == 0) return 0;

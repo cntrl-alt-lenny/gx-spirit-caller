@@ -11,8 +11,7 @@ extern int func_020305d8(int arg);
 extern void func_ov002_021ae400(int a,int b);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c988c(int player,int kind,int extra);
-/* Original caller supplies only r0; remaining parameters are unused here. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca440(int arg0,int arg1);
 extern void func_ov002_021d87dc(int arg0);
 extern int func_ov002_021df708(int arg0,int arg1);

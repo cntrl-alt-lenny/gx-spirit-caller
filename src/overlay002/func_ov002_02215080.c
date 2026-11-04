@@ -3,7 +3,7 @@ struct Obj { u16 id; u16 side:1, rest:15; u16 pad:2, skip:1, rest4:13; };
 struct Node { unsigned int id:13, flag:1, pad:8, sub:8, rest:2; };
 struct State { char pad[0x5a8]; int state; };
 extern struct State data_ov002_022ce288;
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca3f0(int arg0, int arg1);
 extern int func_ov002_021bc618(int arg0);
 extern void func_ov002_021e2b3c();

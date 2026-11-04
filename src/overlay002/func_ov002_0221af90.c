@@ -12,8 +12,7 @@ extern int func_ov002_021b99b4(int player, int id);
 extern int func_ov002_021b9b64(int unused0);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c33e4(int a, int b, int c);
-/* Original supplies only r0 to this four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_0223def4(struct Node0223def4 *self, int idx);

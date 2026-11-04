@@ -20,7 +20,7 @@ extern Ov002Slot data_ov002_022cf288[];
 
 extern int func_ov002_021b9aa8(int a, int b);
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d2140(void)
 {

@@ -10,7 +10,7 @@ struct Card {
 };
 extern int func_ov002_021c23ac(unsigned int bit, unsigned int row);
 extern int func_ov002_022577dc(void *self);
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0223f6c4(void *self);
 extern int func_ov002_022536e8(void *self, int arg1, int arg2);
 extern char data_ov002_022cf17c[];

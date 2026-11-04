@@ -20,8 +20,7 @@ extern int func_ov002_021b9aa8(u32 a,u32 b);
 extern void func_ov002_021baa04(int player,int kind,int extra);
 extern void func_ov002_021c9b80(int,int,int,int);
 extern int func_ov002_0229ade0(int,int,int,int);
-/* The original caller supplies only r0; the other three parameters are unused. */
-extern int func_ov002_0229c7f8();
+extern int func_ov002_0229c7f8(int arg);
 static inline int word(u16 hi,u16 lo) { return lo | (hi << 16); }
 void func_ov002_021d22c8(void) {
  int player,card,id,kind,flag,index,side,bit;

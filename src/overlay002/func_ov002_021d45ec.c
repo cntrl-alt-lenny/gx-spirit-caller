@@ -4,7 +4,7 @@ extern int data_ov002_022cd73c[];
 typedef struct { int value; char pad[0x864]; } Player;
 extern Player data_ov002_022cf16c[];
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 extern void func_ov002_021b0b54(int id, int value);
 extern int func_ov002_021b0bdc(void *self, int arg);
 void func_ov002_021d45ec(void) {

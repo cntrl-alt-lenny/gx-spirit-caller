@@ -2,8 +2,8 @@ typedef struct { unsigned int id:13; unsigned int rest:19; unsigned int pad[4]; 
 extern char data_ov002_022cf16c[];
 extern int func_ov002_0226e46c(int value);
 extern int func_ov002_021b3ecc(int arg0, int arg1, int arg2);
+extern int func_ov002_021ca2b8(int a);
 /* Original calls these thunks with only the explicitly initialized arguments. */
-extern int func_ov002_021ca2b8();
 extern int func_ov002_021c8940();
 extern int func_ov002_021ca698(int arg0, int arg1);
 extern int func_ov002_021bc618(int arg0);

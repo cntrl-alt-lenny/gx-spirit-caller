@@ -9,7 +9,7 @@ extern struct State data_ov002_022ce950;
 extern int func_ov002_021ab864();
 extern int func_ov002_021ae3f0();
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021cac64(void) {
     int a = data_ov002_022ce950.a;
     int b = data_ov002_022ce950.b;

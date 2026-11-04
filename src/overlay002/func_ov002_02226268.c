@@ -13,8 +13,7 @@ extern int data_ov002_022cd73c[];
 extern int func_ov002_021b0c04(int,int);
 extern int func_ov002_021bc6c4(int);
 extern int func_ov002_021bd030(int);
-/* The original supplies only r0 to this four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021d59cc(int,int,int,int,u16);
 extern int func_ov002_021d5d58(int,int,int,int);
 extern int func_ov002_021de480(int,int,int,int);

@@ -6,7 +6,7 @@ extern char data_ov002_022cf16c[];
 extern char data_ov002_022d0e6c[];
 extern int func_0202e234(int x);
 extern int func_ov002_021bc618(int arg0);
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca440(int arg0, int arg1);
 extern void func_ov002_021d7970(void *arg0, int arg1, int arg2);
 extern void func_ov002_0226af94(int arg0, int arg1, int arg2);

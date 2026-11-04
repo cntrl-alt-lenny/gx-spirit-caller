@@ -11,8 +11,7 @@ extern char data_ov002_022cf178[];
 extern int data_ov002_022cd744[];
 extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021bc618(int arg0);
-/* Original supplies only player; the thunk's other parameters are unused here. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 /* These functions ignore their nominal argument; original passes none. */
 extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c();

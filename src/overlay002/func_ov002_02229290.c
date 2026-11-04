@@ -11,8 +11,8 @@ extern unsigned int data_ov002_022cf178[];
 extern int data_ov002_022cd744[];
 extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021ae484(int x);
+extern int func_ov002_021ca2b8(int a);
 /* These thunks are called with fewer arguments than their C definitions. */
-extern int func_ov002_021ca2b8();
 extern int func_ov002_02257878();
 extern int func_ov002_021de4b0(int arg0,int arg1,int arg2);
 extern int func_ov002_021debe0(int a,int b,int c);

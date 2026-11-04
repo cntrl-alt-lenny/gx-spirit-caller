@@ -8,8 +8,7 @@ extern void func_ov002_021af9d0(int a,int b,int c,int d);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021bc618(int a);
 extern int func_ov002_021bcd80(int a,int b);
-/* Original caller supplies only r0 to the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0225368c(int a,int b,int c);
 extern void func_ov002_0226aff0(int a,int b,int c);
 extern int func_ov002_0227adb8(int side, void *p, int c, int d);

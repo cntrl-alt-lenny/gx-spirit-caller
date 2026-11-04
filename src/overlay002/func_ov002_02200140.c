@@ -25,8 +25,7 @@ typedef struct {
 } State;
 extern State data_ov002_022ce288;
 extern Card data_ov002_022ce884[];
-/* The C definition takes four arguments; this original caller supplies only side. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern unsigned int func_ov002_021b947c(int id);
 extern int func_ov002_021bc6c4(int arg0);
 extern void *func_ov002_021c93f0(int player, int kind, int extra);

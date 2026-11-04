@@ -15,7 +15,7 @@ extern char data_ov002_022cf288[];
 extern char data_ov002_022d016c[];
 extern int func_ov002_021c3d84(int a);
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d1fd4(void) {
     int a = (data_ov002_022ce950.f0 & 0x8000) != 0;

@@ -21,8 +21,7 @@ extern int func_ov002_021b99b4(int player, int id);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c33e4(int a, int b, int c);
 extern int func_ov002_021c9df0(int arg);
-/* This caller supplies only r0; the thunk's other arguments are unused. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 /* The first argument is a player number, as passed by the original caller. */
 extern void func_ov002_021e276c(int self, int a, int b, int c);
 extern void func_ov002_021e2b3c(int unused0);

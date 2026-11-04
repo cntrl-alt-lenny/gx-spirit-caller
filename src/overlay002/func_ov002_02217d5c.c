@@ -15,8 +15,7 @@ extern void func_ov002_021b91c4(int *dst,const int *src);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021bc6c4(int arg0);
 extern int func_ov002_021c988c(int player,int kind,int extra);
-/* Original supplies only a; the remaining definition parameters are unused here. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca440(int arg0,int arg1);
 extern int func_ov002_021d8298(int arg0,struct Key *rec,int arg2);
 extern void func_ov002_021d87dc(int arg0);

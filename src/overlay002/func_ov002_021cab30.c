@@ -9,7 +9,7 @@ extern int func_ov002_021b9ecc(int player, int slot);
 extern void func_ov002_021c9b2c(int arg0, int arg1, int arg2);
 extern void func_ov002_021c9af0(int bit, int set);
 extern int func_ov002_0229ade0(int code, ...);
-extern int func_ov002_0229c7f8(int code);
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021cab30(void) {
     int i;
     int slot;

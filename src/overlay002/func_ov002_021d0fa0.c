@@ -34,7 +34,7 @@ extern Ov002D016c_t data_ov002_022d016c;
 extern char data_ov002_022cf198[]; /* row table, 0x868/player */
 
 extern void func_ov002_0229ade0(int a, int b, int c, int d);
-extern int  func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d0fa0(void) {
     int bit15 = (data_ov002_022ce950.f_0 & 0x8000) ? 1 : 0;

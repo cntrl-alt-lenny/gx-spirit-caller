@@ -16,7 +16,7 @@ struct Func0220a5b8Self {
 extern int func_ov002_021c23ac(unsigned int bit, unsigned int field5);
 extern int func_ov002_021ff2b8(struct Func0220a5b8Self *self, unsigned int bit);
 extern int func_ov002_021bc288(unsigned int bit, unsigned int field5);
-extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021c2f24(unsigned int bit, int code);
 
 int func_ov002_0220a5b8(struct Func0220a5b8Self *self) {

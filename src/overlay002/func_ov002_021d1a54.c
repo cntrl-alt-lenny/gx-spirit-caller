@@ -8,7 +8,7 @@ typedef struct {
 extern data_ov002_022ce950_t data_ov002_022ce950;
 
 extern void func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d1a54(void) {
     int flag = (data_ov002_022ce950.flags & 0x8000) ? 1 : 0;

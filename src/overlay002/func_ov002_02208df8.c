@@ -10,8 +10,7 @@ extern struct State data_ov002_022cf16c[];
 extern int func_ov002_021c23ac(int, int);
 extern int func_ov002_021bc288(int, int);
 extern int func_ov002_021ff2b8(int unused_a, int b);
-/* This caller sets only r0; the thunk preserves the other argument registers. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_022536e8(void *self, int arg1, int arg2);
 int func_ov002_02208df8(struct SA0 *a0) {
     unsigned int i;

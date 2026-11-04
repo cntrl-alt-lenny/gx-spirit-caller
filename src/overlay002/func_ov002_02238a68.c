@@ -7,8 +7,7 @@ extern void func_ov002_021ae400(int a, int b);
 extern void func_ov002_021af9d0(int a, int b, int c, int d);
 extern u32 *func_ov002_021b004c(int id);
 extern int func_ov002_021bc618(int arg0);
-/* Original caller supplies only r0; remaining thunk inputs are unused here. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 /* Original caller supplies no argument to these unused-argument functions. */
 extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c();

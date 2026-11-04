@@ -13,8 +13,7 @@ struct Node0223def4 {
 };
 extern char data_ov002_022cf16c[];
 extern int func_ov002_021bc618(int arg0);
-/* This caller supplies only r0 to the four-parameter forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0223def4(struct Node0223def4 *self, int idx);
 extern int func_ov002_021b947c(int value);
 extern int func_ov002_021c3608(int a, int b, int c);

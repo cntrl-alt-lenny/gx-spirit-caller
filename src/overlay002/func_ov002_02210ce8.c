@@ -17,8 +17,8 @@ extern void func_ov002_021af9d0(int,int,int,int);
 extern int *func_ov002_021afb74(void);
 extern unsigned int func_ov002_021b00d0(unsigned int);
 extern int func_ov002_021c8470(int,int);
+extern int func_ov002_021ca2b8(int a);
 /* Original calls these thunks with fewer arguments than their forwarding definitions. */
-extern int func_ov002_021ca2b8();
 extern int func_ov002_021d8288();
 extern int func_ov002_02257878();
 extern int func_ov002_021de408(int,int);

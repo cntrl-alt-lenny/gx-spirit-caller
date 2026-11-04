@@ -2,7 +2,7 @@ typedef unsigned int u32;
 typedef unsigned short u16;
 struct Self { u16 f0; u16 player:1; u16 rest:15; u16 low:6; u16 field:9; u16 top:1; };
 struct Entry { u32 id:13; u32 lo:1; u32 pad:8; u32 hi:8; u32 end:2; };
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021b99b4(int player, int id);
 extern int func_ov002_021c23ac(int player, int index);
 extern int func_ov002_021c8940();

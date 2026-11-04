@@ -9,7 +9,7 @@ extern CardInfo data_ov002_022d0250[];
 extern int func_ov002_021b947c(int val);
 extern int func_ov002_021b9b64(int unused0);
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021cfda8(void) {
     int flag = (data_ov002_022ce950.f0 & 0x8000) != 0;
     int f2;

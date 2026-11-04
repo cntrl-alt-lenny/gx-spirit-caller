@@ -7,8 +7,7 @@ extern struct Context data_ov002_022d016c;
 extern u16 data_ov002_022d0f1c[];
 extern int func_ov002_021b9b64(int unused0);
 extern int func_ov002_021bc618(int arg0);
-/* Original caller supplies only r0; remaining callee parameters are unused here. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 /* Original caller supplies no argument for the unused parameter. */
 extern void func_ov002_021e2b3c();
 /* Original caller supplies no argument for the unused parameter. */

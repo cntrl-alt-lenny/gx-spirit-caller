@@ -17,7 +17,7 @@ extern void func_ov002_021c2934(int player,int arg1,int arg2);
 extern void func_ov002_021c29bc(int player,int arg);
 extern void *func_ov002_021c93f0(int player,int kind,int extra);
 extern void func_ov002_0229ade0(int cmd,int a,int b,int c);
-extern int func_ov002_0229c7f8(int cmd);
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021d0860(void) {
  int f4;
  u16 f6;

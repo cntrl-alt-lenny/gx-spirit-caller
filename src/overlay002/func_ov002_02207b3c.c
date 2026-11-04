@@ -9,7 +9,7 @@ struct F02207b3c_Self {
     struct F02207b3c_F2 f2;
 };
 
-extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_022065a0(struct F02207b3c_Self *self, void *arg1);
 
 int func_ov002_02207b3c(struct F02207b3c_Self *self, void *arg1) {

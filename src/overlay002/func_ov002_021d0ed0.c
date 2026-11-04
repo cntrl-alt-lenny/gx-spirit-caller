@@ -3,7 +3,7 @@
 struct S021d0ed0 { short f0; short f2; char pad[0x80c - 4]; int f80c; int f810; };
 extern struct S021d0ed0 data_ov002_022ce950;
 extern void func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d0ed0(void) {
     int flag;

@@ -23,8 +23,7 @@ extern int func_ov002_021bb068(int);
 extern int func_ov002_021bae7c(int, int, int);
 extern int func_ov002_021b99b4(int, int);
 extern int func_ov002_021c33e4(int, int, int);
-/* This caller supplies only r0 to the four-parameter forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021bc618(int);
 extern int func_ov002_021ae484(int);
 extern void func_ov002_021e2b3c(int);

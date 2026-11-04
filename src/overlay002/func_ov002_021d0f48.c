@@ -9,7 +9,7 @@ typedef struct {
 
 extern State data_ov002_022ce950;
 extern void func_ov002_0229ade0(s32 a, s32 b, s32 c, s32 d);
-extern s32 func_ov002_0229c7f8(s32 a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d0f48(void)
 {

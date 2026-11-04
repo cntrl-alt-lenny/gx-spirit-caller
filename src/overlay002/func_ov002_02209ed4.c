@@ -12,7 +12,7 @@ struct Func02209ed4Self {
     struct Func02209ed4F2 f2;
 };
 
-extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021bc8c8(unsigned int bit, unsigned int bit2, unsigned int field5);
 extern int func_ov002_022536e8(unsigned int bit, unsigned int f0, int z);
 

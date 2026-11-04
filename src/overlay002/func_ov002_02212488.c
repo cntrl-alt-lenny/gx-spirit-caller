@@ -6,7 +6,7 @@ extern void func_ov002_021ae400(int a, int b);
 extern void func_ov002_021af9d0(int a, int b, int c, int d);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021bc618(int arg0);
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0223f6c4(struct Self *self);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern int func_ov002_0227ac64(int a, int b, int c, int d, int e);

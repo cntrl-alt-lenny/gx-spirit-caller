@@ -20,8 +20,7 @@ extern char data_ov002_022cf16c[];
 extern int func_ov002_021b99b4(int player, int id);
 extern int func_ov002_021b9ba0(S021b9ba0 *p);
 extern int func_ov002_021bc618(int arg0);
-/* This caller supplies only r0; remaining thunk arguments are not set. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 /* This caller supplies only r0-r1; remaining thunk arguments are not set. */
 extern int func_ov002_021e104c();
 extern int func_ov002_0223def4(struct Node0223def4 *self, int idx);

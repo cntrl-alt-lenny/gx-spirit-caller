@@ -7,8 +7,8 @@
  * .L_021ae7b4: .word func_ov002_0229c7f8
  */
 
-extern int func_ov002_0229c7f8(int a, int b, int c, int d);
+extern int func_ov002_0229c7f8(int arg);
 
 int func_ov002_021ae7a8(int a, int b, int c, int d) {
-    return func_ov002_0229c7f8(0x31, b, c, d);
+    return func_ov002_0229c7f8(0x31);
 }

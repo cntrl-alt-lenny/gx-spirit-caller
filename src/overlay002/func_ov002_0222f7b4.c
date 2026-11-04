@@ -9,8 +9,7 @@ extern struct Player data_ov002_022d016c;
 extern struct Selection data_ov002_022d0e6c;
 extern int func_ov002_021b9b64(int unused0);
 extern int func_ov002_021bc618(int arg0);
-/* This caller supplies only r0; the thunk's other parameters are passthrough registers. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021e286c(int arg0);
 extern void func_ov002_021e2b3c(int unused0);
 /* The unused input is the preceding call's result in the original. */

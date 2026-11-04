@@ -19,8 +19,7 @@ extern int func_0202e2f8(int unused0);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021bc6c4(int arg0);
 extern int func_ov002_021c9df0(int arg);
-/* The original passes only r0 to this four-parameter thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern void func_ov002_021d8840(unsigned player, unsigned mask);
 extern int func_ov002_021de9c0(int a, int b);
 extern int func_ov002_021e27c0(int self_thing, int arg1);
