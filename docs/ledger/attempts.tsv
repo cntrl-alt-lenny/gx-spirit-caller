@@ -16195,3 +16195,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02046094	main	360	default	factory	parked	57.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x02046094	main	360	legacy	factory	parked	8.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x02046094	main	360	legacy_sp3	factory	parked	72.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x020854f4	main	368	default	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K4	
+0x020854f4	main	368	legacy	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K4	
+0x020854f4	main	368	legacy_sp3	factory	parked	0	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K4	
