@@ -16112,3 +16112,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02027048	main	136	default	factory	parked	35.3	structural	PROVISIONAL:structural	factory-1103-K3	
 0x02027048	main	136	legacy	factory	parked	17.1	structural	PROVISIONAL:structural	factory-1103-K3	
 0x02027048	main	136	legacy_sp3	factory	parked	20.6	structural	PROVISIONAL:structural	factory-1103-K3	
+0x0203eca4	main	136	default	factory	parked	94.1	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K3	
+0x0203eca4	main	136	legacy	factory	parked	18.4	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K3	
+0x0203eca4	main	136	legacy_sp3	factory	parked	94.1	reg-alloc	PROVISIONAL:register-allocation	factory-1103-K3	
