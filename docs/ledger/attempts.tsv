@@ -16145,3 +16145,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0222e5e4	ov002	316	default	factory	parked	20.2	register-numbering-permutation-cascade	P-30	factory-1104-K1	
 0x0222e5e4	ov002	316	legacy	factory	parked	2.4	register-numbering-permutation-cascade	P-30	factory-1104-K1	
 0x0222e5e4	ov002	316	legacy_sp3	factory	parked	5.1	register-numbering-permutation-cascade	P-30	factory-1104-K1	
+0x02231dec	ov002	320	default	factory	shipped	100	n/a		factory-1104-K1	
+0x02231dec	ov002	320	legacy_sp3	factory	parked	13.8	unknown	UNCLASSIFIED:unknown	factory-1104-K1	
