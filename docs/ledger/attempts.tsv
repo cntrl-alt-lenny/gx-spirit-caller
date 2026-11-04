@@ -16119,3 +16119,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b0cbc	main	676	default	factory	parked	38.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
 0x020b0cbc	main	676	legacy	factory	parked	2.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
 0x020b0cbc	main	676	legacy_sp3	factory	parked	5.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
+0x02040e3c	main	688	default	factory	parked	8.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
+0x02040e3c	main	688	legacy	factory	parked	11.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
+0x02040e3c	main	688	legacy_sp3	factory	parked	62.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
