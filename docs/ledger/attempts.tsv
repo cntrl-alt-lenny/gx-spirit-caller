@@ -16212,3 +16212,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b4444	ov015	304	default	factory	parked	27.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K6	
 0x021b4444	ov015	304	legacy	factory	parked	26.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K6	
 0x021b4444	ov015	304	legacy_sp3	factory	parked	26.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K6	
+0x021cabbc	ov011	304	default	factory	shipped	100	n/a		factory-1104-K6	
