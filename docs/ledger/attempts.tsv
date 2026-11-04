@@ -16205,3 +16205,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020973fc	main	300	default	factory	parked	9.3	register-numbering-permutation-cascade	P-30	factory-1104-K5	
 0x020973fc	main	300	legacy	factory	parked	85.3	register-numbering-permutation-cascade	P-30	factory-1104-K5	
 0x020973fc	main	300	legacy_sp3	factory	parked	80	register-numbering-permutation-cascade	P-30	factory-1104-K5	
+0x02092b48	main	304	default	factory	parked	11.8	structural	PROVISIONAL:structural	factory-1104-K5	
+0x02092b48	main	304	legacy	factory	parked	5.3	structural	PROVISIONAL:structural	factory-1104-K5	
+0x02092b48	main	304	legacy_sp3	factory	parked	2.6	structural	PROVISIONAL:structural	factory-1104-K5	
