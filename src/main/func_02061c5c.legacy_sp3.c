@@ -6,7 +6,7 @@ typedef struct {
 } SubObj02061c5c;
 
 typedef struct Self02061c5c Self02061c5c;
-typedef void (*Cb02061c5c)(Self02061c5c *, int, int, int);
+typedef void (*Cb02061c5c)(Self02061c5c *, int, void *, int);
 
 struct Self02061c5c {
     char _pad_08[0x8];
@@ -24,7 +24,7 @@ extern void func_02064aa0(SubObj02061c5c *self);
 extern char data_021014e4[];
 extern char data_021014f4[];
 
-int func_02061c5c(Self02061c5c *self, int a, int b, int c) {
+int func_02061c5c(Self02061c5c *self, int a, void *b, int c) {
     if (self == 0) {
         func_020a6d54(data_021014f4, data_021014e4, 0, 0x69);
     }
