@@ -12434,7 +12434,7 @@ src/main/func_0206d360.legacy.c:
     complete
     .text start:0x0206d360 end:0x0206d404
 
-src/main/func_0206d404.s:
+src/main/func_0206d404.legacy.c:
     complete
     .text start:0x0206d404 end:0x0206d4c0
 
