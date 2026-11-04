@@ -19438,7 +19438,7 @@ src/main/func_020a724c.c:
     complete
     .text start:0x020a724c end:0x020a7268
 
-src/main/func_020a7268.s:
+src/main/func_020a7268.c:
     complete
     .text start:0x020a7268 end:0x020a72f0
 
