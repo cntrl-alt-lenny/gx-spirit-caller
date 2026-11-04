@@ -17041,7 +17041,7 @@ src/main/func_020931e8.c:
 
 
 
-src/main/func_020931f8.s:
+src/main/func_020931f8.legacy.c:
     complete
     .text start:0x020931f8 end:0x02093294
 
