@@ -10319,7 +10319,7 @@ src/main/func_020585d4.legacy_sp3.c:
     complete
     .text start:0x020585d4 end:0x020586c8
 
-src/main/func_020586c8.s:
+src/main/func_020586c8.legacy_sp3.c:
     complete
     .text start:0x020586c8 end:0x0205888c
 
