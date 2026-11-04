@@ -20,9 +20,7 @@ extern Resource *func_02006c0c(int, int, int);
 extern void Copy32(void *src, void *dst, int size);
 extern void Task_Invoke(void *p);
 extern int func_0202bc84(int a0, int a1);
-/* The thunk's C signature is void(void *), but this caller passes no
- * argument and consumes the integer returned by its underlying query. */
-extern int func_0200974c();
+extern unsigned int func_0200974c(void);
 void func_0200a488(int *out1, int *out2) {
     Resource *resource;
     Entry *base;
