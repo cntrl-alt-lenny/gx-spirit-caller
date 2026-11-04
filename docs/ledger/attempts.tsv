@@ -16160,3 +16160,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02002200	main	824	default	factory	parked	4.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
 0x02002200	main	824	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
 0x02002200	main	824	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
+0x020448d8	main	824	default	factory	parked	12.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
+0x020448d8	main	824	legacy	factory	parked	6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
+0x020448d8	main	824	legacy_sp3	factory	parked	15.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K8	
