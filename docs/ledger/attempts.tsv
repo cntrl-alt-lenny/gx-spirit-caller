@@ -16238,3 +16238,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203f37c	main	456	legacy_sp3	factory	parked	89.5	register-numbering-permutation-cascade	P-30	factory-1104-K4	
 0x02088350	main	456	legacy_sp3	factory	shipped	100	n/a		factory-1104-K4	
 0x02088350	main	456	default	factory	parked	5.3	unknown	UNCLASSIFIED:unknown	factory-1104-K4	
+0x02068194	main	468	default	factory	parked	10.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
+0x02068194	main	468	legacy	factory	parked	13.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
+0x02068194	main	468	legacy_sp3	factory	parked	79.5	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K4	
