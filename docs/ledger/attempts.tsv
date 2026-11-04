@@ -16122,3 +16122,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021d3578	ov004	672	default	factory	parked	66.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1104-K9	
 0x021d3578	ov004	672	legacy	factory	parked	3.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1104-K9	
 0x021d3578	ov004	672	legacy_sp3	factory	parked	19.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1104-K9	
+0x021ab1c4	ov018	712	default	factory	parked	79.2	structural	PROVISIONAL:structural	factory-1104-K9	
+0x021ab1c4	ov018	712	legacy	factory	parked	30.9	structural	PROVISIONAL:structural	factory-1104-K9	
+0x021ab1c4	ov018	712	legacy_sp3	factory	parked	32.1	structural	PROVISIONAL:structural	factory-1104-K9	
