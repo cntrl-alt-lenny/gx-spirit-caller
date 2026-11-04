@@ -17431,3 +17431,9 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021b6350	ov016	824	legacy_sp3	factory	parked	12.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K9	
 0x021cf070	ov004	824	default	factory	parked	89.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K9	
 0x021cf070	ov004	824	legacy_sp3	factory	parked	43.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K9	
+0x02059e5c	main	220	default	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
+0x0206de68	main	236	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
+0x0207ef90	main	204	legacy_sp3	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
+0x0207f05c	main	220	legacy_sp3	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
+0x020a6514	main	236	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
+0x020a6924	main	172	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
