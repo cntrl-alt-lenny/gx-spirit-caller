@@ -16218,3 +16218,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02043728	main	400	legacy	factory	parked	4.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x02043728	main	400	legacy_sp3	factory	parked	75	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x0205c54c	main	408	legacy_sp3	factory	shipped	100	n/a		factory-1104-K4	
+0x0206d600	main	412	legacy	factory	shipped	100	n/a		factory-1104-K4	
+0x0206d600	main	412	legacy_sp3	factory	parked	15.4	unknown	UNCLASSIFIED:unknown	factory-1104-K4	

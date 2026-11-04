@@ -12442,7 +12442,7 @@ src/main/func_0206d4c0.legacy.c:
     complete
     .text start:0x0206d4c0 end:0x0206d600
 
-src/main/func_0206d600.s:
+src/main/func_0206d600.legacy.c:
     complete
     .text start:0x0206d600 end:0x0206d79c
 
