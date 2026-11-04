@@ -16114,3 +16114,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b30e4	main	132	default	factory	parked	2.8	asm-int	PROVISIONAL:inline-asm	factory-1103-K5	
 0x020b30e4	main	132	legacy	factory	parked	6.1	asm-int	PROVISIONAL:inline-asm	factory-1103-K5	
 0x020b30e4	main	132	legacy_sp3	factory	parked	6.1	asm-int	PROVISIONAL:inline-asm	factory-1103-K5	
+0x02093160	main	136	default	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K5	
+0x02093160	main	136	legacy	factory	parked	91.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K5	
+0x02093160	main	136	legacy_sp3	factory	parked	55.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K5	
