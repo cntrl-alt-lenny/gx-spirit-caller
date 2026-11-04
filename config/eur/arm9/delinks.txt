@@ -10359,7 +10359,7 @@ src/main/func_02059d90.c:
     complete
     .text start:0x02059d90 end:0x02059e5c
 
-src/main/func_02059e5c.s:
+src/main/func_02059e5c.c:
     complete
     .text start:0x02059e5c end:0x02059f38
 
