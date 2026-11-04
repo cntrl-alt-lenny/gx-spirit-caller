@@ -16161,3 +16161,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209417c	main	192	default	factory	parked	12.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x0209417c	main	192	legacy	factory	parked	77.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
 0x0209417c	main	192	legacy_sp3	factory	parked	12.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x020990e0	main	196	default	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x020990e0	main	196	legacy	factory	parked	81.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
+0x020990e0	main	196	legacy_sp3	factory	parked	73.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K5	
