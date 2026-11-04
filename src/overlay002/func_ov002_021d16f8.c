@@ -21,7 +21,7 @@ typedef struct {
 extern S021d16f8 data_ov002_022ce950;
 extern void func_ov002_021b009c(void);
 extern int func_ov002_0229ade0(int cmd, int a, int b, int c);
-extern int func_ov002_0229c7f8(int cmd);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d16f8(void) {
     int bit15;

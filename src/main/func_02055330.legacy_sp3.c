@@ -1,7 +1,7 @@
 extern char data_020ffbd8;
 extern char data_020ffbf8;
 extern int        func_020931e8(void);
-extern void       func_020a6d54(void *file, void *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern long long  func_020930b0(void);
 extern int        func_020b3808(int lo, int hi, unsigned int c, int d);
 

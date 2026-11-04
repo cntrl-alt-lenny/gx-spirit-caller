@@ -15,7 +15,7 @@ extern int func_ov002_021ff3bc(S021ff3bc *p, int unused1);
 extern int func_ov002_021ca3f0(int arg0, int arg1);
 extern int func_ov002_021b99b4(int player, int id);
 extern s32 func_ov002_021b9aa8(u32 a, u32 b);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern char data_ov002_022cf16c[];
 int func_ov002_022325f8(S021ff3bc *p, int unused1) {
     int index;
@@ -24,12 +24,12 @@ int func_ov002_022325f8(S021ff3bc *p, int unused1) {
     if (p->kind == 14) {
         index = func_ov002_021b99b4(p->bit0, p->id);
         if (index >= 0) {
-            func_ov002_0227adb8(p->bit0, (int)(data_ov002_022cf16c + (p->bit0 & 1) * 0x868 + 0x418 + index * 4), 1, p->w0 << 16);
+            func_ov002_0227adb8(p->bit0, data_ov002_022cf16c + (p->bit0 & 1) * 0x868 + 0x418 + index * 4, 1, p->w0 << 16);
         }
     } else {
         index = func_ov002_021b9aa8(p->bit0, p->id);
         if (index >= 0) {
-            func_ov002_0227adb8(p->bit0, (int)(data_ov002_022cf16c + (p->bit0 & 1) * 0x868 + 0x120 + index * 4), 1, p->w0 << 16);
+            func_ov002_0227adb8(p->bit0, data_ov002_022cf16c + (p->bit0 & 1) * 0x868 + 0x120 + index * 4, 1, p->w0 << 16);
         }
     }
     return 0;

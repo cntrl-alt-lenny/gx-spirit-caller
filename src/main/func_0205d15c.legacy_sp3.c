@@ -34,9 +34,9 @@ extern char data_02100d30[], data_02100d28[], data_02100d54[], data_02100c68[], 
 
 extern int func_0205c54c(void *pp, Node *node);
 extern int func_020601d0(void *pp, int sock, int *out);
-extern int func_0205ffc0(void *pp, char *msg);
+extern int func_0205ffc0(void *p, char *msg);
 extern int func_0205d6bc(void *pp, int val, Conn **out);
-extern void func_02058070(void *pp, void *buf, char *s);
+extern int func_02058070(void *ctx, void *buf, char *s);
 extern void func_02058038(void *pp, void *buf, int v);
 extern void func_020453b4(char *p);
 extern int func_0205d4c0(Conn *c);
@@ -46,7 +46,7 @@ extern int func_02057980(void *pp, int sock, void *buf, int *o, int a4, char *li
 extern int func_0205c6e4(void *pp, Node *n);
 extern char *func_020ab0c4(char *s, char *t);
 extern int func_020ab054(char *a, char *b, int n);
-extern void func_020a6d54(char *a, char *b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 
 int func_0205d15c(void **pp, Node *node) {
     Ctx *ctx = (Ctx *)*pp;

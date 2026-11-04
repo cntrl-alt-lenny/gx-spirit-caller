@@ -13,7 +13,7 @@ struct F022039f4_Self {
     unsigned short f0;
     struct F022039f4_F2 f2;
 };
-extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_022536e8(unsigned int bit, unsigned int f0, unsigned int z);
 
 int func_ov002_022039f4(struct F022039f4_Self *self) {

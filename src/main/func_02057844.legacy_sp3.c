@@ -1,7 +1,7 @@
 extern char *Strchr(char *s, int c);
 extern int func_020ab054(unsigned char *s1, unsigned char *s2, int n);
 extern int func_020602c4(char *src, char *key, char *out, int size);
-extern int func_020ace00();
+extern int func_020ace00(const char *s);
 extern unsigned char data_021000a4[];
 extern char data_021000ac[];
 extern char data_021000b0[];

@@ -9,7 +9,7 @@ typedef struct {
 
 extern int func_020628fc(void *self);
 extern void func_02061fa4(void *a0);
-extern int func_02061c5c(void *self, int a, int b, int c);
+extern int func_02061c5c(void *self, int a, void *b, int c);
 
 int func_020621dc(obj_020621dc_t *o, unsigned int now) {
     int expired;

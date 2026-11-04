@@ -1,5 +1,5 @@
 typedef struct Obj Obj;
-typedef void (*Callback)(Obj *, Obj *, int, int, int, int, int);
+typedef void (*Callback)(Obj *, Obj *, int, int, int, void *, int);
 struct Obj {
     int f0;
     char pad4[8];
@@ -14,13 +14,13 @@ struct Obj {
     Callback f2c;
 };
 extern void func_02064aa0(Obj *self);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_021014dc[];
 extern char data_021014e4[];
-int func_02061670(Obj *self, Obj *other, int a, int b, int c, int d, int e, int mode) {
+int func_02061670(Obj *self, Obj *other, int a, int b, int c, void *d, int e, int mode) {
     Callback callback;
     if (self == 0) {
-        func_020a6d54((int)data_021014dc, (int)data_021014e4, 0, 0x160);
+        func_020a6d54(data_021014dc, data_021014e4, 0, 0x160);
     }
     if (self == 0) return 1;
     callback = mode ? self->f28 : self->f2c;

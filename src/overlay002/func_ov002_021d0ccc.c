@@ -3,7 +3,7 @@ extern struct S021d0ccc data_ov002_022ce950;
 extern unsigned int data_ov002_022cf17c[];
 extern int data_ov002_022d016c[];
 extern void func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 extern void func_ov002_021ba230(int a);
 
 void func_ov002_021d0ccc(void) {

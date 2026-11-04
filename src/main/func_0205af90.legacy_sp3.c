@@ -10,19 +10,19 @@ extern int func_020ab054(unsigned char *s1,unsigned char *s2,int n);
 extern void func_0205ffd4(int *a0,int a1,int a2);
 extern void func_020585d4(void *,int,int);
 extern int func_020602c4(char *,char *,char *,int);
+extern int func_020ace00(const char *s);
 /* These thunks receive only r0 here, fewer arguments than their C definitions. */
-extern int func_020ace00();
 extern int func_020453b4();
 extern int func_020ac45c();
 extern float func_020b1c7c(int);
-extern void func_020a6d54(int,int,int,int);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int func_0205d6bc(void **pp,int val,int *out);
 extern int func_0205d6f8(char **pp,int key);
 extern int func_0205b9ac(void *,int,int *,int *,int *);
 extern int func_020552dc(void *self);
 extern int func_02059e5c(void *,void *,Src *);
 extern void *func_020453e8(int a);
-extern int func_0205ffc0(int *p,int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205b7a8(Src *src,Dst *dst);
 extern int func_02058528(Owner **pp,Pair key,int a3,Item *src,int a5);
 extern void func_0205bd58(Owner **pp,Item *item);
@@ -50,7 +50,7 @@ int func_0205af90(Owner **pp,Item *item,char *line) {
         func_020585d4(pp,3,1); return 3;
     }
     key=func_020ace00(buf);
-    if(key<=0) func_020a6d54((int)data_02100a10,(int)data_02100a20,0,0x15a);
+    if(key<=0) func_020a6d54(data_02100a10,data_02100a20,0,0x15a);
     func_0205d6bc((void **)pp,key,&found);
     Src src={0};
     char s14[0x4c];
@@ -121,7 +121,7 @@ int func_0205af90(Owner **pp,Item *item,char *line) {
     callback=item->callback;
     if(callback.a) {
         dst=func_020453e8(0x204);
-        if(!dst) { func_0205ffc0((int *)pp,(int)data_02100780); return 1; }
+        if(!dst) { func_0205ffc0(pp,data_02100780); return 1; }
         func_0205b7a8(&src,dst);
         dst->kind=0; dst->key=key;
         result=func_02058528(pp,callback,(int)dst,item,0);

@@ -3,8 +3,7 @@ struct State { char pad[0xcec]; int side; char pad2[8]; int mode; };
 extern struct State data_ov002_022d016c;
 extern char data_ov002_022cf17c[];
 extern int func_ov002_021ff2b8(int unused_a, int b);
-/* The original supplies only the player argument to this four-parameter thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021c9df0(int arg);
 int func_ov002_02202030(struct Self *self) {
     if (data_ov002_022d016c.side == self->side) return 0;

@@ -23,7 +23,7 @@ extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021b99b4(int player, int id);
 extern int func_ov002_021c33e4(int player, int owner, int slot);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02221050(struct Self *self, int unused1) {
     int slot;
     int result;
@@ -38,7 +38,7 @@ int func_ov002_02221050(struct Self *self, int unused1) {
         if (data_ov002_022ce288.index < self->count && func_ov002_021bc618(self->bit0) != 0) {
             slot = func_ov002_021b99b4(self->bit0, self->ids[data_ov002_022ce288.index]);
             if (slot >= 0 && func_ov002_021c33e4(self->bit0, self->bit0, slot) != 0) {
-                func_ov002_0227adb8(self->bit0, (int)(data_ov002_022cf16c + (self->bit0 & 1) * 0x868 + 0x418 + slot * 4), 1, self->w0 << 16);
+                func_ov002_0227adb8(self->bit0, data_ov002_022cf16c + (self->bit0 & 1) * 0x868 + 0x418 + slot * 4, 1, self->w0 << 16);
             }
             data_ov002_022ce288.index++;
             return 0x7f;

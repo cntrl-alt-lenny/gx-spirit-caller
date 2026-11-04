@@ -16,8 +16,7 @@ extern int func_ov002_021ae4bc(int self, int idx);
 extern int func_ov002_021ba294(int player, int arg1);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c9df0(int arg);
-/* Original supplies only r0 to this forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021df818(Card *card, int side, int amount);
 extern void func_ov002_021e05fc(int side, int amount);
 extern int func_ov002_021e286c(int arg0);

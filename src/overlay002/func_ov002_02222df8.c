@@ -24,7 +24,7 @@ extern int *func_ov002_021afb74(void);
 extern int func_ov002_021de9d4(int a, int b, int c);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern int func_ov002_02257b48(void *p, void *q);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02222df8(struct Self *self, void *q) {
     switch (data_ov002_022ce288.mode) {
     case 0x80: {
@@ -41,7 +41,7 @@ int func_ov002_02222df8(struct Self *self, void *q) {
         func_ov002_0225368c(self->side, self->id, 0);
         func_ov002_021afb64(0);
         p = func_ov002_021afb74();
-        func_ov002_0227adb8(self->side, (int)p, 1, 0);
+        func_ov002_0227adb8(self->side, p, 1, 0);
         return 0;
     }
     }

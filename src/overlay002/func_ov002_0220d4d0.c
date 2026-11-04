@@ -6,7 +6,7 @@ struct S0220d4d0F2 { u16 bit0 : 1; u16 pad : 15; };
 struct S0220d4d0 { u16 f0; struct S0220d4d0F2 f2; };
 
 extern char data_ov002_022cf17c[];
-extern int func_ov002_021ca2b8(int bit0);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0223f6c4(struct S0220d4d0 *self);
 extern int func_ov002_022536e8(int bit0, unsigned short f0, int val);
 

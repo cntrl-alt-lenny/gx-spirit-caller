@@ -1,4 +1,4 @@
-extern void func_020a6d54(void *a0, void *a1, int a2, int a3);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_020ffb10[];
 extern char data_020ffb04[];
 

@@ -19,7 +19,7 @@ extern int func_ov002_02202680(struct Self_t *self);
 extern int func_ov002_021d5a6c(int a0, int a1, int a2, int a3);
 extern int func_ov002_021b99b4(int bit, int f4);
 extern int func_ov002_021c33e4(int bit, int bit2, int idx);
-extern void func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 int func_ov002_0221b4f0(struct Self_t *a0) {
     int idx;
@@ -36,7 +36,7 @@ int func_ov002_0221b4f0(struct Self_t *a0) {
     bit = a0->f2.bit0;
     if (func_ov002_021c33e4(bit, bit, idx) != 0) {
         bit = a0->f2.bit0;
-        func_ov002_0227adb8(bit, (bit & 1) * 0x868 + (int)data_ov002_022cf16c + 0x18 + 0x400 + (idx << 2), 1, 1);
+        func_ov002_0227adb8(bit, (bit & 1) * 0x868 + data_ov002_022cf16c + 0x18 + 0x400 + (idx << 2), 1, 1);
     }
 done:
     return 0;

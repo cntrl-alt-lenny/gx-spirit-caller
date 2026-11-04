@@ -11,10 +11,10 @@ extern int func_ov002_021ae484(int x);
 extern void func_ov002_021af9d0(int a,int b,int c,int d);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021bc618(int arg0);
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0225368c(int ctx,int card_id,int arg2);
 extern int func_ov002_0226b258();
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02222674(struct Self *self) {
     switch (data_ov002_022ce288.state) {
     case 0x80:
@@ -32,7 +32,7 @@ int func_ov002_02222674(struct Self *self) {
         func_ov002_021af9d0(self->side,6,self->card,data_ov002_022d0e6c.value);
         return 0x7d;
     case 0x7d:
-        func_ov002_0227adb8(self->side,(int)func_ov002_021afb74(),1,0);
+        func_ov002_0227adb8(self->side,func_ov002_021afb74(),1,0);
         return 0;
     }
     return 0;

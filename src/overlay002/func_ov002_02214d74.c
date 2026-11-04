@@ -11,8 +11,7 @@ struct Self {
 struct Record { u32 card:13; u32 bit:1; u32 pad:8; u32 value:8; u32 pad2:2; };
 extern int func_ov002_021b947c(u32 key);
 extern int func_ov002_021bc618(int arg0);
-/* Original supplies only r0 to the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021c33e4(int a, int b, int c);
 extern void *func_ov002_021c93f0(int player, int kind, int extra);
 extern void func_ov002_0227ac64(int a, struct Record *b, int c, int d, u32 e);

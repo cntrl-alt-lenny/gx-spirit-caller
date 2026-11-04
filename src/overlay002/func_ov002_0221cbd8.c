@@ -23,12 +23,11 @@ extern int func_ov002_021bb068(int);
 extern int func_ov002_021bae7c(int, int, int);
 extern int func_ov002_021b99b4(int, int);
 extern int func_ov002_021c33e4(int, int, int);
-/* This caller supplies only r0 to the four-parameter forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021bc618(int);
 extern int func_ov002_021ae484(int);
 extern void func_ov002_021e2b3c(int);
-extern int func_ov002_0227adb8(int, int, int, int);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 /* The original caller supplies no arguments to this unused-argument function. */
 extern void func_ov002_021e2c5c();
 int func_ov002_0221cbd8(struct Self *self) {
@@ -84,7 +83,7 @@ int func_ov002_0221cbd8(struct Self *self) {
   return 0x7c;
  case 0x7c: {
   int count=self->count;
-  func_ov002_0227adb8(self->side,(int)&data_ov002_022cdc88[data_ov002_022ce288.count],1,0);
+  func_ov002_0227adb8(self->side,&data_ov002_022cdc88[data_ov002_022ce288.count],1,0);
   data_ov002_022ce288.count++;
   return data_ov002_022ce288.count<count ? 0x7c : 0x7b;
  }

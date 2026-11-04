@@ -8,7 +8,7 @@
  * src/main/func_0202a1cc.c for the worked reference example.
  */
 
-extern int func_ov002_021ca2b8(int arg0);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021bb068(int arg0);
 extern int func_ov002_022477e8(void *arg0, int arg1);
 

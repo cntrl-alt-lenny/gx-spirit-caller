@@ -28,9 +28,9 @@ extern void func_020882d4(struct S88350 *p);
 extern int  func_020b3a7c(int a, int b);
 extern int  func_02087348(void);
 extern void func_020880bc(struct S88350 *p, int v);
-extern void func_02088170();
+extern int func_02088170(int a, int _unused, int c, int d);
 extern void func_02094e90(int a, int b, int c, int d, int e, int f, int g, int h, int i, int j);
-extern void func_02094fa0(int a, int b, int c, void (*d)(), struct S88350 *e);
+extern void func_02094fa0(int a, int b, int c, int (*d)(int, int, int, int), struct S88350 *e);
 extern void func_0207d12c(char *a, struct S88350 *b);
 
 int func_02088350(struct S88350 *p, int mode, int buf, int total, int a4, int a5, int a6, int a7)

@@ -10,13 +10,12 @@ extern int func_020453e8(int a);
 extern int func_02058528(Owner **pp, Pair key, int a3, Src *src, int a5);
 extern void func_020585d4(Owner **pp, int arg, int kind);
 extern void func_0205bd58(Owner **pp, Item *item);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205ffd4(int *a0, int a1, int a2);
 extern int func_020602c4(char *line, char *key, char *out, int size);
 extern int func_020603cc(char **ctx, char *line, int check);
 extern int func_020ab054(unsigned char *s1, unsigned char *s2, int n);
-/* The thunk has four parameters, but this original call supplies only r0. */
-extern int func_020ace00();
+extern int func_020ace00(const char *s);
 extern char data_02100d8c[], data_02100d94[], data_02100dc4[], data_02100dd0[];
 int func_0205d7e4(Owner **pp, Item *item, char *line) {
     char buf[0x10];
@@ -35,12 +34,12 @@ int func_0205d7e4(Owner **pp, Item *item, char *line) {
         func_020585d4(pp, 3, 1);
         return 3;
     }
-    value = func_020ace00((int)buf);
+    value = func_020ace00(buf);
     key = item->key;
     if (key.a != 0) {
         data = (Data *)func_020453e8(8);
         if (data == 0) {
-            func_0205ffc0((int *)pp, (int)data_02100dd0);
+            func_0205ffc0(pp, data_02100dd0);
             return 1;
         }
         data->value = value;

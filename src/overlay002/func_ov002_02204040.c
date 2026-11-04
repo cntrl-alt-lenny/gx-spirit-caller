@@ -8,7 +8,7 @@
 struct F02204040_F2 { unsigned short bit0 : 1; unsigned short rest : 15; };
 struct F02204040_Self { unsigned short f0; struct F02204040_F2 f2; };
 
-extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ff500(struct F02204040_Self *self, int arg1);
 
 int func_ov002_02204040(struct F02204040_Self *self, int arg1) {

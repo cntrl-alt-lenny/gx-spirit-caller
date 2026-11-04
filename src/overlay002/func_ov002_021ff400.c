@@ -7,7 +7,7 @@ typedef struct {
 } S021ff400;
 
 extern int func_ov002_021ff2b8(S021ff400 *, int);
-extern int func_ov002_021ca2b8(int);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0223f6c4(S021ff400 *);
 extern int func_ov002_022536e8(int, unsigned short, int);
 

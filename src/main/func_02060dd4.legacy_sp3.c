@@ -3,7 +3,7 @@ extern int data_0219e51c;
 extern signed char *data_0219e514;
 extern int data_0219e524;
 extern int data_0219e510;
-extern int func_020453cc(int x, int y);
+extern void *func_020453cc(void *p, int size);
 /* Original supplies four arguments, despite the existing no-argument definition. */
 extern int func_02054d4c(int, signed char *, int, int);
 extern int func_02060728(char *cur, int remaining);
@@ -21,7 +21,7 @@ int func_02060dd4(void) {
         if (data_0219e524 - data_0219e510 < 128) {
             if (data_0219e524 < 256) data_0219e524 = 256;
             else data_0219e524 *= 2;
-            data_0219e514 = (signed char *)func_020453cc((int)data_0219e514, data_0219e524 + 1);
+            data_0219e514 = func_020453cc(data_0219e514, data_0219e524 + 1);
             if (data_0219e514 == 0) return 0;
         }
         n = data_0219e510;

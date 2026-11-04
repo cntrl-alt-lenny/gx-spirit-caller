@@ -24,7 +24,7 @@ extern int func_ov002_0223df38(struct Node *self, int idx, int *out);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern int func_ov002_0225764c(int arg0, int arg1, int arg2);
 extern void func_ov002_0226b054(int arg0);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 #define MIN(a,b) ((a)<(b)?(a):(b))
 #define MIN2(a,b) ((a)>(b)?(b):(a))
 int func_ov002_02224f98(Self *p, int unused) {
@@ -77,7 +77,7 @@ int func_ov002_02224f98(Self *p, int unused) {
     case 0x7c:
         if (p->index < p->count) {
             u32 *entry = func_ov002_021b004c(p->index+1);
-            func_ov002_0227adb8(p->player,(int)entry,1,p->value << 16);
+            func_ov002_0227adb8(p->player,entry,1,p->value << 16);
             p->index++;
             return 0x7c;
         }

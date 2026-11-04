@@ -14,15 +14,14 @@ extern unsigned int func_0202b8a8(int id);
 extern int func_ov002_021bc618(int);
 extern int func_ov002_021bc6c4(int);
 extern int func_ov002_021c1e44(Card021c1e44 *,int,int);
-/* This caller supplies only r0 to the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca3f0(int,int);
 extern int func_ov002_021b9ecc(int,int);
 extern void func_ov002_021c4c9c(int,int,int *);
 extern int func_ov002_021d59cc(int,int,int,int,u16);
 extern u16 func_ov002_0223de94(struct node *,int);
 extern int func_ov002_0223df38(struct Node *,int,int *);
-extern int func_ov002_0227adb8(int,int,int,int);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02226860(struct Input *self) {
     int pair, side, slot;
 
@@ -44,7 +43,7 @@ int func_ov002_02226860(struct Input *self) {
                         cmd.id = 0x1602;
                         cmd.side = self->side;
                         data_ov002_022ce288.count = func_ov002_021bc6c4(self->side);
-                        func_ov002_0227adb8(self->side,(int)&cmd,1,(self->code << 16) | 1);
+                        func_ov002_0227adb8(self->side,&cmd,1,(self->code << 16) | 1);
                         return 0x7f;
                     }
                 }

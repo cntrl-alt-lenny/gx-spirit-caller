@@ -9,7 +9,7 @@ extern int func_ov002_021b3618(int bit0, int field);
 extern int func_ov002_021bc8c8(int player, int lo, int hi);
 extern int func_ov002_021bc68c(int player);
 extern int func_ov002_021bc288(int lo, int hi);
-extern int func_ov002_021ca2b8(int player);
+extern int func_ov002_021ca2b8(int a);
 extern char data_ov002_022cf17c[];
 
 struct SelfFlags {

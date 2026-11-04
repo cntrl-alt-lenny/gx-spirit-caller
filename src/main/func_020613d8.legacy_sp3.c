@@ -6,7 +6,7 @@ typedef struct {
 
 extern char data_02101448[];
 extern char data_02101478[];
-extern void func_020a6d54(const char *msg, const char *file, int a, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void *func_020a7368(void *dst, signed char *src, int count);
 extern int func_020aaddc(char *s);
 

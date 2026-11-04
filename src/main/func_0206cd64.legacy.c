@@ -8,9 +8,9 @@ struct S0206cf {
  struct Inner0206 *f_64; char pad2[0x73-0x68]; s8 f_73;
 };
 typedef struct S0206cf arg_0206ccbc_t;
-typedef struct { char pad0[4]; struct S0206cf *f4; char pad1[8]; int f10; unsigned int f14; u16 *f18; int *f1c; } Request;
+typedef struct { char pad0[4]; struct S0206cf *f4; char pad1[8]; int f10; unsigned int f14; u16 *f18; unsigned int *f1c; } Request;
 extern void *func_0206ccbc(arg_0206ccbc_t *arg);
-extern int func_0206cfa0(struct S0206cf *a, int b, int c, u16 *d, int *e);
+extern int func_0206cfa0(struct S0206cf *a, int b, int c, u16 *d, unsigned int *e);
 extern void func_0207092c(int a);
 extern int func_02070a38(int *out);
 extern void func_02091768(unsigned int a);
@@ -22,7 +22,7 @@ int func_0206cd64(Request *arg) {
  int dest = arg->f10;
  length = arg->f14;
  u16 *out1 = arg->f18;
- int *out2 = arg->f1c;
+ unsigned int *out2 = arg->f1c;
  int base = inner->f_f8;
  int count;
  int result;

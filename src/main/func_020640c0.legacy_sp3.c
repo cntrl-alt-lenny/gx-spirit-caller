@@ -3,7 +3,7 @@ extern void func_02061150();
 extern int func_02062cfc(void *self, void *buf1, void *buf2);
 extern int func_020643d8();
 
-int func_020640c0(char *self, int unused1, int param2) {
+int func_020640c0(char *self, void *unused1, int param2) {
     char buf1[0x20];
     char buf2[0x20];
     int state;

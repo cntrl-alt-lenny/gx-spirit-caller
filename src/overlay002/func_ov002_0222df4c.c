@@ -28,7 +28,7 @@ extern void func_ov002_021e2c5c();
 extern int func_ov002_021ff3bc(S021ff3bc *p, int unused1);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern void func_ov002_0226b054(int arg0);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 int func_ov002_0222df4c(S021ff3bc *self, int arg1) {
     int n;
@@ -59,7 +59,7 @@ int func_ov002_0222df4c(S021ff3bc *self, int arg1) {
         if (data_ov002_022ce288.index < p->count) {
             if (func_ov002_021bc618(p->bit0) != 0) {
                 n = (int)func_ov002_021b004c(data_ov002_022ce288.index + 1);
-                func_ov002_0227adb8(p->bit0, n, 1, p->w0 << 16);
+                func_ov002_0227adb8(p->bit0, (void *)n, 1, p->w0 << 16);
             } else {
                 entry = func_ov002_021b004c(data_ov002_022ce288.index + 1);
                 n = func_ov002_021b98c4(p->bit0, (((*func_ov002_021b004c(data_ov002_022ce288.index + 1) << 2) >> 24) * 2) + ((*entry << 18) >> 31));

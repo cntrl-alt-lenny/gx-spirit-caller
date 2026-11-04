@@ -4,7 +4,7 @@
  * trailing "return 1" reached from every non-failing path. */
 
 extern void func_02061fa4(void *a0);
-extern int func_02061c5c(void *a0, void *a1, int a2, int a3);
+extern int func_02061c5c(void *a0, void *a1, void *a2, int a3);
 extern int func_02061a8c(void *a0, void *a1);
 
 struct S020643ec_A0 {

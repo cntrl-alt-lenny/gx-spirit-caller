@@ -24,7 +24,7 @@ typedef struct {
 } Src;
 
 extern int func_020453e8(int a);
-extern int func_0205ffc0(int *p, int b);
+extern int func_0205ffc0(void *p, char *msg);
 extern char data_021002a4[];
 
 int func_02058528(Owner **pp, Pair key, int a3, Src *src, int a5) {
@@ -32,7 +32,7 @@ int func_02058528(Owner **pp, Pair key, int a3, Src *src, int a5) {
     Node *n = (Node *)func_020453e8(0x18);
 
     if (n == 0) {
-        func_0205ffc0((int *)pp, (int)data_021002a4);
+        func_0205ffc0(pp, data_021002a4);
         return 1;
     }
     n->key = key;

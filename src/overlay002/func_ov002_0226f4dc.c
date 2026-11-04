@@ -22,8 +22,7 @@ extern int func_ov002_021bcd80(int self, int excludeKey);
 extern int func_ov002_021bd85c(int a, int b);
 extern int func_ov002_021c38c4(int side, int index);
 extern int func_ov002_021c9be8(int arg0, int arg1);
-/* Original initializes only r0 for this four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca3f0(int arg0, int arg1);
 extern int func_ov002_0226d6f4(int arg0, int arg1);
 extern int func_ov002_0226d784(int a, int b);

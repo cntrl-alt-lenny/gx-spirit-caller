@@ -14,7 +14,7 @@ extern int func_ov002_021ca0d4(int arg0, int arg1);
 extern int func_ov002_021e286c(int arg0);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern void func_ov002_0226b054(int arg0);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02215cf4(struct Obj *p) {
     switch (*(int *)(data_ov002_022ce288 + 0x5a8)) {
     case 0x80:
@@ -27,7 +27,7 @@ int func_ov002_02215cf4(struct Obj *p) {
         func_ov002_021ae400(p->side, 0xd);
         return 0x7e;
     case 0x7f:
-        func_ov002_0227adb8(p->side, (int)data_ov002_022cdc88, 1, 0);
+        func_ov002_0227adb8(p->side, data_ov002_022cdc88, 1, 0);
         return 0x7d;
     case 0x7e:
         func_ov002_0226b054(1 - p->side);

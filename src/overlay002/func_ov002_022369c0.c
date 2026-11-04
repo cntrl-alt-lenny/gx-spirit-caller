@@ -17,7 +17,7 @@ extern int func_ov002_021ff3bc(struct Arg *p, int unused1);
 extern int func_ov002_0223f6c4(struct Arg *p);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern void func_ov002_0226b054(int arg0);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_022369c0(struct Arg *p, int unused) {
     int side = p->side ^ p->other;
     struct Record *r;
@@ -48,7 +48,7 @@ int func_ov002_022369c0(struct Arg *p, int unused) {
         }
     case 0x7c:
         if (data_ov002_022d016c.value != 0) {
-            func_ov002_0227adb8(side, (int)func_ov002_021afb74(), 1, (unsigned int)p->id << 16);
+            func_ov002_0227adb8(side, func_ov002_021afb74(), 1, (unsigned int)p->id << 16);
         } else {
             func_ov002_021d8288(side, (int)func_ov002_021afb74());
         }

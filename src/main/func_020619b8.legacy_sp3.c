@@ -17,7 +17,7 @@ struct Self020619b8 {
     Cb020619b8 f34;            /* +0x34 */
 };
 
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void func_02064aa0(SubObj020619b8 *self);
 
 extern char data_021014e4[];

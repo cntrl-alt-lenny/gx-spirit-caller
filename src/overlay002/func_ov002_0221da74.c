@@ -5,8 +5,8 @@ extern char data_ov002_022cf16c[];
 extern int func_ov002_021b947c(int idx);
 extern int func_ov002_021bc618(int a);
 extern int func_ov002_021c33e4(int a, int b, int c);
-extern int func_ov002_021ca2b8();
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_021ca2b8(int a);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 typedef struct {
     u16 f0;
@@ -30,7 +30,7 @@ int func_ov002_0221da74(Card *c) {
         u16 hi = v >> 16;
         if (b1 == 0xe) {
             if (func_ov002_021c33e4(c->bit0, b0, hi) != 0) {
-                func_ov002_0227adb8(c->bit0, (b0 & 1) * 0x868 + (int)data_ov002_022cf16c + 0x418 + (hi << 2), 1, 0);
+                func_ov002_0227adb8(c->bit0, (b0 & 1) * 0x868 + data_ov002_022cf16c + 0x418 + (hi << 2), 1, 0);
             }
         }
     }

@@ -12,7 +12,7 @@ struct B {
 extern struct A data_ov002_022ce950;
 extern struct B data_ov002_022d016c;
 extern void func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d1538(void) {
     data_ov002_022d016c.fdc = data_ov002_022ce950.f2;

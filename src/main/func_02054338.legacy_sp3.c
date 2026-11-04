@@ -3,7 +3,7 @@ typedef struct {
     int count;
 } Set;
 
-extern void func_020a6d54(void *a0, void *a1, int a2, int a3);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void *func_02053c34(char *vec, int (*fn)(void *, void *), void *arg);
 extern char data_020ffb7c[];
 extern char data_020ffb80[];

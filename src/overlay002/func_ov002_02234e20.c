@@ -18,8 +18,7 @@ extern int func_ov002_021b947c(u32 a);
 extern int func_ov002_021b9ecc(int a, int b);
 extern int func_ov002_021bbda8(int a, int b);
 extern int func_ov002_021bc618(int a);
-/* This caller supplies only the first argument of the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern void func_ov002_021d7c1c(void *a, void *b, void *c);
 extern int func_ov002_021d873c(int a, int b);
 extern void func_ov002_021e16a4(int a, int b, int c, int d);

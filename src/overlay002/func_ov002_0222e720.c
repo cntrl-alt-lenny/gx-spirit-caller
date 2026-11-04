@@ -20,7 +20,7 @@ extern void func_ov002_021af9d0(int a, int b, int c, int d);
 extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c();
 extern u32 *func_ov002_021b004c(int id);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222e720(S021ff400 *self, int unused1) {
     int side = self->bit0 ^ self->bit14;
     switch (data_ov002_022ce288.state) {
@@ -44,7 +44,7 @@ int func_ov002_0222e720(S021ff400 *self, int unused1) {
     case 0x7d: {
         if (self->index < self->count) {
             u32 *p = func_ov002_021b004c(self->index + 1);
-            func_ov002_0227adb8(side, (int)p, 1, self->w0 << 16);
+            func_ov002_0227adb8(side, p, 1, self->w0 << 16);
             self->index++;
             return 0x7d;
         }

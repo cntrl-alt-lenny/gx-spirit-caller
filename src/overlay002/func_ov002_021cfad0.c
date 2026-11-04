@@ -8,7 +8,7 @@ typedef struct {
 
 extern Ctx data_ov002_022ce950;
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021cfad0(void) {
     int r5 = (data_ov002_022ce950.a & 0x8000) != 0;

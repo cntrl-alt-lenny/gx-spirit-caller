@@ -1,4 +1,4 @@
-/* func_ov002_022b00fc: r0 is never read (unused). field = 2-bit field of
+/* func_ov002_022b00fc: r0 (self) is never read. field = 2-bit field of
  * data_02104f4c+4 at bit-offset 3. base = (field/2==0) ? 0x10 : 0. If field
  * is even, arg1>=0x18 fails (-1); if odd, arg1<=0xe8 fails (-1). Else scan
  * bit i (0..5) of arg3; for each set bit, return i if arg2 falls in
@@ -7,7 +7,7 @@
 extern int data_02104f4c[];
 extern const int data_ov002_022ca510[];
 
-int func_ov002_022b00fc(int unused0, int arg1, int arg2, int arg3) {
+int func_ov002_022b00fc(int *self, int arg1, int arg2, int arg3) {
     int field = (unsigned)(*(int *)((char *)data_02104f4c + 4) << 0x1b) >> 0x1e;
     int half = field / 2;
     int base = (half != 0) ? 0 : 0x10;

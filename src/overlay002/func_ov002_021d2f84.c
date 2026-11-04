@@ -24,7 +24,7 @@ typedef union {
 extern S021d2f84 data_ov002_022ce950;
 extern G73c data_ov002_022cd73c;
 extern int func_ov002_0229ade0(int cmd, int a, int b, int c);
-extern int func_ov002_0229c7f8(int cmd);
+extern int func_ov002_0229c7f8(int arg);
 extern PackedVal *func_ov002_021afb90(int i);
 extern void func_ov002_021b1fe8(int a, int b, int c, int combined);
 extern int func_ov002_021b0c04(int self, int arg1);

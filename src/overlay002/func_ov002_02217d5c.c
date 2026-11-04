@@ -15,8 +15,7 @@ extern void func_ov002_021b91c4(int *dst,const int *src);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021bc6c4(int arg0);
 extern int func_ov002_021c988c(int player,int kind,int extra);
-/* Original supplies only a; the remaining definition parameters are unused here. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca440(int arg0,int arg1);
 extern int func_ov002_021d8298(int arg0,struct Key *rec,int arg2);
 extern void func_ov002_021d87dc(int arg0);
@@ -33,7 +32,7 @@ extern int func_ov002_021e2b1c(int arg0);
 extern void func_ov002_021e2b3c();
 /* Original omits the unused parameter. */
 extern void func_ov002_021e2c5c();
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02217d5c(struct Self *self) {
  struct Row *row;
  int mode, zero;
@@ -75,7 +74,7 @@ int func_ov002_02217d5c(struct Self *self) {
   return 0x7a;
  case 0x7d:
   side=((struct Key *)&data_ov002_022cdc88)->side;
-  func_ov002_0227adb8(side,(int)&data_ov002_022cdc88,0,0);
+  func_ov002_0227adb8(side,&data_ov002_022cdc88,0,0);
   self->masks[side] |= 1<<func_ov002_021bc6c4(side);
   return 0x7a;
  case 0x7c:

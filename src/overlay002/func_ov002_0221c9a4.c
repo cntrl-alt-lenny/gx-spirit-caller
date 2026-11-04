@@ -6,8 +6,7 @@ struct Global { char pad[0x5a8]; int state; int count; };
 extern struct Global data_ov002_022ce288;
 extern int func_ov002_021bbf50(int arg0);
 extern int func_ov002_021bc618(int arg0);
-/* Original caller sets only r0; the thunk forwards incidental registers. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca3f0(int arg0, int arg1);
 extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);

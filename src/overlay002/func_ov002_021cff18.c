@@ -7,7 +7,7 @@ extern Ctx data_ov002_022ce950;
 extern Player data_ov002_022cf16c[];
 extern void func_ov002_021b1f20(int a0, int a1, int a2, int a3, int a4);
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 void func_ov002_021cff18(void) {
     int a = data_ov002_022ce950.f2 & 1;
     int b = data_ov002_022ce950.f2 >> 8;

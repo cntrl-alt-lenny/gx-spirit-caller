@@ -6,8 +6,7 @@ extern char data_ov002_022cf16c[];
 extern int func_ov002_021b947c(u32 key);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c3608(int a, int b, int c);
-/* Original caller supplies only r0 to this four-parameter thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca5bc(int arg0);
 extern void func_ov002_021d81d4(u32 arg0, u32 arg1);
 extern void func_ov002_0227ac64(int a, struct Record *b, int c, int d, u32 e);

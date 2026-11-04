@@ -9,7 +9,7 @@ struct S02053eb4 {
     int elemSize;  /* 0x8 */
 };
 
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void *func_020540d0(struct S02053eb4 *s, int index);
 extern void func_020a7388(void *dst, void *src, int n);
 extern char data_020ffb04[];

@@ -181,7 +181,7 @@ extern int  func_ov002_021d479c(int packed, int a, int b, int c);/* [member2] */
 /* --- sinks already matched on main (signatures are ground-truth) -------- */
 extern int  func_ov002_021bc288(int player, int idx);            /* [shipped 021bcfe4] slot-ready */
 extern int  func_ov002_021ff3bc(struct Ov002Self *self);         /* [shipped .s] bool query */
-extern int  func_ov002_021ca2b8(int a, int unused, int c, int d);/* [shipped] thunk → 021ca0d4(a,0,c,d) */
+extern int  func_ov002_021ca2b8(int a);/* [shipped] thunk → 021ca0d4(a,0) */
 extern void func_ov002_021b91c4(int *dst, const int *src);       /* [shipped] *dst = *src */
 
 /* =======================================================================

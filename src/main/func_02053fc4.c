@@ -4,7 +4,7 @@
  * storing val at idx via func_0205428c. */
 extern char data_020ffb04[];
 extern char data_020ffb3c[];
-extern void  func_020a6d54(char *file, char *expr, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void *func_020540d0(void *arr, int idx);
 extern void  func_0205428c(void *arr, void *val, int idx);
 extern void  func_020542b8(void *arr);                    /* grow */

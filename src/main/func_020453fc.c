@@ -10,22 +10,22 @@ typedef unsigned char u8;
 typedef unsigned short u16;
 typedef unsigned int u32;
 
-typedef u32 (*Fp3a)(u32 a, u32 b, u32 c);
-typedef void (*Fp3b)(u32 a, u32 b, u32 c);
+typedef void *(*Fp3a)(int heap, int size, int align);
+typedef void (*Fp3b)(int heap, void *p, int size);
 
 extern Fp3a data_0219dacc;
 extern Fp3b data_0219dac8;
-extern void func_02094688(u32 a, u32 b, u32 c);
+extern void func_02094688(const void *src, void *dst, unsigned int size);
 
-u32 func_020453fc(u32 a0, u32 a1, u32 a2, u32 a3, u32 a4) {
-    u32 r;
-    r = data_0219dacc(a0, a3, a4);
+void *func_020453fc(int heap, void *p, int size, int d, int align) {
+    void *r;
+    r = data_0219dacc(heap, d, align);
     if (r == 0) {
         return 0;
     }
-    if (a1 != 0) {
-        func_02094688(a1, r, a3);
-        data_0219dac8(a0, a1, a2);
+    if (p != 0) {
+        func_02094688(p, r, d);
+        data_0219dac8(heap, p, size);
     }
     return r;
 }

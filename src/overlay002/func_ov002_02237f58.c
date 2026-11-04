@@ -25,7 +25,7 @@ extern void func_ov002_0225935c(int,int,int);
 extern int func_ov002_022593f4(void);
 extern int func_ov002_021de4b0(int,int,int);
 extern int func_ov002_021bc6c4(int);
-extern int func_ov002_0227adb8(int,int,int,int);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern int func_ov002_021d59cc(int,int,int,int,u16);
 int func_ov002_02237f58(struct Self *p, int q) {
     int pair;
@@ -83,7 +83,7 @@ int func_ov002_02237f58(struct Self *p, int q) {
             row.id=0x19ed;
             row.side=p->side;
             data_ov002_022ce288.saved=func_ov002_021bc6c4(p->side);
-            func_ov002_0227adb8(p->side,(int)&row,1,(p->id<<16)|1);
+            func_ov002_0227adb8(p->side,&row,1,(p->id<<16)|1);
             return 0x7d;
         } case 0x7d: func_ov002_021d59cc(x,y,(u16)((u8)p->side|((u8)data_ov002_022ce288.saved<<8)),6,0);
         }

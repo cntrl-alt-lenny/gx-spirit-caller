@@ -1,7 +1,7 @@
 /* func_020614d8: bounds-checked 1-byte append to a growable buffer.
  * Asserts if count has already reached capacity. */
 
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_021014c0[];
 extern char data_02101448[];
 

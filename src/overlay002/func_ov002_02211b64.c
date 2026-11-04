@@ -18,7 +18,7 @@ extern int func_ov002_021ff3bc();
 extern int func_ov002_0223f6c4(S021ff3bc *self);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern void func_ov002_0226b054(int arg0);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02211b64(S021ff3bc *self, int arg1) {
     int player = self->bit0 ^ self->bit14;
     int flag;
@@ -55,7 +55,7 @@ int func_ov002_02211b64(S021ff3bc *self, int arg1) {
                 func_ov002_021b0c04(0x32, 1);
         }
         *(int *)(data_ov002_022ce288 + 0x5ac) = func_ov002_021bc6c4(player);
-        func_ov002_0227adb8(player, (int)func_ov002_021afb74(), 1,
+        func_ov002_0227adb8(player, func_ov002_021afb74(), 1,
             (unsigned short)flag | (self->w0 << 16));
         return 0x7d;
     case 0x7d:

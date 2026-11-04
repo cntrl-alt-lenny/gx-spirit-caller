@@ -19,9 +19,9 @@ extern void func_020115e0(mtx33_t *m,int tx,int ty,int tz);
 extern void func_02011620(int *m,int angle);
 extern void func_02011688(int *m,int angle);
 extern void func_020116ec(int *m,int angle);
-extern int func_0208e420(int x);
+extern void func_0208e420(void *m);
 void func_0200c874(Obj *obj,int idx,Mtx *a,Mtx *b) {
- int baseB;
+ char *baseB;
  Mtx *baseA;
  Node *n;
  int matrixOffset, i;
@@ -33,7 +33,7 @@ void func_0200c874(Obj *obj,int idx,Mtx *a,Mtx *b) {
  if (!n) return;
  matrixOffset=idx*0x30;
  baseA=data_021883c8;
- baseB=(int)data_02186bc8;
+ baseB=(char *)data_02186bc8;
  func_02011178(a,(Mtx *)((char *)baseA+matrixOffset));
  func_02011178(b,(Mtx *)(baseB+matrixOffset));
  func_02011178(a,(Mtx *)((char *)data_0218b3c8+matrixOffset));
@@ -70,11 +70,11 @@ void func_0200c874(Obj *obj,int idx,Mtx *a,Mtx *b) {
   for(i=0;i<obj->count;i++) {
    if(idx==obj->indices[i]) {
     *(volatile int *)0x04000440=2;
-    func_0208e420((int)(Mtx *)(baseB+matrixOffset));
+    func_0208e420((Mtx *)(baseB+matrixOffset));
     *(volatile int *)0x0400044c=i;
     *(volatile int *)0x04000440=1;
     func_02011100(((Mtx *)((char *)baseA+matrixOffset))->m,obj->shift);
-    func_0208e420((int)(Mtx *)((char *)baseA+matrixOffset));
+    func_0208e420((Mtx *)((char *)baseA+matrixOffset));
     *(volatile int *)0x0400044c=i;
     break;
    }

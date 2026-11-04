@@ -5,8 +5,7 @@ extern char data_ov002_022cf178[];
 extern struct Player data_ov002_022cf16c[];
 extern int func_ov002_02257ab8(int a, int b);
 extern int func_ov002_021bb068(int id);
-/* This caller supplies only r0 to the four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_022536e8(int self, int arg1, int arg2);
 int func_ov002_0220ad78(struct S *self) {
  unsigned i;

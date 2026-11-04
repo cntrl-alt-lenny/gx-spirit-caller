@@ -1,5 +1,5 @@
 extern void *func_020453e8(int size);
-extern void func_020a6d54(const char *msg, const char *file, int a, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 
 extern char data_020ffb5c[];
 extern char data_020ffb04[];

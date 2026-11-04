@@ -4,8 +4,7 @@ typedef struct {
     unsigned short second[15];
     unsigned short third[31];
 } Record;
-/* The original omits the unused input of this pass-through thunk. */
-extern void func_0200974c();
+extern unsigned int func_0200974c(void);
 /* The original passes a card ID; the current C definition omits this input. */
 extern unsigned char func_0202b9ec();
 extern int func_020b3870(int numerator, int denominator);

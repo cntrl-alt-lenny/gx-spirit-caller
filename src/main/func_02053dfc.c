@@ -12,7 +12,7 @@
 
 extern char data_020ffb04;
 extern char data_020ffb10;
-extern void func_020a6d54(void *file, void *msg, int line, int code);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void func_02054314(void *self, int idx);
 extern void func_0205428c(void *self, int arg1, int idx);
 

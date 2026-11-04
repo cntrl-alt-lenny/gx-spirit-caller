@@ -10,8 +10,8 @@
  *  .L_020453e4: .word func_02045470
  */
 
-extern int func_02045470(int a, int b, int c, int d);
+extern void *func_02045470(int heap, void *p, int size, int d);
 
-int func_020453cc(int x, int y) {
-    return func_02045470(5, x, y, y);
+void *func_020453cc(void *p, int size) {
+    return func_02045470(5, p, size, size);
 }

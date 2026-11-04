@@ -2,7 +2,7 @@
  * not found, else decrement its refcount; once it hits zero, tear it
  * down via func_020544c8. */
 
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void *func_02068c08(void *unused);
 extern void *func_0205442c(void *handle, int *outparam);
 extern void func_020544c8(void *handle, int *outparam);

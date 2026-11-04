@@ -1,6 +1,6 @@
 extern char data_020ffb8c[];
 extern char data_020ffb80[];
-extern void func_020a6d54(char *file, char *expr, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int func_02053d10(int *p, int a1, int a2, int a3, int a5);
 extern void func_0205407c(void *self, void *val);
 extern void func_02053dfc(void *self, int arg1, int idx);

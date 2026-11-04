@@ -12,15 +12,14 @@ extern void func_ov002_021af9d0(int player,int phase,int card,int arg);
 extern int *func_ov002_021afb74(void);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021c9df0(int arg);
-/* The original supplies only r0 to this four-argument forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021e286c(int arg0);
 extern int func_ov002_0223f6c4(Card *card);
 extern int func_ov002_0225368c(int ctx,int card_id,int arg2);
 extern void func_ov002_0226b054(int arg0);
 struct Record;
 extern void func_ov002_0227ac64(int a,struct Record *b,int c,int d,u32 e);
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02218068(Card *card) {
  int side = card->side ^ card->flipped;
  if (card->blocked) return 0;
@@ -47,10 +46,10 @@ int func_ov002_02218068(Card *card) {
   { int id=card->id;
    switch(id) {
    case 0x1232:
-    func_ov002_0227adb8(side,(int)func_ov002_021afb74(),1,(id<<16)|1); break;
+    func_ov002_0227adb8(side,func_ov002_021afb74(),1,(id<<16)|1); break;
    case 0x14ba: case 0x14dd: case 0x152f: case 0x1585: case 0x15b6:
    case 0x17e5: case 0x17e6: case 0x1900: case 0x194f: case 0x1a13: case 0x1a8f: case 0x1b25:
-    func_ov002_0227adb8(side,(int)func_ov002_021afb74(),1,id<<16); break;
+    func_ov002_0227adb8(side,func_ov002_021afb74(),1,id<<16); break;
    case 0x1612:
     func_ov002_0227ac64(side,(struct Record *)func_ov002_021afb74(),0,1,0); break;
    default:

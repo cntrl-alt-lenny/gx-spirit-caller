@@ -9,7 +9,7 @@ struct Table { char pad[0x30]; struct Entry entries[1]; };
 extern char data_ov002_022cf16c[][0x868];
 extern char data_ov002_022cf1a2[][0x868];
 extern char data_ov002_022cf1a4[][0x868];
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
 void func_ov002_021d3488(void) {
     int flag;

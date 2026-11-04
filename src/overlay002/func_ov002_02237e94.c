@@ -15,7 +15,7 @@ extern int func_ov002_021c3b60(int a, int b);
 extern int func_ov002_021ff3bc(void *p, int q);
 extern int func_ov002_021ca3f0(int a, int b);
 extern void func_ov002_021d5a6c(int a, int b, int c, int d);
-extern void func_ov002_0227adb8(int a, void *arr, int c, unsigned int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 int func_ov002_02237e94(T02237e94 *p, int q) {
     int idx;

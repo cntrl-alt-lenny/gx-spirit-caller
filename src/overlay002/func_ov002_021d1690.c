@@ -11,7 +11,7 @@ typedef struct {
 
 extern State data_ov002_022ce950;
 extern int func_ov002_0229ade0(int cmd, int a, int b, int c);
-extern int func_ov002_0229c7f8(int cmd, int a, int b, int c);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d1690(void)
 {
@@ -24,7 +24,7 @@ void func_ov002_021d1690(void)
         func_ov002_0229ade0(0x2f, flag, a, b);
         data_ov002_022ce950.f810++;
     } else {
-        if (func_ov002_0229c7f8(0x2f, flag, a, b) == 0) {
+        if (func_ov002_0229c7f8(0x2f) == 0) {
             data_ov002_022ce950.f80c = 0;
         }
     }

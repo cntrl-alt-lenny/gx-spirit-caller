@@ -7,7 +7,7 @@ typedef struct {
 } Obj02063e78;
 
 extern int func_020643d8(void *self);
-extern int func_02061c5c(void *self, int a, int b, int c);
+extern int func_02061c5c(void *self, int a, void *b, int c);
 
 int func_02063e78(Obj02063e78 *self) {
     if (self->field_c == 1) goto L_200;

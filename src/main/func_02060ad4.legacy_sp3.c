@@ -1,7 +1,6 @@
 /* The original supplies two arguments despite the C wrapper's void prototype. */
-extern void *func_02060c9c(void *arg, void *key);
-/* The original supplies only r0, fewer arguments than the four-argument thunk. */
-extern int func_020ace00();
+extern char *func_02060c9c(char *s, char *name);
+extern int func_020ace00(const char *s);
 extern int func_02060b84(int a, int b, int c);
 extern void *func_020540d0(char *s, int index);
 extern void func_02060604(int index, int a, int b, int c, int d);

@@ -1,6 +1,6 @@
 typedef struct { unsigned int id:13; unsigned int rest:19; unsigned int pad[4]; } Slot;
 extern char data_ov002_022cf16c[];
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021ca698(int a, int b);
 extern int func_ov002_021b3ecc(int a, int b, int c);
 extern int func_ov002_021c92ec();

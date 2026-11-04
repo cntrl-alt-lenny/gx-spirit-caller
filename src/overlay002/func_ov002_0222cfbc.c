@@ -13,7 +13,7 @@ extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_021ff3bc(S021ff3bc *p,int unused1);
 extern int func_ov002_0223def4(struct Node0223def4 *self,int idx);
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222cfbc(struct Arg *self,int unused1) {
  int i, count, slot;
  switch(data_ov002_022ce288.mode) {
@@ -34,7 +34,7 @@ int func_ov002_0222cfbc(struct Arg *self,int unused1) {
   if(data_ov002_022ce288.index<self->count && func_ov002_021bc618(self->side)!=0) {
    slot=func_ov002_021b99b4(self->side,func_ov002_0223def4((struct Node0223def4 *)self,data_ov002_022ce288.index));
    if(slot>=0 && func_ov002_021c33e4(self->side,self->side,slot)!=0) {
-    func_ov002_0227adb8(self->side,(int)(data_ov002_022cf16c+(self->side&1)*0x868+0x418+slot*4),1,self->id<<16);
+    func_ov002_0227adb8(self->side,data_ov002_022cf16c+(self->side&1)*0x868+0x418+slot*4,1,self->id<<16);
    }
    data_ov002_022ce288.index++;
    return 0x7f;

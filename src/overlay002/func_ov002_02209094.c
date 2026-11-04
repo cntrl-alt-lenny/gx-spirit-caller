@@ -27,7 +27,7 @@ struct F02209094_Self {
     struct F02209094_F2 f2;
 };
 
-extern int func_ov002_021ca2b8(unsigned int bit0);
+extern int func_ov002_021ca2b8(int a);
 
 int func_ov002_02209094(struct F02209094_Self *self) {
     return func_ov002_021ca2b8(self->f2.bit0) != 0;

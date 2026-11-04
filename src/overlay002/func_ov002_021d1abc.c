@@ -19,7 +19,7 @@ typedef struct {
 extern S021d1abc data_ov002_022ce950;
 extern D016cLocal data_ov002_022d016c;
 extern int func_ov002_0229ade0(int cmd, int a, int b, int c);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021d1abc(void) {
     unsigned short f2 = data_ov002_022ce950.f2;

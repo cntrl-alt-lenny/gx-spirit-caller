@@ -37,7 +37,7 @@ typedef struct {
 
 extern Req_0206d600_t *func_0206bf94(void *a0, void *a1, int a2);
 extern int func_0206be44(void *a0, void *a1);
-extern void func_0206d4c0();
+extern int func_0206d4c0(void *rb);
 extern unsigned short func_0207108c(void);
 extern void func_02094688(void *dst, void *src, int n);
 

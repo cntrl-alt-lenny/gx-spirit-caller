@@ -10,7 +10,7 @@ typedef struct {
 
 extern Data data_ov002_022ce950;
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 extern void func_ov002_021b0b54(int a, int b);
 
 void func_ov002_021d1888(void)

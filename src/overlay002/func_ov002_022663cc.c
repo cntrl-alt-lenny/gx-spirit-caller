@@ -19,8 +19,7 @@ extern int *func_ov002_021afb74(void);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021be384(int a0, int a1, int a2);
 extern int func_ov002_021bf294(int a, int b, int c, int d, int e);
-/* The original supplies only r0 to this four-argument forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern void func_ov002_021d479c(unsigned short a0, unsigned short a1, unsigned short a2, unsigned short a3);
 extern int func_ov002_022536e8(void *self, int arg1, int arg2);
 extern int func_ov002_02259f98(int player);

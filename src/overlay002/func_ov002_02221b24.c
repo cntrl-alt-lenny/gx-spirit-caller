@@ -16,8 +16,7 @@ extern int func_ov002_021b947c(int key);
 extern int func_ov002_021c33e4(int a, int b, int c);
 /* Original supplies two arguments to this four-argument thunk. */
 extern int func_ov002_021c84e0();
-/* Original supplies one argument to this four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021d873c(int arg0, int arg1);
 extern int func_ov002_021de8fc(int a, int b, int c);
 extern int func_ov002_021e7584(void *arg0, int arg1, int arg2);

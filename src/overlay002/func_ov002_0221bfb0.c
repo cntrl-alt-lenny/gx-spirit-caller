@@ -28,7 +28,7 @@ extern void func_ov002_022592ec(int arg0);
 extern void func_ov002_02259324(int arg0);
 extern int func_ov002_022593f4(void);
 extern void func_ov002_0226b1b4(int arg0,int arg1,const u16 *arg2,int arg3);
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern void func_ov002_0229cf10(char *dst,const char *fmt,int val);
 int func_ov002_0221bfb0(State *self,int arg1) {
  char buf[0x100];
@@ -115,7 +115,7 @@ int func_ov002_0221bfb0(State *self,int arg1) {
   return 0x76;
  case 0x76:
   card=(Card *)func_ov002_021b9b64(self->slots[data_ov002_022ce288.selected]);
-  if(func_0202e234(card->id)) func_ov002_0227adb8(self->side,(int)card,1,0);
+  if(func_0202e234(card->id)) func_ov002_0227adb8(self->side,card,1,0);
   else func_ov002_021d7c1c(self->side,card,0);
   return 0;
  }

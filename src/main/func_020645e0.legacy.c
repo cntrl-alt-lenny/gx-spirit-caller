@@ -5,7 +5,7 @@ typedef struct { unsigned char len, family; unsigned short port; unsigned int ad
 extern void *func_02054bfc(int unused0);
 extern int func_02054ca8(int sock, void *buf, int len, int flags, SockAddr *to, int tolen);
 extern int func_02054fd0(int a0);
-extern int func_02061670(Obj *self, Obj *other, int a, int b, int c, int d, int e, int mode);
+extern int func_02061670(Obj *self, Obj *other, int a, int b, int c, void *d, int e, int mode);
 extern int func_02063188(Obj *o, int a, short b);
 extern void func_020644c4(void *a0);
 extern int *func_02064d10(void *p, int a, short b);
@@ -30,7 +30,7 @@ int func_020645e0(Obj *self, int addr, short port, char *buf, int len) {
             return 0;
         }
     } else if (self->f28 != 0) {
-        if (func_02061670(self, (Obj *)func_02064d10(self, addr, port), addr, port, 0, (int)buf, len, 1) == 0) return 0;
+        if (func_02061670(self, (Obj *)func_02064d10(self, addr, port), addr, port, 0, buf, len, 1) == 0) return 0;
     }
     return 1;
     }

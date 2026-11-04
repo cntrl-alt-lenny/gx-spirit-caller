@@ -8,7 +8,7 @@ extern void *func_0201d738(void *self);
 extern void func_0208fd30(void *src, int offset, unsigned int size);
 extern int func_ov002_0225984c(void);
 extern int func_ov002_022aecd0(void *p, int a);
-extern int func_ov002_022b00fc(int unused0, int arg1, int arg2, int arg3);
+extern int func_ov002_022b00fc(int *self, int arg1, int arg2, int arg3);
 extern char data_ov002_022cc804[];
 extern int data_ov002_022d0f2c[];
 extern char data_ov002_022d1a9c[];
@@ -26,10 +26,10 @@ void func_ov002_022b0198(int *p) {
     if (flags == 0) return;
     if (func_02006194() == 0 && func_0200617c() == 0) return;
     func_0200612c(&x, &y);
-    hit = func_ov002_022b00fc((int)p, x, y, flags);
+    hit = func_ov002_022b00fc(p, x, y, flags);
     if (hit < 0) return;
     func_02006110(&x, &y);
-    if (hit != func_ov002_022b00fc((int)p, x, y, flags)) return;
+    if (hit != func_ov002_022b00fc(p, x, y, flags)) return;
     p[2] = hit;
     if (old != hit) {
         void *task = func_02006c0c(data_ov002_022cc804, 4, 0);

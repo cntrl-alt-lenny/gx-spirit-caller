@@ -32,13 +32,13 @@ typedef struct {
 extern int func_02053f48(int handle, void *info, void *cb);
 extern Elem_02063ae0_t *func_020540d0(int handle, int index);
 extern int func_02054140(int handle);
-extern int func_020613d8(void *rangeptr, int d, int arg5);
+extern void func_020613d8(void *rangeptr, void *src, int n);
 extern int func_02061530(void *rangeptr);
 extern int func_0206292c(Obj_02063ae0_t *a, unsigned short b, unsigned short c);
 extern void func_02063c90(void);
 extern int func_02064480(int a, int b);
 
-int func_02063ae0(Obj_02063ae0_t *a, int b, int c, int d, int arg5, int *out) {
+int func_02063ae0(Obj_02063ae0_t *a, int b, int c, void *d, int arg5, int *out) {
     int count = func_02054140(a->field_5c);
     int i;
 

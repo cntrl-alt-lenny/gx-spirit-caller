@@ -3,7 +3,7 @@ struct Self { u16 id; u16 player:1; u16 slot:5; u16 rest:10; };
 extern int func_ov002_021bc8c8(int, int, int);
 extern int func_ov002_021ff2b8(int unused_a, int b);
 extern int func_ov002_021bc288(int, int);
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_022536e8(int player, int arg1, int arg2);
 extern char data_ov002_022cf178[];
 extern char data_ov002_022cf16c[];

@@ -15,7 +15,7 @@ extern void *func_02054bfc(int unused0);
 extern void func_0205ffd4(int *a0, int a1, int a2);
 extern void func_020585d4(Owner **pp, int a, int b);
 extern Host *func_0206ebe8(char *name);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_02100310[], data_021003b0[], data_021005e4[], data_0210060c[], data_02100640[], data_02100668[], data_02100694[], data_021006c4[], data_021006f8[], data_02100718[];
 #define FAIL(msg) { func_0205ffd4((int *)pp, 5, (int)msg); func_020585d4(pp, 3, 1); return 3; }
 int func_0205999c(Owner **pp, Node *node) {
@@ -49,7 +49,7 @@ int func_0205999c(Owner **pp, Node *node) {
     clear_addr(&addr);
     addr.b[1] = 2;
     *((unsigned int *)&addr + 1) = **host->addr_list;
-    if (*((unsigned int *)&addr + 1) == 0) func_020a6d54((int)data_021006f8, (int)data_021003b0, 0, 0x90);
+    if (*((unsigned int *)&addr + 1) == 0) func_020a6d54(data_021006f8, data_021003b0, 0, 0x90);
     *(unsigned short *)&addr.b[2] = 0xcc74;
     if (func_02054db8(ctx->sock, &addr, 8) == -1) {
         error = (int)func_02054bfc(ctx->sock);

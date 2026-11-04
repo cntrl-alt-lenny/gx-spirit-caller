@@ -11,7 +11,7 @@ typedef struct {
 } Node0205be60;
 
 extern void *func_020453e8(int size);
-extern void func_0205ffc0(void *obj, void *data);
+extern int func_0205ffc0(void *p, char *msg);
 extern char data_02100b08;
 
 int func_0205be60(void *obj, int a1, int a2, void **out, int a4, int a5, int a6) {

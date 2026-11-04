@@ -18,7 +18,7 @@ extern void func_ov002_021baa04(int player,int kind,int extra);
 extern int func_ov002_021baca8(int,int,int);
 extern void func_ov002_021c9b80(int,int,int,int);
 extern int func_ov002_0229ade0(int,int,int,int);
-extern int func_ov002_0229c7f8(int);
+extern int func_ov002_0229c7f8(int arg);
 static inline u16 pair(int lo,int hi) { return (unsigned char)lo | ((unsigned char)hi << 8); }
 static inline int word(u16 hi,u16 lo) { return lo | (hi << 16); }
 void func_ov002_021d264c(void) {

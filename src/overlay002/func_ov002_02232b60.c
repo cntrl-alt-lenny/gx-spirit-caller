@@ -23,7 +23,7 @@ extern int func_ov002_021ff3bc(S021ff3bc *p, int unused1);
 extern int func_ov002_02210104(Self02210104 *self, int arg);
 extern int func_ov002_0220e74c(void *x, int arg);
 extern int func_ov002_02214720(void *x, int arg);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern char data_ov002_022cf16c[];
 int func_ov002_02232b60(Self *self, int arg) {
     int index;
@@ -32,7 +32,7 @@ int func_ov002_02232b60(Self *self, int arg) {
         if (index < 0) return 0;
         if (func_ov002_021ff3bc((S021ff3bc *)self, arg) == 0) return 0;
         if (func_ov002_021ca3f0(self->side, self->id) == 0) return 0;
-        func_ov002_0227adb8(self->side, (int)(data_ov002_022cf16c + (self->side & 1) * 0x868 + 0x120 + index * 4), 1, self->id << 16);
+        func_ov002_0227adb8(self->side, data_ov002_022cf16c + (self->side & 1) * 0x868 + 0x120 + index * 4, 1, self->id << 16);
         func_ov002_021e276c((void *)self->side, self->id, 1, (unsigned short)self->card);
         return 0;
     }

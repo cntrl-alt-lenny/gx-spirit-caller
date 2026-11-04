@@ -12,7 +12,7 @@ typedef struct {
 } obj_02063188_t;
 
 extern int *func_02064d10(void *p, int a, short b);
-extern int func_02061670(obj_02063188_t *o, conn_02063188_t *c, int a, short b, int e, int f, int g, int h);
+extern int func_02061670(obj_02063188_t *o, conn_02063188_t *c, int a, short b, int e, void *f, int g, int h);
 extern int func_02055330(void);
 extern int func_020643ec(void *self, int a, int b);
 

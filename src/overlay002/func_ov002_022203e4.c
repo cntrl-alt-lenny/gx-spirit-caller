@@ -15,12 +15,11 @@ extern Global data_ov002_022d0e6c;
 extern char data_ov002_022cf16c[];
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern int func_ov002_021bc618(int arg0);
-/* Original caller supplies only r0 to this four-argument thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern void func_ov002_0226b094(int arg0, int arg1);
 extern int func_ov002_0226b174(int arg0, int arg1, int arg2);
 extern int func_ov002_021b99b4(int player, int id);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_022203e4(S *p) {
     if (p->blocked) return 0;
     switch (data_ov002_022ce288.state) {
@@ -40,7 +39,7 @@ int func_ov002_022203e4(S *p) {
             int side = 1 - p->side;
             idx = func_ov002_021b99b4(side, data_ov002_022d0e6c.id);
             idx = (int)data_ov002_022cf16c + (side & 1) * 0x868 + 0x418 + idx * 4;
-            func_ov002_0227adb8(side, idx, 1, 0);
+            func_ov002_0227adb8(side, (void *)idx, 1, 0);
             return 0x7d;
         }
     }

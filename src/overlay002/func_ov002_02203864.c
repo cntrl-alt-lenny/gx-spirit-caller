@@ -16,7 +16,7 @@ struct F02203864_Self {
     unsigned short pad0;
     struct F02203864_F2 f2;
 };
-extern int func_ov002_021ca2b8(unsigned int bit);
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_021c23ac(unsigned int bit, unsigned int fld);
 
 int func_ov002_02203864(struct F02203864_Self *self) {

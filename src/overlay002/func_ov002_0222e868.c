@@ -13,7 +13,7 @@ extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_021ff46c(Self *self, int unused1);
 extern void func_ov002_0226afb4(int arg0, int arg1);
 extern void func_ov002_0226b094(int arg0, int arg1);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222e868(Self *self, int unused1) {
     int side = data_ov002_022d016c.side ^ data_ov002_022ce288.count;
     switch (data_ov002_022ce288.state) {
@@ -39,7 +39,7 @@ int func_ov002_0222e868(Self *self, int unused1) {
         func_ov002_0226afb4(side, self->value);
         return 125;
     case 125:
-        func_ov002_0227adb8(side, (int)(data_ov002_022cf16c + (side & 1) * 0x868 + 0x120 + data_ov002_022d0e6c.index * 4), 1, self->value << 16);
+        func_ov002_0227adb8(side, data_ov002_022cf16c + (side & 1) * 0x868 + 0x120 + data_ov002_022d0e6c.index * 4, 1, self->value << 16);
         return 100;
     case 100: {
         int count = ++data_ov002_022ce288.count;

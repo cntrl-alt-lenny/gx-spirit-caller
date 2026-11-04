@@ -2,7 +2,7 @@
  * func_0205442c(handle, &b); if found, return result->f4, else return
  * the caller-supplied fallback c. */
 
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_02101d68[];
 extern char data_02101d70[];
 extern void *func_0205442c(void *handle, int *outparam);

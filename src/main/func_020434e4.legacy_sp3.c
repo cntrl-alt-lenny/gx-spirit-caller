@@ -5,8 +5,7 @@ extern int func_020aaf40(const u8 *a, const u8 *b);
 extern int func_0209bc20(void *a0);
 extern int func_0209bb60(void *a0);
 extern long long func_0209bea0(void *date, void *time);
-/* The original calls this atoi thunk with only r0, fewer than its C definition. */
-extern int func_020ace00();
+extern int func_020ace00(const char *s);
 extern char data_020fec28[];
 extern const u8 *data_020febf8[];
 extern int data_021aa460;

@@ -12,7 +12,7 @@ extern int func_ov002_021ff400(S021ff400 *p, int unused1);
 extern void func_ov002_021ae400(int a, int b);
 extern void func_ov002_021af9d0(int a, int b, int c, int d);
 extern int *func_ov002_021afb74(void);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern void func_ov002_021e276c(int self, int a, int b, int c);
 int func_ov002_0221e548(S021ff400 *self, int arg1) {
     switch (data_ov002_022ce288.state) {
@@ -27,7 +27,7 @@ int func_ov002_0221e548(S021ff400 *self, int arg1) {
         func_ov002_021af9d0(self->bit0, 6, self->w0, 0);
         return 0x7d;
     case 0x7d:
-        func_ov002_0227adb8(self->bit0, (int)func_ov002_021afb74(), 1, 0);
+        func_ov002_0227adb8(self->bit0, func_ov002_021afb74(), 1, 0);
         return 0x64;
     case 0x64:
         func_ov002_021e276c(self->bit0, self->w0, 1, 0);

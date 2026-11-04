@@ -11,15 +11,14 @@ extern char data_ov002_022cf178[];
 extern int data_ov002_022cd744[];
 extern void func_ov002_021ae400(int a, int b);
 extern int func_ov002_021bc618(int arg0);
-/* Original supplies only player; the thunk's other parameters are unused here. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 /* These functions ignore their nominal argument; original passes none. */
 extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c();
 extern int func_ov002_02229dcc(int player, int kind, int index);
 extern void func_ov002_022592ec(int arg0);
 extern int func_ov002_022593f4(void);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern void func_ov002_02290500(int player, int card, int (*callback)(int,int,int));
 int func_ov002_02229ee8(struct Context *self) {
     u32 i;
@@ -67,7 +66,7 @@ int func_ov002_02229ee8(struct Context *self) {
         case 0x1685: self->flags |= 8; break;
         case 0x1686: self->flags |= 0x10; break;
         }
-        func_ov002_0227adb8(self->bit0, (int)((char *)&data_ov002_022cf16c + (self->bit0 & 1) * 0x868 + 0x120 + data_ov002_022ce288.index * 4), 1, 0);
+        func_ov002_0227adb8(self->bit0, (char *)&data_ov002_022cf16c + (self->bit0 & 1) * 0x868 + 0x120 + data_ov002_022ce288.index * 4, 1, 0);
         return 0x7f;
     }
     case 0x7c:

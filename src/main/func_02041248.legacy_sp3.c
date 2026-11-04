@@ -1,8 +1,7 @@
 extern int func_020aaddc(const char *s);
 extern char *func_020aaec0(char *dst, const char *src, unsigned int n);
 extern unsigned char *func_020ab0c4(unsigned char *haystack, const unsigned char *needle);
-/* This caller supplies only the string; the thunk's other parameters are unused here. */
-extern int func_020ace00();
+extern int func_020ace00(const char *s);
 extern unsigned char data_020fe894[], data_020fe89c[], data_020fe8a8[], data_020fe8ac[];
 typedef struct {
     char pad[0x1024];
@@ -44,7 +43,7 @@ int func_02041248(Context *self, const char *text) {
         *p = 0;
         self->path = p + 1;
     }
-    if (port) self->port = func_020ace00(port);
+    if (port) self->port = func_020ace00((char *)port);
     return 1;
 }
 

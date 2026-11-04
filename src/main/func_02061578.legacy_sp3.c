@@ -1,5 +1,5 @@
 typedef struct Obj02061578 Obj02061578;
-typedef int (*Cb02061578)(Obj02061578 *self, int a, int b, int c, int d);
+typedef int (*Cb02061578)(Obj02061578 *self, int a, int b, void *c, int d);
 
 struct Obj02061578 {
     char       _pad_00[0x14];
@@ -12,10 +12,10 @@ struct Obj02061578 {
 
 extern char data_021014dc[];
 extern char data_021014e4[];
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void func_02064aa0(Obj02061578 *self);
 
-int func_02061578(Obj02061578 *self, int a, int b, int c, int d, int *out) {
+int func_02061578(Obj02061578 *self, int a, int b, void *c, int d, int *out) {
     *out = 0;
     if (self == 0) {
         func_020a6d54(data_021014dc, data_021014e4, 0, 0x197);

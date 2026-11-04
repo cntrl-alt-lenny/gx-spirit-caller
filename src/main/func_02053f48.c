@@ -8,7 +8,7 @@ typedef struct {
 
 extern char data_020ffb04;
 extern char data_020ffb30;
-extern void func_020a6d54(void *file, void *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int  func_02053b38(void *val, int f14, int count, int elemsize, int n, void *out_buf);
 extern int  func_020b3870(int diff, int elemsize);
 extern void func_02053fc4(Self02053f48 *arr, void *val, int idx);

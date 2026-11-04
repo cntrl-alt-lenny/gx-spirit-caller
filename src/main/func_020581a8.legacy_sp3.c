@@ -4,9 +4,9 @@ typedef struct {
     int len;
 } StrBuf;
 
-extern int func_020453cc(int x, int y);
-extern int func_0205ffc0(int *p, int b);
-extern void func_020a6d54(void *a0, void *a1, int a2, int a3);
+extern void *func_020453cc(void *p, int size);
+extern int func_0205ffc0(void *p, char *msg);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_021000b8[];
 extern char data_021000d0[];
 extern char data_02100154[];
@@ -24,9 +24,9 @@ int func_020581a8(void *ctx, StrBuf *b, char c) {
     data = b->data;
     if (cap == len) {
         cap += 0x800;
-        data = (char *)func_020453cc((int)data, cap + 1);
+        data = func_020453cc(data, cap + 1);
         if (data == 0) {
-            func_0205ffc0((int *)ctx, (int)data_02100154);
+            func_0205ffc0(ctx, data_02100154);
             return 1;
         }
     }

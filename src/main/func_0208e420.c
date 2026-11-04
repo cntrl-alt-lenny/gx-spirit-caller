@@ -2,9 +2,9 @@
  * GX_SendFifo48B. Twin of func_0208e404.
  */
 
-extern int GX_SendFifo48B(int x);
+extern void GX_SendFifo48B(void *src, void *dst);
 
-int func_0208e420(int x) {
+void func_0208e420(void *m) {
     *(volatile int *)0x4000400 = 0x17;
-    return GX_SendFifo48B(x);
+    GX_SendFifo48B(m, (void *)0x4000400);
 }

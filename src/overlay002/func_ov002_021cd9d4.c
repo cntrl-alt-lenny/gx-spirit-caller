@@ -8,7 +8,7 @@ extern int func_ov002_021b9a30(unsigned int a, unsigned int b);
 extern void func_ov002_021c2c54(int player, unsigned short id);
 extern void func_ov002_021c2d34(int player, unsigned short id);
 extern int func_ov002_0229ade0(int a, int b, int c, int d);
-extern int func_ov002_0229c7f8(int a);
+extern int func_ov002_0229c7f8(int arg);
 
 void func_ov002_021cd9d4(void) {
     int f = (data_ov002_022ce950.flags & 0x8000) ? 1 : 0;

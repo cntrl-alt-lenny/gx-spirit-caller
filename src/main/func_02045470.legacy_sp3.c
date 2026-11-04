@@ -10,8 +10,8 @@
  *     ldmia sp!, {pc}
  */
 
-extern int func_020453fc(int a, int b, int c, int d, int e);
+extern void *func_020453fc(int heap, void *p, int size, int d, int align);
 
-int func_02045470(int a, int b, int c, int d) {
-    return func_020453fc(a, b, c, d, 0x20);
+void *func_02045470(int heap, void *p, int size, int d) {
+    return func_020453fc(heap, p, size, d, 0x20);
 }

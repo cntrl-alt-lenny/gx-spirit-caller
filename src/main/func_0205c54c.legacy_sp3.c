@@ -24,7 +24,7 @@ typedef struct {
 } sa_t;
 
 extern int func_0205d6bc(void *arg0, int junk, item_t **out);
-extern int func_0205ffc0(void *arg0, void *key);
+extern int func_0205ffc0(void *p, char *msg);
 extern int func_0205ffd4(void *arg0, int a, void *s);
 extern int func_02054e8c(int a, int b, int c);
 extern int func_02055250(int fd, int flag);

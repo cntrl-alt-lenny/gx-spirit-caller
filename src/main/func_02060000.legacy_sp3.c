@@ -1,5 +1,5 @@
 extern char data_02101234[], data_02101244[], data_02101254[], data_02101260[], data_02101270[];
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void func_0205ffd4(int *a0, int a1, int a2);
 extern void func_020585d4(void *a0, int a1, int a2);
 
@@ -8,9 +8,9 @@ int func_02060000(int *ctx, char *text, int *offset, char *key, char *value) {
     char *start;
     int n;
     int count;
-    if (text == 0) func_020a6d54((int)data_02101234, (int)data_02101244, 0, 0x199);
-    if (key == 0) func_020a6d54((int)data_02101254, (int)data_02101244, 0, 0x19a);
-    if (value == 0) func_020a6d54((int)data_02101260, (int)data_02101244, 0, 0x19b);
+    if (text == 0) func_020a6d54(data_02101234, data_02101244, 0, 0x199);
+    if (key == 0) func_020a6d54(data_02101254, data_02101244, 0, 0x19a);
+    if (value == 0) func_020a6d54(data_02101260, data_02101244, 0, 0x19b);
     start = text + *offset;
     if (*start != '\\') {
         func_0205ffd4(ctx, 1, (int)data_02101270);

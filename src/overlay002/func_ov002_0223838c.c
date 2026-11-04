@@ -26,7 +26,7 @@ extern void func_ov002_021e2c5c();
 /* The original passes only the object, leaving the unused r1 untouched. */
 extern int func_ov002_021ff400(Obj *p, int unused1);
 extern int func_ov002_0225368c(int ctx,int card_id,int arg2);
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0223838c(Obj *p, int arg1) {
     u32 side = p->bit0 ^ p->bit14;
     u32 bit = p->bit0;
@@ -54,7 +54,7 @@ int func_ov002_0223838c(Obj *p, int arg1) {
     case 0x7d:
         if (p->count < p->total) {
             data_ov002_022ce288.value = func_ov002_021bc6c4(side);
-            func_ov002_0227adb8(side,(int)func_ov002_021b004c(p->count+1),1,p->id<<16);
+            func_ov002_0227adb8(side,func_ov002_021b004c(p->count+1),1,p->id<<16);
             return 0x7c;
         }
         func_ov002_021e2c5c();

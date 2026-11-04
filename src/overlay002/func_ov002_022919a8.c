@@ -10,8 +10,7 @@ extern int func_0202b920(int id);
 extern int func_ov002_021b9ba0(S021b9ba0 *p);
 extern int func_ov002_021bbf50(int arg0);
 extern int func_ov002_021bc618(int arg0);
-/* The original supplies only r0 to this four-parameter forwarding thunk. */
-extern int func_ov002_021ca2b8();
+extern int func_ov002_021ca2b8(int a);
 extern int func_ov002_0223b468(int key);
 extern int func_ov002_0223bcb4(int arg0, int arg1, int *arg2);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);

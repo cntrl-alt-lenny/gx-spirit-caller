@@ -7,7 +7,7 @@ extern unsigned int func_ov002_021b00d0(unsigned int x);
 extern void func_ov002_021b2e04(u16, u16);
 extern int func_ov002_0229cd70(int a,int b,int c);
 extern int func_ov002_0229ade0(int,int,int,int);
-extern int func_ov002_0229c7f8(int);
+extern int func_ov002_0229c7f8(int arg);
 static inline u16 pack(int side,int slot) { return (unsigned char)side | ((unsigned char)slot << 8); }
 void func_ov002_021d3160(void) {
     int side = (data_ov002_022ce950.f0 & 0x8000) ? 1 : 0;

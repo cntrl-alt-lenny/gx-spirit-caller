@@ -3,8 +3,8 @@
  * the fields out through 3 out-params or fall back to func_0205ffc0. */
 
 extern int func_0205ba5c(int a0, int a1, int a2);
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
-extern void func_0205ffc0(void *a0, void *a1);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
+extern int func_0205ffc0(void *p, char *msg);
 
 extern char data_02100a64[];
 extern char data_02100a20[];
