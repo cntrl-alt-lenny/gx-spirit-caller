@@ -16142,3 +16142,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02009dec	main	176	legacy	factory	parked	19.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
 0x02009dec	main	176	legacy_sp3	factory	parked	44.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
 0x0202be4c	main	176	default	factory	shipped	100	n/a		factory-1104-K3	
+0x0203aae8	main	176	default	factory	parked	97.8	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1104-K3	
+0x0203aae8	main	176	legacy	factory	parked	2	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1104-K3	
+0x0203aae8	main	176	legacy_sp3	factory	parked	14.6	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1104-K3	
