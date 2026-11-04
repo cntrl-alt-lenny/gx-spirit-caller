@@ -24,7 +24,7 @@ extern u16 data_021a8dc0[];
 
 extern u32 OS_DisableIrq(void);
 extern void OS_RestoreIrq(u32);
-extern void func_0209256c(void *, void *, int);
+extern int func_0209256c(void *, void *, int);
 extern void func_02092614(void *, void *, int);
 extern void func_020928cc(void *, u32);
 extern void func_020928e8(void *, int);

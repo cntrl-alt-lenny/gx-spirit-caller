@@ -2,6 +2,6 @@
 
 extern void func_0206b814(void *p);
 
-void func_02068ca8(void *p) {
+void func_02068ca8(void *p, int unused1, int unused2, int unused3) {
     func_0206b814((char *)p + 0x4c);
 }

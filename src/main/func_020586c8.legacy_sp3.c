@@ -3,7 +3,7 @@ extern char data_02100350[], data_02100364[], data_0210036c[];
 extern void func_020453b4(void *p);
 extern int func_02054e54(int a, int b);
 extern int func_02054e70(int a);
-extern void func_02057980(int *self, int a, char *b, int *c, int d, char *e);
+extern int func_02057980(int *self, int a, char *b, int *c, int d, char *e);
 extern void func_02058038(int *a0, char *a1, int a2);
 extern void func_02058070(int *a, char *b, char *c);
 extern void func_0205888c(void);

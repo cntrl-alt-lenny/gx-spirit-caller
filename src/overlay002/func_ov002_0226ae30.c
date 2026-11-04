@@ -6,7 +6,7 @@
 
 extern void func_ov002_0226ae50(void);
 
-asm void func_ov002_0226ae30(void) {
+asm void func_ov002_0226ae30(int unused0, int unused1, int unused2, int unused3) {
     nofralloc
     cmp r2, #0x0
     mov r2, #0x0

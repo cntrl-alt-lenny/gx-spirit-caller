@@ -26,7 +26,7 @@ extern void func_ov002_021e2b3c(void);
 extern void func_ov002_021e2c5c(void);
 extern int func_ov002_0223def4(struct Node *self, int idx);
 
-int func_ov002_02216424(struct Node *self) {
+int func_ov002_02216424(struct Node *self, int unused1) {
     int n, i;
 
     n = ((u32)self->f_6 << 16) >> 24;

@@ -10,8 +10,8 @@ typedef struct {
 
 extern Def_ov002_022bdb88 data_ov002_022cd090[];
 extern int func_020211c8(void *);
-extern void func_0202147c(int);
-extern void func_02021650(int, void *, void *);
+extern int func_0202147c(int);
+extern int func_02021650(int, void *, void *);
 extern int func_02021660(int, int, int);
 extern void func_020216b0(int, int, int);
 extern void func_ov002_022bdd44();
