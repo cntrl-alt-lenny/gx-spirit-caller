@@ -16111,3 +16111,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02067a94	main	192	legacy_sp3	factory	shipped	100	n/a		factory-1103-K4	
 0x02067a94	main	192	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
 0x02067a94	main	192	legacy	factory	parked	20.4	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
+0x0207d6cc	main	192	legacy_sp3	factory	shipped	100	n/a		factory-1103-K4	
+0x0207d6cc	main	192	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
+0x0207d6cc	main	192	legacy	factory	parked	74	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
