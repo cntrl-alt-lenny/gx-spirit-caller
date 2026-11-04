@@ -16111,3 +16111,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a33a8	main	132	legacy	factory	shipped	100	n/a		factory-1103-K5	
 0x020a33a8	main	132	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K5	
 0x020a33a8	main	132	legacy_sp3	factory	parked	39.4	unknown	UNCLASSIFIED:unknown	factory-1103-K5	
+0x020b30e4	main	132	default	factory	parked	2.8	asm-int	PROVISIONAL:inline-asm	factory-1103-K5	
+0x020b30e4	main	132	legacy	factory	parked	6.1	asm-int	PROVISIONAL:inline-asm	factory-1103-K5	
+0x020b30e4	main	132	legacy_sp3	factory	parked	6.1	asm-int	PROVISIONAL:inline-asm	factory-1103-K5	
