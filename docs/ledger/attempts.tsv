@@ -16148,3 +16148,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201ce94	main	192	default	factory	parked	91.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
 0x0201ce94	main	192	legacy	factory	parked	3.7	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
 0x0201ce94	main	192	legacy_sp3	factory	parked	6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
+0x02029c80	main	192	default	factory	parked	87.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
+0x02029c80	main	192	legacy	factory	parked	20	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
+0x02029c80	main	192	legacy_sp3	factory	parked	18.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K3	
