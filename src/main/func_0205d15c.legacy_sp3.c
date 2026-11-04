@@ -46,7 +46,7 @@ extern int func_02057980(void *pp, int sock, void *buf, int *o, int a4, char *li
 extern int func_0205c6e4(void *pp, Node *n);
 extern char *func_020ab0c4(char *s, char *t);
 extern int func_020ab054(char *a, char *b, int n);
-extern void func_020a6d54(char *a, char *b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 
 int func_0205d15c(void **pp, Node *node) {
     Ctx *ctx = (Ctx *)*pp;

@@ -11,7 +11,7 @@
 
 extern char data_02101518[];   /* __FILE__ string */
 extern char data_02101524[];   /* assertion message string */
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 
 typedef struct Obj {
     char _pad_00[0x40];

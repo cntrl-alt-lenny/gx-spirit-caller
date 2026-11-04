@@ -15,7 +15,7 @@ extern int func_020ace00();
 extern int func_020453b4();
 extern int func_020ac45c();
 extern float func_020b1c7c(int);
-extern void func_020a6d54(int,int,int,int);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int func_0205d6bc(void **pp,int val,int *out);
 extern int func_0205d6f8(char **pp,int key);
 extern int func_0205b9ac(void *,int,int *,int *,int *);
@@ -50,7 +50,7 @@ int func_0205af90(Owner **pp,Item *item,char *line) {
         func_020585d4(pp,3,1); return 3;
     }
     key=func_020ace00(buf);
-    if(key<=0) func_020a6d54((int)data_02100a10,(int)data_02100a20,0,0x15a);
+    if(key<=0) func_020a6d54(data_02100a10,data_02100a20,0,0x15a);
     func_0205d6bc((void **)pp,key,&found);
     Src src={0};
     char s14[0x4c];

@@ -18,7 +18,7 @@ struct Self {
     char pad28[112];
     char *f98;
 };
-extern void func_020a6d54(int a,int b,int c,int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void *func_020540d0(char *s, int index);
 extern void func_02064aa0(Obj *self);
 extern char data_021014f4[];
@@ -26,7 +26,7 @@ extern char data_021014e4[];
 int func_020618a8(Self *self, int arg1, int arg2, int arg3, int arg4) {
     void *cb;
     if (self == 0) {
-        func_020a6d54((int)data_021014f4, (int)data_021014e4, 0, 0x101);
+        func_020a6d54(data_021014f4, data_021014e4, 0, 0x101);
     }
     if (self == 0) return 1;
     cb = func_020540d0(self->f98, arg1);

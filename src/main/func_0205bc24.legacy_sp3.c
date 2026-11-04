@@ -8,7 +8,7 @@ extern int func_0205d7e4(Owner **pp, Item *item, char *line);
 extern int func_0205af90(Owner **pp, Item *item, char *line);
 extern int func_0205febc(Owner **pp, Item *item, char *line);
 extern void func_020604a4(int a, ...);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_02100a8c[], data_02100ad4[], data_02100ad8[];
 int func_0205bc24(Owner **pp, Item *item, char *line)
 {
@@ -20,7 +20,7 @@ int func_0205bc24(Owner **pp, Item *item, char *line)
     case 4: result = func_0205febc(pp, item, line); break;
     default:
         func_020604a4((int)pp, data_02100a8c, item->a);
-        func_020a6d54((int)data_02100ad4, (int)data_02100ad8, 0, 0x146);
+        func_020a6d54(data_02100ad4, data_02100ad8, 0, 0x146);
         break;
     }
     if (result != 0) item->status = result;

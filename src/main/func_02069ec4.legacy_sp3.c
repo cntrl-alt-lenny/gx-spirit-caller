@@ -19,7 +19,7 @@ extern int func_0206a31c(T_0206b7d8 *ctx, unsigned char *s, int n);
 extern void func_0206a984(obj_0206a984_t *o, signed char *in, int len);
 extern int func_0206b44c(signed char *s, int n);
 extern int func_0206b4fc(void *a0, int a1);
-extern void func_020a6d54(int a,int b,int c,int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern signed char *func_020a7388(signed char *dst, signed char *src, int n);
 extern int data_0219eccc;
 extern char data_02101dc0[], data_02101db0[];
@@ -106,7 +106,7 @@ int func_02069ec4(T_0206b7d8 *o) {
    if (o->buf == 0) n = 0;
   } while (n != 0);
  }
- if (len < 0) func_020a6d54((int)data_02101dc0,(int)data_02101db0,0,0x4af);
+ if (len < 0) func_020a6d54(data_02101dc0,data_02101db0,0,0x4af);
  if (o->buf == 0) return 0;
  if (len != 0) func_020a7388((signed char *)o->buf,(signed char *)p,len);
  o->size = len;

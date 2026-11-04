@@ -12,7 +12,7 @@ struct Obj02061578 {
 
 extern char data_021014dc[];
 extern char data_021014e4[];
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void func_02064aa0(Obj02061578 *self);
 
 int func_02061578(Obj02061578 *self, int a, int b, int c, int d, int *out) {

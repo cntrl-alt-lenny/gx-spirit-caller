@@ -12,7 +12,7 @@
 
 extern char data_020ffb8c[];   /* -> r0 */
 extern char data_020ffb80[];   /* -> r1 */
-extern void func_020a6d54(char *file, char *expr, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int  func_02054140(void *item);
 
 typedef struct {

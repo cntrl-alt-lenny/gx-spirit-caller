@@ -2,7 +2,7 @@
  * return) if self is null, then unconditionally stores through it
  * anyway — matches the project's other soft-assert guard chains. */
 
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_02101518[];
 extern char data_02101524[];
 

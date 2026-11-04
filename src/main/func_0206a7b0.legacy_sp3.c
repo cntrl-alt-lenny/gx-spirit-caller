@@ -3,7 +3,7 @@ typedef struct { int f0, kind; } Entry;
 extern void *func_020540d0(char *s, int index);
 extern int func_02054140(void *p);
 extern int func_0206b44c(signed char *s, int n);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_02101dd4[];
 extern char data_02101db0[];
 
@@ -35,7 +35,7 @@ int func_0206a7b0(Context *ctx, unsigned char *s, int n) {
             break;
         }
         default:
-            func_020a6d54((int)data_02101dd4, (int)data_02101db0, 0, 0x317);
+            func_020a6d54(data_02101dd4, data_02101db0, 0, 0x317);
             return 0;
         }
         if (n < 0) return 0;

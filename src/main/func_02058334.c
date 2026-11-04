@@ -1,12 +1,12 @@
 extern int func_020453b4(); /* Original call sites supply only r0, fewer than the four-argument definition. */
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_02100260[], data_02100280[], data_02100290[];
 typedef struct { int x0; int count; void *items; void *xc; void *x10; } Data;
 typedef struct { char pad[0x38]; int count; void **a; void **b; } Arrays;
 typedef struct Node { void (*callback)(void *, void *, int); int arg; void *data; int kind; } Node;
 void func_02058334(void *ctx, Node *n) {
-    if (n->callback == 0) func_020a6d54((int)data_02100260, (int)data_02100280, 0, 0x6e);
-    if (n->data == 0) func_020a6d54((int)data_02100290, (int)data_02100280, 0, 0x6f);
+    if (n->callback == 0) func_020a6d54(data_02100260, data_02100280, 0, 0x6e);
+    if (n->data == 0) func_020a6d54(data_02100290, data_02100280, 0, 0x6f);
     n->callback(ctx, n->data, n->arg);
     if (n->kind == 2) {
         func_020453b4((int)((Data *)n->data)->items);

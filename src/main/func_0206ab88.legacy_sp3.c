@@ -7,7 +7,7 @@ struct S {
 struct P { unsigned char *cur; };
 struct Two { unsigned char a,b; };
 extern char data_02101db0[], data_02101dd8[], data_02101df8[];
-extern void func_020a6d54(int a,int b,int c,int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int func_020aaddc(const char *s);
 extern int func_0206b0c4(struct S *p);
 extern void func_0206aea0(struct S *p);
@@ -25,7 +25,7 @@ int func_0206ab88(struct S *p,char *a,char *b,u32 flags,int extra) {
  unsigned char *cur;
  unsigned short len;
  int result;
- if(p->state != 1) func_020a6d54((int)data_02101dd8,(int)data_02101db0,0,0x20a);
+ if(p->state != 1) func_020a6d54(data_02101dd8,data_02101db0,0,0x20a);
  if(a == 0) a = data_02101df8;
  if(b == 0) b = data_02101df8;
  if((u32)func_020aaddc(a) > 0x100) return 6;

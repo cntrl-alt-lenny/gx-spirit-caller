@@ -2,7 +2,7 @@
  * func_02062280 with a rebased offset; on success clear field_90 and
  * return 1, else return 0. */
 
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int func_02054140(void *handle);
 extern void *func_020540d0(void *handle, int idx);
 extern int func_02062280(void *self, int a, int b);

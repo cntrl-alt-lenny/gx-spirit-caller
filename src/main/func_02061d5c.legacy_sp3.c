@@ -16,12 +16,12 @@ struct Other {
     int f24;
 };
 extern void func_02064aa0(Obj *self);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_02101500[];
 extern char data_021014e4[];
 int func_02061d5c(Obj *self, Other *other, int a, int b, int c, int d, int e) {
     if (self == 0 || other == 0) {
-        func_020a6d54((int)data_02101500, (int)data_021014e4, 0, 0x3d);
+        func_020a6d54(data_02101500, data_021014e4, 0, 0x3d);
     }
     if (self == 0 || other == 0) {
         return 1;

@@ -1,4 +1,4 @@
-extern void func_020a6d54(void *p1, void *p2, int a, int b);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int func_02054140(int v);
 extern int func_02057f3c(void *a0, int f8, int *pArg2, int flag, int *out1, int *out2, void *p3);
 extern int func_020581a8(void *a0, void *p, signed char b);

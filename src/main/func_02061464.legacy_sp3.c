@@ -1,7 +1,7 @@
 /* func_02061464: bounds-checked 2-byte big-endian append to a growable
  * buffer. Asserts if writing 2 more bytes would exceed capacity. */
 
-extern void func_020a6d54(const char *file, const char *msg, int zero, int line);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_0210149c[];
 extern char data_02101448[];
 

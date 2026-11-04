@@ -8,7 +8,7 @@ typedef struct {
 } Vec;
 
 extern int func_020453cc(int x, int y);
-extern void func_020a6d54(void *a0, void *a1, int a2, int a3);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_020ffb70[];
 extern char data_020ffb04[];
 

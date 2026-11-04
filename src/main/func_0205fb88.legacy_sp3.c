@@ -19,7 +19,7 @@ extern void func_020585d4(int *self, int state, int flag);
 extern int func_0205ffc0(void *p, char *msg);
 extern void func_0205ffd4(int *a0, int a1, int a2);
 extern hostent_0206ebe8_t *func_0206ebe8(char *name);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_02100de0[], data_02100e20[], data_02100e50[], data_021010e8[], data_02101110[], data_02101144[], data_02101174[], data_02101194[];
 int func_0205fb88(int *self, Req *req) {
     Stream *s = req->stream;
@@ -54,7 +54,7 @@ int func_0205fb88(int *self, Req *req) {
     addr.family = 2;
     addr.addr = **host->addr_list;
     if (addr.addr == 0) {
-        func_020a6d54((int)data_02101174, (int)data_02100e50, 0, 0x59);
+        func_020a6d54(data_02101174, data_02100e50, 0, 0x59);
     }
     addr.port = 0xcd74;
     if (func_02054db8(s->socket, &addr, 8) == -1) {

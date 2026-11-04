@@ -5,7 +5,7 @@ typedef struct { int id; int value; char first[0x100]; char second[0x100]; int a
 extern int func_0205d504(int a0, int a1);
 extern int func_0205ffc0(void *p, char *msg);
 extern void func_020604b0(char *dst, char *src, int n);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern int func_020a73d4(int x, int unused1, int unused2);
 extern char data_020ffcd0[], data_020ffce0[], data_020ffcf0[], data_020ffcfc[];
 int func_020557b8(int *self, int index, Output *out) {
@@ -33,7 +33,7 @@ int func_020557b8(int *self, int index, Output *out) {
         return 2;
     }
     info = item->info;
-    if (info == 0) func_020a6d54((int)data_020ffcf0, (int)data_020ffcfc, 0, 0x5cf);
+    if (info == 0) func_020a6d54(data_020ffcf0, data_020ffcfc, 0, 0x5cf);
     out->id = item->id;
     out->value = info->value;
     if (info->first == 0) *info->first = 0;

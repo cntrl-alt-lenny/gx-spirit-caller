@@ -1,7 +1,7 @@
 struct Buffer { char *data; int size; int used; };
 typedef struct { int status; int pad4; int sock; int result; int pad10[2]; struct Buffer buf; int field24; char queue[4]; } Req;
 extern int func_02057b00(int *ctx, int sock, struct Buffer *buf, int *out, int *done, char *name);
-extern void func_020a6d54(int a,int b,int c,int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void func_02054868(int a0,int a1,int a2);
 extern int func_02058070(void *ctx, void *buf, char *s);
 extern int func_020602c4(char *,char *,char *,int);
@@ -20,7 +20,7 @@ int func_0205cf10(int *ctx, Req *req) {
     unsigned char *end;
     char *data;
     int value, ret;
-    if (req->status != 0x68) func_020a6d54((int)data_02100cd0,(int)data_02100b64,0,0xc1);
+    if (req->status != 0x68) func_020a6d54(data_02100cd0,data_02100b64,0,0xc1);
     ret = func_02057b00(ctx,req->sock,&req->buf,&out,&done,data_02100cb8);
     if (ret != 0) return ret;
     if (done != 0) { req->status = 0x6a; return 0; }

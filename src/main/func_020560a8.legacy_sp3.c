@@ -13,7 +13,7 @@ extern void func_0205bd58(Owner **pp, Item *item);
 extern int func_0205bf18(Owner **pp, Item *item);
 extern int func_0205c830(Owner **pp);
 extern int func_0205da48(Owner **pp);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern char data_020ffd50[], data_020ffe48[], data_020ffe50[];
 int func_020560a8(Owner **pp, int wait) {
     Owner *o = *pp;
@@ -21,7 +21,7 @@ int func_020560a8(Owner **pp, int wait) {
     Node2 *node;
     int again;
     int ret;
-    if (o->state > 4) func_020a6d54((int)data_020ffd50, (int)data_020ffe48, 0, 0x1b5);
+    if (o->state > 4) func_020a6d54(data_020ffd50, data_020ffe48, 0, 0x1b5);
     if (o->state == 1) {
         do {
             result = func_02058954((void **)pp);
@@ -30,7 +30,7 @@ int func_020560a8(Owner **pp, int wait) {
         } while (again);
         if (result != 0) {
             if (func_0205bd0c(pp, &node, 1)) node->result = 4;
-            else func_020a6d54((int)data_020ffe50, (int)data_020ffe48, 0, 0x1db);
+            else func_020a6d54(data_020ffe50, data_020ffe48, 0, 0x1db);
         }
     }
     if (o->state == 2 || o->state == 3) {

@@ -2,7 +2,7 @@
  * (decrementing a0->counter and logging if it goes negative), then
  * unconditionally release a1->field_4 and finally a1 itself. */
 
-extern void func_020a6d54(const char *msg1, const char *msg2, int a2, int a3);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern void func_02054e54(void *p, int mode);
 extern void func_02054e70(void *p);
 extern void func_020453b4(void *p);

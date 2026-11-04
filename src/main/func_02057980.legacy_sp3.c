@@ -1,5 +1,5 @@
 extern int func_02057f3c(void *ctx, int sock, int a2, int a3, int *done, int *result, char *name);
-extern void func_020a6d54(int a, int b, int c, int d);
+extern void func_020a6d54(const char *expr, const char *file, const char *func, int line);
 extern signed char *func_020a7388(signed char *dst, signed char *src, int n);
 extern char data_021000b8[], data_021000d0[], data_021000dc[], data_021000e8[], data_021000f4[];
 struct Buffer { signed char *data; int unk4; int size; int used; };
@@ -8,7 +8,7 @@ int func_02057980(void *ctx, int sock, struct Buffer *buf, int *out, int compact
     signed char *data;
     int used;
     int result, done, count;
-    if (!buf) func_020a6d54((int)data_021000b8, (int)data_021000d0, 0, 0x1b9);
+    if (!buf) func_020a6d54(data_021000b8, data_021000d0, 0, 0x1b9);
     total = 0;
     size = buf->size;
     used = buf->used;
@@ -26,9 +26,9 @@ int func_02057980(void *ctx, int sock, struct Buffer *buf, int *out, int compact
             size -= total;
         }
     } else { used += total; }
-    if (size < 0) func_020a6d54((int)data_021000dc, (int)data_021000d0, 0, 0x1de);
-    if (used < 0) func_020a6d54((int)data_021000e8, (int)data_021000d0, 0, 0x1df);
-    if (used > size) func_020a6d54((int)data_021000f4, (int)data_021000d0, 0, 0x1e0);
+    if (size < 0) func_020a6d54(data_021000dc, data_021000d0, 0, 0x1de);
+    if (used < 0) func_020a6d54(data_021000e8, data_021000d0, 0, 0x1df);
+    if (used > size) func_020a6d54(data_021000f4, data_021000d0, 0, 0x1e0);
     buf->size = size;
     buf->used = used;
     if (out) *out = done;
