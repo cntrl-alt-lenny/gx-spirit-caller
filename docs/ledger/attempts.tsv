@@ -16108,3 +16108,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209b0f4	main	120	legacy_sp3	factory	parked	36.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K5	
 0x02090330	main	128	legacy	factory	shipped	100	n/a		factory-1103-K5	
 0x020a2394	main	132	legacy	factory	shipped	100	n/a		factory-1103-K5	
+0x020a33a8	main	132	legacy	factory	shipped	100	n/a		factory-1103-K5	
+0x020a33a8	main	132	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1103-K5	
+0x020a33a8	main	132	legacy_sp3	factory	parked	39.4	unknown	UNCLASSIFIED:unknown	factory-1103-K5	
