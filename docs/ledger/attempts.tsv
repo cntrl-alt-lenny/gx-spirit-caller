@@ -16173,3 +16173,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02081348	main	308	default	factory	parked	3.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x02081348	main	308	legacy	factory	parked	13.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x02081348	main	308	legacy_sp3	factory	parked	48	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x02051c4c	main	312	default	factory	parked	2.6	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x02051c4c	main	312	legacy	factory	parked	8.5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x02051c4c	main	312	legacy_sp3	factory	parked	60.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
