@@ -16131,3 +16131,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207f05c	main	220	legacy_sp3	factory	shipped	100	n/a		factory-1103-K4	
 0x0207f05c	main	220	default	factory	parked	10.9	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
 0x0207f05c	main	220	legacy	factory	parked	75.4	unknown	UNCLASSIFIED:unknown	factory-1103-K4	
+0x0207084c	main	224	default	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K4	
+0x0207084c	main	224	legacy	factory	parked	82.1	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K4	
+0x0207084c	main	224	legacy_sp3	factory	parked	75	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1103-K4	
