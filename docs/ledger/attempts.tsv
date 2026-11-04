@@ -16201,3 +16201,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0203f198	main	372	default	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x0203f198	main	372	legacy	factory	parked	10.8	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x0203f198	main	372	legacy_sp3	factory	parked	19.4	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x0204a174	main	376	default	factory	parked	27.7	register-numbering-permutation-cascade	P-30	factory-1104-K4	
+0x0204a174	main	376	legacy	factory	parked	11.5	register-numbering-permutation-cascade	P-30	factory-1104-K4	
+0x0204a174	main	376	legacy_sp3	factory	parked	75.5	register-numbering-permutation-cascade	P-30	factory-1104-K4	
