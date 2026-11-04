@@ -13,7 +13,7 @@ struct Self0 {
 
 extern int func_ov002_021ff14c(int bit0, int a, int bits, int c, int d);
 
-int func_ov002_02203290(struct Self0 *self) {
+int func_ov002_02203290(struct Self0 *self, int unused1) {
     if (func_ov002_021ff14c(self->bit0, 1, self->b6_14, 0, 1) != 0) return 2;
     return self->f2_1213 == 0;
 }

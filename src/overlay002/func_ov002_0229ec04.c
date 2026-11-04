@@ -8,7 +8,7 @@ typedef struct {
 } Obj;
 extern Vec func_ov002_0229ea40(int side, int kind);
 extern int data_ov002_022cd73c[];
-Vec func_ov002_0229ec04(Obj *obj) {
+Vec func_ov002_0229ec04(Obj *obj, int unused1) {
     Vec pos = func_ov002_0229ea40(obj->side, obj->kind);
     int n = obj->amount / 10;
     int flip;

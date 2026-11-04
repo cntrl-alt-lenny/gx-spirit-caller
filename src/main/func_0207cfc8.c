@@ -5,7 +5,7 @@
  * natural-C phrasing mwcc might schedule differently.
  */
 
-asm void func_0207cfc8(void) {
+asm void func_0207cfc8(int unused0, int unused1) {
     nofralloc
     cmp     r1, #0x0
     ldreq   r0, [r0, #0x4]

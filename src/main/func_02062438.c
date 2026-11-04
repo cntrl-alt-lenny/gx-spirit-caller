@@ -26,7 +26,7 @@ struct Func02062438Target {
 
 extern int func_02064864(void);
 
-int func_02062438(int arg0, struct Func02062438Target **pp) {
+int func_02062438(int arg0, struct Func02062438Target **pp, int unused2, int unused3) {
     int r = func_02064864();
     if (r) return r;
     (*pp)->f12 = 2;
