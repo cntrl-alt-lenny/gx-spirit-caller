@@ -6,7 +6,7 @@ typedef struct { int count; int pad; unsigned char *values; } Track;
 typedef struct { int count; Track **tracks; } Anim;
 typedef struct { int pad; signed int frame:10; signed int rest:22; } State;
 typedef struct Obj {
- void *p0; List *lists; Node *nodes; void *p0c; int matrices; signed char *indices;
+ void *p0; List *lists; Node *nodes; void *p0c; char *matrices; signed char *indices;
  char pad18[0x3c]; void (*callback)(struct Obj *,int); char pad58[8];
  unsigned int low60:4; unsigned int flag60:1; unsigned int high60:27;
  char pad64[8]; u32 mask; char pad70[12];
@@ -14,7 +14,7 @@ typedef struct Obj {
  char pad80[0x24]; Anim *anim; State *states; char padac[0x1d4]; struct M **transforms;
 } Obj;
 extern int func_0200cf88(Obj *,int);
-extern int func_0208e420(int x);
+extern void func_0208e420(void *m);
 extern void func_0208ea74(struct M *m);
 extern void func_01ff87c0(u32,void *,u32);
 extern signed char data_020b4908[];

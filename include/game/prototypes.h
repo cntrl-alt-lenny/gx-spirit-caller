@@ -1539,7 +1539,7 @@ extern void func_0208e2f4(void *, fx32, fx32);
 extern void func_0208e318(void *, int, int, int, int);
 extern int func_0208e3e8(int);
 extern int func_0208e404(int);
-extern int func_0208e420(int);
+extern void func_0208e420(void *);
 extern void func_0208e4d0(int);
 extern int func_0208e4ec(void *);
 extern int func_0208e518(void *);
