@@ -16146,3 +16146,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0204cf7c	main	776	default	factory	parked	2.6	unknown	UNCLASSIFIED:unknown	factory-1104-K8	
 0x0204cf7c	main	776	legacy	factory	parked	37.8	unknown	UNCLASSIFIED:unknown	factory-1104-K8	
 0x0200cb50	main	780	default	factory	shipped	100	n/a		factory-1104-K8	
+0x020b1964	main	792	default	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1104-K8	
