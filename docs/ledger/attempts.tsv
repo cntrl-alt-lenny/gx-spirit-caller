@@ -16171,3 +16171,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a4a94	main	216	default	factory	parked	0	structural	PROVISIONAL:structural	factory-1104-K5	
 0x020a4a94	main	216	legacy	factory	parked	3.7	structural	PROVISIONAL:structural	factory-1104-K5	
 0x020a4a94	main	216	legacy_sp3	factory	parked	7.4	structural	PROVISIONAL:structural	factory-1104-K5	
+0x0209ea24	main	220	legacy	factory	shipped	100	n/a		factory-1104-K5	
