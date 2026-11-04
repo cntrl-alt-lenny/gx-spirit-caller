@@ -11,7 +11,7 @@ typedef struct {
 extern int func_ov002_021b9aa8(int a, int b);
 extern int func_ov002_021bc618(int arg0);
 extern int func_ov002_021ca3f0(int arg0, int arg1);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 int func_ov002_0222ec50(Ov002_ec50_Self *self) {
     int r4;
@@ -34,7 +34,7 @@ int func_ov002_0222ec50(Ov002_ec50_Self *self) {
     {
         char *rowBase = data_ov002_022cf16c + (self->bit0 & 1) * 0x868;
         int *arr = (int *)(rowBase + 0x120);
-        func_ov002_0227adb8(self->bit0, (int)&arr[r4], 1, (int)self->f0 << 16);
+        func_ov002_0227adb8(self->bit0, &arr[r4], 1, (int)self->f0 << 16);
     }
     return 0;
 }

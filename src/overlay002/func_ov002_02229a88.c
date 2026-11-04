@@ -18,7 +18,7 @@ extern int func_ov002_021ff3bc(void *self);
 extern int func_ov002_0223def4(void *self, int idx);
 extern int func_ov002_021b947c(void);
 extern int func_ov002_021c33e4(int a, int b, int c);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 /* func_ov002_02229a88: gate on func_ov002_021ff3bc(self) and self's field6
  * top byte == 1; call func_ov002_0223def4(self, 0), then decode
@@ -47,7 +47,7 @@ int func_ov002_02229a88(struct Self *self) {
 
         {
             char *addr = data_ov002_022cf16c + (lo & 1) * 0x868 + 0x418 + hi16 * 4;
-            func_ov002_0227adb8(self->f2.bit0, (int)addr, 1, self->f0 << 16);
+            func_ov002_0227adb8(self->f2.bit0, addr, 1, self->f0 << 16);
         }
     }
 

@@ -32,7 +32,7 @@ extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c();
 extern void func_ov002_0226b054(int arg0);
 extern int func_ov002_0226b298(int arg0, int arg1, int arg2);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern void func_ov002_0229cf10(char *dst, const char *fmt, int val);
 int func_ov002_02225814(struct Self *self) {
     char buf[0x100];
@@ -68,7 +68,7 @@ int func_ov002_02225814(struct Self *self) {
                     func_ov002_021e13f4(player, 1, 0);
                 } else {
                     if (func_ov002_021bc618(self->bit) != 0 && func_ov002_021ca2b8(self->bit) != 0 && func_ov002_021ca440(self->bit, id) != 0) {
-                        func_ov002_0227adb8(flag, (int)(base + 0x260), 1, 0);
+                        func_ov002_0227adb8(flag, base + 0x260, 1, 0);
                     } else {
                         func_ov002_021e13f4(player, 1, 0);
                     }

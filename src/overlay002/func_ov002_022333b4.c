@@ -15,7 +15,7 @@ extern int func_ov002_022107b4(int, int, int);
 extern void func_ov002_021ae400(int, int);
 extern void func_ov002_022592ec(int);
 extern int func_ov002_022593f4(void);
-extern int func_ov002_0227adb8(int, int, int, int);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern void func_ov002_02290500(int, int, int (*)(int,int,int));
 int func_ov002_022333b4(struct node *self) {
  int v, lo, hi;
@@ -41,7 +41,7 @@ int func_ov002_022333b4(struct node *self) {
   return 0x7e;
  case 0x7e:
   if (!func_ov002_022593f4()) return 0x7f;
-  func_ov002_0227adb8(self->side,(int)&data_ov002_022cf16c[self->side & 1].cards[data_ov002_022d016c.index],1,self->id << 16);
+  func_ov002_0227adb8(self->side,&data_ov002_022cf16c[self->side & 1].cards[data_ov002_022d016c.index],1,self->id << 16);
   return 0;
  }
  return 0;

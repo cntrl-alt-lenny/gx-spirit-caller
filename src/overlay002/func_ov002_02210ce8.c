@@ -31,7 +31,7 @@ extern int func_ov002_022536e8(void *,int,int);
 extern void func_ov002_0225935c(int,int,int);
 extern int func_ov002_022593f4(void);
 extern void func_ov002_0226b22c(int,int,int,int);
-extern int func_ov002_0227adb8(int,int,int,int);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern void func_ov002_0229ce5c(char *,int,int);
 int func_ov002_02210ce8(Card *self) {
  char buf2[256],buf1[256],buf0[256];
@@ -79,7 +79,7 @@ int func_ov002_02210ce8(Card *self) {
  case 0x64:
   func_ov002_021af9d0(self->side,6,self->id,0); return 0x63;
  case 0x63:
-  func_ov002_0227adb8(self->side,(int)func_ov002_021afb74(),1,1); return 0x61;
+  func_ov002_0227adb8(self->side,func_ov002_021afb74(),1,1); return 0x61;
  case 0x61:
   if(func_ov002_0225368c(self->side,0x146e,0)<=0) return 10;
   func_ov002_021ae400(self->side,0x3c); return 0x60;

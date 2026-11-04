@@ -25,7 +25,7 @@ extern int func_ov002_021ca2b8();
 /* This caller supplies only r0-r1; remaining thunk arguments are not set. */
 extern int func_ov002_021e104c();
 extern int func_ov002_0223def4(struct Node0223def4 *self, int idx);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02233c50(Self *self) {
     int side = self->player ^ self->flip;
     int index;
@@ -38,7 +38,7 @@ int func_ov002_02233c50(Self *self) {
         if (index >= 0) {
             entry = (S021b9ba0 *)(data_ov002_022cf16c + (side & 1) * 0x868 + 0x418 + index * 4);
             if (!func_ov002_021b9ba0(entry)) return 0;
-            func_ov002_0227adb8(side, (int)entry, 1, self->field0 << 16);
+            func_ov002_0227adb8(side, entry, 1, self->field0 << 16);
         }
     }
     return 0;

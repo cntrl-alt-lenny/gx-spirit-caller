@@ -15,7 +15,7 @@ extern void func_ov002_021d87dc(int a);
 extern void func_ov002_021e13f4(int a, int b, int c);
 extern void func_ov002_021e2818(int a);
 extern void func_ov002_021e2d20(int a0, int a1, int a2);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 int func_ov002_022335d8(struct Ov002Self *self)
 {
@@ -39,7 +39,7 @@ int func_ov002_022335d8(struct Ov002Self *self)
             if (func_ov002_021bc618(self->b0) != 0
                 && ((int (*)(int))func_ov002_021ca2b8)(self->b0) != 0) {
                 func_ov002_0227adb8(self->b0,
-                    (int)(data_ov002_022cf16c + (((1 - self->b0) & 1) * 0x868) + 0x260), 1, 0);
+                    data_ov002_022cf16c + (((1 - self->b0) & 1) * 0x868) + 0x260, 1, 0);
                 goto end;
             }
             func_ov002_021e13f4(1 - self->b0, 1, 1);

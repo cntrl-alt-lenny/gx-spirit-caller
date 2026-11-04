@@ -42,7 +42,7 @@ extern int func_ov002_0223b5cc(int,int);
 extern int func_ov002_022536e8(int self, int arg1, int arg2);
 extern void func_ov002_0226b054(int);
 extern int func_ov002_0226b0d0(int,int,int);
-extern int func_ov002_0227adb8(int,int,int,int);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern void func_ov002_0229cf10(char *,const char *,int);
 int func_ov002_0223d1ec(struct Self *self,int arg1) {
  char text[256];
@@ -155,7 +155,7 @@ int func_ov002_0223d1ec(struct Self *self,int arg1) {
  }
  func_ov002_021d479c((u16)((player?0x8000:0)|0x4d),(u16)data_ov002_022ce288.id,(u16)data_ov002_022ce288.number,(u16)data_ov002_022ce288.total);
  data_ov002_022ce288.result=func_ov002_021bc6c4(player);
- func_ov002_0227adb8(player,(int)card,1,(self->id<<16)|1);
+ func_ov002_0227adb8(player,card,1,(self->id<<16)|1);
  return 0x7f;
  }
  case 0x7f:

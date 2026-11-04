@@ -12,7 +12,7 @@ extern int func_ov002_0223def4(struct Node0223def4 *, int);
 extern unsigned int func_ov002_021b947c(int);
 extern int func_ov002_021c33e4(int a,int b,int c);
 extern int func_ov002_021ca698(int arg0,int arg1);
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern void func_ov002_021d8128(int arg0,void *arg1,int arg2);
 int func_ov002_02224044(struct S021ff3bc *self, int unused) {
  switch(data_ov002_022ce288.state) {
@@ -23,7 +23,7 @@ int func_ov002_02224044(struct S021ff3bc *self, int unused) {
    int kind=(u8)((u16)word >> 8);
    int index=(u16)(word >> 16);
    if(kind==14 && func_ov002_021c33e4(self->bit0,lo,index)) {
-    func_ov002_0227adb8(self->bit0,(int)&data_ov002_022cf16c[lo & 1].cards[index],1,0);
+    func_ov002_0227adb8(self->bit0,&data_ov002_022cf16c[lo & 1].cards[index],1,0);
    }
   }
   return 0x7f;

@@ -13,7 +13,7 @@ extern int func_ov002_021bc6c4(int arg0);
 extern int func_ov002_021ca2b8();
 extern int func_ov002_021ca3f0(int arg0, int arg1);
 extern int func_ov002_021d59cc(int arg0, int arg1, int arg2, int arg3, unsigned short arg4);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02237994(struct Self *self, int arg) {
     switch (self->mode) {
     case 1: return func_ov002_02220038(self, arg);
@@ -35,7 +35,7 @@ int func_ov002_02237994(struct Self *self, int arg) {
             card.id = 0x19ed;
             card.side = self->b0;
             data_ov002_022ce288.slot = func_ov002_021bc6c4(self->b0);
-            func_ov002_0227adb8(self->b0, (int)&card, 1, (self->f0 << 16) | 1);
+            func_ov002_0227adb8(self->b0, &card, 1, (self->f0 << 16) | 1);
             return 0x7f;
             }
         }

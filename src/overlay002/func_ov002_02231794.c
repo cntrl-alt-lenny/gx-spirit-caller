@@ -28,7 +28,7 @@ extern int func_ov002_021ff46c(void *self, int arg1);
 extern int func_ov002_02290500(int a, u16 b, void *c);
 extern void func_ov002_022107b4(void);
 extern void func_ov002_022592ec(int arg0);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 int func_ov002_02231794(struct Node794 *self, int arg1) {
     int bit, field;
@@ -81,7 +81,7 @@ int func_ov002_02231794(struct Node794 *self, int arg1) {
         if (func_ov002_022593f4() == 0)
             return 0x7d;
         func_ov002_0227adb8(self->b0,
-            (int)((char *)data_ov002_022cf16c + (self->b0 & 1) * 0x868 + 0x120 + D016C->f_d78 * 4),
+            (char *)data_ov002_022cf16c + (self->b0 & 1) * 0x868 + 0x120 + D016C->f_d78 * 4,
             1, self->f0 << 16);
         return 0;
 

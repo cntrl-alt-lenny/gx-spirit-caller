@@ -17,7 +17,7 @@ extern int func_ov002_021ca2b8();
 extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_0223def4(struct Node0223def4 *self, int idx);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0221af90(struct Node0223def4 *self) {
  int n;
 
@@ -40,7 +40,7 @@ int func_ov002_0221af90(struct Node0223def4 *self) {
   func_ov002_021e2b3c((int)&data_ov002_022ce288);
   return 0x7f;
  case 0x7f:
-  { int slot=func_ov002_0223def4(self,data_ov002_022ce288.index); int card=func_ov002_021b9b64(slot); func_ov002_0227adb8(self->owner,card,1,self->kind<<16); }
+  { int slot=func_ov002_0223def4(self,data_ov002_022ce288.index); int card=func_ov002_021b9b64(slot); func_ov002_0227adb8(self->owner,(void *)card,1,self->kind<<16); }
   data_ov002_022ce288.index++;
   return data_ov002_022ce288.index<n ? 0x7f:0x7e;
  case 0x7e:

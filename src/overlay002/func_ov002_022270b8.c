@@ -16,7 +16,7 @@ extern u16 func_ov002_021b39c4(int, int, int);
 extern int func_ov002_021ff3bc(S021ff3bc *, int);
 extern int func_ov002_021b3ecc(int, int, int);
 extern int func_ov002_021bc6c4(int);
-extern int func_ov002_0227adb8(int, int, int, int);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 extern int func_ov002_021d59cc(int, int, int, int, u16);
 extern void func_ov002_021d479c(u16, u16, u16, u16);
 extern void func_ov002_021e2b3c(int);
@@ -40,7 +40,7 @@ int func_ov002_022270b8(struct Self *self, int arg) {
             if (func_ov002_021ff3bc((S021ff3bc *)self, arg) != 0) {
                 data_ov002_022ce288.flag = func_ov002_021b3ecc(side, index, 0xfb6);
                 data_ov002_022ce288.slot = func_ov002_021bc6c4(self->bit0);
-                func_ov002_0227adb8(side, (int)(data_ov002_022cf16c + (side & 1) * 0x868 + 0x30 + index * 20), 1, 0);
+                func_ov002_0227adb8(side, data_ov002_022cf16c + (side & 1) * 0x868 + 0x30 + index * 20, 1, 0);
                 return 0x7e;
             }
         }

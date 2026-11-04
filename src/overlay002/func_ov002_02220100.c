@@ -12,7 +12,7 @@ extern int func_ov002_021bcd80(int a,int b);
 extern int func_ov002_021ca2b8();
 extern int func_ov002_0225368c(int a,int b,int c);
 extern void func_ov002_0226aff0(int a,int b,int c);
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02220100(S *p) {
     switch (data_ov002_022ce288.state) {
     case 0x80:
@@ -33,7 +33,7 @@ int func_ov002_02220100(S *p) {
     case 0x7d:
         {
             int *q=func_ov002_021afb74();
-            func_ov002_0227adb8(p->side,(int)q,1,p->id<<16);
+            func_ov002_0227adb8(p->side,q,1,p->id<<16);
             return 0;
         }
     }

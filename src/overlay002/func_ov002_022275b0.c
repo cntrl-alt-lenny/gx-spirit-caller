@@ -20,7 +20,7 @@ extern int func_ov002_021d59cc(int, int, int, int, u16);
 extern u16 func_ov002_0223de94(struct node *, int);
 extern int func_ov002_0223df38(struct Node *, int, int *);
 extern int func_ov002_0225764c(int, int, int);
-extern int func_ov002_0227adb8(int, int, int, int);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_022275b0(struct Self *self) {
     switch (data_ov002_022ce288.state) {
     case 0x80: {
@@ -41,7 +41,7 @@ int func_ov002_022275b0(struct Self *self) {
                     cmd.id = 0x1608;
                     cmd.side = self->side;
                     data_ov002_022ce288.slot = func_ov002_021bc6c4(self->side);
-                    func_ov002_0227adb8(self->side, (int)&cmd, 1, (self->id << 16) | 1);
+                    func_ov002_0227adb8(self->side, &cmd, 1, (self->id << 16) | 1);
                     return 0x7f;
                 }
             }

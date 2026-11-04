@@ -10,7 +10,7 @@ extern int func_ov002_021ca2b8();
 extern int func_ov002_021ca440(int arg0, int arg1);
 extern void func_ov002_021d7970(void *arg0, int arg1, int arg2);
 extern void func_ov002_0226af94(int arg0, int arg1, int arg2);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222bda8(struct Self *self) {
     int slot;
     int card;
@@ -25,7 +25,7 @@ int func_ov002_0222bda8(struct Self *self) {
         slot = *(unsigned short *)(data_ov002_022d0e6c + 0xb0);
         card = ((struct Card *)(data_ov002_022cf16c + (self->side & 1) * 0x868 + slot * 4 + 0x120))->id;
         if (func_0202e234(card) && func_ov002_021ca440(self->side, card)) {
-            func_ov002_0227adb8(self->side, (int)(data_ov002_022cf16c + (self->side & 1) * 0x868 + 0x120 + slot * 4), 1, 0);
+            func_ov002_0227adb8(self->side, data_ov002_022cf16c + (self->side & 1) * 0x868 + 0x120 + slot * 4, 1, 0);
         } else {
             func_ov002_021d7970((void *)self->side, slot, 0);
         }

@@ -22,7 +22,7 @@ extern int func_ov002_021e286c(int arg0);
 /* Original supplies no arguments to these unused parameters. */
 extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c();
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222d6cc(struct Obj *self) {
     int i;
     switch (data_ov002_022ce288.state) {
@@ -46,7 +46,7 @@ int func_ov002_0222d6cc(struct Obj *self) {
         func_ov002_021d87dc(self->side);
         if (func_0202de9c(data_ov002_022cf16c[self->side & 1].cards[0].id) == 0 && (int)func_0202b8a8(data_ov002_022cf16c[self->side & 1].cards[0].id) <= 3) {
             if (self->count != 0 && func_ov002_021bc618(self->side) != 0) {
-                func_ov002_0227adb8(self->side, (int)&data_ov002_022cf16c[self->side & 1].cards[0], 1, self->id << 16);
+                func_ov002_0227adb8(self->side, &data_ov002_022cf16c[self->side & 1].cards[0], 1, self->id << 16);
             } else {
                 func_ov002_021e13f4(self->side, 1, 0);
             }

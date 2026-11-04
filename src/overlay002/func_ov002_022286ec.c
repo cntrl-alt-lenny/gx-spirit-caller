@@ -13,7 +13,7 @@ extern struct Slot data_ov002_022d0250[];
 extern int func_0202e234(int x);
 extern int func_ov002_021b947c(int arg0);
 extern int func_ov002_021c33e4(int a, int b, int c);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 int func_ov002_022286ec(struct Self022286ec *self) {
     int callResult;
@@ -34,7 +34,7 @@ int func_ov002_022286ec(struct Self022286ec *self) {
             if (func_ov002_021c33e4(self->b0, byte0, high16) != 0) {
                 char *rowBase = data_ov002_022cf16c + (byte0 & 1) * 0x868;
                 int *arr = (int *)(rowBase + 0x418);
-                func_ov002_0227adb8(self->b0, (int)&arr[high16], 1, (int)self->f0 << 16);
+                func_ov002_0227adb8(self->b0, &arr[high16], 1, (int)self->f0 << 16);
             }
         }
     }

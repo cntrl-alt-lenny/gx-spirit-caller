@@ -19,7 +19,7 @@ extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_0225368c(int ctx,int card_id,int arg2);
 extern int func_ov002_02257704(void *self);
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222f080(struct Self *self) {
  int n;
  switch(data_ov002_022ce288.phase) {
@@ -57,7 +57,7 @@ int func_ov002_0222f080(struct Self *self) {
  case 0x7b:
   if(self->index<data_ov002_022ce288.total) {
    u32 *p=func_ov002_021b004c(self->index+1);
-   func_ov002_0227adb8(self->side,(int)p,1,self->id<<16);
+   func_ov002_0227adb8(self->side,p,1,self->id<<16);
    self->index++;
    return 0x7b;
   }

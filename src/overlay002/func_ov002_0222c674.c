@@ -24,7 +24,7 @@ extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_0225368c(int ctx,int card_id,int arg2);
 extern void func_ov002_0226b054(int arg0);
-extern int func_ov002_0227adb8(int a,int b,int c,int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222c674(struct Self *self) {
     int state = data_ov002_022ce288.state;
     switch (state) {
@@ -49,7 +49,7 @@ int func_ov002_0222c674(struct Self *self) {
             func_ov002_021d87dc(side);
             if (func_0202e234(id) != 0 && func_020305d8(id) != 0) {
                 if (func_ov002_021bc618(self->side) != 0 && func_ov002_021ca2b8(self->side) != 0 && func_ov002_021ca440(self->side,id) != 0) {
-                    func_ov002_0227adb8(flag, (int)&row->card, 1, 0);
+                    func_ov002_0227adb8(flag, &row->card, 1, 0);
                 } else {
                     func_ov002_021e13f4(side,1,0);
                 }

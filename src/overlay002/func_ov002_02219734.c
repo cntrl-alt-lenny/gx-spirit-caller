@@ -28,7 +28,7 @@ extern void func_ov002_021e276c(int self, int a, int b, int c);
 extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);
 extern void func_ov002_0227ac64(int a, struct Record *b, int c, int d, u32 e);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02219734(struct node *self) {
  int player = (u8)func_ov002_0223de94(self, data_ov002_022ce288.index);
  int idx;
@@ -52,7 +52,7 @@ int func_ov002_02219734(struct node *self) {
       if (func_ov002_021b3e28(player, 11, self->id) >= 10) break;
       func_ov002_021e276c(player, self->id, 1, 0);
      }
-     func_ov002_0227adb8(player, (int)card, func_0203058c(card->card) != 0, self->id << 16);
+     func_ov002_0227adb8(player, card, func_0203058c(card->card) != 0, self->id << 16);
      break;
     case 0x1365:
      if (func_ov002_021c9df0(player) != 0)

@@ -26,7 +26,7 @@ extern int func_ov002_021ff3bc(S021ff3bc *p, int unused1);
 extern int func_ov002_0223f6c4(S021ff3bc *p);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern void func_ov002_0226b054(int arg0);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02232d20(S021ff3bc *self, int arg) {
     int side = self->bit0 ^ self->bit14;
     int n;
@@ -57,7 +57,7 @@ int func_ov002_02232d20(S021ff3bc *self, int arg) {
         return 0x7d;
     case 0x7d:
         if (data_ov002_022ce288.selected < self->count) {
-            func_ov002_0227adb8(side, (int)func_ov002_021b004c(data_ov002_022ce288.selected + 1), 1, self->w0 << 16);
+            func_ov002_0227adb8(side, func_ov002_021b004c(data_ov002_022ce288.selected + 1), 1, self->w0 << 16);
             data_ov002_022ce288.selected++;
             return 0x7d;
         }

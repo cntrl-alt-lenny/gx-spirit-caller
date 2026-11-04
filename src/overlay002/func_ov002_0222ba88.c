@@ -15,7 +15,7 @@ extern void func_ov002_021e2b3c();
 extern void func_ov002_021e2c5c();
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern int func_ov002_0226b194(int arg0, int arg1, int arg2);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222ba88(u16 *self) {
     int side = data_ov002_022ce288.side;
     switch (data_ov002_022ce288.mode) {
@@ -39,7 +39,7 @@ int func_ov002_0222ba88(u16 *self) {
         return 0x7d;
     case 0x7d:
         if (self[4] >= self[5]) return 0x78;
-        func_ov002_0227adb8(side, func_ov002_021b9b64(data_ov002_022d0f1c[self[4] + 1]), 1, 0);
+        func_ov002_0227adb8(side, (void *)func_ov002_021b9b64(data_ov002_022d0f1c[self[4] + 1]), 1, 0);
         self[4]++;
         return 0x7d;
     case 0x78:

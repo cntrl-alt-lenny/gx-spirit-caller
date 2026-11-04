@@ -20,7 +20,7 @@ extern char data_ov002_022cf16c[];
 extern int func_ov002_021b9aa8(int a, int b);
 extern void func_ov002_021e27c0(int a, int b);
 extern void func_ov002_0226b094(int a, int b);
-extern void func_ov002_0227adb8(int a, int *b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 
 int func_ov002_02238578(void *obj) {
     char *o = (char *)obj;

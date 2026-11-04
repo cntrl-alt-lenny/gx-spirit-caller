@@ -18,7 +18,7 @@ extern int func_ov002_021ca2b8();
 extern int func_ov002_0223def4(struct Node0223def4 *self, int idx);
 extern int func_ov002_021b947c(int value);
 extern int func_ov002_021c3608(int a, int b, int c);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_0222b0dc(struct Node0223def4 *self) {
     u32 result;
     int high;
@@ -36,7 +36,7 @@ int func_ov002_0222b0dc(struct Node0223def4 *self) {
         kind = (u8)((u16)result >> 8);
         if (kind == 15) {
             if (func_ov002_021c3608(self->player, player, index) != 0) {
-                func_ov002_0227adb8(self->player, (int)(data_ov002_022cf16c + (player & 1) * 0x868 + 0x5d0 + (u16)high * 4), 1, 0);
+                func_ov002_0227adb8(self->player, data_ov002_022cf16c + (player & 1) * 0x868 + 0x5d0 + (u16)high * 4, 1, 0);
             }
         }
     }

@@ -8,8 +8,8 @@
  *     ldmia sp!, {r3, pc}
  */
 
-extern int func_ov002_0227ac64(int a, int b, int c, int d, int e);
+extern int func_ov002_0227ac64(int side, void *p, int c, int d, int e);
 
-int func_ov002_0227adb8(int a, int b, int c, int d) {
-    return func_ov002_0227ac64(a, b, c, 2, d);
+int func_ov002_0227adb8(int side, void *p, int c, int d) {
+    return func_ov002_0227ac64(side, p, c, 2, d);
 }

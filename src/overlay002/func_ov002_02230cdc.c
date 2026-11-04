@@ -17,7 +17,7 @@ extern void func_ov002_021e2b3c(int unused0);
 extern void func_ov002_021e2c5c(int unused0);
 extern int func_ov002_0225368c(int ctx, int card_id, int arg2);
 extern void func_ov002_0226b054(int arg0);
-extern int func_ov002_0227adb8(int a, int b, int c, int d);
+extern int func_ov002_0227adb8(int side, void *p, int c, int d);
 int func_ov002_02230cdc(struct Obj *self) {
     int result, player, idx;
     switch (data_ov002_022ce288.state) {
@@ -41,7 +41,7 @@ int func_ov002_02230cdc(struct Obj *self) {
         if (!data_ov002_022d016c.flag) return 125;
         player = self->player;
         idx = func_ov002_021ba294(player, self->id);
-        func_ov002_0227adb8(player, (int)(data_ov002_022cf16c + (player & 1) * 0x868 + 0x260 + idx * 4), 1, 0);
+        func_ov002_0227adb8(player, data_ov002_022cf16c + (player & 1) * 0x868 + 0x260 + idx * 4, 1, 0);
         return 127;
     case 125:
         result = func_ov002_021e286c(self->player);
