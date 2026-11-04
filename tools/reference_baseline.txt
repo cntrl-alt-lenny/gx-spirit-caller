@@ -393,8 +393,6 @@ eur	src/main/func_02006a38.s	missing-reloc	.text+0xd0 original ABS32 data_02104f
 eur	src/main/func_02006a38.s	missing-reloc	.text+0xd4 original ABS32 data_020c3e84+0x0 built none
 eur	src/main/func_020071c4.c	wrong-target	.text+0x50 original ABS32 data_02104f1c+0x0 built ABS32 data_02104f1c_alias+0x0
 eur	src/main/func_0200ac60.s	missing-reloc	.text+0xa4 original ABS32 data_02186a58+0x0 built none
-eur	src/main/func_0200cb50.s	missing-reloc	.text+0x1d8 original PC24 .text-0x8 built none
-eur	src/main/func_0200cb50.s	missing-reloc	.text+0x2e0 original PC24 .text-0x8 built none
 eur	src/main/func_020119f4.c	wrong-target	.text+0x18 original ABS32 data_020b52d4+0x0 built ABS32 data_020b52d0+0x4
 eur	src/main/func_02011a14.c	wrong-target	.text+0x20 original ABS32 data_020b52d6+0x0 built ABS32 data_020b52d0+0x6
 eur	src/main/func_02011a7c.c	wrong-target	.text+0x14 original ABS32 data_020b52d8+0x0 built ABS32 data_020b52d0+0x8
