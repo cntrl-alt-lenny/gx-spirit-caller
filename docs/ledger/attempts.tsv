@@ -16187,3 +16187,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0206cb6c	main	336	default	factory	parked	8.3	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x0206cb6c	main	336	legacy	factory	parked	17.9	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
 0x0206cb6c	main	336	legacy_sp3	factory	parked	17.1	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x02063034	main	340	legacy_sp3	factory	shipped	100	n/a		factory-1104-K4	
+0x02063034	main	340	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1104-K4	
