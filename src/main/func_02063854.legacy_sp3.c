@@ -15,7 +15,7 @@ struct F020639a0 {
 };
 extern void func_020639a0(struct F020639a0 *self);
 extern int func_020639c8(void *self);
-extern int func_02063ae0(Obj_02063ae0_t *a, int b, int c, unsigned char *d, int arg5, int *out);
+extern int func_02063ae0(Obj_02063ae0_t *a, int b, int c, void *d, int arg5, int *out);
 extern int func_02063ca4(void *a0, int a1, void *a2, int a3);
 extern int func_0206429c(void *self, int value);
 extern int func_020643ac(void *self);
