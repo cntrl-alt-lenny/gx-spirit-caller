@@ -16133,3 +16133,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a7d0c	main	736	default	factory	parked	15.4	register-numbering-permutation-cascade	P-30	factory-1104-K8	
 0x020a7d0c	main	736	legacy	factory	parked	4.2	register-numbering-permutation-cascade	P-30	factory-1104-K8	
 0x020a7d0c	main	736	legacy_sp3	factory	parked	4.2	register-numbering-permutation-cascade	P-30	factory-1104-K8	
+0x020ad688	main	740	default	factory	parked	6.8	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K8	
+0x020ad688	main	740	legacy	factory	parked	2.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K8	
+0x020ad688	main	740	legacy_sp3	factory	parked	2.1	frame-shape	PROVISIONAL:frame/epilogue	factory-1104-K8	
