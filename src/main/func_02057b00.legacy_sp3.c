@@ -1,4 +1,4 @@
-extern int func_020453cc(int x, int y);
+extern void *func_020453cc(void *p, int size);
 /* Original caller supplies the socket although the C callee ignores it. */
 extern void *func_02054bfc();
 extern int func_02054d4c(int unused0, int unused1, int unused2, int unused3);
@@ -22,7 +22,7 @@ int func_02057b00(int *ctx, int sock, struct Buffer *buf, int *out, int *done, c
     do {
         if (used + 0x800 > size) {
             size = used + 0x800;
-            data = (char *)func_020453cc((int)data, size + 1);
+            data = func_020453cc(data, size + 1);
             if (!data) {
                 func_0205ffc0(ctx, data_02100154);
                 return 1;

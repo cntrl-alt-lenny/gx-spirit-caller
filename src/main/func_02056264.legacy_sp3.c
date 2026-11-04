@@ -4,7 +4,7 @@ typedef struct Session { char pad[0x1d4]; int sock, state; RecvBuffer recv; int 
 typedef struct Owner Owner;
 typedef struct Root2 Root2;
 typedef struct Node2 Node2;
-extern int func_020453cc(int x, int y);
+extern void *func_020453cc(void *p, int size);
 extern void func_02055324(void *p);
 extern int func_02056d1c(int *ctx, unsigned char *line);
 extern int func_02057980(void *ctx, int sock, SendBuffer *buf, int *out, int compact, char *name);
@@ -53,7 +53,7 @@ int func_02056264(int *ctx) {
                 unsigned char *newbuf;
                 if (growth < 0x800) growth = 0x800;
                 s->capacity += growth;
-                newbuf = (unsigned char *)func_020453cc((int)s->line, s->capacity + 1);
+                newbuf = func_020453cc(s->line, s->capacity + 1);
                 if (newbuf == 0) {
                     func_0205ffc0(ctx, data_020ffe98);
                     return 1;
