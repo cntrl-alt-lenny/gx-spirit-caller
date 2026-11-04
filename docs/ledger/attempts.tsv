@@ -16146,3 +16146,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020930b0	main	176	legacy_sp3	factory	parked	18.2	unknown	UNCLASSIFIED:unknown	factory-1103-K5	
 0x02090330	main	128	legacy	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-K5	
 0x020a5a94	main	176	legacy	factory	shipped	100	n/a		factory-1104-K5	
+0x0209240c	main	180	legacy	factory	shipped	100	n/a		factory-1104-K5	
+0x0209240c	main	180	legacy_sp3	factory	parked	4.4	unknown	UNCLASSIFIED:unknown	factory-1104-K5	
+0x0209240c	main	180	default	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1104-K5	
