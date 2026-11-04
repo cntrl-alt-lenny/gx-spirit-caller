@@ -10,13 +10,13 @@
  *  .L_02062914: .word func_020628b0
  */
 
-extern int func_020628b0(int a, int b, unsigned short c);
+extern int func_020628b0(void *self, int b, unsigned short c);
 
 typedef struct {
     int            f_0;
     unsigned short h_4;
     char           _pad6[0x2];
-    int            f_8;
+    void          *f_8;
 } state_020628fc_t;
 
 int func_020628fc(state_020628fc_t *p) {

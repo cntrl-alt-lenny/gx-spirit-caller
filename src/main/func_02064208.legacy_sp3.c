@@ -6,10 +6,10 @@ typedef struct {
 } obj_02064208_t;
 
 extern int func_02054140(void *p);
-extern int func_02061798(void *self, int arg1, int arg2, int arg3, int arg4);
-extern int func_02061b60(void *self, int a, int b, int c);
+extern int func_02061798(void *self, int arg1, void *arg2, int arg3, int arg4);
+extern int func_02061b60(void *self, void *a, int b, int c);
 
-int func_02064208(obj_02064208_t *o, int a, int b) {
+int func_02064208(obj_02064208_t *o, void *a, int b) {
     if (o->state != 5 && o->state != 6) {
         return 1;
     }

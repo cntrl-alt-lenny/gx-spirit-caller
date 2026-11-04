@@ -9,15 +9,15 @@ struct Obj {
 };
 extern int data_02101530;
 extern int *func_02064d10(void *p, int a, short b);
-extern int func_02061670(Obj *self, int *other, int a, int b, int c, int d, int e, int mode);
-extern int func_02061578(Obj *self, int a, int b, int c, int d, int *out);
+extern int func_02061670(Obj *self, int *other, int a, int b, int c, void *d, int e, int mode);
+extern int func_02061578(Obj *self, int a, int b, void *c, int d, int *out);
 extern int func_02062438(Obj *a, int **pp, int b, int c);
-extern int func_020628b0(int a, int b, short c);
+extern int func_020628b0(void *self, int b, short c);
 extern int func_020628fc(int *p);
-extern int func_02064208(int *o, int a, int b);
+extern int func_02064208(int *o, void *a, int b);
 /* original passes only the first argument; no parameter list on purpose */
 extern int func_020643d8();
-extern int func_02063854(int *self, int type, int data, int len);
+extern int func_02063854(int *self, int type, unsigned char *data, int len);
 extern int func_02063548(int *o, int kind, unsigned char *p, int len);
 extern int func_020a7440(void *a, void *b, int n);
 
@@ -30,7 +30,7 @@ int func_02063288(Obj *self, unsigned char *data, int len, int a, short b) {
 
     entry = func_02064d10(self, a, b);
     if (self->f2c != 0) {
-        if (func_02061670(self, entry, a, b, 0, (int)data, len, 0) == 0) {
+        if (func_02061670(self, entry, a, b, 0, data, len, 0) == 0) {
             return 0;
         }
     }
@@ -40,7 +40,7 @@ int func_02063288(Obj *self, unsigned char *data, int len, int a, short b) {
         flag = 0;
     }
     if (entry == 0) {
-        if (func_02061578(self, a, b, (int)data, len, &out) == 0) {
+        if (func_02061578(self, a, b, data, len, &out) == 0) {
             return 0;
         }
         if (out != 0) {
@@ -48,7 +48,7 @@ int func_02063288(Obj *self, unsigned char *data, int len, int a, short b) {
         }
         if (flag == 0 || data[2] != 1) {
             if (flag == 0 || data[2] != 0x68) {
-                if (func_020628b0((int)self, a, b) == 0) {
+                if (func_020628b0(self, a, b) == 0) {
                     return 0;
                 }
             }
@@ -61,7 +61,7 @@ int func_02063288(Obj *self, unsigned char *data, int len, int a, short b) {
             int r = func_02062438(self, &entry, a, b);
             if (r != 0) {
                 if (r != 5) {
-                    if (func_020628b0((int)self, a, b) == 0) {
+                    if (func_020628b0(self, a, b) == 0) {
                         return 0;
                     }
                 }
@@ -86,7 +86,7 @@ int func_02063288(Obj *self, unsigned char *data, int len, int a, short b) {
         }
     }
     if (flag == 0) {
-        if (func_02064208(e, (int)data, len) != 0) return 1;
+        if (func_02064208(e, data, len) != 0) return 1;
         return 0;
     }
     kind = data[2];
@@ -95,7 +95,7 @@ int func_02063288(Obj *self, unsigned char *data, int len, int a, short b) {
         return 0;
     }
     if (kind < 8) {
-        if (func_02063854(e, kind, (int)data, len) != 0) return 1;
+        if (func_02063854(e, kind, data, len) != 0) return 1;
         return 0;
     }
     if (func_02063548(e, kind, data, len) != 0) return 1;
