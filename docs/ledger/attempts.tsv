@@ -16196,3 +16196,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02019940	main	280	default	factory	parked	81.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K3	
 0x02019940	main	280	legacy	factory	parked	8.4	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K3	
 0x02019940	main	280	legacy_sp3	factory	parked	8.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1104-K3	
+0x0200962c	main	288	default	factory	shipped	100	n/a		factory-1104-K3	
+0x0200962c	main	288	legacy	factory	parked	79.7	unknown	UNCLASSIFIED:unknown	factory-1104-K3	
+0x0200962c	main	288	legacy_sp3	factory	parked	87.7	unknown	UNCLASSIFIED:unknown	factory-1104-K3	
