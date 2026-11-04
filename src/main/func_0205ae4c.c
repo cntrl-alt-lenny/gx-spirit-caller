@@ -21,8 +21,8 @@
 
 extern int func_02058070(void *ctx, void *buf, char *s);
 
-int func_0205ae4c(char **a, char *b, char *c) {
-    char *base = *a;          /* kept in a callee-saved reg across both calls */
+int func_0205ae4c(void *a, char *b, char *c) {
+    char *base = *(char **)a;        /* kept in a callee-saved reg across both calls */
     int r = func_02058070(a, base + 0x450, b);
     if (r != 0) return r;
     r = func_02058070(a, base + 0x450, c);

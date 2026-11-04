@@ -21,8 +21,8 @@
 
 extern int func_02058070(void *ctx, void *buf, char *s);
 
-int func_0205ae8c(char **a, char *b, char *c) {
-    char *base = *a;
+int func_0205ae8c(void *a, char *b, char *c) {
+    char *base = *(char **)a;
     int r = func_02058070(a, base + 0x440, b);
     if (r != 0) return r;
     r = func_02058070(a, base + 0x440, c);

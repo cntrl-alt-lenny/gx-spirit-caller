@@ -8,7 +8,7 @@ typedef struct {
     void *list;
 } obj_0206371c_t;
 
-extern void *func_020644a4(int p1, int zero);
+extern unsigned int func_020644a4(unsigned char *data, int offset);
 extern int func_020643d8(void *self);
 extern int func_02054140(void *p);
 extern void *func_020540d0(char *s, int index);
@@ -22,11 +22,11 @@ int func_0206371c(obj_0206371c_t *o, unsigned char *p, int len) {
     int n;
     int i;
 
-    lo = (unsigned int)func_020644a4((int)p, 0);
+    lo = func_020644a4(p, 0);
     if (len == 2) {
         hi = lo;
     } else if (len == 4) {
-        hi = (unsigned int)func_020644a4((int)p, 2);
+        hi = func_020644a4(p, 2);
     } else {
         return func_020643d8(o) != 0;
     }

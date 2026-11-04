@@ -21,7 +21,7 @@ extern int func_0206429c(void *self, int value);
 extern int func_020643ac(void *self);
 extern int func_020643d8(void *self, int unused1, unsigned char *unused2, int d);
 extern int func_02064480(int a, int b);
-extern int func_020644a4(unsigned char *data, int offset);
+extern unsigned int func_020644a4(unsigned char *data, int offset);
 
 int func_02063854(Obj_02063ae0_t *self, int type, unsigned char *data, int len) {
     int seq;
