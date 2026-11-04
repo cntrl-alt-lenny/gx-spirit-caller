@@ -16249,3 +16249,5 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02064dfc	main	392	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1104-K4	
 0x020667e8	main	476	legacy_sp3	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1104-K4	
 0x0207b250	main	440	legacy	fastmatch-100-but-reference-check-wrong-target	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1104-K4	
+0x02069720	main	476	default	factory	parked	5	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
+0x02069720	main	476	legacy_sp3	factory	parked	9.2	reg-alloc	PROVISIONAL:register-allocation	factory-1104-K4	
