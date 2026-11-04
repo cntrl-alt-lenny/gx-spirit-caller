@@ -325,7 +325,7 @@ src/overlay004/func_ov004_021d12b0.c:
     complete
     .text start:0x021d12b0 end:0x021d1308
 
-src/overlay004/func_ov004_021d1308.s:
+src/overlay004/func_ov004_021d1308.c:
     complete
     .text start:0x021d1308 end:0x021d1360
 
@@ -892,7 +892,7 @@ src/overlay004/func_ov004_021db860.c:
     complete
     .text start:0x021db860 end:0x021db874
 
-src/overlay004/func_ov004_021db874.s:
+src/overlay004/func_ov004_021db874.c:
     complete
     .text start:0x021db874 end:0x021db994
 
