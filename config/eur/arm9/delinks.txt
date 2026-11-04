@@ -19738,7 +19738,7 @@ src/main/func_020b044c.c:
     complete
     .text start:0x020b044c end:0x020b048c
 
-src/main/func_020b048c.s:
+src/main/func_020b048c.c:
     complete
     .text start:0x020b048c end:0x020b0558
 
