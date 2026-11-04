@@ -16141,3 +16141,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a3190	main	172	legacy	factory	parked	15.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
 0x020a3190	main	172	legacy_sp3	factory	parked	37.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1103-K5	
 0x020a6924	main	172	legacy	factory	shipped	100	n/a		factory-1103-K5	
+0x020930b0	main	176	default	factory	parked	6.8	unknown	UNCLASSIFIED:unknown	factory-1103-K5	
+0x020930b0	main	176	legacy	factory	parked	20.4	unknown	UNCLASSIFIED:unknown	factory-1103-K5	
+0x020930b0	main	176	legacy_sp3	factory	parked	18.2	unknown	UNCLASSIFIED:unknown	factory-1103-K5	
