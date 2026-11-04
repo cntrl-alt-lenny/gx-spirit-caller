@@ -1,75 +1,69 @@
 # Review: callee-param-retype
 
-Verifier review of `221656316` (PR 1666) against `origin/main`
-(`8f29ff66e`), read blind from the diff before the summary.
+Verifier review of PR 1666, read blind from the diff against `origin/main`
+(`8f29ff66e`).
 
-## Verdict
+## Round 1 (`221656316`): FIX FIRST
 
-**FIX FIRST.** No ROM risk: all three regions rebuild byte-identical. But the
-batch retyped two caller definitions and left their 42 call sites with the
-same `(int)` casts this batch exists to remove, behind externs that now
-disagree with those definitions. A short fix in the same batch.
+- **SHOULD FIX 1:** `func_0205ae4c`/`func_0205ae8c` definitions retyped,
+  but `func_0205a18c`/`func_0205a974` externs and `prototypes.h` were left
+  `int`, with 42 `(int)` casts at the calls.
+- **SHOULD FIX 2:** `prototypes.h` still had `func_0206ee18(int, …)`.
+- **NOTEs:** pointer externs over unchanged `int` definitions one level down
+  (`func_0206d148`, `func_020453fc`, `func_02061798`, `func_02061b60`,
+  `func_02063ae0`, `func_02063ca4`, `func_020643d8`, `func_02060cbc`
+  signedness); `func_020644a4` extern returned `int`.
+- Otherwise sound: all retyped callees consistent, 7 of 8 empty-parens
+  externs gone (508 → 416 in `src/`), no `volatile`/`#pragma`/`asm`
+  added, 11 files at `-w all` showed no new implicit conversions. Gate
+  passed at `221656316` (three SHA1 PASS, `GATE EXIT 0`).
 
-## Findings
+## Re-review (`e24c72bed`): MERGE
 
-**SHOULD FIX 1: `func_0205ae4c`/`func_0205ae8c` half-retyped.**
-`src/main/func_0205ae4c.c:24` and `src/main/func_0205ae8c.c:24` are now
-`int (char **a, char *b, char *c)`, but `src/main/func_0205a18c.legacy_sp3.c:4-5`
-and `src/main/func_0205a974.legacy_sp3.c:1-2` still declare
-`(int *a, int b, int c)` and `include/game/prototypes.h:1088-1089`
-`(void *, int, int)`. The 42 calls (22 in `func_0205a18c`, 20 in
-`func_0205a974`) still pass `(int)data_…, (int)buf`. The summary does not
-mention them. Retype both externs and `prototypes.h`, drop the casts, re-gate.
+Read every hunk of `221656316..e24c72bed` (30 files) and re-ran the
+declaration-consistency script over `src/`, `include/` and `libs/`.
 
-**SHOULD FIX 2: `func_0206ee18` prototype stale.**
-`src/main/func_0206ee18.legacy.c:3` is now `void (void *a0, …)`;
-`include/game/prototypes.h:1249` still says `(int, int, int, int)`.
+- **SHOULD FIX 1: resolved.** Definitions are `(void *a, char *b, char *c)`;
+  both externs and `prototypes.h:1088-1089` match; no `(int)` casts remain
+  into either (script: 0).
+- **SHOULD FIX 2: resolved** (`prototypes.h:1249`).
+- **One level down: resolved** except `func_020643d8`. Definitions now take
+  pointers: receive chain `func_0206d148` → `func_0206d0b0` →
+  `func_0206ceb8` (request record) / `func_0206cfa0` (+ `func_0206cd64`'s
+  record), `func_020453fc` (allocator hook typedefs too), `func_02063ca4`
+  and its handlers, `func_02061798`, `func_02061b60`, `func_02061c5c`,
+  `func_02063ae0`; `func_02060cbc` uses plain `char`. `func_020644a4`
+  returns `unsigned int` in all four declarations.
+- **NOTE (`func_020643d8`, revert 1):** the arity reason is real;
+  `func_020640c0` sets r1 for this call, so a one-parameter prototype
+  changes its code. Still left: the definition (`func_020643d8.c:5`) and
+  `prototypes.h:1136` take `int a` for the object pointer, and
+  `func_02063ed0.legacy_sp3.c:28-30` still passes `(int)self` through an
+  empty-parens extern. Typing `a` as `void *` while keeping four
+  parameters was not tried. Disclosed as a follow-up.
+- **NOTE (`func_020643ec`, revert 2):** the reason is real. Its second and
+  third parameters are small integers (callers pass 1, 2, 4, 6, 7 or 0/1), typed
+  `void *` on `main` so that `func_02063620`'s
+  `state == 6 ? (void *)0 : (void *)1` matches. That fit predates the
+  batch. The batch changed only its local extern of `func_02061c5c`, so
+  the third slot now agrees with the definition's `void *b`.
+- Remaining declaration differences are struct-name views or predate the
+  batch (`func_020628b0` short/int, `func_0206ee18`'s `int (void)` view,
+  `func_020580a0`, `func_02094688`).
 
-**NOTE (one level down):** retyped callers now declare pointer parameters
-that the unchanged definitions take as `int`: `func_0206d148`
-(`func_0206d1f0.legacy.c:7`), `func_020453fc` (`func_02045470.legacy_sp3.c:13`),
-`func_02061798`/`func_02061b60` (`func_02064208.legacy_sp3.c:9-10`),
-`func_02063ae0`/`func_02063ca4`/`func_020643d8` (`func_02063854.legacy_sp3.c:18-22`).
-Before the batch these externs matched their definitions. Disclosed as
-follow-ups; fine as long as that batch is queued. Also
-`func_02060c9c.legacy_sp3.c:14` declares `func_02060cbc` with `char *`;
-the definition uses `signed char *`.
+## Evidence
 
-**NOTE (claim):** the summary says `func_020644a4`'s local extern now matches
-its definition; `func_02063854.legacy_sp3.c:24` returns `int`, the
-definition `unsigned int`. Parameters do match.
-
-**NOTE (`func_020643d8`):** the reason holds. The definition forwards its
-fourth argument (r3) to `func_020643ec`, so it truly reads four registers,
-while callers pass one, two or four arguments. No single prototype fits.
-Not tested: whether `func_02063288.legacy_sp3.c:19` could take the 1-arg
-`(void *self)` view that four sibling callers already use.
-
-Checked and sound: every other retyped callee's definition agrees with all
-of its declarations in `src/`, `include/`, `libs/` (script over all
-three; USA/JPN ports use other names). Assert signature matches its format
-string. Seven of the review's eight empty-parens externs are gone (grep).
-No `(int)` pointer casts remain into any other retyped callee; the six left
-are value casts (`(int)self->f0 << 16`). The diff adds no `volatile`,
-`#pragma` or `asm`. All 69 hunks that are not pure cast/extern edits were
-read: local, field and parameter retypes, thunk arity cuts and one added
-argument (`func_0208e420.c:9`, `GX_SendFifo48B(m, (void *)0x4000400)`,
-the SDK signature). 11 touched files compiled at `-w all` against
-`origin/main` show only new "result of function call is not used" and
-unused-argument warnings, no implicit conversions. Counts re-derived: empty-parens externs
-508 → 416; `(int)` removed 363, added 4.
-
-## Evidence (at `221656316`)
+At `35062767a`, the merge of `e24c72bed` with round 1's review.
+`git diff e24c72bed 35062767a -- src include libs config tools` is empty.
 
 ```text
 $ python tools/gate3.py --scope all --log <log>          (exit 0)
-$ grep -nE "SHA1 (PASS|FAIL)|INFRASTRUCTURE|CLEAN-FAIL|SKIP|GATE [A-Z]+|[0-9]+ (passed|failed)" <log>
-24481:[eur] SHA1 PASS
-50079:[usa] SHA1 PASS
-75678:[jpn] SHA1 PASS
-75718:1328 passed, 17 skipped, 132 subtests passed in 30.09s
-75721:==================== GATE PASS ====================
-75722:gate3: GATE EXIT 0
+1075:[eur] SHA1 PASS
+1202:[usa] SHA1 PASS
+1329:[jpn] SHA1 PASS
+1369:1328 passed, 17 skipped, 132 subtests passed in 28.94s
+1372:==================== GATE PASS ====================
+1373:gate3: GATE EXIT 0
 $ python tools/check_match_invariants.py --version eur  (exit 1 = warnings only)
 Found 13999 issue(s): 0 error(s), 13999 warning(s).
 $ python tools/check_fake_matches.py                     (exit 0)
@@ -79,6 +73,3 @@ check_delink_dupes: OK (81 delinks.txt, no duplicate .text addresses)
 $ python tools/fw.py check                               (exit 0)
 0 error(s), 16 warning(s)    (the standing word-count warnings)
 ```
-
-The invariant warnings are the standing placeholder-name class; the
-touched names (`func_02058070`, `func_0205ae4c`, …) were already in it.
