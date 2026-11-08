@@ -17454,3 +17454,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02202f78	ov002	252	default	factory	shipped	100	n/a		factory-1108-M5	
 0x02202f78	ov002	252	legacy	factory	parked	5	unknown	UNCLASSIFIED:unknown	factory-1108-M5	
 0x02202f78	ov002	252	legacy_sp3	factory	parked	5.6	unknown	UNCLASSIFIED:unknown	factory-1108-M5	
+0x021d9778	ov002	176	default	factory	parked	97.7	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
+0x021d9778	ov002	176	legacy	factory	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
+0x021d9778	ov002	176	legacy_sp3	factory	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
