@@ -10722,7 +10722,7 @@ src/main/func_02061018.legacy_sp3.c:
     complete
     .text start:0x02061018 end:0x02061150
 
-src/main/func_02061150.s:
+src/main/func_02061150.legacy_sp3.c:
     complete
     .text start:0x02061150 end:0x02061290
 
