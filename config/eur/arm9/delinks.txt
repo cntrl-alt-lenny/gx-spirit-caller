@@ -1613,7 +1613,7 @@ src/main/func_0200c078.c:
     complete
     .text start:0x0200c078 end:0x0200c0e4
 
-src/main/func_0200c0e4.s:
+src/main/func_0200c0e4.c:
     complete
     .text start:0x0200c0e4 end:0x0200c23c
 
