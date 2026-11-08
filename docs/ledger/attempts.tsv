@@ -17439,3 +17439,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6924	main	172	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
 0x022a096c	ov002	344	default	factory	shipped	100	n/a		factory-1108-M6	
 0x022938fc	ov002	352	default	factory	shipped	100	n/a		factory-1108-M6	
+0x0223c72c	ov002	492	default	factory	shipped	100	n/a		factory-1108-M6	
