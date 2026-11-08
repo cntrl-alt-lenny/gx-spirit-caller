@@ -17451,3 +17451,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020ac37c	main	224	default	factory	parked	94.6	structural	PROVISIONAL:structural	factory-1108-M4	
 0x020ac37c	main	224	legacy	factory	parked	48.3	structural	PROVISIONAL:structural	factory-1108-M4	
 0x020ac37c	main	224	legacy_sp3	factory	parked	49.1	structural	PROVISIONAL:structural	factory-1108-M4	
+0x0209d4ec	main	112	default	factory	parked	25	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M4	
+0x0209d4ec	main	112	legacy	factory	parked	92.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M4	
+0x0209d4ec	main	112	legacy_sp3	factory	parked	25	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M4	
