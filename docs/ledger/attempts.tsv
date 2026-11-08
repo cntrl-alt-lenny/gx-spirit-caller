@@ -17438,3 +17438,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6514	main	236	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
 0x020a6924	main	172	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
 0x021c9dd4	ov004	280	default	factory	shipped	100	n/a		factory-1108-M7	
+0x021cd0dc	ov011	180	default	factory	parked	38.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M7	
+0x021cd0dc	ov011	180	legacy	factory	parked	30.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M7	
+0x021cd0dc	ov011	180	legacy_sp3	factory	parked	33.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M7	
