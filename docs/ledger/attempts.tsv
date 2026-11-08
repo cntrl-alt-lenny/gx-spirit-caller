@@ -17447,3 +17447,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020aadf8	main	200	default	factory	parked	96	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
 0x020aadf8	main	200	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
 0x020aadf8	main	200	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
+0x020b007c	main	188	default	factory	shipped	100	n/a		factory-1108-M4	
