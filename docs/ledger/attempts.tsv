@@ -17437,3 +17437,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207f05c	main	220	legacy_sp3	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
 0x020a6514	main	236	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
 0x020a6924	main	172	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
+0x02023f7c	main	112	default	factory	parked	92.9	structural	PROVISIONAL:structural	factory-1108-M2	
+0x02023f7c	main	112	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1108-M2	
+0x02023f7c	main	112	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1108-M2	
