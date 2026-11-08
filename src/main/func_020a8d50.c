@@ -2,6 +2,8 @@
 typedef unsigned char u8;
 typedef struct { u8 pad, sign, precision, alternate, length, conversion; int width, limit; } Format;
 extern char data_02102a94[];
+extern char data_02102a98[];
+extern char data_02102a9c[];
 extern char *Strchr(char *, int);
 extern int func_020aaddc(const char *);
 extern char *func_020a7530(char *, char **, Format *);
@@ -82,10 +84,10 @@ int func_020a8d50(int (*write)(void *, const char *, int), void *context, char *
         case 's':
             if (f.length == 5) {
                 const unsigned short *s = ARG(const unsigned short *);
-                if ((int)func_020a72f0(buffer, s ? s : (const unsigned short *)(data_02102a94 + 4), 512) < 0) goto invalid;
+                if ((int)func_020a72f0(buffer, s ? s : (const unsigned short *)(data_02102a98), 512) < 0) goto invalid;
                 text = buffer;
             } else { text = ARG(char *); }
-            if (!text) text = data_02102a94 + 8;
+            if (!text) text = data_02102a9c;
             if (f.alternate) {
                 size = (unsigned char)*text++;
                 if (f.precision && size > f.limit) size = f.limit;

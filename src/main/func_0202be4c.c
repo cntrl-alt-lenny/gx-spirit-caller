@@ -10,6 +10,7 @@ extern int func_02038ad4(strm_t *strm, void *buf, int len);
 extern int func_02097ff0(int *self);
 extern void func_020928e8(void *buf, int len);
 extern unsigned char data_020c6a9c[];
+extern unsigned char data_020c6aa0[];
 extern unsigned char data_02105eb8[];
 void *func_0202be4c(int id) {
     unsigned char strm[0x48];
@@ -23,7 +24,7 @@ void *func_0202be4c(int id) {
     off = index * 0x434;
     size = index > 0 ? 0x434 : 0x640;
     func_02098388((Obj_t *)strm);
-    func_02098038(strm, data_020c6a9c + 4);
+    func_02098038(strm, data_020c6aa0);
     buf = (void *)Task_PostLocked((void *)size, 4, 0);
     func_02097ea4((obj_t *)strm, off + base, 0);
     func_02038ad4((strm_t *)strm, buf, size);

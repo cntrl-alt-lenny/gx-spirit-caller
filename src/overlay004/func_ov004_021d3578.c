@@ -16,6 +16,7 @@ extern state_t data_02102c90;
 extern Settings data_02104f4c;
 extern short data_020bef80[];
 extern triple_020822a0_t data_ov004_02200e00[];
+extern triple_020822a0_t data_ov004_02200e18;
 extern triple_020822c8_t data_ov004_02200de8;
 extern struct Mtx33 data_021a1974;
 extern Render data_021a18b8;
@@ -91,7 +92,7 @@ int func_ov004_021d3578(void) {
     if (v < 0) v = -v;
     if (v > 32) v = 32;
     func_ov004_021d03ec(data_020bef80[((v << 9) >> 4) * 2]);
-    a = data_ov004_02200e00[2];
+    a = data_ov004_02200e18;
     b = data_ov004_02200de8;
     MTX_Identity33_(&m);
     MI_Copy36B(&m,&data_021a1974);

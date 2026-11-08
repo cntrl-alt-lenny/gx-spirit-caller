@@ -7,8 +7,9 @@ typedef struct {
 extern void func_0207850c(Ctx *c, unsigned char *data, unsigned int len);
 extern void func_02078d30(void *a, void *b, int n);
 extern unsigned char data_021020b4[];
+extern unsigned char data_021020b5[];
 
 void func_0207845c(Ctx *c, void *out) {
-    func_0207850c(c, data_021020b4 + 1, 0x2c);
+    func_0207850c(c, data_021020b5, 0x2c);
     func_02078d30(out, c, 0x14);
 }

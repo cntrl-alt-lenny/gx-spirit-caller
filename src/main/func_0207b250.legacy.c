@@ -21,6 +21,8 @@ typedef struct {
 } GxState;
 extern GxState *data_021a088c;
 extern unsigned char data_020bee6c[];
+extern unsigned char data_020bee7c[];
+extern unsigned char data_020bee84[];
 extern unsigned int func_0207b548(unsigned int flags);
 extern unsigned short func_0207b18c(int x);
 extern unsigned short func_0209e308(void);
@@ -38,12 +40,12 @@ void func_0207b250(char *a, unsigned char *b,unsigned int c) {
     data_021a088c->f2290 = v;
     data_021a088c->f2298 = (data_021a088c->f2264 & 0x300000) != 0x300000;
     if (a == 0) {
-        func_02094688(data_020bee6c + 0x10, data_021a088c->mac, 6);
+        func_02094688(data_020bee7c, data_021a088c->mac, 6);
     } else {
         func_02094688(a, data_021a088c->mac, 6);
     }
-    if (b == 0 || b == data_020bee6c + 0x18) {
-        func_02094688(data_020bee6c + 0x18, data_021a088c->name, 0x20);
+    if (b == 0 || b == data_020bee84) {
+        func_02094688(data_020bee84, data_021a088c->name, 0x20);
         data_021a088c->f229a = 0;
     } else {
         int i;

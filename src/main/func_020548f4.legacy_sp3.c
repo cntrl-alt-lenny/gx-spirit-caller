@@ -1,5 +1,8 @@
 extern void func_02054a30(char *src, unsigned char *dst, int len);
 extern signed char data_020bece4[];
+extern signed char data_020bed50[];
+extern signed char data_020bed54[];
+extern signed char data_020bed58[];
 
 void func_020548f4(char *src, signed char *dst, int len, int mode) {
     signed char *table;
@@ -8,9 +11,9 @@ void func_020548f4(char *src, signed char *dst, int len, int mode) {
     signed char *end;
     int value;
     switch (mode) {
-    case 1: table = data_020bece4 + 0x6c; break;
-    case 2: table = data_020bece4 + 0x70; break;
-    default: table = data_020bece4 + 0x74; break;
+    case 1: table = data_020bed50; break;
+    case 2: table = data_020bed54; break;
+    default: table = data_020bed58; break;
     }
     while (remaining > 0) {
         func_02054a30(src, (unsigned char *)dst, len >= 3 ? 3 : len);

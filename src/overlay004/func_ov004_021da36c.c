@@ -26,6 +26,7 @@ extern char data_ov004_0220b500[];
 extern signed char data_ov004_0220a1b4[],data_ov004_0220a1c8[],data_ov004_0220a1e0[],data_ov004_0220a1f4[],data_ov004_0220a20c[],data_ov004_0220a22c[],data_ov004_0220a240[];
 extern char data_ov004_022105d8[];
 extern int data_ov004_02200e00[];
+extern int data_ov004_02200ec8[];
 void func_ov004_021da36c(void) {
     char *self = data_ov004_0220b500;
     char a[0x28];
@@ -112,7 +113,7 @@ void func_ov004_021da36c(void) {
     func_ov004_021da874(0);
     { u32 layers=(*(volatile u32 *)0x04001000 & 0x1f00)>>8; *(volatile u32 *)0x04001000=(*(volatile u32 *)0x04001000 & ~0x1f00) | ((layers | 0xc)<<8); }
     for(i=0;i<4;i++) {
-        func_ov004_021d9fc4(i+6,func_0202c0c0(((int *)((char *)data_ov004_02200e00+0xc8))[i]+0x3b6),0x80);
+        func_ov004_021d9fc4(i+6,func_0202c0c0(data_ov004_02200ec8[i]+0x3b6),0x80);
     }
     h=func_02006c0c(data_ov004_0220a22c,4,0);
     func_0201d47c((Obj *)d);

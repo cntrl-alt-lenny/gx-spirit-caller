@@ -7,6 +7,7 @@ extern void func_ov000_021af4d8(int, int, int);
 extern void func_ov000_021af560(int, int, int);
 extern unsigned char data_ov011_021d3060[];
 extern unsigned char data_ov011_021d3138[];
+extern unsigned char data_ov011_021d3177[];
 struct S {
     char pad0[0x268];
     unsigned int a : 5;
@@ -35,7 +36,7 @@ void func_ov011_021cabbc(int a, int show) {
         }
         return;
     }
-    c = (data_ov011_021d3138 + 0x3f + (s->nib << 4))[s->e];
+    c = (data_ov011_021d3177 + (s->nib << 4))[s->e];
     if (c == 0x32) {
         if (func_0201a3ec() != 0 || func_0201b6e4(0x73) != 0) c = 0x41;
         else if (func_0201a498() != 0 || func_0201b6e4(0x74) != 0) c = 0x39;

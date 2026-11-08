@@ -13,6 +13,9 @@ struct Ctx {
 extern void func_02084e0c(int cmd,void *src,int n);
 extern void func_020947b8(void *dst);
 extern u8 data_020bef5c[][4];
+extern u8 data_020bef5d[][4];
+extern u8 data_020bef5e[][4];
+extern u8 data_020bef5f[][4];
 void func_02083dd8(struct Ctx *c,int mode)
 {
  int id = c->pc[1];
@@ -69,11 +72,11 @@ void func_02083dd8(struct Ctx *c,int mode)
      mat->m[axis]=(*h&0x100)?-0x1000:0x1000;
      p+=2;
      mat->m[data_020bef5c[axis][0]]=x;
-     mat->m[data_020bef5c[axis][1]]=y;
+     mat->m[data_020bef5d[axis][0]]=y;
      if(*h&0x200) y=-y;
-     mat->m[data_020bef5c[axis][2]]=y;
+     mat->m[data_020bef5e[axis][0]]=y;
      if(*h&0x400) x=-x;
-     mat->m[data_020bef5c[axis][3]]=x;
+     mat->m[data_020bef5f[axis][0]]=x;
     } else {
      mat->m[0]=((short *)h)[1];
      mat->m[1]=p[0];mat->m[2]=p[1];mat->m[3]=p[2];mat->m[4]=p[3];mat->m[5]=p[4];mat->m[6]=p[5];mat->m[7]=p[6];mat->m[8]=p[7];p+=8;
