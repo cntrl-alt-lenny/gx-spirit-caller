@@ -43,9 +43,14 @@ byte-identity rests on the driver and Brain's gate.
 The gate on 5245c7d47 passed SHA-1 in all three regions, but the reference
 check reported 16 NEW relocation differences in 10 new `.c` files: the same
 ones main had baselined for their `.s` files. Re-keying them broke CI's
-baselines-only-shrink rule, so Brain fixed the cause at d27ee158c instead.
-Nine files now declare and use the exact symbol the original relocation
-names, rather than a neighbour plus an offset, and each still fastmatches
-100%. `func_02024574` matched only through a hard-coded `(Pool *)0x0219a8ec`
-cast; with the real symbol it drops to 20.7%, so it is reverted to `.s` and
-ledgered parked. The reference baseline now only shrinks (16 lines removed).
+baselines-only-shrink rule, so Brain fixed the cause instead. Five files
+(func_020548f4, func_0207b250, func_02083dd8, func_ov004_021d3578,
+func_ov004_021da36c) now use the exact symbol the original relocation names,
+still 100%. Five were reverted to `.s` and ledgered parked:
+
+- func_02024574 matched only through a hard-coded `(Pool *)0x0219a8ec` cast
+  (20.7% with the real symbol).
+- func_0202be4c, func_0207845c, func_020a8d50 and func_ov011_021cabbc need
+  symbols that symbols.txt names but no object defines, so the link failed.
+
+The reference baseline now only shrinks.
