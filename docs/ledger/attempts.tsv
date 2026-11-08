@@ -17440,3 +17440,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02090048	main	88	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M3	
 0x02090048	main	88	legacy	factory	parked	95.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M3	
 0x02090048	main	88	legacy_sp3	factory	parked	54.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M3	
+0x0208d204	main	184	legacy	factory	shipped	100	n/a		factory-1108-M3	
+0x0208d204	main	184	default	factory	parked	13	unknown	UNCLASSIFIED:unknown	factory-1108-M3	
+0x0208d204	main	184	legacy_sp3	factory	parked	73.9	unknown	UNCLASSIFIED:unknown	factory-1108-M3	
