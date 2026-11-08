@@ -17438,3 +17438,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020a6514	main	236	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
 0x020a6924	main	172	legacy	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1103-integration	
 0x021da36c	ov004	1244	default	factory	shipped	100	n/a		factory-1108-M14	
+0x021cada4	ov011	1140	default	factory	parked	99.7	asm-int	PROVISIONAL:inline-asm	factory-1108-M14	
+0x021cada4	ov011	1140	legacy	factory	parked	4.9	asm-int	PROVISIONAL:inline-asm	factory-1108-M14	
+0x021cada4	ov011	1140	legacy_sp3	factory	parked	4.6	asm-int	PROVISIONAL:inline-asm	factory-1108-M14	
