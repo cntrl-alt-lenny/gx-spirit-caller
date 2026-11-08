@@ -17520,3 +17520,27 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0209c0dc	main	256	default	factory	parked	21.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
 0x0209c0dc	main	256	legacy	factory	parked	92.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
 0x0209c0dc	main	256	legacy_sp3	factory	parked	54.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
+0x021efd78	ov002	204	default	factory	shipped	100	n/a		factory-1108-M5	
+0x021eb704	ov002	180	default	factory	shipped	100	n/a		factory-1108-M5	
+0x021edc38	ov002	176	default	factory	shipped	100	n/a		factory-1108-M5	
+0x02214738	ov002	284	default	factory	shipped	100	n/a		factory-1108-M5	
+0x02214738	ov002	284	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1108-M5	
+0x02214738	ov002	284	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1108-M5	
+0x02200084	ov002	60	default	factory	parked	80	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
+0x02200084	ov002	60	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
+0x02200084	ov002	60	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
+0x021f2628	ov002	232	default	factory	shipped	100	n/a		factory-1108-M5	
+0x021ec1a4	ov002	488	default	factory	shipped	100	n/a		factory-1108-M5	
+0x021ec1a4	ov002	488	legacy	factory	parked	5.2	unknown	UNCLASSIFIED:unknown	factory-1108-M5	
+0x021ec1a4	ov002	488	legacy_sp3	factory	parked	13.7	unknown	UNCLASSIFIED:unknown	factory-1108-M5	
+0x02214e58	ov002	368	default	factory	shipped	100	n/a		factory-1108-M5	
+0x02202f78	ov002	252	default	factory	shipped	100	n/a		factory-1108-M5	
+0x02202f78	ov002	252	legacy	factory	parked	5	unknown	UNCLASSIFIED:unknown	factory-1108-M5	
+0x02202f78	ov002	252	legacy_sp3	factory	parked	5.6	unknown	UNCLASSIFIED:unknown	factory-1108-M5	
+0x021d9778	ov002	176	default	factory	parked	97.7	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
+0x021d9778	ov002	176	legacy	factory	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
+0x021d9778	ov002	176	legacy_sp3	factory	parked	2.1	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M5	
+0x021eba34	ov002	152	default	factory	shipped	100	n/a		factory-1108-M5	
+0x021f1fe8	ov002	128	default	factory	parked	96.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M5	
+0x021f1fe8	ov002	128	legacy	factory	parked	9.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M5	
+0x021f1fe8	ov002	128	legacy_sp3	factory	parked	9.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M5	
