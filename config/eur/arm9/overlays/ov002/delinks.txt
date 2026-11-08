@@ -13484,7 +13484,7 @@ libs/nitro/func_ov002_022ab3e0.legacy.c:
     complete
     .text start:0x022ab3e0 end:0x022ab3e4
 
-src/overlay002/func_ov002_022ab3e4.s:
+src/overlay002/func_ov002_022ab3e4.c:
     complete
     .text start:0x022ab3e4 end:0x022abf88
 
@@ -13637,7 +13637,7 @@ src/overlay002/func_ov002_022b0444.c:
     complete
     .text start:0x022b0444 end:0x022b0484
 
-src/overlay002/func_ov002_022b0484.s:
+src/overlay002/func_ov002_022b0484.c:
     complete
     .text start:0x022b0484 end:0x022b13ec
 
