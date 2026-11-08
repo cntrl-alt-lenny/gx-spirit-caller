@@ -17457,3 +17457,20 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201f874	main	224	default	factory	parked	94.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M1	
 0x0201f874	main	224	legacy	factory	parked	6.2	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M1	
 0x0201f874	main	224	legacy_sp3	factory	parked	6.6	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M1	
+0x02023f7c	main	112	default	factory	parked	92.9	structural	PROVISIONAL:structural	factory-1108-M2	
+0x02023f7c	main	112	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1108-M2	
+0x02023f7c	main	112	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1108-M2	
+0x02024574	main	116	default	factory	shipped	100	n/a		factory-1108-M2	
+0x02024574	main	116	legacy_sp3	factory	parked	21.9	unknown	UNCLASSIFIED:unknown	factory-1108-M2	
+0x02024574	main	116	legacy	factory	parked	20.6	unknown	UNCLASSIFIED:unknown	factory-1108-M2	
+0x020234f8	main	124	default	factory	parked	77.4	structural	PROVISIONAL:structural	factory-1108-M2	
+0x020234f8	main	124	legacy	factory	parked	13.9	structural	PROVISIONAL:structural	factory-1108-M2	
+0x020234f8	main	124	legacy_sp3	factory	parked	14.7	structural	PROVISIONAL:structural	factory-1108-M2	
+0x02024024	main	124	default	factory	parked	38.7	structural	PROVISIONAL:structural	factory-1108-M2	
+0x02024024	main	124	legacy	factory	parked	19.4	structural	PROVISIONAL:structural	factory-1108-M2	
+0x02024024	main	124	legacy_sp3	factory	parked	20.6	structural	PROVISIONAL:structural	factory-1108-M2	
+0x0202abdc	main	272	default	factory	shipped	100	n/a		factory-1108-M2	
+0x0202be4c	main	176	default	factory	shipped	100	n/a		factory-1108-M2	
+0x0202c0c0	main	236	default	factory	parked	93.2	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M2	
+0x0202c0c0	main	236	legacy	factory	parked	9.8	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M2	
+0x0202c0c0	main	236	legacy_sp3	factory	parked	89.8	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M2	
