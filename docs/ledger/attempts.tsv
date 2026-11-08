@@ -17777,3 +17777,4 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021cb49c	ov012	2584	default	factory	parked	96.4	asm-int	PROVISIONAL:inline-asm	factory-1108-M16	
 0x021cb49c	ov012	2584	legacy	factory	parked	0.9	asm-int	PROVISIONAL:inline-asm	factory-1108-M16	
 0x021cb49c	ov012	2584	legacy_sp3	factory	parked	0.9	asm-int	PROVISIONAL:inline-asm	factory-1108-M16	
+0x02045d0c	main	892	legacy_sp3	matches-only-with-unjustified-volatile	parked	unknown	tool-anomaly	UNCLASSIFIED:tool-anomaly	factory-1108-integration	
