@@ -17500,3 +17500,23 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0207fda4	main	260	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M3	
 0x0207fda4	main	260	legacy	factory	parked	10.3	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M3	
 0x0207fda4	main	260	legacy_sp3	factory	parked	93.8	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M3	
+0x020b0f60	main	384	default	factory	parked	99	unknown	UNCLASSIFIED:unknown	factory-1108-M4	
+0x020b0f60	main	384	legacy	factory	parked	18.4	unknown	UNCLASSIFIED:unknown	factory-1108-M4	
+0x020b0f60	main	384	legacy_sp3	factory	parked	18.8	unknown	UNCLASSIFIED:unknown	factory-1108-M4	
+0x020a97b8	main	348	default	factory	parked	97.8	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1108-M4	
+0x020a97b8	main	348	legacy	factory	parked	5.4	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1108-M4	
+0x020a97b8	main	348	legacy_sp3	factory	parked	49.4	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1108-M4	
+0x020a2100	main	220	legacy	factory	shipped	100	n/a		factory-1108-M4	
+0x020aadf8	main	200	default	factory	parked	96	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
+0x020aadf8	main	200	legacy	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
+0x020aadf8	main	200	legacy_sp3	factory	parked	0	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
+0x020b007c	main	188	default	factory	shipped	100	n/a		factory-1108-M4	
+0x020ac37c	main	224	default	factory	parked	94.6	structural	PROVISIONAL:structural	factory-1108-M4	
+0x020ac37c	main	224	legacy	factory	parked	48.3	structural	PROVISIONAL:structural	factory-1108-M4	
+0x020ac37c	main	224	legacy_sp3	factory	parked	49.1	structural	PROVISIONAL:structural	factory-1108-M4	
+0x0209d4ec	main	112	default	factory	parked	25	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M4	
+0x0209d4ec	main	112	legacy	factory	parked	92.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M4	
+0x0209d4ec	main	112	legacy_sp3	factory	parked	25	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M4	
+0x0209c0dc	main	256	default	factory	parked	21.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
+0x0209c0dc	main	256	legacy	factory	parked	92.2	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
+0x0209c0dc	main	256	legacy_sp3	factory	parked	54.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M4	
