@@ -17567,3 +17567,32 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02233778	ov002	312	default	factory	parked	93.6	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
 0x02233778	ov002	312	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
 0x02233778	ov002	312	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x021c9dd4	ov004	280	default	factory	shipped	100	n/a		factory-1108-M7	
+0x021cd0dc	ov011	180	default	factory	parked	38.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M7	
+0x021cd0dc	ov011	180	legacy	factory	parked	30.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M7	
+0x021cd0dc	ov011	180	legacy_sp3	factory	parked	33.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M7	
+0x021d2c64	ov011	40	default	factory	parked	90	structural	PROVISIONAL:structural	factory-1108-M7	
+0x021d2c64	ov011	40	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1108-M7	
+0x021d2c64	ov011	40	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1108-M7	
+0x021ca9e8	ov011	276	default	factory	parked	98.5	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021ca9e8	ov011	276	legacy	factory	parked	2.9	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021ca9e8	ov011	276	legacy_sp3	factory	parked	2.9	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021d07b0	ov011	212	default	factory	parked	98.1	structural	PROVISIONAL:structural	factory-1108-M7	
+0x021d07b0	ov011	212	legacy	factory	parked	0	structural	PROVISIONAL:structural	factory-1108-M7	
+0x021d07b0	ov011	212	legacy_sp3	factory	parked	0	structural	PROVISIONAL:structural	factory-1108-M7	
+0x021d0884	ov011	152	default	factory	parked	97.4	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021d0884	ov011	152	legacy	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021d0884	ov011	152	legacy_sp3	factory	parked	0	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021cc7bc	ov004	448	default	factory	parked	97.3	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M7	
+0x021cc7bc	ov004	448	legacy	factory	parked	13.8	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M7	
+0x021cc7bc	ov004	448	legacy_sp3	factory	parked	33.3	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M7	
+0x021d62b8	ov004	204	default	factory	parked	68.6	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M7	
+0x021d62b8	ov004	204	legacy	factory	parked	69.2	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M7	
+0x021d62b8	ov004	204	legacy_sp3	factory	parked	96.1	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M7	
+0x021cabbc	ov011	304	default	factory	shipped	100	n/a		factory-1108-M7	
+0x021c9e98	ov011	420	default	factory	parked	95.2	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021c9e98	ov011	420	legacy	factory	parked	10.7	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021c9e98	ov011	420	legacy_sp3	factory	parked	34.2	asm-int	PROVISIONAL:inline-asm	factory-1108-M7	
+0x021d4e0c	ov004	504	default	factory	shipped	100	n/a		factory-1108-M7	
+0x021d4e0c	ov004	504	legacy	factory	parked	3.9	unknown	UNCLASSIFIED:unknown	factory-1108-M7	
+0x021d4e0c	ov004	504	legacy_sp3	factory	parked	3.9	unknown	UNCLASSIFIED:unknown	factory-1108-M7	
