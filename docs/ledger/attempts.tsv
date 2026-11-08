@@ -17440,3 +17440,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x020b0f60	main	384	default	factory	parked	99	unknown	UNCLASSIFIED:unknown	factory-1108-M4	
 0x020b0f60	main	384	legacy	factory	parked	18.4	unknown	UNCLASSIFIED:unknown	factory-1108-M4	
 0x020b0f60	main	384	legacy_sp3	factory	parked	18.8	unknown	UNCLASSIFIED:unknown	factory-1108-M4	
+0x020a97b8	main	348	default	factory	parked	97.8	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1108-M4	
+0x020a97b8	main	348	legacy	factory	parked	5.4	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1108-M4	
+0x020a97b8	main	348	legacy_sp3	factory	parked	49.4	epilogue-shape	PROVISIONAL:frame/epilogue	factory-1108-M4	
