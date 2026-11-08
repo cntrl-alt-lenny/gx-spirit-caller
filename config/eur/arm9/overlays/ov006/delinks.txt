@@ -1795,7 +1795,7 @@ src/overlay006/ov006_021c757c.c:
 
 
 
-src/overlay006/func_ov006_021c7584.s:
+src/overlay006/func_ov006_021c7584.c:
     complete
     .text start:0x021c7584 end:0x021c7964
 
