@@ -46,7 +46,7 @@ src/overlay012/func_ov012_021ca3fc.c:
 src/overlay012/func_ov012_021ca450.s:
     complete
     .text start:0x021ca450 end:0x021ca6dc
-src/overlay012/func_ov012_021ca6dc.s:
+src/overlay012/func_ov012_021ca6dc.c:
     complete
     .text start:0x021ca6dc end:0x021ca814
 
