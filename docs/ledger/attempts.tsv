@@ -17442,3 +17442,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021c46a8	ov002	1524	legacy_sp3	factory	parked	3	unknown	UNCLASSIFIED:unknown	factory-1108-M13	
 0x021ea390	ov002	1880	default	factory	shipped	100	n/a		factory-1108-M13	
 0x021c8e38	ov002	1204	default	factory	shipped	100	n/a		factory-1108-M13	
+0x021c84f0	ov002	1104	default	factory	shipped	100	n/a		factory-1108-M13	
+0x021c84f0	ov002	1104	legacy	factory	parked	7.1	unknown	UNCLASSIFIED:unknown	factory-1108-M13	
+0x021c84f0	ov002	1104	legacy_sp3	factory	parked	13	unknown	UNCLASSIFIED:unknown	factory-1108-M13	
