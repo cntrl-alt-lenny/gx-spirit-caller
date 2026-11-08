@@ -17447,3 +17447,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201b82c	main	888	legacy	factory	parked	13.9	asm-int	PROVISIONAL:inline-asm	factory-1108-M9	
 0x0201b82c	main	888	legacy_sp3	factory	parked	15.3	asm-int	PROVISIONAL:inline-asm	factory-1108-M9	
 0x02045d0c	main	892	legacy_sp3	factory	shipped	100	n/a		factory-1108-M9	
+0x020ad438	main	592	default	factory	parked	98.7	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M9	
+0x020ad438	main	592	legacy	factory	parked	1.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M9	
+0x020ad438	main	592	legacy_sp3	factory	parked	1.3	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M9	
