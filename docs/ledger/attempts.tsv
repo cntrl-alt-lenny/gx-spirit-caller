@@ -17440,3 +17440,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0201c6a0	main	764	default	factory	parked	99.5	unknown	UNCLASSIFIED:unknown	factory-1108-M9	
 0x0201c6a0	main	764	legacy	factory	parked	1	unknown	UNCLASSIFIED:unknown	factory-1108-M9	
 0x0201c6a0	main	764	legacy_sp3	factory	parked	1	unknown	UNCLASSIFIED:unknown	factory-1108-M9	
+0x0206627c	main	868	default	factory	parked	0	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M9	
+0x0206627c	main	868	legacy	factory	parked	6.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M9	
+0x0206627c	main	868	legacy_sp3	factory	parked	99.5	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M9	
