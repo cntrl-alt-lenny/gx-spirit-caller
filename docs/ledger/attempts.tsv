@@ -17443,3 +17443,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x02024574	main	116	default	factory	shipped	100	n/a		factory-1108-M2	
 0x02024574	main	116	legacy_sp3	factory	parked	21.9	unknown	UNCLASSIFIED:unknown	factory-1108-M2	
 0x02024574	main	116	legacy	factory	parked	20.6	unknown	UNCLASSIFIED:unknown	factory-1108-M2	
+0x020234f8	main	124	default	factory	parked	77.4	structural	PROVISIONAL:structural	factory-1108-M2	
+0x020234f8	main	124	legacy	factory	parked	13.9	structural	PROVISIONAL:structural	factory-1108-M2	
+0x020234f8	main	124	legacy_sp3	factory	parked	14.7	structural	PROVISIONAL:structural	factory-1108-M2	
