@@ -17544,3 +17544,26 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x021f1fe8	ov002	128	default	factory	parked	96.9	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M5	
 0x021f1fe8	ov002	128	legacy	factory	parked	9.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M5	
 0x021f1fe8	ov002	128	legacy_sp3	factory	parked	9.1	instruction-selection	PROVISIONAL:instruction-selection	factory-1108-M5	
+0x022a096c	ov002	344	default	factory	shipped	100	n/a		factory-1108-M6	
+0x022938fc	ov002	352	default	factory	shipped	100	n/a		factory-1108-M6	
+0x0223c72c	ov002	492	default	factory	shipped	100	n/a		factory-1108-M6	
+0x02250044	ov002	496	default	factory	shipped	100	n/a		factory-1108-M6	
+0x02222cac	ov002	332	default	factory	parked	97.6	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x02222cac	ov002	332	legacy	factory	parked	6.1	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x02222cac	ov002	332	legacy_sp3	factory	parked	19.8	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x02235b74	ov002	460	default	factory	shipped	100	n/a		factory-1108-M6	
+0x02235b74	ov002	460	legacy	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1108-M6	
+0x02235b74	ov002	460	legacy_sp3	factory	parked	0	unknown	UNCLASSIFIED:unknown	factory-1108-M6	
+0x0222e5e4	ov002	316	default	factory	parked	96.2	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x0222e5e4	ov002	316	legacy	factory	parked	3.5	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x0222e5e4	ov002	316	legacy_sp3	factory	parked	67.1	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x022565c4	ov002	348	default	factory	shipped	100	n/a		factory-1108-M6	
+0x022565c4	ov002	348	legacy	factory	parked	1.1	unknown	UNCLASSIFIED:unknown	factory-1108-M6	
+0x022565c4	ov002	348	legacy_sp3	factory	parked	1.1	unknown	UNCLASSIFIED:unknown	factory-1108-M6	
+0x0223cfec	ov002	344	default	factory	parked	95.3	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x0223cfec	ov002	344	legacy	factory	parked	6.6	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x0223cfec	ov002	344	legacy_sp3	factory	parked	52.3	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x0222a268	ov002	376	default	factory	shipped	100	n/a		factory-1108-M6	
+0x02233778	ov002	312	default	factory	parked	93.6	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x02233778	ov002	312	legacy	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
+0x02233778	ov002	312	legacy_sp3	factory	parked	0	reg-alloc	PROVISIONAL:register-allocation	factory-1108-M6	
