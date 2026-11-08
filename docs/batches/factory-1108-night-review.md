@@ -40,11 +40,12 @@ byte-identity rests on the driver and Brain's gate.
 
 ## Brain note after review
 
-The gate on 5245c7d47 passed SHA-1 for all three regions and pytest, but the
-reference check reported 16 NEW lines on 10 of the new `.c` files. They are
-the relocation differences main already carried for those functions' `.s`
-files: same kinds, offsets and symbols, except func_02024574's missing-reloc
-moving from `.text+0x70` (old `.s` line) to `.text+0x6c`. func_ov002_021c8e38's
-line is gone for good. Brain re-keyed the 16 lines to the `.c` paths (17
-deleted, 16 added, net -1) at cd33b6fc6; no new defect is admitted, and the
-inherited symbol-attribution defects stay listed for a follow-up.
+The gate on 5245c7d47 passed SHA-1 in all three regions, but the reference
+check reported 16 NEW relocation differences in 10 new `.c` files: the same
+ones main had baselined for their `.s` files. Re-keying them broke CI's
+baselines-only-shrink rule, so Brain fixed the cause at d27ee158c instead.
+Nine files now declare and use the exact symbol the original relocation
+names, rather than a neighbour plus an offset, and each still fastmatches
+100%. `func_02024574` matched only through a hard-coded `(Pool *)0x0219a8ec`
+cast; with the real symbol it drops to 20.7%, so it is reverted to `.s` and
+ledgered parked. The reference baseline now only shrinks (16 lines removed).
