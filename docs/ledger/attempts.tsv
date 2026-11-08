@@ -17445,3 +17445,6 @@ addr	module	text_size	tier	shape	result	match_pct	park_class	park_family	brief	a
 0x0208d204	main	184	legacy_sp3	factory	parked	73.9	unknown	UNCLASSIFIED:unknown	factory-1108-M3	
 0x0207845c	main	60	legacy	factory	shipped	100	n/a		factory-1108-M3	
 0x0207b250	main	440	legacy	factory	shipped	100	n/a		factory-1108-M3	
+0x0206cb6c	main	336	default	factory	parked	6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M3	
+0x0206cb6c	main	336	legacy	factory	parked	97.6	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M3	
+0x0206cb6c	main	336	legacy_sp3	factory	parked	92.9	reg-alloc-instr-scheduling	PROVISIONAL:register-allocation+scheduling	factory-1108-M3	
